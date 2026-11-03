@@ -1,0 +1,232 @@
+import java.io.*;
+import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.*;
+
+/**
+ * Generates tests/Nro.Tests/Helpers/util-differential.json: extra reference vectors (beyond tests/golden/util-pure.json) produced by the REAL JDK 17 for the number
+ * formatting and random-number code that Util.java relies on. Run with: java -Dfile.encoding=UTF-8 UtilDifferentialGenerator.java <output.json> (UTF-8 is needed: the source contains Vietnamese letters)
+ * The formatting bodies below are copied from Utils/Util.java (formatNumber, numberToMoney, roundToTwoDecimals, convertMillisecondsDouble, format).
+ */
+public class UtilDifferentialGenerator {
+    static final Locale VI = new Locale("vi", "VN");
+
+    enum FormatStyle { VIETNAMESE, KMB }
+
+    static String formatNumber(double power, FormatStyle style) {
+        DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(VI);
+        df.setGroupingUsed(true);
+        df.setMaximumFractionDigits(1);
+        df.setMinimumFractionDigits(0);
+        df.setRoundingMode(RoundingMode.DOWN);
+        String suffix = "";
+        if (Double.isInfinite(power) && power > 0) return null; // the Java loop never ends for +Infinity
+        while (power >= 1_000_000_000) { power /= 1_000_000_000; suffix = (style == FormatStyle.KMB ? "B" : "Tỷ") + suffix; }
+        while (power >= 1_000_000) { power /= 1_000_000; suffix = (style == FormatStyle.KMB ? "M" : "Triệu") + suffix; }
+        while (power >= 1_000) { power /= 1_000; suffix = (style == FormatStyle.KMB ? "K" : "Nghìn") + suffix; }
+        return df.format(power) + (suffix.isEmpty() ? "" : " " + suffix);
+    }
+
+    static String numberToMoney(long power) {
+        NumberFormat num = NumberFormat.getInstance(VI);
+        num.setMaximumFractionDigits(1);
+        if (power >= 1000000000) return num.format((double) power / 1000000000) + " Tỷ";
+        else if (power >= 1000000) return num.format((double) power / 1000000) + " Tr";
+        else if (power >= 1000) return num.format((double) power / 1000) + " k";
+        else return num.format(power);
+    }
+
+    static String roundToTwoDecimals(double num) {
+        double roundedNumber = Math.round(num * 100.0) / 100.0;
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+        return decimalFormat.format(roundedNumber);
+    }
+
+    static String convertMillisecondsDouble(long milliseconds) {
+        double seconds = (double) milliseconds / 1000;
+        return String.format("%.2f", seconds).replace('.', ',');
+    }
+
+    static String esc(String s) {
+        StringBuilder sb = new StringBuilder("\"");
+        for (char c : s.toCharArray()) {
+            if (c == '"' || c == '\\') sb.append('\\').append(c);
+            else if (c < 0x20 || c > 0x7e) sb.append(String.format("\\u%04x", (int) c));
+            else sb.append(c);
+        }
+        return sb.append('"').toString();
+    }
+
+    static List<Double> doubles(Random r) {
+        List<Double> ds = new ArrayList<>();
+        double[] specials = {0.0, -0.0, 1, -1, 0.5, 1.5, 2.5, -2.5, 0.05, 0.15, 0.25, 0.35, 0.45, 0.95, 0.005, 0.0005, 0.0015, 0.0025, 1.005, 2.675, 0.125, 0.135,
+            999.95, 999.99, 9.99999999E8, 1.0E9, 1.0E12, 1.0E15, 1.0E17, 1.0E18, 1.0E19, 1.0E21, 1.0E22, 1.0E23, 1.0E30, 1.0E300, Double.MAX_VALUE, Double.MIN_VALUE,
+            Double.MIN_NORMAL, 4.35, 0.285, 1.45, 1.35, 1.25, 12.345, 1234.5678, 9007199254740992.0, 9007199254740993.0, 9223372036854775807.0, 4.611686018427388E18,
+            1.5372286728091293E17, 0.1 + 0.2, 100.0 / 3, 2.0 / 3, 1.0E-5, 1.0E-7, 123456789.125, 0.045, 0.095, 0.0095, 0.00095, 5.0E-4, 5.0E-5, 99.995, 0.994999999, Double.NaN,
+            Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        for (double d : specials) ds.add(d);
+        for (int i = 0; i < 1500; i++) {
+            double d;
+            switch (i % 9) {
+                case 0: d = r.nextInt(2_000_000) / Math.pow(10, r.nextInt(5)); break;
+                case 1: d = (r.nextInt(100_000) + 0.5) / Math.pow(10, r.nextInt(4)); break;
+                case 2: d = (r.nextInt(1_000_000) + 0.25 * r.nextInt(4)) / Math.pow(2, r.nextInt(4)); break;
+                case 3: d = Double.longBitsToDouble(r.nextLong()); if (Double.isNaN(d) || Double.isInfinite(d)) d = 1.0; break;
+                case 4: d = r.nextDouble() * Math.pow(10, r.nextInt(30) - 12); break;
+                case 5: d = (double) (r.nextLong() >> r.nextInt(50)); break;
+                case 6: d = Math.pow(2, r.nextInt(120) - 20) * (r.nextBoolean() ? 1 : 1.5); break;
+                case 7: d = (double) Math.abs(r.nextLong() >> r.nextInt(60)) / (r.nextBoolean() ? 1000 : r.nextBoolean() ? 1000000 : 60); break;
+                default: d = Math.nextUp(Math.pow(10, r.nextInt(25) - 5) * (1 + r.nextInt(9))); break;
+            }
+            if (r.nextInt(4) == 0) d = -d;
+            ds.add(d);
+        }
+        return ds;
+    }
+
+    static List<Long> longs(Random r) {
+        List<Long> ls = new ArrayList<>();
+        long[] specials = {0, 1, 999, 1000, 1001, 1250, 1350, 1450, 1500, 9999, 12345, 999999, 1000000, 1250000, 1550000, 999999999, 1000000000L, 2500000000L, 123456789012L,
+            Long.MAX_VALUE, Long.MIN_VALUE, -1, -999, -1500, 1049, 1050, 1051, 1149, 1150, 1151, 1250000000L, 1250000001L, 1349999999L, 1350000000L, 1450000000L};
+        for (long l : specials) ls.add(l);
+        for (int i = 0; i < 1500; i++) {
+            long l = r.nextLong() >> r.nextInt(64);
+            if (i % 5 == 0) l = (long) r.nextInt(100) * (long) Math.pow(10, r.nextInt(12)) + (r.nextInt(2) == 0 ? 0 : 50 * (long) Math.pow(10, r.nextInt(8)));
+            ls.add(l);
+        }
+        return ls;
+    }
+
+    public static void main(String[] args) throws Exception {
+        Random r = new Random(20261103L);
+        StringBuilder sb = new StringBuilder("{\n");
+        sb.append("\"meta\": {\"jdk\": ").append(esc(System.getProperty("java.version"))).append(", \"defaultLocale\": ").append(esc(Locale.getDefault().toString())).append("},\n");
+
+        List<Double> ds = doubles(r);
+        List<Long> ls = longs(r);
+
+        sb.append("\"formatNumber\": [\n");
+        boolean first = true;
+        for (double d : ds) for (FormatStyle st : FormatStyle.values()) {
+            String res = formatNumber(d, st);
+            if (res == null) continue;
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("[").append(esc(Double.toString(d))).append(",").append(esc(st.name())).append(",").append(esc(res)).append("]");
+        }
+        sb.append("\n],\n");
+
+        sb.append("\"numberToMoney\": [\n");
+        first = true;
+        for (long l : ls) {
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("[").append(esc(Long.toString(l))).append(",").append(esc(numberToMoney(l))).append("]");
+        }
+        sb.append("\n],\n");
+
+        sb.append("\"formatDouble\": [\n");
+        first = true;
+        for (double d : ds) {
+            NumberFormat n3 = NumberFormat.getInstance(VI);
+            NumberFormat n1 = NumberFormat.getInstance(VI);
+            n1.setMaximumFractionDigits(1);
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("[").append(esc(Double.toString(d))).append(",").append(esc(n3.format(d))).append(",").append(esc(n1.format(d))).append("]");
+        }
+        sb.append("\n],\n");
+
+        sb.append("\"formatLong\": [\n");
+        first = true;
+        for (long l : ls) {
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("[").append(esc(Long.toString(l))).append(",").append(esc(NumberFormat.getInstance(VI).format(l))).append("]");
+        }
+        sb.append("\n],\n");
+
+        sb.append("\"roundToTwoDecimals\": [\n");
+        first = true;
+        for (double d : ds) {
+            Locale.setDefault(Locale.US);
+            String en = roundToTwoDecimals(d);
+            Locale.setDefault(VI);
+            String vi = roundToTwoDecimals(d);
+            Locale.setDefault(Locale.US);
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("[").append(esc(Double.toString(d))).append(",").append(esc(en)).append(",").append(esc(vi)).append("]");
+        }
+        sb.append("\n],\n");
+
+        sb.append("\"fixed2\": [\n");
+        first = true;
+        for (double d : ds) {
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("[").append(esc(Double.toString(d))).append(",").append(esc(String.format(Locale.US, "%.2f", d))).append("]");
+        }
+        sb.append("\n],\n");
+
+        sb.append("\"convertMillisecondsDouble\": [\n");
+        first = true;
+        for (long l : ls) {
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("[").append(esc(Long.toString(l))).append(",").append(esc(convertMillisecondsDouble(l))).append("]");
+        }
+        sb.append("\n],\n");
+
+        // java.util.Random scripts. op codes: I = nextInt(), B = nextInt(bound), L = nextLong(bound), D = nextDouble(bound), F = nextFloat(bound)
+        sb.append("\"random\": [\n");
+        long[] seeds = {0L, 1L, 42L, -1L, 123456789L, Long.MAX_VALUE, Long.MIN_VALUE, 20261103L};
+        first = true;
+        for (long seed : seeds) {
+            Random rnd = new Random(seed);
+            Random pick = new Random(seed ^ 0x5DEECE66DL);
+            if (!first) sb.append(",\n");
+            first = false;
+            sb.append("{\"seed\": ").append(esc(Long.toString(seed))).append(", \"steps\": [");
+            for (int i = 0; i < 400; i++) {
+                if (i > 0) sb.append(",");
+                switch (pick.nextInt(5)) {
+                    case 0:
+                        sb.append("[\"I\",\"0\",").append(esc(Integer.toString(rnd.nextInt()))).append("]");
+                        break;
+                    case 1: {
+                        int b = 1 + (pick.nextBoolean() ? pick.nextInt(1000) : pick.nextInt(Integer.MAX_VALUE - 1));
+                        if (pick.nextInt(4) == 0) b = 1 << pick.nextInt(30);
+                        sb.append("[\"B\",").append(esc(Integer.toString(b))).append(",").append(esc(Integer.toString(rnd.nextInt(b)))).append("]");
+                        break;
+                    }
+                    case 2: {
+                        long b = 1 + (pick.nextBoolean() ? pick.nextInt(100000) : Math.abs(pick.nextLong() >> pick.nextInt(62)));
+                        if (b <= 0) b = 7;
+                        if (pick.nextInt(4) == 0) b = 1L << pick.nextInt(62);
+                        sb.append("[\"L\",").append(esc(Long.toString(b))).append(",").append(esc(Long.toString(rnd.nextLong(b)))).append("]");
+                        break;
+                    }
+                    case 3: {
+                        double b = pick.nextBoolean() ? 1 + pick.nextInt(1000) : pick.nextDouble() * 1e6 + 1e-3;
+                        sb.append("[\"D\",").append(esc(Double.toString(b))).append(",").append(esc(Double.toString(rnd.nextDouble(b)))).append("]");
+                        break;
+                    }
+                    default: {
+                        float b = pick.nextBoolean() ? 1 + pick.nextInt(1000) : pick.nextFloat() * 1e5f + 1e-2f;
+                        sb.append("[\"F\",").append(esc(Float.toString(b))).append(",").append(esc(Float.toString(rnd.nextFloat(b)))).append("]");
+                        break;
+                    }
+                }
+            }
+            sb.append("]}");
+        }
+        sb.append("\n]\n}\n");
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(args[0]), StandardCharsets.UTF_8)) {
+            w.write(sb.toString());
+        }
+        System.out.println("written " + args[0] + " (" + sb.length() + " chars)");
+    }
+}

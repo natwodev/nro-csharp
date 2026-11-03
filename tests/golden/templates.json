@@ -1,0 +1,1945 @@
+{
+  "schema": "nro-templates-golden/1",
+  "note": "Sinh tu dong boi tools/templates/regen.py tu ma Java goc; KHONG sua tay. Gia tri trong 'instances' la ket qua goi that constructor Java.",
+  "javaRelease": 17,
+  "package": "nro.template",
+  "sources": [
+    {
+      "path": "nro/template/AchievementQuest.java",
+      "sha256": "9c8fd29626a213ec282ad14b7751dc0cf70e89765ba024c18576c3f3aa0061c7"
+    },
+    {
+      "path": "nro/template/AchievementTemplate.java",
+      "sha256": "e436c5d76b7a58d2a666c35607780c4d943cd22e5a48055ca4fad49b46d937f4"
+    },
+    {
+      "path": "nro/template/ArrHead2Frames.java",
+      "sha256": "72c60ae849b98799167d6ce61648836154dbaf43375d04ef09e93d588992401a"
+    },
+    {
+      "path": "nro/template/BgItem.java",
+      "sha256": "081c68bad635a2586165a62cc995fd30fb4d14ca12d3d67b5c988b005b9d4a69"
+    },
+    {
+      "path": "nro/template/FlagBag.java",
+      "sha256": "b0c5dc439b8b6af5732ef06d6803826afd7c2828c6e7b45a0075b09f5842a568"
+    },
+    {
+      "path": "nro/template/HeadAvatar.java",
+      "sha256": "be165ed9129ca7a1158bd4dd8c53def3b225b0708d07cc4b7ffe73a8e1eccf49"
+    },
+    {
+      "path": "nro/template/ItemOptionTemplate.java",
+      "sha256": "f8338e1aa90981d703993e30dde3036e9dc1ef8c36d7bc1b76b6d84bb87d599c"
+    },
+    {
+      "path": "nro/template/ItemTemplate.java",
+      "sha256": "0c51a5e9c926f056f375b4c5c7e5e149df75cbd0d04e51d140b416e9b9319398"
+    },
+    {
+      "path": "nro/template/MobTemplate.java",
+      "sha256": "db7c7625744787bc993977924b8e71d2d4986979124a420a71f56b7d9e1b4e59"
+    },
+    {
+      "path": "nro/template/NpcTemplate.java",
+      "sha256": "b276bf3b048c13e94c820add3b277edca6220c5625ec865b6c5138453d347e32"
+    },
+    {
+      "path": "nro/template/Part.java",
+      "sha256": "3d2fc6df52727b49997e7367e401f6a26dccc87e92b1bb012b8d4aeccd4834df"
+    },
+    {
+      "path": "nro/template/PartDetail.java",
+      "sha256": "01d856fce1522d86cc8b02d213fe9309954b14615f6c0b2b27059de542c6abf7"
+    },
+    {
+      "path": "nro/template/Template.java",
+      "sha256": "8d6a58f564dff1dda829c91f23b906cd74f16c748b80c668a6308d3b089a68ae"
+    },
+    {
+      "path": "nro/template/TileSetInfo.java",
+      "sha256": "921b5bba047e991242555cb5e50fe28923b780d9854b5710331258c09be1afbc"
+    },
+    {
+      "path": "nro/template/TileSetInfoData.java",
+      "sha256": "8d5b63d8c8cedc895ce670eb62fe5a5d7a9b96d60f98cc3d1d46dc65b32b9edf"
+    },
+    {
+      "path": "nro/template/WaitSuperRank.java",
+      "sha256": "9eaf2076020596a6dff8c7b10c5287b8cf002451d3cb7a4081dd9620e308f93f"
+    }
+  ],
+  "classes": [
+    {
+      "name": "nro.template.AchievementQuest",
+      "simpleName": "AchievementQuest",
+      "source": "nro/template/AchievementQuest.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "completed",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "isRecieve",
+          "type": "boolean",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "completed",
+              "type": "long"
+            },
+            {
+              "name": "isRecieve",
+              "type": "boolean"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["long", "boolean"],
+          "args": [-9223372036854775808, true],
+          "state": {
+            "completed": -9223372036854775808,
+            "isRecieve": true
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["long", "boolean"],
+          "args": [-70000000000, false],
+          "state": {
+            "completed": -70000000000,
+            "isRecieve": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.AchievementTemplate",
+      "simpleName": "AchievementTemplate",
+      "source": "nro/template/AchievementTemplate.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "info1",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "info2",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "maxCount",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "money",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "info1",
+              "type": "java.lang.String"
+            },
+            {
+              "name": "info2",
+              "type": "java.lang.String"
+            },
+            {
+              "name": "money",
+              "type": "int"
+            },
+            {
+              "name": "maxCount",
+              "type": "long"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["java.lang.String", "java.lang.String", "int", "long"],
+          "args": ["\u0110\u1ec7 t\u1eed #0 \"q\" \\ \t\n\ud83d\ude00", "\u0110\u1ec7 t\u1eed #1 \"q\" \\ \t\n\ud83d\ude00", -1, 4294967296],
+          "state": {
+            "info1": "\u0110\u1ec7 t\u1eed #0 \"q\" \\ \t\n\ud83d\ude00",
+            "info2": "\u0110\u1ec7 t\u1eed #1 \"q\" \\ \t\n\ud83d\ude00",
+            "maxCount": 4294967296,
+            "money": -1
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["java.lang.String", "java.lang.String", "int", "long"],
+          "args": ["n0", "n1", 12, -9],
+          "state": {
+            "info1": "n0",
+            "info2": "n1",
+            "maxCount": -9,
+            "money": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.ArrHead2Frames",
+      "simpleName": "ArrHead2Frames",
+      "source": "nro/template/ArrHead2Frames.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "frames",
+          "type": "java.util.List<java.lang.Integer>",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "frames": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.BgItem",
+      "simpleName": "BgItem",
+      "source": "nro/template/BgItem.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "dx",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "dy",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "id",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "idImage",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "layer",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "dx": 0,
+            "dy": 0,
+            "id": 0,
+            "idImage": 0,
+            "layer": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.FlagBag",
+      "simpleName": "FlagBag",
+      "source": "nro/template/FlagBag.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "gem",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "gold",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "iconEffect",
+          "type": "short[]",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "iconId",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "id",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "name",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "gem": 0,
+            "gold": 0,
+            "iconEffect": null,
+            "iconId": 0,
+            "id": 0,
+            "name": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.HeadAvatar",
+      "simpleName": "HeadAvatar",
+      "source": "nro/template/HeadAvatar.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "avatarId",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "headId",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "headId",
+              "type": "int"
+            },
+            {
+              "name": "avatarId",
+              "type": "int"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["int", "int"],
+          "args": [-2147483648, 2147483647],
+          "state": {
+            "avatarId": 2147483647,
+            "headId": -2147483648
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["int", "int"],
+          "args": [-70000, 90000],
+          "state": {
+            "avatarId": 90000,
+            "headId": -70000
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.ItemOptionTemplate",
+      "simpleName": "ItemOptionTemplate",
+      "source": "nro/template/ItemOptionTemplate.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "id",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "name",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "type",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        },
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "int"
+            },
+            {
+              "name": "name",
+              "type": "java.lang.String"
+            },
+            {
+              "name": "type",
+              "type": "int"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "id": 0,
+            "name": null,
+            "type": 0
+          }
+        },
+        {
+          "sample": "boundary",
+          "ctor": ["int", "java.lang.String", "int"],
+          "args": [-2147483648, "\u0110\u1ec7 t\u1eed #1 \"q\" \\ \t\n\ud83d\ude00", -1],
+          "state": {
+            "id": -2147483648,
+            "name": "\u0110\u1ec7 t\u1eed #1 \"q\" \\ \t\n\ud83d\ude00",
+            "type": -1
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["int", "java.lang.String", "int"],
+          "args": [-70000, "n1", 12],
+          "state": {
+            "id": -70000,
+            "name": "n1",
+            "type": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.ItemTemplate",
+      "simpleName": "ItemTemplate",
+      "source": "nro/template/ItemTemplate.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "BLACK_FRIDAY",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "CHRISTMAS",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "DAY_20_10",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "HALLOWEEN",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "HUNG_VUONG",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "INTERNATIONAL_WOMANS_DAY",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "LUNNAR_NEW_YEAR",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "TRUNG_THU",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "TypeEvent",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "VALENTINE",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "VU_LAN_FESTIVAL",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "WORLD_CUP",
+          "type": "byte",
+          "modifiers": ["protected"],
+          "annotations": []
+        },
+        {
+          "name": "body",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "description",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "gem",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "gemSell",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "gender",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "gold",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "goldSell",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "head",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "iconID",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "id",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "isGender",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "isUpToUp",
+          "type": "boolean",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "leg",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "level",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "name",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "part",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "ruby",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "ruby_sell",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "strRequire",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "type",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        },
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "id",
+              "type": "short"
+            },
+            {
+              "name": "type",
+              "type": "byte"
+            },
+            {
+              "name": "gender",
+              "type": "byte"
+            },
+            {
+              "name": "name",
+              "type": "java.lang.String"
+            },
+            {
+              "name": "description",
+              "type": "java.lang.String"
+            },
+            {
+              "name": "iconID",
+              "type": "short"
+            },
+            {
+              "name": "part",
+              "type": "short"
+            },
+            {
+              "name": "isUpToUp",
+              "type": "boolean"
+            },
+            {
+              "name": "strRequire",
+              "type": "int"
+            },
+            {
+              "name": "TypeEvent",
+              "type": "int"
+            },
+            {
+              "name": "isGender",
+              "type": "byte"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "BLACK_FRIDAY": 8,
+            "CHRISTMAS": 2,
+            "DAY_20_10": 11,
+            "HALLOWEEN": 4,
+            "HUNG_VUONG": 7,
+            "INTERNATIONAL_WOMANS_DAY": 5,
+            "LUNNAR_NEW_YEAR": 1,
+            "TRUNG_THU": 6,
+            "TypeEvent": 0,
+            "VALENTINE": 10,
+            "VU_LAN_FESTIVAL": 3,
+            "WORLD_CUP": 9,
+            "body": 0,
+            "description": null,
+            "gem": 0,
+            "gemSell": 0,
+            "gender": 0,
+            "gold": 0,
+            "goldSell": 0,
+            "head": 0,
+            "iconID": 0,
+            "id": 0,
+            "isGender": 0,
+            "isUpToUp": false,
+            "leg": 0,
+            "level": 0,
+            "name": null,
+            "part": 0,
+            "ruby": 0,
+            "ruby_sell": 0,
+            "strRequire": 0,
+            "type": 0
+          }
+        },
+        {
+          "sample": "boundary",
+          "ctor": ["short", "byte", "byte", "java.lang.String", "java.lang.String", "short", "short", "boolean", "int", "int", "byte"],
+          "args": [-32768, 127, -1, "\u0110\u1ec7 t\u1eed #3 \"q\" \\ \t\n\ud83d\ude00", "\u0110\u1ec7 t\u1eed #4 \"q\" \\ \t\n\ud83d\ude00", 256, -256, true, -123456789, 2000000000, -55],
+          "state": {
+            "BLACK_FRIDAY": 8,
+            "CHRISTMAS": 2,
+            "DAY_20_10": 11,
+            "HALLOWEEN": 4,
+            "HUNG_VUONG": 7,
+            "INTERNATIONAL_WOMANS_DAY": 5,
+            "LUNNAR_NEW_YEAR": 1,
+            "TRUNG_THU": 6,
+            "TypeEvent": 2000000000,
+            "VALENTINE": 10,
+            "VU_LAN_FESTIVAL": 3,
+            "WORLD_CUP": 9,
+            "body": 0,
+            "description": "\u0110\u1ec7 t\u1eed #4 \"q\" \\ \t\n\ud83d\ude00",
+            "gem": 0,
+            "gemSell": 0,
+            "gender": -1,
+            "gold": 0,
+            "goldSell": 0,
+            "head": 0,
+            "iconID": 256,
+            "id": -32768,
+            "isGender": -55,
+            "isUpToUp": true,
+            "leg": 0,
+            "level": 0,
+            "name": "\u0110\u1ec7 t\u1eed #3 \"q\" \\ \t\n\ud83d\ude00",
+            "part": -256,
+            "ruby": 0,
+            "ruby_sell": 0,
+            "strRequire": -123456789,
+            "type": 127
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["short", "byte", "byte", "java.lang.String", "java.lang.String", "short", "short", "boolean", "int", "int", "byte"],
+          "args": [-300, 12, 7, "n3", "n4", -1700, 333, false, -210000, 44, -3],
+          "state": {
+            "BLACK_FRIDAY": 8,
+            "CHRISTMAS": 2,
+            "DAY_20_10": 11,
+            "HALLOWEEN": 4,
+            "HUNG_VUONG": 7,
+            "INTERNATIONAL_WOMANS_DAY": 5,
+            "LUNNAR_NEW_YEAR": 1,
+            "TRUNG_THU": 6,
+            "TypeEvent": 44,
+            "VALENTINE": 10,
+            "VU_LAN_FESTIVAL": 3,
+            "WORLD_CUP": 9,
+            "body": 0,
+            "description": "n4",
+            "gem": 0,
+            "gemSell": 0,
+            "gender": 7,
+            "gold": 0,
+            "goldSell": 0,
+            "head": 0,
+            "iconID": -1700,
+            "id": -300,
+            "isGender": -3,
+            "isUpToUp": false,
+            "leg": 0,
+            "level": 0,
+            "name": "n3",
+            "part": 333,
+            "ruby": 0,
+            "ruby_sell": 0,
+            "strRequire": -210000,
+            "type": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.MobTemplate",
+      "simpleName": "MobTemplate",
+      "source": "nro/template/MobTemplate.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "dartType",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "hp",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "id",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "name",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "percentDame",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "percentTiemNang",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "percent_gold",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "rangeMove",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "speed",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "type",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "dartType": 0,
+            "hp": 0,
+            "id": 0,
+            "name": null,
+            "percentDame": 0,
+            "percentTiemNang": 0,
+            "percent_gold": 0,
+            "rangeMove": 0,
+            "speed": 0,
+            "type": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.NpcTemplate",
+      "simpleName": "NpcTemplate",
+      "source": "nro/template/NpcTemplate.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "avatar",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "body",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "head",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "id",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "leg",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "name",
+          "type": "java.lang.String",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "avatar": 0,
+            "body": 0,
+            "head": 0,
+            "id": 0,
+            "leg": 0,
+            "name": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.Part",
+      "simpleName": "Part",
+      "source": "nro/template/Part.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "id",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "partDetails",
+          "type": "java.util.List<nro.template.PartDetail>",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "type",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {
+            "id": 0,
+            "partDetails": [],
+            "type": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.PartDetail",
+      "simpleName": "PartDetail",
+      "source": "nro/template/PartDetail.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "dx",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "dy",
+          "type": "byte",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "iconId",
+          "type": "short",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "iconId",
+              "type": "short"
+            },
+            {
+              "name": "dx",
+              "type": "byte"
+            },
+            {
+              "name": "dy",
+              "type": "byte"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["short", "byte", "byte"],
+          "args": [-32768, 127, -1],
+          "state": {
+            "dx": 127,
+            "dy": -1,
+            "iconId": -32768
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["short", "byte", "byte"],
+          "args": [-300, 12, 7],
+          "state": {
+            "dx": 12,
+            "dy": 7,
+            "iconId": -300
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.Template",
+      "simpleName": "Template",
+      "source": "nro/template/Template.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": ["nro.template.Template$BauCuaData", "nro.template.Template$TaiXiuData", "nro.template.Template$TaiXiuMD5Data", "nro.template.Template$XocDiaData"],
+      "instances": [
+        {
+          "sample": "default",
+          "ctor": [],
+          "args": [],
+          "state": {}
+        }
+      ]
+    },
+    {
+      "name": "nro.template.Template$BauCuaData",
+      "simpleName": "BauCuaData",
+      "source": "nro/template/Template.java",
+      "enclosing": "nro.template.Template",
+      "kind": "class",
+      "modifiers": ["public", "static"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "bau",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "ca",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "cua",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "ga",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "nai",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "playerId",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "tom",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "playerId",
+              "type": "long"
+            },
+            {
+              "name": "bau",
+              "type": "long"
+            },
+            {
+              "name": "cua",
+              "type": "long"
+            },
+            {
+              "name": "tom",
+              "type": "long"
+            },
+            {
+              "name": "ca",
+              "type": "long"
+            },
+            {
+              "name": "nai",
+              "type": "long"
+            },
+            {
+              "name": "ga",
+              "type": "long"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["long", "long", "long", "long", "long", "long", "long"],
+          "args": [-9223372036854775808, 9223372036854775807, -1, 4294967296, -4294967296, 1000000000000, -1000000000000],
+          "state": {
+            "bau": 9223372036854775807,
+            "ca": -4294967296,
+            "cua": -1,
+            "ga": -1000000000000,
+            "nai": 1000000000000,
+            "playerId": -9223372036854775808,
+            "tom": 4294967296
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["long", "long", "long", "long", "long", "long", "long"],
+          "args": [-70000000000, 90000000000, 12, -9, 250000, -170000, 33333],
+          "state": {
+            "bau": 90000000000,
+            "ca": 250000,
+            "cua": 12,
+            "ga": 33333,
+            "nai": -170000,
+            "playerId": -70000000000,
+            "tom": -9
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.Template$TaiXiuData",
+      "simpleName": "TaiXiuData",
+      "source": "nro/template/Template.java",
+      "enclosing": "nro.template.Template",
+      "kind": "class",
+      "modifiers": ["public", "static"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "playerId",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "tai",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "xiu",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "playerId",
+              "type": "long"
+            },
+            {
+              "name": "tai",
+              "type": "long"
+            },
+            {
+              "name": "xiu",
+              "type": "long"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["long", "long", "long"],
+          "args": [-9223372036854775808, 9223372036854775807, -1],
+          "state": {
+            "playerId": -9223372036854775808,
+            "tai": 9223372036854775807,
+            "xiu": -1
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["long", "long", "long"],
+          "args": [-70000000000, 90000000000, 12],
+          "state": {
+            "playerId": -70000000000,
+            "tai": 90000000000,
+            "xiu": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.Template$TaiXiuMD5Data",
+      "simpleName": "TaiXiuMD5Data",
+      "source": "nro/template/Template.java",
+      "enclosing": "nro.template.Template",
+      "kind": "class",
+      "modifiers": ["public", "static"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "playerId",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "tai",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "xiu",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "playerId",
+              "type": "long"
+            },
+            {
+              "name": "tai",
+              "type": "long"
+            },
+            {
+              "name": "xiu",
+              "type": "long"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["long", "long", "long"],
+          "args": [-9223372036854775808, 9223372036854775807, -1],
+          "state": {
+            "playerId": -9223372036854775808,
+            "tai": 9223372036854775807,
+            "xiu": -1
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["long", "long", "long"],
+          "args": [-70000000000, 90000000000, 12],
+          "state": {
+            "playerId": -70000000000,
+            "tai": 90000000000,
+            "xiu": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.Template$XocDiaData",
+      "simpleName": "XocDiaData",
+      "source": "nro/template/Template.java",
+      "enclosing": "nro.template.Template",
+      "kind": "class",
+      "modifiers": ["public", "static"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "chanX1",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "chanX15",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "chanX3",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "chanXiu",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "leTai",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "leX1",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "leX15",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "leX3",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "playerId",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "playerId",
+              "type": "long"
+            },
+            {
+              "name": "chanX1",
+              "type": "long"
+            },
+            {
+              "name": "chanXiu",
+              "type": "long"
+            },
+            {
+              "name": "chanX3",
+              "type": "long"
+            },
+            {
+              "name": "chanX15",
+              "type": "long"
+            },
+            {
+              "name": "leX1",
+              "type": "long"
+            },
+            {
+              "name": "leTai",
+              "type": "long"
+            },
+            {
+              "name": "leX3",
+              "type": "long"
+            },
+            {
+              "name": "leX15",
+              "type": "long"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["long", "long", "long", "long", "long", "long", "long", "long", "long"],
+          "args": [-9223372036854775808, 9223372036854775807, -1, 4294967296, -4294967296, 1000000000000, -1000000000000, 123456789012345, -123456789012345],
+          "state": {
+            "chanX1": 9223372036854775807,
+            "chanX15": -4294967296,
+            "chanX3": 4294967296,
+            "chanXiu": -1,
+            "leTai": -1000000000000,
+            "leX1": 1000000000000,
+            "leX15": -123456789012345,
+            "leX3": 123456789012345,
+            "playerId": -9223372036854775808
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["long", "long", "long", "long", "long", "long", "long", "long", "long"],
+          "args": [-70000000000, 90000000000, 12, -9, 250000, -170000, 33333, 8, -210000],
+          "state": {
+            "chanX1": 90000000000,
+            "chanX15": 250000,
+            "chanX3": -9,
+            "chanXiu": 12,
+            "leTai": 33333,
+            "leX1": -170000,
+            "leX15": -210000,
+            "leX3": 8,
+            "playerId": -70000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.TileSetInfo",
+      "simpleName": "TileSetInfo",
+      "source": "nro/template/TileSetInfo.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "tileSetInfoData",
+          "type": "java.util.List<nro.template.TileSetInfoData>",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "tileSetInfoData",
+              "type": "java.util.List<nro.template.TileSetInfoData>"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["java.util.List<nro.template.TileSetInfoData>"],
+          "args": [
+            [
+              {
+                "new": "nro.template.TileSetInfoData",
+                "ctor": ["int", "int[]"],
+                "args": [
+                  -2147483648,
+                  [-2147483648, 2147483647, 0, -1, 1]
+                ]
+              },
+              {
+                "new": "nro.template.TileSetInfoData",
+                "ctor": ["int", "int[]"],
+                "args": [
+                  -1,
+                  [-2147483648, 2147483647, 0, -1, 1]
+                ]
+              }
+            ]
+          ],
+          "state": {
+            "tileSetInfoData": [
+              {
+                "class": "nro.template.TileSetInfoData",
+                "fields": {
+                  "data": [-2147483648, 2147483647, 0, -1, 1],
+                  "type": -2147483648
+                }
+              },
+              {
+                "class": "nro.template.TileSetInfoData",
+                "fields": {
+                  "data": [-2147483648, 2147483647, 0, -1, 1],
+                  "type": -1
+                }
+              }
+            ]
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["java.util.List<nro.template.TileSetInfoData>"],
+          "args": [
+            [
+              {
+                "new": "nro.template.TileSetInfoData",
+                "ctor": ["int", "int[]"],
+                "args": [
+                  -70000,
+                  [7, -8, 9]
+                ]
+              }
+            ]
+          ],
+          "state": {
+            "tileSetInfoData": [
+              {
+                "class": "nro.template.TileSetInfoData",
+                "fields": {
+                  "data": [7, -8, 9],
+                  "type": -70000
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.TileSetInfoData",
+      "simpleName": "TileSetInfoData",
+      "source": "nro/template/TileSetInfoData.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "data",
+          "type": "int[]",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "type",
+          "type": "int",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "type",
+              "type": "int"
+            },
+            {
+              "name": "data",
+              "type": "int[]"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["int", "int[]"],
+          "args": [
+            -2147483648,
+            [-2147483648, 2147483647, 0, -1, 1]
+          ],
+          "state": {
+            "data": [-2147483648, 2147483647, 0, -1, 1],
+            "type": -2147483648
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["int", "int[]"],
+          "args": [
+            -70000,
+            [7, -8, 9]
+          ],
+          "state": {
+            "data": [7, -8, 9],
+            "type": -70000
+          }
+        }
+      ]
+    },
+    {
+      "name": "nro.template.WaitSuperRank",
+      "simpleName": "WaitSuperRank",
+      "source": "nro/template/WaitSuperRank.java",
+      "enclosing": null,
+      "kind": "class",
+      "modifiers": ["public"],
+      "superclass": "java.lang.Object",
+      "interfaces": [],
+      "annotations": [],
+      "fields": [
+        {
+          "name": "playerId",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        },
+        {
+          "name": "rivalId",
+          "type": "long",
+          "modifiers": ["public"],
+          "annotations": []
+        }
+      ],
+      "constructors": [
+        {
+          "modifiers": ["public"],
+          "parameters": [
+            {
+              "name": "playerId",
+              "type": "long"
+            },
+            {
+              "name": "rivalId",
+              "type": "long"
+            }
+          ],
+          "varArgs": false,
+          "annotations": []
+        }
+      ],
+      "methods": [],
+      "nested": [],
+      "instances": [
+        {
+          "sample": "boundary",
+          "ctor": ["long", "long"],
+          "args": [-9223372036854775808, 9223372036854775807],
+          "state": {
+            "playerId": -9223372036854775808,
+            "rivalId": 9223372036854775807
+          }
+        },
+        {
+          "sample": "typical",
+          "ctor": ["long", "long"],
+          "args": [-70000000000, 90000000000],
+          "state": {
+            "playerId": -70000000000,
+            "rivalId": 90000000000
+          }
+        }
+      ]
+    }
+  ]
+}

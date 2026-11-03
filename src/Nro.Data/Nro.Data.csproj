@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nro.Core\Nro.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Npgsql: latest stable version at the time of selection (10.0.3, released 2026-05-27), has a net10.0 TFM, works with PostgreSQL 18 (tried on 18.6). Pinned to an exact version. -->
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <!-- ILogger/NullLogger/LoggerMessage live in this package. Npgsql also pulls it in transitively (>= 10.0.0); declared directly because Nro.Data uses it directly. Do not add any other package. -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

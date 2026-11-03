@@ -1,0 +1,8 @@
+# Normalise line endings: a dev machine with core.autocrlf=true turns LF into CRLF, which breaks the hashes of the golden data
+* text=auto eol=lf
+*.sh text eol=lf
+*.cs text eol=lf
+*.csproj text eol=lf
+*.md text eol=lf
+# Golden vectors are pinned by SHA-256 hash in golden-index.json: never change their bytes
+tests/golden/*.json -text

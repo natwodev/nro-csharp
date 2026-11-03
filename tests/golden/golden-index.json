@@ -1,0 +1,172 @@
+{
+  "meta": {
+    "file": "golden-index.json",
+    "purpose": "chỉ mục các file vector + dấu vân tay của nguồn Java gốc và stub đã dùng",
+    "generator": "port-csharp/tools/golden (P0-05) - sinh bằng regen.py, KHÔNG sửa tay",
+    "environment": {
+      "defaultLocale": "en-US",
+      "defaultTimeZone": "Asia/Ho_Chi_Minh",
+      "viVnDecimalSeparatorCodePoint": 44,
+      "viVnGroupingSeparatorCodePoint": 46
+    }
+  },
+  "howToUse": "So SHA-256 trong `files` với từng file vector, `javaSources`/`stubSources` với file Java hiện tại, `libraries` với jar: nếu khác, vector có thể đã lỗi thời hoặc bị sửa -> chạy lại regen.py. verify_vectors.py tự kiểm các băm này.",
+  "files": [
+    {
+      "name": "utf.json",
+      "bytes": 32075,
+      "sha256": "39bde9540fde55ffa3d9e805fa2f317cec8cbbf7ba288fb8b2c1ea20c12910b2",
+      "cases": 49,
+      "javaSources": ["network/io/Message.java"]
+    },
+    {
+      "name": "primitives.json",
+      "bytes": 27637,
+      "sha256": "26bbca09b44462e285678f82ec53c5f1ffd023fdae92bd2b717a5c5297d9db09",
+      "cases": 168,
+      "javaSources": ["network/io/Message.java"]
+    },
+    {
+      "name": "frame-xor.json",
+      "bytes": 395959,
+      "sha256": "73a10f9ade2982bc25fd8ed45656a5590758b53bce09b37da3f682a36ceb7e98",
+      "cases": 1124,
+      "javaSources": ["network/io/MessageSendCollect.java", "network/io/Message.java", "network/session/Session.java"]
+    },
+    {
+      "name": "frame-size3.json",
+      "bytes": 255372,
+      "sha256": "237713ff813e8b5869da411fbf02b2f6e367abbbd68efa690d8dba8767ef1ff8",
+      "cases": 359,
+      "javaSources": ["network/io/MessageSendCollect.java", "network/io/Message.java", "network/session/Session.java"]
+    },
+    {
+      "name": "handshake-key.json",
+      "bytes": 13073,
+      "sha256": "b9645ae106ba38fd171eb4bb086ed7d3c5bc4bdd9890de584deea65b4c1dafd8",
+      "cases": 16,
+      "javaSources": [
+        "network/io/KeyHandler.java",
+        "network/session/Session.java",
+        "network/Sender.java",
+        "network/io/MessageSendCollect.java",
+        "network/io/Message.java",
+        "network/CommandMessage.java"
+      ]
+    },
+    {
+      "name": "util-pure.json",
+      "bytes": 88693,
+      "sha256": "5d17cccdb1251ed45d72ca97caa5d38749874aecfc33b911ea823f965b455132",
+      "cases": 660,
+      "javaSources": [
+        "Utils/Util.java",
+        "Utils/TimeUtil.java",
+        "Utils/FormatStyle.java",
+        "models/Item/ItemOption.java",
+        "nro/template/ItemOptionTemplate.java"
+      ]
+    }
+  ],
+  "javaSources": [
+    {"path": "network/CommandMessage.java", "sha256": "1fd9883269ad27cb01eeafbd18ca50838ad9e3d1c18815720f284d82c773c3c6", "lines": 11},
+    {"path": "network/Collector.java", "sha256": "7c7d950e3a58473b440716a287af0a4685e3c32567002b1188ffbe11f4baa13e", "lines": 77},
+    {"path": "network/Network.java", "sha256": "1292b17ac1b15e028383a0719ed8901480569c29281a24ae12021d69a53649f0", "lines": 167},
+    {"path": "network/QueueHandler.java", "sha256": "8e49d2c2b954166d0127b105bfb481b8b3f76d5098ba477ee698883b8e248978", "lines": 66},
+    {"path": "network/Sender.java", "sha256": "ad56dbf2f91c42942738cfb90b713b887bce45b7e3e49ffe2901ffe28ee46fc4", "lines": 92},
+    {"path": "network/SocketType.java", "sha256": "89c353fe34d5d2505b2ba8ee6ecea813c5996a955bd562d05ca78b197947515e", "lines": 9},
+    {
+      "path": "network/interfaces/IKeySessionHandler.java",
+      "sha256": "11149aa297f9024a2b42b3ffea0a90c4834c60e4823fac4c5a4b63764ec586e2",
+      "lines": 15
+    },
+    {"path": "network/interfaces/IMessage.java", "sha256": "30cc122ac0ef8d06f97b2cccebb1c6d3bec6f0f56e106076a0cc14fb6702aa46", "lines": 88},
+    {
+      "path": "network/interfaces/IMessageHandler.java",
+      "sha256": "ec4ecc4a4a0be3b76ddcf27d8aba2c1249e5e5905ec25d6f27bf8bb8f8028476",
+      "lines": 13
+    },
+    {
+      "path": "network/interfaces/IMessageSendCollect.java",
+      "sha256": "6d9789cc3df5621f00c7235c3c0790b8f3038b962c205ed47f2e02c448fb9f7e",
+      "lines": 22
+    },
+    {"path": "network/interfaces/INetwork.java", "sha256": "8dafc336ba4d5429bb6cbc174765e367aa8989d9e6a836281b70f04ba50e2b13", "lines": 27},
+    {
+      "path": "network/interfaces/IServerClose.java",
+      "sha256": "1232da9b663bcd206fd6075f64be916aa19260d7f0d7ce7feb374af96d311c5f",
+      "lines": 11
+    },
+    {"path": "network/interfaces/ISession.java", "sha256": "639a406e5e52e51e4d51dc719b7be497b129b9e47402ae125e572b86238173b9", "lines": 57},
+    {
+      "path": "network/interfaces/ISessionAcceptHandler.java",
+      "sha256": "9dc18677d5c9f85e21bf35592b00148412e609e5b64050962ba75de4f67590f1",
+      "lines": 13
+    },
+    {"path": "network/io/KeyHandler.java", "sha256": "1d3608efd5e8296a292c25e8610087e7be0fc19f9de5fe9d0c14fed713f51a61", "lines": 47},
+    {"path": "network/io/Message.java", "sha256": "4ae3b1b6181a78b59fee6adaebdb62dee74ccde749d2e7b15acee47b8aa9af0a", "lines": 276},
+    {
+      "path": "network/io/MessageSendCollect.java",
+      "sha256": "b01e85850f61356b3a98b9baa42689ecc03d2d57fedb84bcf1cac60671606b24",
+      "lines": 115
+    },
+    {"path": "network/session/Session.java", "sha256": "0b104099e98ef6aedba06cf4cdf3780782c5fa8a9a6bf479bdffcbc50d990b54", "lines": 242},
+    {
+      "path": "network/session/SessionFactory.java",
+      "sha256": "0e95423035959947821b4bbf48a7b474b954e24fb26bcb102d6e1ff6907a4b5a",
+      "lines": 25
+    },
+    {
+      "path": "network/session/SessionManager.java",
+      "sha256": "f73af3115db2af883fc21dc905518e031d62c70bb494585db3faf168fd0c816a",
+      "lines": 58
+    },
+    {"path": "Utils/FormatStyle.java", "sha256": "730388b133e9ca5bbfccc91708ca9c255bd3c8d191d659948e2f71ba473bb2f0", "lines": 17},
+    {"path": "Utils/Logger.java", "sha256": "11ab8c53b6f367ef6373a939102f49fa63a2dacfc92f4b638f84b6f8e38e6055", "lines": 380},
+    {"path": "Utils/TimeUtil.java", "sha256": "5d08476bd14b934efb440dadefe6b5246f2a00d3054509974c2e7f836a8b1720", "lines": 382},
+    {"path": "Utils/Util.java", "sha256": "61a48bd8c76e272c1d032b2e163bd4745871eedad8657669ac644a187356e832", "lines": 895},
+    {"path": "models/Item/ItemOption.java", "sha256": "c06b47f3d67af3025fd57b4941ea7b2cd492e31c2b6ac46b5fcce2dc84ce7c74", "lines": 66},
+    {
+      "path": "nro/template/ItemOptionTemplate.java",
+      "sha256": "f8338e1aa90981d703993e30dde3036e9dc1ef8c36d7bc1b76b6d84bb87d599c",
+      "lines": 30
+    },
+    {"path": "nro/template/ItemTemplate.java", "sha256": "0c51a5e9c926f056f375b4c5c7e5e149df75cbd0d04e51d140b416e9b9319398", "lines": 84}
+  ],
+  "stubSources": [
+    {
+      "path": "QuanLiBoss/Manager/BossManager.java",
+      "sha256": "6acfd60d97979a7faa7beafddbbdce05ba86330997302e27b57663f2f4019889",
+      "lines": 18
+    },
+    {"path": "models/Item/Item.java", "sha256": "0f856a5964fe85b0ca8494a2d465676bd459aa2e43d14403da6280347c6327c2", "lines": 15},
+    {"path": "models/Item/ItemService.java", "sha256": "c2cd5fb6b4a8ddda6ec6a169be7f0d3b0f03930963fbab96103f17a4df893ff2", "lines": 32},
+    {
+      "path": "nro/map/BlackBallWar/BlackBallWar.java",
+      "sha256": "552c640e647a3d4442a153554d8503e9647c1bfe6974d97c835326a7d4a84fc8",
+      "lines": 18
+    },
+    {"path": "nro/map/ItemMap.java", "sha256": "519510df991952c48cce3411f664b77d825445387e8d88d5adb58726afb1ea0a", "lines": 19},
+    {
+      "path": "nro/map/MajinBuu12H/MajinBuu12H.java",
+      "sha256": "116efcb7668d8981440138d5b6b349bbd5fdc386ea1d2a6feed88f73e35b886a",
+      "lines": 10
+    },
+    {"path": "nro/map/Zone.java", "sha256": "ad863695f7fe528a645bb1c6e047d1904d2b1ebb60fbf635570c0d809ac94a78", "lines": 17},
+    {"path": "nro/mob/Mob.java", "sha256": "94556dac6a8582482e44b8af98d16fca3d1f08f74abcf1edb98b90cea5ebdf29", "lines": 11},
+    {"path": "nro/npc/Npc.java", "sha256": "ea5c28187ba9101e397d8c40d90049de7ee819f38baac43e557b57000e8c8e5a", "lines": 10},
+    {"path": "nro/player/Location.java", "sha256": "e0e4c7984cbcd08db3d2bd2aa3c3b00b9330dd0e1028732c95fcf9f583835c27", "lines": 10},
+    {"path": "nro/player/Player.java", "sha256": "b7a2171ca4799e0d0bfae9d2b273b668f4de4367e161daf92b198b8c91893550", "lines": 10},
+    {"path": "nro/server/Manager.java", "sha256": "111381a7fd3e4249a6465cf4ab6f30a1eb839b4b1380c8117786d473c8f32fad", "lines": 11}
+  ],
+  "libraries": [
+    {
+      "path": "source-game/SRC_6/AWN_Version/AWN_Version/lib/NgocRongOnline.jar",
+      "sha256": "aa3d74e0823263f787e46f2dd56caf1b4b3244c1221190524cf7e01c722302c2",
+      "bytes": 5790915,
+      "lombokVersion": "1.18.30",
+      "commonsLangVersion": "2.6",
+      "warning": "Jar chưa quét mã độc và được THỰC THI lúc biên dịch (bộ xử lý chú thích Lombok chạy trong javac) và lúc chạy (ArrayUtils). Chạy regen.py trên máy dev thường, không trong môi trường chứa bí mật."
+    }
+  ]
+}

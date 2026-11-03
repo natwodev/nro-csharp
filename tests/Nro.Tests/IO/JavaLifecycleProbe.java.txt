@@ -1,0 +1,183 @@
+// =====================================================================================================================
+// JavaLifecycleProbe.java.txt  (evidence of measured Java behaviour for MessageLifecycleTests.cs, MessageTests.cs, JavaDataStreamBehaviorTests.cs)
+//
+// This program runs the project's OWN network.io.Message class (the original Java code, read-only) on JDK 17.0.19 and prints the result of each operation around
+// cleanup()/dispose()/getData()/writer()/reader()/constructors/writeCris... The labels W*, D*, R*, C*, X* in the C# tests' comments point to exactly the lines below.
+// How to re-run it: rename this file to LifecycleProbe.java (drop the .txt suffix), then (JSRC = the src folder of the original Java code)
+//   javac --release 17 -encoding UTF-8 -d out -sourcepath "$JSRC" "$JSRC/network/io/Message.java" LifecycleProbe.java
+//   java -cp out LifecycleProbe
+//
+// Recorded results (JDK 17.0.19):
+//
+//   W0 write-mode reader() -> OK null
+//   W1 getData after cleanup -> OK bytes:01020304
+//   W2 writer() same instance after cleanup -> OK true
+//   W3 writeShort after cleanup -> OK bytes:010203040506
+//   W4 writer().writeByte after cleanup -> OK bytes:01020304050607
+//   W5 cleanup x3 then getData -> OK bytes:01020304050607
+//   W6 command after cleanup -> OK 5
+//   W7 getData is a copy (mutating returned array) -> OK bytes:01020304050607
+//   W8 two getData() equal but distinct objects -> OK true
+//   D1 writer() after dispose -> OK null
+//   D2 reader() after dispose -> OK null
+//   D3 getData after dispose -> THROWS java.lang.NullPointerException
+//   D4 writeInt after dispose -> THROWS java.lang.NullPointerException
+//   D5 writeCris after dispose -> THROWS java.lang.NullPointerException
+//   D6 readInt after dispose -> THROWS java.lang.NullPointerException
+//   D7 cleanup after dispose -> OK ok
+//   D8 dispose twice -> OK ok
+//   D9 command after dispose -> OK 6
+//   D10 write(byte[]) after dispose -> THROWS java.lang.NullPointerException
+//   D11 writeUTF after dispose -> THROWS java.lang.NullPointerException
+//   D12 read() after dispose -> THROWS java.lang.NullPointerException
+//   R0 writer() read-mode -> OK null
+//   R1 getData read-mode -> THROWS java.lang.NullPointerException
+//   R2 writeInt read-mode -> THROWS java.lang.NullPointerException
+//   R3 readByte -> OK 1
+//   R4 readByte after cleanup continues -> OK 2
+//   R5 reader() same after cleanup, readInt -> OK 50595078
+//   R6 readShort after 2nd cleanup -> OK 1800
+//   R7 readUTF -> EOF? (remaining 2 bytes) -> THROWS java.io.EOFException
+//   R8 readByte after dispose -> THROWS java.lang.NullPointerException
+//   R9 reader() after dispose -> OK null
+//   R10 command after dispose -> OK -27
+//   R11 cleanup after dispose -> OK ok
+//   C1 new Message(-218).command -> OK 38
+//   C2 new Message(200).command -> OK -56
+//   C3 new Message(255).command -> OK -1
+//   C4 new Message(256).command -> OK 0
+//   C5 new Message(-129).command -> OK 127
+//   C6 new Message(-27).command -> OK -27
+//   C7 new Message(128).command -> OK -128
+//   C8 empty write-mode getData -> OK bytes:
+//   C9 new Message((byte)1, null) -> THROWS java.lang.NullPointerException
+//   C10 read-mode empty data, readByte -> THROWS java.io.EOFException
+//   C11 aliasing: reader sees mutated source array -> OK 77
+//   X1 writeCris(0x123456789AL,true) -> OK bytes:3456789a
+//   X2 writeCris(0x123456789AL,false) -> OK bytes:000000123456789a
+//   X3 writeShortToLong(-2,true) -> OK bytes:fffe
+//   X4 writeByteToLong(0x1FF,true) -> OK bytes:ff
+//   X5 writeBytes("\u00e9\u0141A") -> OK bytes:e94141
+//   X6 writeChars("\u00e9A") -> OK bytes:00e90041
+//   X7 write(int 0x1234) -> OK bytes:34
+//   X8 write(byte[]{1,2,3}, 1, 2) -> OK bytes:0203
+//   X9 writer().size() -> OK 8
+//   X10 writeUTF too long leaves data intact -> OK bytes:01
+//   X11 writeUTF(null) -> THROWS java.lang.NullPointerException
+//   X12 write(byte[] null) -> THROWS java.lang.NullPointerException
+//   X13 write(b, 2, 5) -> THROWS java.lang.IndexOutOfBoundsException
+//   X14 writer().flush() then data -> OK bytes:03
+//   X15 writer().close() then more writes -> OK bytes:0304
+// =====================================================================================================================
+import java.io.*;
+import java.util.HexFormat;
+import network.io.Message;
+
+/** Measures the real behaviour of network.io.Message (original code, JDK 17) around cleanup()/dispose(). */
+public class LifecycleProbe {
+    static String hex(byte[] b) { return b == null ? "null" : HexFormat.of().formatHex(b); }
+
+    interface Act { Object run() throws Exception; }
+
+    static void t(String name, Act a) {
+        try {
+            Object r = a.run();
+            if (r instanceof byte[]) r = "bytes:" + hex((byte[]) r);
+            System.out.println(name + " -> OK " + r);
+        } catch (Throwable ex) {
+            System.out.println(name + " -> THROWS " + ex.getClass().getName());
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        // ---------- write, then cleanup ----------
+        Message w = new Message(5);
+        w.writer().writeInt(0x01020304);
+        DataOutputStream d1 = w.writer();
+        t("W0 write-mode reader()", () -> w.reader());
+        w.cleanup();
+        t("W1 getData after cleanup", () -> w.getData());
+        t("W2 writer() same instance after cleanup", () -> w.writer() == d1);
+        t("W3 writeShort after cleanup", () -> { w.writeShort(0x0506); return w.getData(); });
+        t("W4 writer().writeByte after cleanup", () -> { w.writer().writeByte(7); return w.getData(); });
+        w.cleanup(); w.cleanup();
+        t("W5 cleanup x3 then getData", () -> w.getData());
+        t("W6 command after cleanup", () -> w.command);
+        byte[] copy1 = w.getData(); copy1[0] = 99;
+        t("W7 getData is a copy (mutating returned array)", () -> w.getData());
+        t("W8 two getData() equal but distinct objects", () -> (w.getData() != w.getData()) && java.util.Arrays.equals(w.getData(), w.getData()));
+
+        // ---------- dispose ----------
+        Message x = new Message(6);
+        x.writer().writeInt(42);
+        x.dispose();
+        t("D1 writer() after dispose", () -> x.writer());
+        t("D2 reader() after dispose", () -> x.reader());
+        t("D3 getData after dispose", () -> x.getData());
+        t("D4 writeInt after dispose", () -> { x.writeInt(1); return "x"; });
+        t("D5 writeCris after dispose", () -> { x.writeCris(1, true); return "x"; });
+        t("D6 readInt after dispose", () -> x.readInt());
+        t("D7 cleanup after dispose", () -> { x.cleanup(); return "ok"; });
+        t("D8 dispose twice", () -> { x.dispose(); return "ok"; });
+        t("D9 command after dispose", () -> x.command);
+        t("D10 write(byte[]) after dispose", () -> { x.write(new byte[]{1}); return "x"; });
+        t("D11 writeUTF after dispose", () -> { x.writeUTF("a"); return "x"; });
+        t("D12 read() after dispose", () -> x.read());
+
+        // ---------- read mode ----------
+        Message r = new Message((byte) -27, new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+        t("R0 writer() read-mode", () -> r.writer());
+        t("R1 getData read-mode", () -> r.getData());
+        t("R2 writeInt read-mode", () -> { r.writeInt(1); return "x"; });
+        t("R3 readByte", () -> r.readByte());
+        r.cleanup();
+        t("R4 readByte after cleanup continues", () -> r.readByte());
+        t("R5 reader() same after cleanup, readInt", () -> r.reader().readInt());
+        r.cleanup();
+        t("R6 readShort after 2nd cleanup", () -> r.readShort());
+        t("R7 readUTF -> EOF? (remaining 2 bytes)", () -> r.readUTF());
+        r.dispose();
+        t("R8 readByte after dispose", () -> r.readByte());
+        t("R9 reader() after dispose", () -> r.reader());
+        t("R10 command after dispose", () -> r.command);
+        t("R11 cleanup after dispose", () -> { r.cleanup(); return "ok"; });
+
+        // ---------- constructors ----------
+        t("C1 new Message(-218).command", () -> new Message(-218).command);
+        t("C2 new Message(200).command", () -> new Message(200).command);
+        t("C3 new Message(255).command", () -> new Message(255).command);
+        t("C4 new Message(256).command", () -> new Message(256).command);
+        t("C5 new Message(-129).command", () -> new Message(-129).command);
+        t("C6 new Message(-27).command", () -> new Message(-27).command);
+        t("C7 new Message(128).command", () -> new Message(128).command);
+        t("C8 empty write-mode getData", () -> new Message(1).getData());
+        t("C9 new Message((byte)1, null)", () -> new Message((byte) 1, null));
+        t("C10 read-mode empty data, readByte", () -> new Message((byte) 1, new byte[0]).readByte());
+        // aliasing: ByteArrayInputStream does not copy the array
+        byte[] shared = new byte[]{10, 20, 30};
+        Message al = new Message((byte) 1, shared);
+        shared[0] = 77;
+        t("C11 aliasing: reader sees mutated source array", () -> al.readByte());
+
+        // ---------- writeCris & co ----------
+        t("X1 writeCris(0x123456789AL,true)", () -> { Message m = new Message(1); m.writeCris(0x123456789AL, true); return m.getData(); });
+        t("X2 writeCris(0x123456789AL,false)", () -> { Message m = new Message(1); m.writeCris(0x123456789AL, false); return m.getData(); });
+        t("X3 writeShortToLong(-2,true)", () -> { Message m = new Message(1); m.writeShortToLong(-2, true); return m.getData(); });
+        t("X4 writeByteToLong(0x1FF,true)", () -> { Message m = new Message(1); m.writeByteToLong(0x1FF, true); return m.getData(); });
+        t("X5 writeBytes(\"\\u00e9\\u0141A\")", () -> { Message m = new Message(1); m.writeBytes("\u00e9\u0141A"); return m.getData(); });
+        t("X6 writeChars(\"\\u00e9A\")", () -> { Message m = new Message(1); m.writeChars("\u00e9A"); return m.getData(); });
+        t("X7 write(int 0x1234)", () -> { Message m = new Message(1); m.write(0x1234); return m.getData(); });
+        t("X8 write(byte[]{1,2,3}, 1, 2)", () -> { Message m = new Message(1); m.write(new byte[]{1, 2, 3}, 1, 2); return m.getData(); });
+        t("X9 writer().size()", () -> { Message m = new Message(1); m.writeInt(1); m.writeUTF("ab"); return m.writer().size(); });
+        t("X10 writeUTF too long leaves data intact", () -> {
+            Message m = new Message(1); m.writeByte(1);
+            try { m.writeUTF("a".repeat(65536)); } catch (UTFDataFormatException e) { }
+            return m.getData();
+        });
+        t("X11 writeUTF(null)", () -> { Message m = new Message(1); m.writeUTF(null); return "x"; });
+        t("X12 write(byte[] null)", () -> { Message m = new Message(1); m.write((byte[]) null); return "x"; });
+        t("X13 write(b, 2, 5)", () -> { Message m = new Message(1); m.write(new byte[3], 2, 5); return "x"; });
+        t("X14 writer().flush() then data", () -> { Message m = new Message(1); m.writeByte(3); m.writer().flush(); return m.getData(); });
+        t("X15 writer().close() then more writes", () -> { Message m = new Message(1); m.writeByte(3); m.writer().close(); m.writeByte(4); return m.getData(); });
+    }
+}

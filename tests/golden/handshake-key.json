@@ -1,0 +1,202 @@
+{
+  "meta": {
+    "file": "handshake-key.json",
+    "purpose": "gói -27 (khoá phiên) server gửi, không mã hoá; sau đó bật mã hoá với con trỏ curW bắt đầu từ 0",
+    "generator": "port-csharp/tools/golden (P0-05) - sinh bằng regen.py, KHÔNG sửa tay",
+    "environment": {
+      "defaultLocale": "en-US",
+      "defaultTimeZone": "Asia/Ho_Chi_Minh",
+      "viVnDecimalSeparatorCodePoint": 44,
+      "viVnGroupingSeparatorCodePoint": 46
+    },
+    "javaSources": [
+      {"path": "network/io/KeyHandler.java", "sha256": "1d3608efd5e8296a292c25e8610087e7be0fc19f9de5fe9d0c14fed713f51a61", "lines": 47},
+      {"path": "network/session/Session.java", "sha256": "0b104099e98ef6aedba06cf4cdf3780782c5fa8a9a6bf479bdffcbc50d990b54", "lines": 242},
+      {"path": "network/Sender.java", "sha256": "ad56dbf2f91c42942738cfb90b713b887bce45b7e3e49ffe2901ffe28ee46fc4", "lines": 92},
+      {
+        "path": "network/io/MessageSendCollect.java",
+        "sha256": "b01e85850f61356b3a98b9baa42689ecc03d2d57fedb84bcf1cac60671606b24",
+        "lines": 115
+      },
+      {"path": "network/io/Message.java", "sha256": "4ae3b1b6181a78b59fee6adaebdb62dee74ccde749d2e7b15acee47b8aa9af0a", "lines": 276},
+      {"path": "network/CommandMessage.java", "sha256": "1fd9883269ad27cb01eeafbd18ca50838ad9e3d1c18815720f284d82c773c3c6", "lines": 11}
+    ]
+  },
+  "getSessionIdCmd": -27,
+  "sourceRefs": {
+    "getSessionIdConstant": "network/CommandMessage.java:5",
+    "serverReceivesHello": "network/Collector.java:37",
+    "keyHandlerSendKey": "network/io/KeyHandler.java:10",
+    "keyHandlerSetKey": "network/io/KeyHandler.java:27",
+    "sessionSendKey": "network/session/Session.java:182",
+    "sessionDefaultKey": "network/session/Session.java:59",
+    "sentKeySetAfterSend": "network/io/KeyHandler.java:21"
+  },
+  "howToUse": "clientHello: server đọc wireHex phải ra cmd -27 không payload. cases: với keyHex, server gửi keyPacket.wireHex (không mã hoá), sau đó sentKey=true và curW=0; client suy lại khoá từ payload phải ra keyHex; framesAfterHandshake là các gói mã hoá liên tiếp ngay sau bắt tay.",
+  "notCovered": "MyKeyHandler (lớp bắt tay thật của server) còn gửi DataGame.sendDataImageVersion/sendVersionRes sau khi gửi khoá: đó là gói ứng dụng phụ thuộc DataGame/MySession nên không có trong vector này.",
+  "format": {
+    "flow": "client gửi -27 (không payload) -> server KeyHandler.sendKey gửi -27 KHÔNG mã hoá -> server đặt sentKey=true -> mọi gói sau đều mã hoá XOR, con trỏ curW của server bắt đầu từ 0 (gói -27 không làm di chuyển nó).",
+    "keyPacketPayload": "[len][K0][K1^K0][K2^K1]...[K(n-1)^K(n-2)] \u2014 len là MỘT byte (số byte khoá); client khôi phục K[j+1] = P[j+1] ^ K[j] (KeyHandler.setKey).",
+    "keyPacketWire": "[0xE5 = cmd -27][size uint16 big-endian = 1 + len][payload] \u2014 sentKey=false nên không mã hoá.",
+    "keyLengthLimit": "len là byte có dấu phía client (readSByte): khoá > 127 byte không dùng được.",
+    "clientExtraFields": "client Unity (Session_ME.getKey) còn đọc thêm UTF IP2, int PORT2, byte isConnect2 SAU mảng khoá; server Java KHÔNG gửi các trường này, client nuốt lỗi hết dữ liệu và vẫn đặt getKeyComplete=true trước đó."
+  },
+  "clientHello": {
+    "note": "client xin khoá: server đọc ra cmd == GET_SESSION_ID rồi gọi session.sendKey()",
+    "wireHex": "e50000",
+    "cmd": -27,
+    "payloadLength": 0,
+    "consumedBytes": 3,
+    "curR": 0
+  },
+  "cases": [
+    {
+      "id": "default-key",
+      "note": "khoá mặc định của Session(Socket)",
+      "keyHex": "4e677579656e4475635675456e7465727461696e6d656e74",
+      "keyLength": 24,
+      "keyAscii": "NguyenDucVuEntertainment",
+      "keySource": "network/session/Session.java dòng 59: this.KEYS = \"NguyenDucVuEntertainment\".getBytes()",
+      "keyPacket": {
+        "cmd": -27,
+        "payloadHex": "184e29120c1c0b2a31163523302b1a11170615080703080b1a",
+        "payloadLength": 25,
+        "wireHex": "e50019184e29120c1c0b2a31163523302b1a11170615080703080b1a",
+        "wireLength": 28,
+        "sentKeyBefore": false,
+        "sentKeyAfter": true,
+        "serverCurWAfter": 0
+      },
+      "clientDerivedKeyHex": "4e677579656e4475635675456e7465727461696e6d656e74",
+      "clientSentKeyAfter": true,
+      "framesAfterHandshake": [
+        {"index": 1, "cmd": 1, "payloadLength": 0, "payloadHex": "", "wireHex": "4f6775", "serverCurWAfter": 3, "clientCurRAfter": 3},
+        {
+          "index": 2,
+          "cmd": -2,
+          "payloadLength": 5,
+          "payloadHex": "29ac2fb235",
+          "wireHex": "87656b6dd94ce440",
+          "serverCurWAfter": 11,
+          "clientCurRAfter": 11
+        },
+        {
+          "index": 3,
+          "cmd": 3,
+          "payloadLength": 30,
+          "payloadHex": "2aad30b336b93cbf42c548cb4ed154d75add60e366e96cef72f578fb7e01",
+          "wireHex": "466e6a4fdf44d25fd751da2cb106ac3ba831b91ea803b513ac029b17870c9a176f",
+          "serverCurWAfter": 20,
+          "clientCurRAfter": 20
+        },
+        {
+          "index": 4,
+          "cmd": -4,
+          "payloadLength": 300,
+          "payloadHex": "2bae31b437ba3dc043c649cc4fd255d85bde61e467ea6df073f679fc7f0285088b0e9114971a9d20a326a92caf32b538bb3ec144c74acd50d356d95cdf62e568eb6ef174f77afd800386098c0f9215981b9e21a427aa2db033b639bc3fc245c84bce51d457da5de063e669ec6ff275f87bfe8104870a8d109316991c9f22a528ab2eb134b73abd40c346c94ccf52d558db5ee164e76aed70f376f97cff8205880b8e1194179a1da023a629ac2fb235b83bbe41c447ca4dd053d659dc5fe265e86bee71f477fa7d008306890c8f1295189b1ea124a72aad30b336b93cbf42c548cb4ed154d75add60e366e96cef72f578fb7e0184078a0d901396199c1fa225a83cbf42c548cb4ed154d75add60e366e96cef72f578fb7e0184078a0d901396199c1fa225a82bae31b437ba3d",
+          "wireHex": "9164425fe056c14edf538436a51fb90abc21bd29aa008d0987089e07b81e890667eb4cfe6dc761d274e945d152c845c15fd056cf70a631be2fa314a6358f299a0c910d991a901d991798ee77c86ef976f77bdc6efd77d162c459d541c258d551af20a63f8036a12ebf33a416853f992a9c019d098ae06de967e87ee758fe69e647cb6cde4de741f254c925b132a825a13fb036af1086119e0f83348615af09baec71ed79fa70fd79f778ce57e84ed956d75bfc4edd17b102a439b521a238b5318f00861fa016810e9f1344f665df79ca7ce17de96ac04dc947c85ec778de49c627ab0cbe2d87219234a90591128805811f90168f3066f17eef63d466f54fe95acc51cd4ecb23ac26a62bbf20993da8198608ad198c24803d950a64f673eb64fe7ef377e851c550d14ec075c154ec48",
+          "serverCurWAfter": 11,
+          "clientCurRAfter": 11
+        }
+      ]
+    },
+    {
+      "id": "short-key-5",
+      "note": "khoá ngắn 5 byte có byte >= 0x80",
+      "keyHex": "13f07f80aa",
+      "keyLength": 5,
+      "keySource": "đặt bằng Session.setKey(byte[]) trước khi sendKey()",
+      "keyPacket": {
+        "cmd": -27,
+        "payloadHex": "0513e38fff2a",
+        "payloadLength": 6,
+        "wireHex": "e500060513e38fff2a",
+        "wireLength": 9,
+        "sentKeyBefore": false,
+        "sentKeyAfter": true,
+        "serverCurWAfter": 0
+      },
+      "clientDerivedKeyHex": "13f07f80aa",
+      "clientSentKeyAfter": true,
+      "framesAfterHandshake": [
+        {"index": 1, "cmd": 1, "payloadLength": 0, "payloadHex": "", "wireHex": "12f07f", "serverCurWAfter": 3, "clientCurRAfter": 3},
+        {
+          "index": 2,
+          "cmd": -2,
+          "payloadLength": 5,
+          "payloadHex": "29ac2fb235",
+          "wireHex": "7eaa16d9d3af1826",
+          "serverCurWAfter": 1,
+          "clientCurRAfter": 1
+        },
+        {
+          "index": 3,
+          "cmd": 3,
+          "payloadLength": 30,
+          "payloadHex": "2aad30b336b93cbf42c548cb4ed154d75add60e366e96cef72f578fb7e01",
+          "wireHex": "f37f9e80bec0ccb6132f4f3d45e2d8beaed47d492d1f63ccfa9c90f25f6b0b0181",
+          "serverCurWAfter": 4,
+          "clientCurRAfter": 4
+        },
+        {
+          "index": 4,
+          "cmd": -4,
+          "payloadLength": 300,
+          "payloadHex": "2bae31b437ba3dc043c649cc4fd255d85bde61e467ea6df073f679fc7f0285088b0e9114971a9d20a326a92caf32b538bb3ec144c74acd50d356d95cdf62e568eb6ef174f77afd800386098c0f9215981b9e21a427aa2db033b639bc3fc245c84bce51d457da5de063e669ec6ff275f87bfe8104870a8d109316991c9f22a528ab2eb134b73abd40c346c94ccf52d558db5ee164e76aed70f376f97cff8205880b8e1194179a1da023a629ac2fb235b83bbe41c447ca4dd053d659dc5fe265e86bee71f477fa7d008306890c8f1295189b1ea124a72aad30b336b93cbf42c548cb4ed154d75add60e366e96cef72f578fb7e0184078a0d901396199c1fa225a83cbf42c548cb4ed154d75add60e366e96cef72f578fb7e0184078a0d901396199c1fa225a82bae31b437ba3d",
+          "wireHex": "5612dc542e9ba7c7c5bd6a5036364ce5c1a5a7db747214186ac7e38389f9566cf2fa88211d616b17b08ed0dca6033f5f4d3592a8cebec46d593d2f53fccaaca0e24f7b1b1171dee48a8200a995f9f38f380668641e8bb7d7d5ad1a2046463c95d1b5b7cb644224285af7f39399e9467c020a78d1ed717b07a09ee0ec96330f6f5d2582b8deceb41d294d3f43ecdabcb0d27f4b2b2161cef49a92f0596509037f281678740ebb87e7e59d0a3056562c85a1c5c7bb145234384ae7c3a3a9d9764c121a68c1fd818bf7506ef0fc86231f7f6d15b288eedea40d395d4f339caaccc0c26f5b3b3151fec4aaa2e0497519136fd8e68884feab97f7f58d3a0066661cb5b1d5d7bc155135374be4c2a4a8da7773131969c6fc828af8516df1fb87201e606c16b38fefdda502385e4e349da9cd",
+          "serverCurWAfter": 2,
+          "clientCurRAfter": 2
+        }
+      ]
+    },
+    {
+      "id": "long-key-127",
+      "note": "khoá dài nhất dùng được (127 byte): len = 0x7F",
+      "keyHex": "0b30557a9fc4e90e33587da2c7ec11365b80a5caef14395e83a8cdf2173c6186abd0f51a3f6489aed3f81d42678cb1d6fb20456a8fb4d9fe23486d92b7dc01264b7095badf04294e7398bde2072c51769bc0e50a2f54799ec3e80d32577ca1c6eb10355a7fa4c9ee13385d82a7ccf1163b6085aacff4193e6388add2f71c41",
+      "keyLength": 127,
+      "keySource": "đặt bằng Session.setKey(byte[]) trước khi sendKey()",
+      "keyPacket": {
+        "cmd": -27,
+        "payloadHex": "7f0b3b652fe55b2de73d6b25df652bfd276ddb256f25fb2d67dd2b653fe52b5de72d7b25ef255bed277d2be55f25eb3d672ddb652fe53b6d27dd6b25ff256bdd276d3be52f65db2d673deb255fe52b7d27ed5b25ef257b2de75d2be53f652bdd672dfb256f25db6d27fd2b65df256b3de72d5be52f653bed275deb257f25eb5d",
+        "payloadLength": 128,
+        "wireHex": "e500807f0b3b652fe55b2de73d6b25df652bfd276ddb256f25fb2d67dd2b653fe52b5de72d7b25ef255bed277d2be55f25eb3d672ddb652fe53b6d27dd6b25ff256bdd276d3be52f65db2d673deb255fe52b7d27ed5b25ef257b2de75d2be53f652bdd672dfb256f25db6d27fd2b65df256b3de72d5be52f653bed275deb257f25eb5d",
+        "wireLength": 131,
+        "sentKeyBefore": false,
+        "sentKeyAfter": true,
+        "serverCurWAfter": 0
+      },
+      "clientDerivedKeyHex": "0b30557a9fc4e90e33587da2c7ec11365b80a5caef14395e83a8cdf2173c6186abd0f51a3f6489aed3f81d42678cb1d6fb20456a8fb4d9fe23486d92b7dc01264b7095badf04294e7398bde2072c51769bc0e50a2f54799ec3e80d32577ca1c6eb10355a7fa4c9ee13385d82a7ccf1163b6085aacff4193e6388add2f71c41",
+      "clientSentKeyAfter": true,
+      "framesAfterHandshake": [
+        {"index": 1, "cmd": 1, "payloadLength": 0, "payloadHex": "", "wireHex": "0a3055", "serverCurWAfter": 3, "clientCurRAfter": 3},
+        {
+          "index": 2,
+          "cmd": -2,
+          "payloadLength": 5,
+          "payloadHex": "29ac2fb235",
+          "wireHex": "849fc1c0a21cea48",
+          "serverCurWAfter": 11,
+          "clientCurRAfter": 11
+        },
+        {
+          "index": 3,
+          "cmd": 3,
+          "payloadLength": 30,
+          "payloadHex": "2aad30b336b93cbf42c548cb4ed154d75add60e366e96cef72f578fb7e01",
+          "wireHex": "a1c7f23b9b6b339373d3ab7b9bcb63832343eb3b5bcb3393f3538bfb5bab036343",
+          "serverCurWAfter": 44,
+          "clientCurRAfter": 44
+        },
+        {
+          "index": 4,
+          "cmd": -4,
+          "payloadLength": 300,
+          "payloadHex": "2bae31b437ba3dc043c649cc4fd255d85bde61e467ea6df073f679fc7f0285088b0e9114971a9d20a326a92caf32b538bb3ec144c74acd50d356d95cdf62e568eb6ef174f77afd800386098c0f9215981b9e21a427aa2db033b639bc3fc245c84bce51d457da5de063e669ec6ff275f87bfe8104870a8d109316991c9f22a528ab2eb134b73abd40c346c94ccf52d558db5ee164e76aed70f376f97cff8205880b8e1194179a1da023a629ac2fb235b83bbe41c447ca4dd053d659dc5fe265e86bee71f477fa7d008306890c8f1295189b1ea124a72aad30b336b93cbf42c548cb4ed154d75add60e366e96cef72f578fb7e0184078a0d901396199c1fa225a83cbf42c548cb4ed154d75add60e366e96cef72f578fb7e0184078a0d901396199c1fa225a82bae31b437ba3d",
+          "wireHex": "9b8d9dfd5511f15d358919bde501a1dd6589d97d951171dd3569d93d85e1419d05a959fd9551f19d35c9593de541219d65c9997dd5d1719d3569993d45e1015dc52999fd5591f15db509993de58121dd6509d910ae74deb86ec4be00ee441ef82e54fe104ef41eb8ce64bee04ea41e78ce147ed02e741eb86e04be40ee845ef8ae14fe500ef45e388e64bee00ea4de788ed47e902e74de386ec43e80ee449ef8ae54fe904ef49e38ce643ee04e249e78ce947ed0ae749e386e843e40ee045ef82e94fe508ef45eb80e643ee08e24de780ed413ab4bdbbb63c3a303eb4b1bfb5353f3134beb1bbbc36383e34bab1b7bd31373d32b8b1bbb6303a343eb8b5bfb9313f3531cfa284afc12b0f21cbac86abce240a21c7ac82a7cd230721cba680abc42e0825cfaa80afc5230f25c3a886a",
+          "serverCurWAfter": 93,
+          "clientCurRAfter": 93
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,656 @@
+{
+  "meta": {
+    "file": "primitives.json",
+    "purpose": "kiểu nguyên thuỷ big-endian của Java qua network.io.Message",
+    "generator": "port-csharp/tools/golden (P0-05) - sinh bằng regen.py, KHÔNG sửa tay",
+    "environment": {
+      "defaultLocale": "en-US",
+      "defaultTimeZone": "Asia/Ho_Chi_Minh",
+      "viVnDecimalSeparatorCodePoint": 44,
+      "viVnGroupingSeparatorCodePoint": 46
+    },
+    "javaSources": [{"path": "network/io/Message.java", "sha256": "4ae3b1b6181a78b59fee6adaebdb62dee74ccde749d2e7b15acee47b8aa9af0a", "lines": 276}]
+  },
+  "sourceRefs": {
+    "writeCris": "network/io/Message.java:52",
+    "writeShortToLong": "network/io/Message.java:60",
+    "writeByteToLong": "network/io/Message.java:68",
+    "writeByte": "network/io/Message.java:205",
+    "underlying": "java.io.DataOutputStream / DataInputStream của JDK (không phải mã dự án)"
+  },
+  "howToUse": "writeCases: gọi hàm ghi cùng tên với `arg` (và `argBits` cho float/double) phải ra đúng `hex`. readCases: đọc `hex` bằng hàm đọc cùng tên phải ra `result.value` (số thực kiểm thêm `bits`) và còn `remainingBytes` byte. compositeCases: ghi lần lượt `ops` phải ra `hex`.",
+  "format": "Mọi số nguyên/thực ghi big-endian (byte cao trước). boolean = 1 byte (0/1). float/double ghi qua floatToIntBits/doubleToLongBits nên MỌI NaN bị chuẩn hoá về 7fc00000 / 7ff8000000000000. writeByte/writeShort/writeChar nhận int và chỉ giữ 8/16 bit thấp. Giá trị 64-bit và số thực luôn là CHUỖI (tránh mất độ chính xác JSON); với float/double có thêm argBits = bit thô của đối số.",
+  "writeCases": [
+    {"id": "writeByte(-128)", "method": "writeByte", "argType": "int", "arg": "-128", "hex": "80"},
+    {"id": "writeByte(127)", "method": "writeByte", "argType": "int", "arg": "127", "hex": "7f"},
+    {"id": "writeByte(-1)", "method": "writeByte", "argType": "int", "arg": "-1", "hex": "ff"},
+    {"id": "writeByte(0)", "method": "writeByte", "argType": "int", "arg": "0", "hex": "00"},
+    {"id": "writeByte(1)", "method": "writeByte", "argType": "int", "arg": "1", "hex": "01"},
+    {"id": "writeByte(128)", "method": "writeByte", "argType": "int", "arg": "128", "hex": "80"},
+    {"id": "writeByte(255)", "method": "writeByte", "argType": "int", "arg": "255", "hex": "ff"},
+    {"id": "writeByte(256)", "method": "writeByte", "argType": "int", "arg": "256", "hex": "00"},
+    {"id": "writeByte(-129)", "method": "writeByte", "argType": "int", "arg": "-129", "hex": "7f"},
+    {"id": "writeByte(2147483647)", "method": "writeByte", "argType": "int", "arg": "2147483647", "hex": "ff"},
+    {"id": "writeByte(-2147483648)", "method": "writeByte", "argType": "int", "arg": "-2147483648", "hex": "00"},
+    {"id": "writeShort(-32768)", "method": "writeShort", "argType": "int", "arg": "-32768", "hex": "8000"},
+    {"id": "writeShort(32767)", "method": "writeShort", "argType": "int", "arg": "32767", "hex": "7fff"},
+    {"id": "writeShort(-1)", "method": "writeShort", "argType": "int", "arg": "-1", "hex": "ffff"},
+    {"id": "writeShort(0)", "method": "writeShort", "argType": "int", "arg": "0", "hex": "0000"},
+    {"id": "writeShort(1)", "method": "writeShort", "argType": "int", "arg": "1", "hex": "0001"},
+    {"id": "writeShort(256)", "method": "writeShort", "argType": "int", "arg": "256", "hex": "0100"},
+    {"id": "writeShort(32768)", "method": "writeShort", "argType": "int", "arg": "32768", "hex": "8000"},
+    {"id": "writeShort(65535)", "method": "writeShort", "argType": "int", "arg": "65535", "hex": "ffff"},
+    {"id": "writeShort(65536)", "method": "writeShort", "argType": "int", "arg": "65536", "hex": "0000"},
+    {"id": "writeShort(-32769)", "method": "writeShort", "argType": "int", "arg": "-32769", "hex": "7fff"},
+    {"id": "writeShort(2147483647)", "method": "writeShort", "argType": "int", "arg": "2147483647", "hex": "ffff"},
+    {"id": "writeShort(-2147483648)", "method": "writeShort", "argType": "int", "arg": "-2147483648", "hex": "0000"},
+    {"id": "writeInt(-2147483648)", "method": "writeInt", "argType": "int", "arg": "-2147483648", "hex": "80000000"},
+    {"id": "writeInt(2147483647)", "method": "writeInt", "argType": "int", "arg": "2147483647", "hex": "7fffffff"},
+    {"id": "writeInt(-1)", "method": "writeInt", "argType": "int", "arg": "-1", "hex": "ffffffff"},
+    {"id": "writeInt(0)", "method": "writeInt", "argType": "int", "arg": "0", "hex": "00000000"},
+    {"id": "writeInt(1)", "method": "writeInt", "argType": "int", "arg": "1", "hex": "00000001"},
+    {"id": "writeInt(256)", "method": "writeInt", "argType": "int", "arg": "256", "hex": "00000100"},
+    {"id": "writeInt(65536)", "method": "writeInt", "argType": "int", "arg": "65536", "hex": "00010000"},
+    {"id": "writeInt(305419896)", "method": "writeInt", "argType": "int", "arg": "305419896", "hex": "12345678"},
+    {"id": "writeInt(-559038737)", "method": "writeInt", "argType": "int", "arg": "-559038737", "hex": "deadbeef"},
+    {
+      "id": "writeLong(-9223372036854775808)",
+      "method": "writeLong",
+      "argType": "long",
+      "arg": "-9223372036854775808",
+      "hex": "8000000000000000"
+    },
+    {
+      "id": "writeLong(9223372036854775807)",
+      "method": "writeLong",
+      "argType": "long",
+      "arg": "9223372036854775807",
+      "hex": "7fffffffffffffff"
+    },
+    {"id": "writeLong(-1)", "method": "writeLong", "argType": "long", "arg": "-1", "hex": "ffffffffffffffff"},
+    {"id": "writeLong(0)", "method": "writeLong", "argType": "long", "arg": "0", "hex": "0000000000000000"},
+    {"id": "writeLong(1)", "method": "writeLong", "argType": "long", "arg": "1", "hex": "0000000000000001"},
+    {"id": "writeLong(81985529216486895)", "method": "writeLong", "argType": "long", "arg": "81985529216486895", "hex": "0123456789abcdef"},
+    {"id": "writeLong(4294967296)", "method": "writeLong", "argType": "long", "arg": "4294967296", "hex": "0000000100000000"},
+    {"id": "writeLong(-4294967296)", "method": "writeLong", "argType": "long", "arg": "-4294967296", "hex": "ffffffff00000000"},
+    {"id": "writeBoolean(true)", "method": "writeBoolean", "argType": "boolean", "arg": "true", "hex": "01"},
+    {"id": "writeBoolean(false)", "method": "writeBoolean", "argType": "boolean", "arg": "false", "hex": "00"},
+    {
+      "id": "writeFloat(0.0 bits=00000000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "0.0",
+      "argBits": "00000000",
+      "hex": "00000000"
+    },
+    {
+      "id": "writeFloat(-0.0 bits=80000000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "-0.0",
+      "argBits": "80000000",
+      "hex": "80000000"
+    },
+    {
+      "id": "writeFloat(1.0 bits=3f800000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "1.0",
+      "argBits": "3f800000",
+      "hex": "3f800000"
+    },
+    {
+      "id": "writeFloat(-1.0 bits=bf800000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "-1.0",
+      "argBits": "bf800000",
+      "hex": "bf800000"
+    },
+    {
+      "id": "writeFloat(1.4E-45 bits=00000001)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "1.4E-45",
+      "argBits": "00000001",
+      "hex": "00000001"
+    },
+    {
+      "id": "writeFloat(1.1754942E-38 bits=007fffff)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "1.1754942E-38",
+      "argBits": "007fffff",
+      "hex": "007fffff"
+    },
+    {
+      "id": "writeFloat(1.17549435E-38 bits=00800000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "1.17549435E-38",
+      "argBits": "00800000",
+      "hex": "00800000"
+    },
+    {
+      "id": "writeFloat(3.4028235E38 bits=7f7fffff)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "3.4028235E38",
+      "argBits": "7f7fffff",
+      "hex": "7f7fffff"
+    },
+    {
+      "id": "writeFloat(Infinity bits=7f800000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "Infinity",
+      "argBits": "7f800000",
+      "hex": "7f800000"
+    },
+    {
+      "id": "writeFloat(-Infinity bits=ff800000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "-Infinity",
+      "argBits": "ff800000",
+      "hex": "ff800000"
+    },
+    {
+      "id": "writeFloat(NaN bits=7fc00000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "NaN",
+      "argBits": "7fc00000",
+      "hex": "7fc00000"
+    },
+    {
+      "id": "writeFloat(NaN bits=7f800001)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "NaN",
+      "argBits": "7f800001",
+      "hex": "7fc00000"
+    },
+    {
+      "id": "writeFloat(NaN bits=ffc00000)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "NaN",
+      "argBits": "ffc00000",
+      "hex": "7fc00000"
+    },
+    {
+      "id": "writeFloat(0.1 bits=3dcccccd)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "0.1",
+      "argBits": "3dcccccd",
+      "hex": "3dcccccd"
+    },
+    {
+      "id": "writeFloat(3.1415927 bits=40490fdb)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "3.1415927",
+      "argBits": "40490fdb",
+      "hex": "40490fdb"
+    },
+    {
+      "id": "writeFloat(1.0E9 bits=4e6e6b28)",
+      "method": "writeFloat",
+      "argType": "float",
+      "arg": "1.0E9",
+      "argBits": "4e6e6b28",
+      "hex": "4e6e6b28"
+    },
+    {
+      "id": "writeDouble(0.0 bits=0000000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "0.0",
+      "argBits": "0000000000000000",
+      "hex": "0000000000000000"
+    },
+    {
+      "id": "writeDouble(-0.0 bits=8000000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "-0.0",
+      "argBits": "8000000000000000",
+      "hex": "8000000000000000"
+    },
+    {
+      "id": "writeDouble(1.0 bits=3ff0000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "1.0",
+      "argBits": "3ff0000000000000",
+      "hex": "3ff0000000000000"
+    },
+    {
+      "id": "writeDouble(-1.0 bits=bff0000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "-1.0",
+      "argBits": "bff0000000000000",
+      "hex": "bff0000000000000"
+    },
+    {
+      "id": "writeDouble(4.9E-324 bits=0000000000000001)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "4.9E-324",
+      "argBits": "0000000000000001",
+      "hex": "0000000000000001"
+    },
+    {
+      "id": "writeDouble(2.225073858507201E-308 bits=000fffffffffffff)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "2.225073858507201E-308",
+      "argBits": "000fffffffffffff",
+      "hex": "000fffffffffffff"
+    },
+    {
+      "id": "writeDouble(2.2250738585072014E-308 bits=0010000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "2.2250738585072014E-308",
+      "argBits": "0010000000000000",
+      "hex": "0010000000000000"
+    },
+    {
+      "id": "writeDouble(1.7976931348623157E308 bits=7fefffffffffffff)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "1.7976931348623157E308",
+      "argBits": "7fefffffffffffff",
+      "hex": "7fefffffffffffff"
+    },
+    {
+      "id": "writeDouble(Infinity bits=7ff0000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "Infinity",
+      "argBits": "7ff0000000000000",
+      "hex": "7ff0000000000000"
+    },
+    {
+      "id": "writeDouble(-Infinity bits=fff0000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "-Infinity",
+      "argBits": "fff0000000000000",
+      "hex": "fff0000000000000"
+    },
+    {
+      "id": "writeDouble(NaN bits=7ff8000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "NaN",
+      "argBits": "7ff8000000000000",
+      "hex": "7ff8000000000000"
+    },
+    {
+      "id": "writeDouble(NaN bits=7ff0000000000001)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "NaN",
+      "argBits": "7ff0000000000001",
+      "hex": "7ff8000000000000"
+    },
+    {
+      "id": "writeDouble(NaN bits=fff8000000000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "NaN",
+      "argBits": "fff8000000000000",
+      "hex": "7ff8000000000000"
+    },
+    {
+      "id": "writeDouble(0.1 bits=3fb999999999999a)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "0.1",
+      "argBits": "3fb999999999999a",
+      "hex": "3fb999999999999a"
+    },
+    {
+      "id": "writeDouble(3.141592653589793 bits=400921fb54442d18)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "3.141592653589793",
+      "argBits": "400921fb54442d18",
+      "hex": "400921fb54442d18"
+    },
+    {
+      "id": "writeDouble(1.0E9 bits=41cdcd6500000000)",
+      "method": "writeDouble",
+      "argType": "double",
+      "arg": "1.0E9",
+      "argBits": "41cdcd6500000000",
+      "hex": "41cdcd6500000000"
+    },
+    {"id": "writeChar(65)", "method": "writeChar", "argType": "int", "arg": "65", "hex": "0041"},
+    {"id": "writeChar(65535)", "method": "writeChar", "argType": "int", "arg": "65535", "hex": "ffff"},
+    {"id": "writeChar(65536)", "method": "writeChar", "argType": "int", "arg": "65536", "hex": "0000"},
+    {"id": "writeChar(-1)", "method": "writeChar", "argType": "int", "arg": "-1", "hex": "ffff"},
+    {"id": "writeChar(7871)", "method": "writeChar", "argType": "int", "arg": "7871", "hex": "1ebf"},
+    {"id": "writeCris(0,true)", "method": "writeCris", "argType": "long,boolean", "arg": "0,true", "hex": "00000000"},
+    {"id": "writeCris(0,false)", "method": "writeCris", "argType": "long,boolean", "arg": "0,false", "hex": "0000000000000000"},
+    {"id": "writeCris(1,true)", "method": "writeCris", "argType": "long,boolean", "arg": "1,true", "hex": "00000001"},
+    {"id": "writeCris(1,false)", "method": "writeCris", "argType": "long,boolean", "arg": "1,false", "hex": "0000000000000001"},
+    {"id": "writeCris(-1,true)", "method": "writeCris", "argType": "long,boolean", "arg": "-1,true", "hex": "ffffffff"},
+    {"id": "writeCris(-1,false)", "method": "writeCris", "argType": "long,boolean", "arg": "-1,false", "hex": "ffffffffffffffff"},
+    {
+      "id": "writeCris(1250999896491,true)",
+      "method": "writeCris",
+      "argType": "long,boolean",
+      "arg": "1250999896491,true",
+      "hex": "456789ab"
+    },
+    {
+      "id": "writeCris(1250999896491,false)",
+      "method": "writeCris",
+      "argType": "long,boolean",
+      "arg": "1250999896491,false",
+      "hex": "00000123456789ab"
+    },
+    {"id": "writeCris(4294967296,true)", "method": "writeCris", "argType": "long,boolean", "arg": "4294967296,true", "hex": "00000000"},
+    {
+      "id": "writeCris(4294967296,false)",
+      "method": "writeCris",
+      "argType": "long,boolean",
+      "arg": "4294967296,false",
+      "hex": "0000000100000000"
+    },
+    {
+      "id": "writeCris(9223372036854775807,true)",
+      "method": "writeCris",
+      "argType": "long,boolean",
+      "arg": "9223372036854775807,true",
+      "hex": "ffffffff"
+    },
+    {
+      "id": "writeCris(9223372036854775807,false)",
+      "method": "writeCris",
+      "argType": "long,boolean",
+      "arg": "9223372036854775807,false",
+      "hex": "7fffffffffffffff"
+    },
+    {"id": "writeShortToLong(0,true)", "method": "writeShortToLong", "argType": "long,boolean", "arg": "0,true", "hex": "0000"},
+    {
+      "id": "writeShortToLong(0,false)",
+      "method": "writeShortToLong",
+      "argType": "long,boolean",
+      "arg": "0,false",
+      "hex": "0000000000000000"
+    },
+    {"id": "writeShortToLong(1,true)", "method": "writeShortToLong", "argType": "long,boolean", "arg": "1,true", "hex": "0001"},
+    {
+      "id": "writeShortToLong(1,false)",
+      "method": "writeShortToLong",
+      "argType": "long,boolean",
+      "arg": "1,false",
+      "hex": "0000000000000001"
+    },
+    {"id": "writeShortToLong(-1,true)", "method": "writeShortToLong", "argType": "long,boolean", "arg": "-1,true", "hex": "ffff"},
+    {
+      "id": "writeShortToLong(-1,false)",
+      "method": "writeShortToLong",
+      "argType": "long,boolean",
+      "arg": "-1,false",
+      "hex": "ffffffffffffffff"
+    },
+    {"id": "writeShortToLong(70000,true)", "method": "writeShortToLong", "argType": "long,boolean", "arg": "70000,true", "hex": "1170"},
+    {
+      "id": "writeShortToLong(70000,false)",
+      "method": "writeShortToLong",
+      "argType": "long,boolean",
+      "arg": "70000,false",
+      "hex": "0000000000011170"
+    },
+    {"id": "writeShortToLong(32768,true)", "method": "writeShortToLong", "argType": "long,boolean", "arg": "32768,true", "hex": "8000"},
+    {
+      "id": "writeShortToLong(32768,false)",
+      "method": "writeShortToLong",
+      "argType": "long,boolean",
+      "arg": "32768,false",
+      "hex": "0000000000008000"
+    },
+    {
+      "id": "writeShortToLong(1250999896491,true)",
+      "method": "writeShortToLong",
+      "argType": "long,boolean",
+      "arg": "1250999896491,true",
+      "hex": "89ab"
+    },
+    {
+      "id": "writeShortToLong(1250999896491,false)",
+      "method": "writeShortToLong",
+      "argType": "long,boolean",
+      "arg": "1250999896491,false",
+      "hex": "00000123456789ab"
+    },
+    {"id": "writeByteToLong(0,true)", "method": "writeByteToLong", "argType": "long,boolean", "arg": "0,true", "hex": "00"},
+    {"id": "writeByteToLong(0,false)", "method": "writeByteToLong", "argType": "long,boolean", "arg": "0,false", "hex": "0000000000000000"},
+    {"id": "writeByteToLong(1,true)", "method": "writeByteToLong", "argType": "long,boolean", "arg": "1,true", "hex": "01"},
+    {"id": "writeByteToLong(1,false)", "method": "writeByteToLong", "argType": "long,boolean", "arg": "1,false", "hex": "0000000000000001"},
+    {"id": "writeByteToLong(-1,true)", "method": "writeByteToLong", "argType": "long,boolean", "arg": "-1,true", "hex": "ff"},
+    {
+      "id": "writeByteToLong(-1,false)",
+      "method": "writeByteToLong",
+      "argType": "long,boolean",
+      "arg": "-1,false",
+      "hex": "ffffffffffffffff"
+    },
+    {"id": "writeByteToLong(200,true)", "method": "writeByteToLong", "argType": "long,boolean", "arg": "200,true", "hex": "c8"},
+    {
+      "id": "writeByteToLong(200,false)",
+      "method": "writeByteToLong",
+      "argType": "long,boolean",
+      "arg": "200,false",
+      "hex": "00000000000000c8"
+    },
+    {"id": "writeByteToLong(256,true)", "method": "writeByteToLong", "argType": "long,boolean", "arg": "256,true", "hex": "00"},
+    {
+      "id": "writeByteToLong(256,false)",
+      "method": "writeByteToLong",
+      "argType": "long,boolean",
+      "arg": "256,false",
+      "hex": "0000000000000100"
+    },
+    {
+      "id": "writeByteToLong(1250999896491,true)",
+      "method": "writeByteToLong",
+      "argType": "long,boolean",
+      "arg": "1250999896491,true",
+      "hex": "ab"
+    },
+    {
+      "id": "writeByteToLong(1250999896491,false)",
+      "method": "writeByteToLong",
+      "argType": "long,boolean",
+      "arg": "1250999896491,false",
+      "hex": "00000123456789ab"
+    }
+  ],
+  "readCases": [
+    {"id": "readByte(80)", "method": "readByte", "hex": "80", "result": {"value": "-128"}, "remainingBytes": 0},
+    {"id": "readByte(7f)", "method": "readByte", "hex": "7f", "result": {"value": "127"}, "remainingBytes": 0},
+    {"id": "readByte(ff)", "method": "readByte", "hex": "ff", "result": {"value": "-1"}, "remainingBytes": 0},
+    {"id": "readByte(00)", "method": "readByte", "hex": "00", "result": {"value": "0"}, "remainingBytes": 0},
+    {"id": "readUnsignedByte(80)", "method": "readUnsignedByte", "hex": "80", "result": {"value": "128"}, "remainingBytes": 0},
+    {"id": "readUnsignedByte(ff)", "method": "readUnsignedByte", "hex": "ff", "result": {"value": "255"}, "remainingBytes": 0},
+    {"id": "readUnsignedByte(00)", "method": "readUnsignedByte", "hex": "00", "result": {"value": "0"}, "remainingBytes": 0},
+    {"id": "readUnsignedByte(7f)", "method": "readUnsignedByte", "hex": "7f", "result": {"value": "127"}, "remainingBytes": 0},
+    {"id": "readShort(8000)", "method": "readShort", "hex": "8000", "result": {"value": "-32768"}, "remainingBytes": 0},
+    {"id": "readShort(7fff)", "method": "readShort", "hex": "7fff", "result": {"value": "32767"}, "remainingBytes": 0},
+    {"id": "readShort(ffff)", "method": "readShort", "hex": "ffff", "result": {"value": "-1"}, "remainingBytes": 0},
+    {"id": "readShort(0000)", "method": "readShort", "hex": "0000", "result": {"value": "0"}, "remainingBytes": 0},
+    {"id": "readShort(0100)", "method": "readShort", "hex": "0100", "result": {"value": "256"}, "remainingBytes": 0},
+    {"id": "readUnsignedShort(ffff)", "method": "readUnsignedShort", "hex": "ffff", "result": {"value": "65535"}, "remainingBytes": 0},
+    {"id": "readUnsignedShort(8000)", "method": "readUnsignedShort", "hex": "8000", "result": {"value": "32768"}, "remainingBytes": 0},
+    {"id": "readUnsignedShort(0000)", "method": "readUnsignedShort", "hex": "0000", "result": {"value": "0"}, "remainingBytes": 0},
+    {"id": "readUnsignedShort(7fff)", "method": "readUnsignedShort", "hex": "7fff", "result": {"value": "32767"}, "remainingBytes": 0},
+    {"id": "readUnsignedShort(0100)", "method": "readUnsignedShort", "hex": "0100", "result": {"value": "256"}, "remainingBytes": 0},
+    {"id": "readInt(80000000)", "method": "readInt", "hex": "80000000", "result": {"value": "-2147483648"}, "remainingBytes": 0},
+    {"id": "readInt(7fffffff)", "method": "readInt", "hex": "7fffffff", "result": {"value": "2147483647"}, "remainingBytes": 0},
+    {"id": "readInt(ffffffff)", "method": "readInt", "hex": "ffffffff", "result": {"value": "-1"}, "remainingBytes": 0},
+    {"id": "readInt(00000000)", "method": "readInt", "hex": "00000000", "result": {"value": "0"}, "remainingBytes": 0},
+    {"id": "readInt(00000100)", "method": "readInt", "hex": "00000100", "result": {"value": "256"}, "remainingBytes": 0},
+    {
+      "id": "readLong(8000000000000000)",
+      "method": "readLong",
+      "hex": "8000000000000000",
+      "result": {"value": "-9223372036854775808"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readLong(7fffffffffffffff)",
+      "method": "readLong",
+      "hex": "7fffffffffffffff",
+      "result": {"value": "9223372036854775807"},
+      "remainingBytes": 0
+    },
+    {"id": "readLong(ffffffffffffffff)", "method": "readLong", "hex": "ffffffffffffffff", "result": {"value": "-1"}, "remainingBytes": 0},
+    {"id": "readLong(0000000000000000)", "method": "readLong", "hex": "0000000000000000", "result": {"value": "0"}, "remainingBytes": 0},
+    {
+      "id": "readLong(0000000100000000)",
+      "method": "readLong",
+      "hex": "0000000100000000",
+      "result": {"value": "4294967296"},
+      "remainingBytes": 0
+    },
+    {"id": "readBoolean(00)", "method": "readBoolean", "hex": "00", "result": {"value": "false"}, "remainingBytes": 0},
+    {"id": "readBoolean(01)", "method": "readBoolean", "hex": "01", "result": {"value": "true"}, "remainingBytes": 0},
+    {"id": "readBoolean(02)", "method": "readBoolean", "hex": "02", "result": {"value": "true"}, "remainingBytes": 0},
+    {"id": "readBoolean(ff)", "method": "readBoolean", "hex": "ff", "result": {"value": "true"}, "remainingBytes": 0},
+    {"id": "readBoolean(80)", "method": "readBoolean", "hex": "80", "result": {"value": "true"}, "remainingBytes": 0},
+    {
+      "id": "readFloat(3f800000)",
+      "method": "readFloat",
+      "hex": "3f800000",
+      "result": {"value": "1.0", "bits": "3f800000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readFloat(7fc00000)",
+      "method": "readFloat",
+      "hex": "7fc00000",
+      "result": {"value": "NaN", "bits": "7fc00000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readFloat(7f800000)",
+      "method": "readFloat",
+      "hex": "7f800000",
+      "result": {"value": "Infinity", "bits": "7f800000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readFloat(ff800000)",
+      "method": "readFloat",
+      "hex": "ff800000",
+      "result": {"value": "-Infinity", "bits": "ff800000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readFloat(80000000)",
+      "method": "readFloat",
+      "hex": "80000000",
+      "result": {"value": "-0.0", "bits": "80000000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readFloat(00000001)",
+      "method": "readFloat",
+      "hex": "00000001",
+      "result": {"value": "1.4E-45", "bits": "00000001"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readFloat(7f7fffff)",
+      "method": "readFloat",
+      "hex": "7f7fffff",
+      "result": {"value": "3.4028235E38", "bits": "7f7fffff"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readDouble(3ff0000000000000)",
+      "method": "readDouble",
+      "hex": "3ff0000000000000",
+      "result": {"value": "1.0", "bits": "3ff0000000000000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readDouble(7ff8000000000000)",
+      "method": "readDouble",
+      "hex": "7ff8000000000000",
+      "result": {"value": "NaN", "bits": "7ff8000000000000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readDouble(7ff0000000000000)",
+      "method": "readDouble",
+      "hex": "7ff0000000000000",
+      "result": {"value": "Infinity", "bits": "7ff0000000000000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readDouble(fff0000000000000)",
+      "method": "readDouble",
+      "hex": "fff0000000000000",
+      "result": {"value": "-Infinity", "bits": "fff0000000000000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readDouble(8000000000000000)",
+      "method": "readDouble",
+      "hex": "8000000000000000",
+      "result": {"value": "-0.0", "bits": "8000000000000000"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readDouble(0000000000000001)",
+      "method": "readDouble",
+      "hex": "0000000000000001",
+      "result": {"value": "4.9E-324", "bits": "0000000000000001"},
+      "remainingBytes": 0
+    },
+    {
+      "id": "readDouble(7fefffffffffffff)",
+      "method": "readDouble",
+      "hex": "7fefffffffffffff",
+      "result": {"value": "1.7976931348623157E308", "bits": "7fefffffffffffff"},
+      "remainingBytes": 0
+    },
+    {"id": "readChar(0041)", "method": "readChar", "hex": "0041", "result": {"value": "65"}, "remainingBytes": 0},
+    {"id": "readChar(ffff)", "method": "readChar", "hex": "ffff", "result": {"value": "65535"}, "remainingBytes": 0},
+    {"id": "readChar(1ebf)", "method": "readChar", "hex": "1ebf", "result": {"value": "7871"}, "remainingBytes": 0},
+    {"id": "readChar(0000)", "method": "readChar", "hex": "0000", "result": {"value": "0"}, "remainingBytes": 0}
+  ],
+  "compositeCases": [
+    {
+      "id": "all-types-in-order",
+      "note": "mỗi kiểu một lần, theo thứ tự byte, short, int, long, boolean, UTF, float, double",
+      "ops": [
+        "writeByte:-3",
+        "writeShort:-300",
+        "writeInt:-70000",
+        "writeLong:-5000000000",
+        "writeBoolean:true",
+        "writeUTF:Chào Việt Nam",
+        "writeFloat:1.5",
+        "writeDouble:-2.25"
+      ],
+      "hex": "fdfed4fffeee90fffffffed5fa0e000100104368c3a06f205669e1bb8774204e616d3fc00000c002000000000000"
+    },
+    {
+      "id": "typical-packet",
+      "note": "kiểu gói thường gặp: mã con, số lượng, tên, tiền",
+      "ops": ["writeByte:0", "writeShort:3", "writeUTF:Đậu thần", "writeInt:100000", "writeLong:1700000000000"],
+      "hex": "000003000dc490e1baad75207468e1baa76e000186a00000018bcfe56800"
+    }
+  ]
+}

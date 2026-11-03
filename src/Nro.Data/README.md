@@ -1,0 +1,20 @@
+# Nro.Data: the database access layer (replaces `jbcd.ConnectDB`)
+
+`NroDatabase` runs JDBC-style SQL (positional `?`) on Npgsql/PostgreSQL and returns results as a snapshot (`IResultSnapshot`).
+This document lists the pitfalls that DAO authors need to know. A test pins each one (see the "Test" column).
+
+## Pitfalls when writing SQL for DAOs
+
+| # | Pitfall | How to handle it | Test |
+|---|---|---|---|
+| 1 | A `string` parameter is sent as "unknown" (PostgreSQL infers the type the way MySQL coerces it: `citext` comparison is case-insensitive, the string `'12'` into a numeric column, `'true'` into a boolean column, JSON into `jsonb`). Consequence: when there is NO type context, PostgreSQL raises `could not determine data type of parameter $1` (42P18) or `could not determine polymorphic type because input has type unknown` (42804) for `? is null`, `pg_typeof(?)`, `to_jsonb(?)`, `jsonb_build_object('a', ?)`. | Cast explicitly when the parameter is a string and has no context: `?::text is null`, `to_jsonb(?::text)`, `?::jsonb`. Comparing with a column, assigning to a column, `jsonb_exists(profile, ?)`, `coalesce(column, ?)` need no cast. | `NroDatabaseQueryTests.String_parameters_are_unknown_so_statements_that_let_PostgreSQL_infer_the_type_must_cast_explicitly` |
+| 2 | The jsonb operators `?`, `?|`, `?&` are treated as positional parameters (the `?` translator cannot tell them apart). | Use the functions `jsonb_exists(j, k)`, `jsonb_exists_any(j, keys)`, `jsonb_exists_all(j, keys)`. Using `?` as an operator without a matching argument throws `SqlPlaceholderMismatchException` (broken SQL is never sent). | `SqlPlaceholdersTests` (the `j ? 'a'`, `?\|`, `?&` cases) |
+| 3 | A `DateTime` with `Kind=Utc` is sent by Npgsql as `timestamptz`; written into a `timestamp` column it is converted by the session time zone. `Kind=Local/Unspecified` keeps the wall-clock time. | Use `Unspecified` for `timestamp` columns; the time zone decision belongs to B-01 (pending). | `Timestamp_without_time_zone_written_and_read_back_keeps_the_wall_clock_time` |
+| 4 | A Java quirk, preserved: `ExecuteUpdateAsync` with SQL that starts with exactly `insert` (lower case) and ends with exactly `()` turns EVERY `()` into `(?,?,...)` sized by the number of arguments. | Know about it to avoid surprises; it only applies when there are arguments, and not in `ExecuteQueryAsync`. | `SqlPlaceholdersTests.Insert_quirk_...` |
+| 5 | `GetString` of a large floating-point number (`|x| >= 1e7`) may differ from the Java string (JDK 17 prints extra digits). | Read it with `GetDouble`/`GetFloat`. | see the remarks of `JavaStringFormat` |
+
+## SQL error log
+
+Only the SQL text (with `?`, no parameter values), the SQLSTATE code and, for errors outside class 22, the primary message with
+the quoted segments blanked are logged. Reason: PostgreSQL copies user values into the message of data errors (e.g. `invalid input syntax for type integer: "..."`).
+The exception thrown to the caller stays intact (it may contain values; whoever catches the exception must be careful when writing it out).

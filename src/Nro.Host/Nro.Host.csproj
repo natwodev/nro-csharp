@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nro.Core\Nro.Core.csproj" />
+    <ProjectReference Include="..\Nro.Data\Nro.Data.csproj" />
+    <ProjectReference Include="..\Nro.Network\Nro.Network.csproj" />
+    <ProjectReference Include="..\Nro.Game\Nro.Game.csproj" />
+    <ProjectReference Include="..\Nro.Content\Nro.Content.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

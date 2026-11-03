@@ -1,0 +1,344 @@
+// =====================================================================================================================
+// JavaDifferentialReference.java.txt  (Java reference for JavaDifferentialTests.cs; this is a copy of DiffGen.java)
+//
+// How to re-run it to generate/verify the SHA-256 constants in JavaDifferentialTests.cs (needs JDK 17; JSRC = the src folder of the original Java code):
+//   1) rename this file to DiffGen.java (drop the .txt suffix)
+//   2) javac --release 17 -encoding UTF-8 -d out -sourcepath "$JSRC" "$JSRC/network/io/Message.java" DiffGen.java
+//   3) java -cp out DiffGen
+// The program uses the project's OWN network.io.Message class (the original Java code, read-only) for the numbers part, and the JDK's DataOutputStream/DataInputStream
+// for the string part. Results of the run that was used (JDK 17.0.19):
+//   WRITE_UTF seed=20260101 cases=12000 ok=11372 err=628 maxWire=65537 sha256=725c58e199e17dfa06919e99613e2e7c383485f79a6d9bb7e88964604110143f
+//   READ_UTF  seed=20260102 cases=12000 ok=5669 utfError=5615 eof=716 sha256=5e9b8c9ce29e9f0fa9f5ed208d8397c2eb8e21302779db6e8207cc971ef04d88
+//   NUMBERS   seed=20260103 tuples=12000 ops=41863 bytes=192199 sha256=f58c6aae6bf2ddf86941c2943fe487c6d6d4410babd712a3a3ab12f7addc5e20
+// Every random-generator call (order, count) here must match DifferentialGenerators.cs and JavaDifferentialTests.cs exactly.
+// =====================================================================================================================
+import java.io.*;
+import java.security.MessageDigest;
+import java.util.HexFormat;
+import network.io.Message;
+
+/**
+ * Java reference for JavaDifferentialTests.cs (C#): generates deterministic pseudo-random data (SplitMix64), writes/reads with
+ * the real JDK 17 (DataOutputStream/DataInputStream and the project's own network.io.Message class) and then prints the SHA-256 of the result.
+ */
+public class DiffGen {
+    // ------------------------------------------------------------------ SplitMix64
+    static final class Rng {
+        long state;
+        Rng(long seed) { state = seed; }
+        long next() {
+            state += 0x9E3779B97F4A7C15L;
+            long z = state;
+            z = (z ^ (z >>> 30)) * 0xBF58476D1CE4E5B9L;
+            z = (z ^ (z >>> 27)) * 0x94D049BB133111EBL;
+            return z ^ (z >>> 31);
+        }
+        int below(int n) { return (int) ((next() >>> 33) % n); }
+    }
+
+    static final int[] LO = {0x0000, 0x0080, 0x0800, 0xD800, 0xDC00, 0xE000, 0x1E00, 0x4E00};
+    static final int[] HI = {0x007F, 0x07FF, 0xD7FF, 0xDBFF, 0xDFFF, 0xFFFF, 0x1EFF, 0x9FFF};
+    static final int[] LONG_ASCII_LENGTHS = {254, 255, 256, 257, 32767, 32768, 32769, 65534, 65535, 65536, 65537};
+    static final int[] EDGE_UNITS = {0, 'a', 0x7F, 0x80, 0x7FF, 0x800, 0xFFFF};
+    static final int[] INTERESTING_BYTES = {0x00, 0x01, 0x41, 0x7F, 0x80, 0x81, 0x9F, 0xA0, 0xB0, 0xBF, 0xC0, 0xC1, 0xC2, 0xDF,
+            0xE0, 0xE1, 0xEF, 0xF0, 0xF4, 0xF7, 0xF8, 0xFF};
+    static final int[] INTERESTING_INTS = {0, 1, -1, 2, 127, 128, 255, 256, -128, -129, 32767, 32768, 65535, 65536, -32768, -32769,
+            0x7FFFFFFF, 0x80000000, 0x7F7F7F7F, 0x01020304, 0xDEADBEEF, 0x12345678};
+    static final long[] INTERESTING_LONGS = {0L, 1L, -1L, 0x7FFFFFFFFFFFFFFFL, 0x8000000000000000L, 0xFFFFFFFFL, 0x100000000L,
+            -4294967296L, 0x0123456789ABCDEFL, 0x7FFFFFFFL, 0x80000000L, 255L, 256L, 65535L, 65536L, -32768L, 32768L, 200L};
+
+    static int interestingInt(Rng g) {
+        return g.below(4) < 2 ? INTERESTING_INTS[g.below(INTERESTING_INTS.length)] : (int) g.next();
+    }
+
+    static long interestingLong(Rng g) {
+        return g.below(4) < 2 ? INTERESTING_LONGS[g.below(INTERESTING_LONGS.length)] : g.next();
+    }
+
+    static String shortString(Rng g) {
+        int len = g.below(9);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < len; i++) sb.append((char) g.below(0x10000));
+        return sb.toString();
+    }
+
+    // ------------------------------------------------------------------ strings
+    static String genString(Rng g) {
+        int kind = g.below(12);
+        StringBuilder sb = new StringBuilder();
+        switch (kind) {
+            case 0:
+                break;
+            case 1: {
+                int len = 1 + g.below(48);
+                for (int i = 0; i < len; i++) sb.append((char) (0x20 + g.below(0x5F)));
+                break;
+            }
+            case 2: {
+                int len = 1 + g.below(64);
+                for (int i = 0; i < len; i++) sb.append((char) g.below(0x10000));
+                break;
+            }
+            case 3: {
+                int pairs = 1 + g.below(24);
+                for (int i = 0; i < pairs; i++) {
+                    sb.append((char) (0xD800 + g.below(0x400)));
+                    sb.append((char) (0xDC00 + g.below(0x400)));
+                }
+                break;
+            }
+            case 4: {
+                int len = 1 + g.below(32);
+                for (int i = 0; i < len; i++) sb.append((char) EDGE_UNITS[g.below(7)]);
+                break;
+            }
+            case 5: {
+                int len = 1 + g.below(64);
+                for (int i = 0; i < len; i++) {
+                    int r = g.below(8);
+                    sb.append((char) (LO[r] + g.below(HI[r] - LO[r] + 1)));
+                }
+                break;
+            }
+            case 6:
+                genNearLimit(g, sb);
+                break;
+            case 7: {
+                int len = LONG_ASCII_LENGTHS[g.below(11)];
+                char c = (char) ('a' + g.below(26));
+                for (int i = 0; i < len; i++) sb.append(c);
+                break;
+            }
+            case 8: {
+                int len = 1 + g.below(40);
+                for (int i = 0; i < len; i++) {
+                    if (g.below(2) == 0) sb.append((char) (0xD800 + g.below(0x800)));
+                    else sb.append((char) ('a' + g.below(26)));
+                }
+                break;
+            }
+            default: {
+                int len = 1 + g.below(100);
+                for (int i = 0; i < len; i++) {
+                    int r = g.below(6);
+                    char c;
+                    switch (r) {
+                        case 0: c = (char) (0x20 + g.below(0x5F)); break;
+                        case 1: c = (char) (0x80 + g.below(0x780)); break;
+                        case 2: c = (char) (0x800 + g.below(0xD800 - 0x800)); break;
+                        case 3: c = (char) (0xD800 + g.below(0x400)); break;
+                        case 4: c = (char) (0xDC00 + g.below(0x400)); break;
+                        default: c = 0; break;
+                    }
+                    sb.append(c);
+                }
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
+    static void genNearLimit(Rng g, StringBuilder sb) {
+        long target = 65529 + g.below(13);
+        char[] block = new char[16];
+        int[] blen = new int[16];
+        for (int k = 0; k < 16; k++) {
+            int r = g.below(4);
+            char c;
+            int size;
+            if (r == 0) { c = (char) (0x20 + g.below(0x5F)); size = 1; }
+            else if (r == 1) { c = (char) (0x80 + g.below(0x780)); size = 2; }
+            else if (r == 2) { c = (char) (0x800 + g.below(0xD800 - 0x800)); size = 3; }
+            else { c = 0; size = 2; }
+            block[k] = c;
+            blen[k] = size;
+        }
+        long len = 0;
+        int k = 0;
+        while (true) {
+            int sz = blen[k & 15];
+            if (len + sz > target) break;
+            sb.append(block[k & 15]);
+            len += sz;
+            k++;
+        }
+        long rem = target - len;
+        while (rem > 0) {
+            if (rem >= 2) { sb.append((char) (0x80 + g.below(0x780))); rem -= 2; }
+            else { sb.append((char) (0x20 + g.below(0x5F))); rem -= 1; }
+        }
+    }
+
+    static String genSmallString(Rng g) {
+        int len = g.below(25);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            int r = g.below(7);
+            char c;
+            switch (r) {
+                case 0: c = (char) (0x20 + g.below(0x5F)); break;
+                case 1: c = (char) (0x80 + g.below(0x780)); break;
+                case 2: c = (char) (0x800 + g.below(0xD800 - 0x800)); break;
+                case 3: c = (char) (0xD800 + g.below(0x400)); break;
+                case 4: c = (char) (0xDC00 + g.below(0x400)); break;
+                case 5: c = (char) (0xE000 + g.below(0x2000)); break;
+                default: c = 0; break;
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    // ------------------------------------------------------------------ digest helpers
+    static void be32(MessageDigest md, int v) {
+        md.update((byte) (v >>> 24)); md.update((byte) (v >>> 16)); md.update((byte) (v >>> 8)); md.update((byte) v);
+    }
+
+    static void units(MessageDigest md, String s) {
+        be32(md, s.length());
+        for (int i = 0; i < s.length(); i++) { char c = s.charAt(i); md.update((byte) (c >>> 8)); md.update((byte) c); }
+    }
+
+    // ------------------------------------------------------------------ 1) writeUTF
+    static void runWriteUtf(long seed, int cases) throws Exception {
+        Rng g = new Rng(seed);
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        int ok = 0, err = 0, maxOk = 0;
+        for (int i = 0; i < cases; i++) {
+            String s = genString(g);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            try {
+                dos.writeUTF(s);
+                byte[] w = baos.toByteArray();
+                md.update((byte) 'O');
+                be32(md, w.length);
+                md.update(w);
+                ok++;
+                maxOk = Math.max(maxOk, w.length);
+            } catch (UTFDataFormatException e) {
+                md.update((byte) 'E');
+                units(md, e.getMessage());
+                err++;
+            }
+        }
+        System.out.println("WRITE_UTF seed=" + seed + " cases=" + cases + " ok=" + ok + " err=" + err + " maxWire=" + maxOk
+                + " sha256=" + HexFormat.of().formatHex(md.digest()));
+    }
+
+    // ------------------------------------------------------------------ 2) readUTF on random bytes
+    static void runReadUtf(long seed, int cases) throws Exception {
+        Rng g = new Rng(seed);
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        int okN = 0, utfN = 0, eofN = 0;
+        for (int i = 0; i < cases; i++) {
+            byte[] data;
+            if (g.below(4) == 0) {
+                int n0 = g.below(48);
+                data = new byte[n0];
+                for (int j = 0; j < n0; j++) {
+                    data[j] = g.below(2) == 0 ? (byte) INTERESTING_BYTES[g.below(INTERESTING_BYTES.length)] : (byte) g.below(256);
+                }
+            } else {
+                ByteArrayOutputStream enc = new ByteArrayOutputStream();
+                new DataOutputStream(enc).writeUTF(genSmallString(g));
+                byte[] full = enc.toByteArray();
+                data = new byte[full.length - 2];
+                System.arraycopy(full, 2, data, 0, data.length);
+                int muts = g.below(3) == 0 ? 1 + g.below(2) : 0;
+                for (int k = 0; k < muts; k++) {
+                    if (data.length > 0) {
+                        int at = g.below(data.length);
+                        data[at] = g.below(2) == 0 ? (byte) INTERESTING_BYTES[g.below(INTERESTING_BYTES.length)] : (byte) g.below(256);
+                    }
+                }
+            }
+            int n = data.length;
+            int mode = g.below(8);
+            int d;
+            if (mode <= 5) d = n;
+            else if (mode == 6) d = n + 1 + g.below(3);
+            else d = g.below(n + 1);
+            int extra = g.below(4);
+            byte[] wire = new byte[2 + n + extra];
+            wire[0] = (byte) (d >>> 8);
+            wire[1] = (byte) d;
+            System.arraycopy(data, 0, wire, 2, n);
+            for (int j = 0; j < extra; j++) wire[2 + n + j] = (byte) g.below(256);
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(wire));
+            try {
+                String r = dis.readUTF();
+                md.update((byte) 'S');
+                units(md, r);
+                be32(md, dis.available());
+                okN++;
+            } catch (UTFDataFormatException e) {
+                md.update((byte) 'U');
+                units(md, e.getMessage());
+                be32(md, dis.available());
+                utfN++;
+            } catch (EOFException e) {
+                md.update((byte) 'E');
+                be32(md, dis.available());
+                eofN++;
+            }
+        }
+        System.out.println("READ_UTF seed=" + seed + " cases=" + cases + " ok=" + okN + " utfError=" + utfN + " eof=" + eofN
+                + " sha256=" + HexFormat.of().formatHex(md.digest()));
+    }
+
+    // ------------------------------------------------------------------ 3) numbers and the real Message
+    static void runNumbers(long seed, int tuples) throws Exception {
+        Rng g = new Rng(seed);
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        long totalOps = 0, totalBytes = 0;
+        for (int i = 0; i < tuples; i++) {
+            int cmd = g.below(1024) - 512;
+            Message m = new Message(cmd);
+            md.update(m.command);
+            int ops = 1 + g.below(6);
+            for (int o = 0; o < ops; o++) {
+                int kind = g.below(16);
+                switch (kind) {
+                    case 0: m.writeByte(interestingInt(g)); break;
+                    case 1: m.writeShort(interestingInt(g)); break;
+                    case 2: m.writeChar(interestingInt(g)); break;
+                    case 3: m.writeInt(interestingInt(g)); break;
+                    case 4: m.writeLong(interestingLong(g)); break;
+                    case 5: m.writeBoolean(g.below(2) == 1); break;
+                    case 6: m.writeFloat(Float.intBitsToFloat(interestingInt(g))); break;
+                    case 7: m.writeDouble(Double.longBitsToDouble(interestingLong(g))); break;
+                    case 8: { long v = interestingLong(g); m.writeCris(v, g.below(2) == 1); break; }
+                    case 9: { long v = interestingLong(g); m.writeShortToLong(v, g.below(2) == 1); break; }
+                    case 10: { long v = interestingLong(g); m.writeByteToLong(v, g.below(2) == 1); break; }
+                    case 11: m.writeBytes(shortString(g)); break;
+                    case 12: m.writeChars(shortString(g)); break;
+                    case 13: m.write(interestingInt(g)); break;
+                    case 14: {
+                        int len = g.below(9);
+                        byte[] b = new byte[len];
+                        for (int j = 0; j < len; j++) b[j] = (byte) g.below(256);
+                        int off = g.below(len + 1);
+                        int cnt = g.below(len - off + 1);
+                        m.write(b, off, cnt);
+                        break;
+                    }
+                    default: m.writeUTF(shortString(g)); break;
+                }
+                totalOps++;
+            }
+            byte[] data = m.getData();
+            be32(md, data.length);
+            md.update(data);
+            totalBytes += data.length;
+        }
+        System.out.println("NUMBERS seed=" + seed + " tuples=" + tuples + " ops=" + totalOps + " bytes=" + totalBytes
+                + " sha256=" + HexFormat.of().formatHex(md.digest()));
+    }
+
+    public static void main(String[] args) throws Exception {
+        runWriteUtf(20260101L, 12000);
+        runReadUtf(20260102L, 12000);
+        runNumbers(20260103L, 12000);
+    }
+}
