@@ -1746,9 +1746,9 @@
           "viaColumn": "player_id"
         },
         {
-          "name": "ConsignItems",
-          "element": "ConsignItem",
-          "viaTable": "shop_ky_gui",
+          "name": "ConsignmentItems",
+          "element": "ConsignmentItem",
+          "viaTable": "consignment_item",
           "viaColumn": "player_id"
         }
       ]
@@ -2373,10 +2373,10 @@
       ]
     },
     {
-      "table": "blockip_list",
+      "table": "blocked_ip",
       "entity": "BlockedIp",
       "folder": "Runtime",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -2445,10 +2445,10 @@
       "collections": []
     },
     {
-      "table": "napthe",
+      "table": "card_topup",
       "entity": "CardTopup",
       "folder": "Web",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -2724,10 +2724,10 @@
       "collections": []
     },
     {
-      "table": "vp_bank",
+      "table": "bank_transfer",
       "entity": "BankTransfer",
       "folder": "Web",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -2856,8 +2856,8 @@
       "collections": []
     },
     {
-      "table": "moc_nap",
-      "entity": "TopupMilestoneRewardRow",
+      "table": "top_up_milestone_reward",
+      "entity": "TopUpMilestoneRewardRow",
       "folder": "StaticData",
       "explicitTable": true,
       "primaryKey": [
@@ -2866,7 +2866,7 @@
       "columns": [
         {
           "explicitName": false,
-          "property": "TopupMilestoneRewardId",
+          "property": "TopUpMilestoneRewardId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -5802,17 +5802,17 @@
       ]
     },
     {
-      "table": "shop_ky_gui",
-      "entity": "ConsignItem",
+      "table": "consignment_item",
+      "entity": "ConsignmentItem",
       "folder": "Runtime",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
       "columns": [
         {
           "explicitName": false,
-          "property": "ConsignItemId",
+          "property": "ConsignmentItemId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -6479,8 +6479,8 @@
       "collections": []
     },
     {
-      "table": "array_head_2_frames",
-      "entity": "ArrayHead2FramesRow",
+      "table": "head_animation_frame",
+      "entity": "HeadAnimationFrameRow",
       "folder": "StaticData",
       "explicitTable": true,
       "primaryKey": [
@@ -6489,7 +6489,7 @@
       "columns": [
         {
           "explicitName": false,
-          "property": "ArrayHead2FramesId",
+          "property": "HeadAnimationFrameId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -8478,17 +8478,17 @@
       "collections": []
     },
     {
-      "table": "nclass",
-      "entity": "NClass",
+      "table": "character_class",
+      "entity": "CharacterClass",
       "folder": "Unused",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
       "columns": [
         {
           "explicitName": false,
-          "property": "NClassId",
+          "property": "CharacterClassId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -9502,10 +9502,10 @@
       "collections": []
     },
     {
-      "table": "tai_xiu",
+      "table": "sic_bo_round",
       "entity": "SicBoRound",
       "folder": "Runtime",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -9604,10 +9604,10 @@
       "collections": []
     },
     {
-      "table": "chan_le",
+      "table": "even_odd_spin",
       "entity": "EvenOddSpin",
       "folder": "Logs",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -9676,10 +9676,10 @@
       "collections": []
     },
     {
-      "table": "pariry_players",
-      "entity": "PariryPlayer",
+      "table": "parity_bet",
+      "entity": "ParityBet",
       "folder": "Runtime",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [],
       "columns": [
         {
@@ -9696,9 +9696,9 @@
           "primaryKey": false,
           "identity": false,
           "foreignKey": {
-            "navigation": "ParirySession",
-            "target": "ParirySession",
-            "targetTable": "pariry_session",
+            "navigation": "ParitySession",
+            "target": "ParitySession",
+            "targetTable": "parity_session",
             "optional": false
           }
         },
@@ -9796,8 +9796,8 @@
       "collections": []
     },
     {
-      "table": "pariry_session",
-      "entity": "ParirySession",
+      "table": "parity_session",
+      "entity": "ParitySession",
       "folder": "Logs",
       "explicitTable": false,
       "primaryKey": [
@@ -9806,7 +9806,7 @@
       "columns": [
         {
           "explicitName": false,
-          "property": "ParirySessionId",
+          "property": "ParitySessionId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -9897,9 +9897,9 @@
       ],
       "collections": [
         {
-          "name": "PariryPlayers",
-          "element": "PariryPlayer",
-          "viaTable": "pariry_players",
+          "name": "ParityBets",
+          "element": "ParityBet",
+          "viaTable": "parity_bet",
           "viaColumn": "session_id"
         }
       ]

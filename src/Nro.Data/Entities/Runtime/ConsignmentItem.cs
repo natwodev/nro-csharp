@@ -4,14 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Runtime;
 
 // Entity đại diện cho vật phẩm ký gửi trong hệ thống
-// Bảng cơ sở dữ liệu: shop_ky_gui (sinh tự động, không sửa tay)
-[Table("shop_ky_gui")]
-public class ConsignItem
+// Bảng cơ sở dữ liệu: consignment_item (sinh tự động, không sửa tay)
+public class ConsignmentItem
 {
-    // Khóa chính của bảng ConsignItem (tự tăng)
+    // Khóa chính của bảng ConsignmentItem (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int ConsignItemId { get; set; }
+    public int ConsignmentItemId { get; set; }
 
     // Khóa ngoại liên kết với Player (người chơi bán)
     [ForeignKey("Player")]

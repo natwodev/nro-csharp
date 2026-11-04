@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Runtime;
 
 // Entity đại diện cho một ván minigame Tài Xỉu trong hệ thống
-// Bảng cơ sở dữ liệu: tai_xiu (sinh tự động, không sửa tay)
-[Table("tai_xiu")]
+// Bảng cơ sở dữ liệu: sic_bo_round (sinh tự động, không sửa tay)
 public class SicBoRound
 {
     // Khóa chính của bảng SicBoRound (tự tăng)

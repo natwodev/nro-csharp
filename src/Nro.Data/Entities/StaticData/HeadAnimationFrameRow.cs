@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho hoạt ảnh đầu nhiều khung hình trong hệ thống
-// Bảng cơ sở dữ liệu: array_head_2_frames (sinh tự động, không sửa tay)
-[Table("array_head_2_frames")]
-public class ArrayHead2FramesRow
+// Bảng cơ sở dữ liệu: head_animation_frame (sinh tự động, không sửa tay)
+[Table("head_animation_frame")]
+public class HeadAnimationFrameRow
 {
-    // Khóa chính của bảng ArrayHead2Frames (tự tăng)
+    // Khóa chính của bảng HeadAnimationFrame (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int ArrayHead2FramesId { get; set; }
+    public int HeadAnimationFrameId { get; set; }
 
     // Mã bộ phận đầu của hoạt ảnh (mảng JSON)
     [Required]

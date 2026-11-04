@@ -4,12 +4,11 @@ using Nro.Data.Entities.Logs;
 namespace Nro.Data.Entities.Runtime;
 
 // Entity đại diện cho lượt đặt cược của người chơi trong phiên Chẵn Lẻ trong hệ thống
-// Bảng cơ sở dữ liệu: pariry_players (sinh tự động, không sửa tay)
-[Table("pariry_players")]
-public class PariryPlayer
+// Bảng cơ sở dữ liệu: parity_bet (sinh tự động, không sửa tay)
+public class ParityBet
 {
-    // Khóa ngoại liên kết với ParirySession (phiên minigame)
-    [ForeignKey("ParirySession")]
+    // Khóa ngoại liên kết với ParitySession (phiên minigame)
+    [ForeignKey("ParitySession")]
     public int SessionId { get; set; }
 
     // Người chơi đặt cược
@@ -31,6 +30,6 @@ public class PariryPlayer
     [Column(TypeName = "timestamp with time zone")]
     public DateTime BetAt { get; set; }
 
-    // Navigation property đến entity ParirySession
-    public ParirySession ParirySession { get; set; } = default!;
+    // Navigation property đến entity ParitySession
+    public ParitySession ParitySession { get; set; } = default!;
 }

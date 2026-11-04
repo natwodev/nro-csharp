@@ -587,7 +587,7 @@ public class Player
     // Mối quan hệ one-to-many với GoldBarReceiveHistory
     public ICollection<GoldBarReceiveHistory> GoldBarReceiveHistories { get; set; } = new List<GoldBarReceiveHistory>();
 
-    // Collection các bản ghi ConsignItem thuộc Player này
-    // Mối quan hệ one-to-many với ConsignItem
-    public ICollection<ConsignItem> ConsignItems { get; set; } = new List<ConsignItem>();
+    // Collection các bản ghi ConsignmentItem thuộc Player này
+    // Mối quan hệ one-to-many với ConsignmentItem
+    public ICollection<ConsignmentItem> ConsignmentItems { get; set; } = new List<ConsignmentItem>();
 }

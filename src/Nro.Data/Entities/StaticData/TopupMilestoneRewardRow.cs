@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho cấu hình thưởng mốc nạp trong hệ thống
-// Bảng cơ sở dữ liệu: moc_nap (sinh tự động, không sửa tay)
-[Table("moc_nap")]
-public class TopupMilestoneRewardRow
+// Bảng cơ sở dữ liệu: top_up_milestone_reward (sinh tự động, không sửa tay)
+[Table("top_up_milestone_reward")]
+public class TopUpMilestoneRewardRow
 {
-    // Khóa chính của bảng TopupMilestoneReward (tự tăng)
+    // Khóa chính của bảng TopUpMilestoneReward (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int TopupMilestoneRewardId { get; set; }
+    public int TopUpMilestoneRewardId { get; set; }
 
     // Tài khoản người dùng
     public int UserId { get; set; }

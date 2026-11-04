@@ -4,14 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Unused;
 
 // Entity đại diện cho lớp nhân vật hoặc tên hành tinh trong hệ thống
-// Bảng cơ sở dữ liệu: nclass (sinh tự động, không sửa tay)
-[Table("nclass")]
-public class NClass
+// Bảng cơ sở dữ liệu: character_class (sinh tự động, không sửa tay)
+public class CharacterClass
 {
-    // Khóa chính của bảng NClass
+    // Khóa chính của bảng CharacterClass
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int NClassId { get; set; }
+    public int CharacterClassId { get; set; }
 
     // Tên lớp
     [Required]

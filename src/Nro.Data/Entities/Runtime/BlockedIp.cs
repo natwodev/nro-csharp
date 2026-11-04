@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Runtime;
 
 // Entity đại diện cho địa chỉ IP bị chặn trong hệ thống
-// Bảng cơ sở dữ liệu: blockip_list (sinh tự động, không sửa tay)
-[Table("blockip_list")]
+// Bảng cơ sở dữ liệu: blocked_ip (sinh tự động, không sửa tay)
 public class BlockedIp
 {
     // Khóa chính của bảng BlockedIp (tự tăng)

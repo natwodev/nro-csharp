@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho giao dịch nạp thẻ cào trong hệ thống
-// Bảng cơ sở dữ liệu: napthe (sinh tự động, không sửa tay)
-[Table("napthe")]
+// Bảng cơ sở dữ liệu: card_topup (sinh tự động, không sửa tay)
 public class CardTopup
 {
     // Khóa chính của bảng CardTopup (tự tăng)

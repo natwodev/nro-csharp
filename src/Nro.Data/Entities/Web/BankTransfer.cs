@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho giao dịch chuyển khoản SePay trong hệ thống
-// Bảng cơ sở dữ liệu: vp_bank (sinh tự động, không sửa tay)
-[Table("vp_bank")]
+// Bảng cơ sở dữ liệu: bank_transfer (sinh tự động, không sửa tay)
 public class BankTransfer
 {
     // Khóa chính của bảng BankTransfer (tự tăng)
