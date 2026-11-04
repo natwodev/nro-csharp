@@ -14,6 +14,9 @@ public interface ISession
     // Địa chỉ client không gồm cổng (Java: getIP).
     string IpAddress { get; }
 
+    // Địa chỉ IP:cổng xa của client; phiên cũ hoặc mock chỉ có IP sẽ trả IpAddress.
+    string RemoteEndPoint => IpAddress;
+
     // Cho biết phiên còn kết nối (Java: isConnected).
     bool IsConnected { get; }
 

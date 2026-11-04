@@ -43,8 +43,23 @@ public sealed class Session : ISession
         ISessionAcceptHandler? acceptHandler = null,
         SessionOptions? options = null,
         ILogger? logger = null)
+        : this(id, ipAddress, ipAddress, stream, handler, acceptHandler, options, logger)
+    {
+    }
+
+    // Tạo phiên với mã, IP, địa chỉ IP:cổng xa, stream, handler và các xử lý vòng đời/cấu hình/logger tùy chọn.
+    public Session(
+        long id,
+        string ipAddress,
+        string remoteEndPoint,
+        Stream stream,
+        IMessageHandler handler,
+        ISessionAcceptHandler? acceptHandler = null,
+        SessionOptions? options = null,
+        ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
+        ArgumentNullException.ThrowIfNull(remoteEndPoint);
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(handler);
         options ??= new SessionOptions();
@@ -62,6 +77,7 @@ public sealed class Session : ISession
         _run = new Lazy<Task>(RunCoreAsync, LazyThreadSafetyMode.ExecutionAndPublication);
         Id = id;
         IpAddress = ipAddress;
+        RemoteEndPoint = remoteEndPoint;
         _stream = stream;
         _handler = handler;
         _acceptHandler = acceptHandler;
@@ -85,6 +101,9 @@ public sealed class Session : ISession
 
     // Địa chỉ IP của client.
     public string IpAddress { get; }
+
+    // Địa chỉ IP:cổng xa của client.
+    public string RemoteEndPoint { get; }
 
     // Cho biết phiên chưa bị đóng.
     public bool IsConnected => Volatile.Read(ref _closed) == 0;
@@ -242,6 +261,7 @@ public sealed class Session : ISession
                     byte[] wire = KeyPacket.CreateServerFrame(_cipher);
                     await _stream.WriteAsync(wire, ct).ConfigureAwait(false);
                     await _stream.FlushAsync(ct).ConfigureAwait(false);
+                    _logger.LogInformation("Phiên {Id} ({Ip}): nhận cmd -27 (GET_SESSION_ID) bắt tay, {Length} byte; đã gửi khóa", Id, IpAddress, frame.Value.Payload.Length);
                     _keySent.TrySetResult();
                     continue;
                 }

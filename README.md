@@ -2,6 +2,8 @@
 
 C# (.NET 10) server ported from `SRC_6` (AWN_Version, Java). The documentation, the plan and the checker live in the `port-csharp` folder next to this repo.
 
+Chạy thử client Unity với host TCP tối thiểu: [docs/RUN-HOST-MINIMAL.md](docs/RUN-HOST-MINIMAL.md).
+
 | Project | Role |
 |---|---|
 | `Nro.Core` | constants, templates, `Util`, `Message`, Java-style big-endian read/write |

@@ -177,13 +177,15 @@ public sealed class GameServer : IAsyncDisposable
 
     private void Admit(TcpClient client)
     {
-        IPAddress address = ((IPEndPoint)client.Client.RemoteEndPoint!).Address;
+        IPEndPoint remoteEndPoint = (IPEndPoint)client.Client.RemoteEndPoint!;
+        IPAddress address = remoteEndPoint.Address;
         if (address.IsIPv4MappedToIPv6)
         {
             address = address.MapToIPv4();
         }
 
         string ip = address.ToString();
+        string remoteAddress = new IPEndPoint(address, remoteEndPoint.Port).ToString();
         if (!_limiter.TryAcquire(ip))
         {
             _logger.LogWarning("Connection refused: IP {Ip} already holds {Max} connections", ip, _options.MaxConnectionsPerIp);
@@ -198,7 +200,7 @@ public sealed class GameServer : IAsyncDisposable
             client.NoDelay = _options.NoDelay;
             client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
-            var session = new Session(_sessions.NextId(), ip, client.GetStream(), _handler, _acceptHandler, _options.Session, _logger);
+            var session = new Session(_sessions.NextId(), ip, remoteAddress, client.GetStream(), _handler, _acceptHandler, _options.Session, _logger);
             var done = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             _running[session.Id] = done.Task;
             _sessions.Add(session);
