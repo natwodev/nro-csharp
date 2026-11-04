@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Event;
 using System.Buffers;
 using System.Globalization;
 using System.Numerics;

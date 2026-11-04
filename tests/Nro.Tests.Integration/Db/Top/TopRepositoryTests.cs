@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Top;
 using Nro.Data.Repositories.Top;
 using Nro.Tests.Integration.Db.Players;
 

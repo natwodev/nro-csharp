@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Gift;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Nro.Tests.Integration")]
 

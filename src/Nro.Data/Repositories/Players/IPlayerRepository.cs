@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Players;
 
 namespace Nro.Data.Repositories.Players;
 

@@ -1,4 +1,5 @@
 using Nro.Data.Repositories.Players;
+using Nro.Data.Models.Players;
 
 namespace Nro.Game.Players.Persistence;
 

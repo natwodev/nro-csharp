@@ -1,4 +1,5 @@
 using System.Globalization;
+using Nro.Core.Exceptions;
 namespace Nro.Core.Time;
 
 // Đồng hồ cho phần phụ thuộc thời gian của TimeUtil, lấy thời điểm từ TimeProvider tiêm được để kiểm thử và trả lịch theo giờ Việt Nam.

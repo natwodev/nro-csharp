@@ -1,5 +1,6 @@
 using System.Reflection;
 using Nro.Core.IO;
+using Nro.Core.Exceptions;
 using Nro.Core.Util;
 
 namespace Nro.Tests.Unit.Core.IO;

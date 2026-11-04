@@ -1,3 +1,4 @@
+using Nro.Data.Models.Gift;
 using Nro.Data.Repositories.Gift;
 
 namespace Nro.Tests.Integration.Db.GiftTests;

@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Shop;
 
 namespace Nro.Data.Repositories.Shop;
 

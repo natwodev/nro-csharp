@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Gift;
 namespace Nro.Data.Repositories.Gift;
 
 // Cung cấp hợp đồng lưu hai quà đăng nhập đầu tiên của người chơi.

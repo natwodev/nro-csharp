@@ -19,6 +19,10 @@ Only the SQL text (with `?`, no parameter values), the SQLSTATE code and, for er
 the quoted segments blanked are logged. Reason: PostgreSQL copies user values into the message of data errors (e.g. `invalid input syntax for type integer: "..."`).
 The exception thrown to the caller stays intact (it may contain values; whoever catches the exception must be careful when writing it out).
 
+## Repository models (`Models/<feature>/`, namespace `Nro.Data.Models.<feature>`)
+
+Records and pure data classes returned by or supplied to repositories live in `Models/<feature>/`. Repository interfaces remain beside their implementations in `Repositories/<feature>/`.
+
 ## Repositories (`Repositories/<feature>/`, interfaces beside their implementations, namespace `Nro.Data.Repositories.<feature>`)
 
 | Repository | Replaces | Notes |

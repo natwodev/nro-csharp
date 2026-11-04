@@ -1,5 +1,6 @@
 using Nro.Core.Util;
 using Nro.Core.IO;
+using Nro.Core.Exceptions;
 using Xunit.Abstractions;
 
 namespace Nro.Tests.Unit.Core.IO;

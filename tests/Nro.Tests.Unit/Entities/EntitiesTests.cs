@@ -134,6 +134,15 @@ public class EntitiesTests
     }
 
     [Fact]
+    public void Archived_entities_use_the_Archive_folder_and_namespace()
+    {
+        GoldenEntity[] archived = Golden.Value.Entities.Where(e => e.Folder == "Archive").ToArray();
+        Assert.NotEmpty(archived);
+        Assert.DoesNotContain(Golden.Value.Entities, e => e.Folder == "Unused");
+        Assert.All(archived, e => Assert.NotNull(TypeOf(e)));
+    }
+
+    [Fact]
     public void Generated_entities_do_not_use_Table_attributes()
     {
         foreach (GoldenEntity e in Golden.Value.Entities)

@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Nro.Core.Consts;
+using Nro.Data.Models.Players;
 using Nro.Data.Repositories.Players;
 
 namespace Nro.Game.Players.Persistence;

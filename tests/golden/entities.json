@@ -3193,7 +3193,7 @@
     {
       "table": "bank_history",
       "entity": "BankHistory",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -3816,7 +3816,7 @@
     {
       "table": "cvh_article",
       "entity": "CvhArticle",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -4020,7 +4020,7 @@
     {
       "table": "cvh_gift_code",
       "entity": "CvhGiftCode",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -4160,7 +4160,7 @@
     {
       "table": "cvh_gift_code_history",
       "entity": "CvhGiftCodeHistory",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -4236,7 +4236,7 @@
     {
       "table": "cvh_message",
       "entity": "CvhMessage",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -4312,7 +4312,7 @@
     {
       "table": "cvh_recharge",
       "entity": "CvhRecharge",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -4484,7 +4484,7 @@
     {
       "table": "cvh_sell_item",
       "entity": "CvhSellItem",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -4624,7 +4624,7 @@
     {
       "table": "cvh_site_setting",
       "entity": "CvhSiteSetting",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -8994,7 +8994,7 @@
     {
       "table": "character_class",
       "entity": "CharacterClass",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id"
@@ -10017,7 +10017,7 @@
     {
       "table": "event_server",
       "entity": "EventServer",
-      "folder": "Unused",
+      "folder": "Archive",
       "explicitTable": false,
       "primaryKey": [
         "id_event"

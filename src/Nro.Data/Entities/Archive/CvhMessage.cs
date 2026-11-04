@@ -1,0 +1,28 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Nro.Data.Entities.Archive;
+
+// Entity đại diện cho tin nhắn của website cũ trong hệ thống
+// Bảng cơ sở dữ liệu: cvh_message (sinh tự động, không sửa tay)
+public class CvhMessage
+{
+    // Khóa chính của bảng CvhMessage (tự tăng)
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int CvhMessageId { get; set; }
+
+    // Tên đăng nhập người gửi
+    [Required]
+    [MaxLength(255)]
+    public string Username { get; set; } = default!;
+
+    // Nội dung tin nhắn
+    [Required]
+    public string Message { get; set; } = default!;
+
+    // Thời gian gửi (dạng text)
+    [Required]
+    [MaxLength(999)]
+    public string CreatedAt { get; set; } = default!;
+}

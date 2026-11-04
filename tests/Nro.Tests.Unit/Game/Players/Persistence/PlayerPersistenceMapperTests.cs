@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Players;
 using Nro.Data.Repositories.Players;
 using Nro.Game;
 using Nro.Game.Players.Persistence;

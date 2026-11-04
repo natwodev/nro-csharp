@@ -5,6 +5,7 @@ using Nro.Core.Logging;
 using Nro.Core.Time;
 using Nro.Core.Templates;
 using Nro.Data.Db;
+using Nro.Data.Models.Gift;
 using Nro.Data.Repositories.Gift;
 using Nro.Game;
 

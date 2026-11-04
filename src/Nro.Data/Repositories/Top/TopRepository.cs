@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Top;
 using Nro.Core.Enums;
 using System.Data;
 

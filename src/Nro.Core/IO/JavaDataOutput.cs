@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using Nro.Core.Exceptions;
 
 namespace Nro.Core.IO;
 

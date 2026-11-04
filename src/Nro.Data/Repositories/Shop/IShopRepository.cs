@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Shop;
 namespace Nro.Data.Repositories.Shop;
 
 // Cung cấp hợp đồng tải cấu trúc cửa hàng bất biến cho tầng Game.

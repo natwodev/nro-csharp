@@ -4,6 +4,7 @@ using Nro.Core.Util;
 using Nro.Core.IO;
 using Nro.Core.Logging;
 using Nro.Core.Time;
+using Nro.Core.Exceptions;
 using Nro.Tests.Unit.Core.IO;
 using Nro.Tests.Unit.Helpers;
 

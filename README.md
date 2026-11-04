@@ -35,7 +35,7 @@ nro-csharp/
 │   │   ├── Templates/         template classes (ItemTemplate, MobTemplate, ...)
 │   │   ├── IO/                Java-style binary reading/writing, Message
 │   │   ├── Interfaces/        IMessage
-│   │   ├── Exceptions/        UtfDataFormatException
+│   │   ├── Exceptions/        UtfDataFormatException, InvalidTimeException
 │   │   └── Helpers/           JavaIoChecks
 │   ├── Nro.Data/              PostgreSQL access
 │   │   ├── Configurations/    NroDatabaseOptions
@@ -48,7 +48,8 @@ nro-csharp/
 │   │       ├── StaticData/    tables loaded once at start-up; class names end with Row (ItemTemplateRow, ...)
 │   │       ├── Web/           tables only the PHP site uses
 │   │       ├── Logs/          append-only logs and mini-game history
-│   │       └── Unused/        tables nothing reads or writes (kept so the whole schema is mapped)
+│   │       └── Archive/       tables nothing reads or writes (kept so the whole schema is mapped)
+│   │   └── Nro.Data/Models/   repository data records grouped by feature
 │   ├── Nro.Network/           packets on the wire
 │   │   ├── Consts/            Cmd_message (288 command numbers, generated from the Java class)
 │   │   ├── Framing/           WireCipher, FrameWriter, FrameReader, WireCommands
@@ -64,7 +65,7 @@ nro-csharp/
 ```
 
 Where new code goes: `Db/` database access, contracts, options, and database exceptions; `Entities/` table classes;
-`Repositories/<feature>/` data access plus its local models and implementation-owned interfaces; `Extensions/` extension methods,
+`Models/<feature>/` repository data records; `Repositories/<feature>/` data access plus implementation-owned interfaces; `Extensions/` extension methods,
 `Messages/` queue/game messages, and `Services/` business logic with implementation-owned interfaces beside the implementation and external contracts in the feature's `Ports/` folder.
 
 Notes:

@@ -1,3 +1,4 @@
+using Nro.Data.Models.Shop;
 using Nro.Data.Repositories.Shop;
 
 namespace Nro.Tests.Integration.Db.Shop;

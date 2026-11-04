@@ -4,6 +4,7 @@ using Nro.Core.Time;
 using Nro.Core.Util;
 using Nro.Core.Templates;
 using Nro.Data.Db;
+using Nro.Data.Models.Gift;
 using Nro.Data.Repositories.Gift;
 
 namespace Nro.Game.Items.Inventory;

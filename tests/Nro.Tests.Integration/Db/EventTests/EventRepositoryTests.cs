@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Nro.Data.Db;
+using Nro.Data.Models.Event;
 using Nro.Data.Repositories.Event;
 using Nro.Tests.Integration.Db.Players;
 using Nro.Tests.Integration.Db.Top;

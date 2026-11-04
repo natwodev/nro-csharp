@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Data.Models.Event;
 namespace Nro.Data.Repositories.Event;
 
 // Cung cấp hợp đồng lưu trữ sự kiện mùa toàn máy chủ, mỗi sự kiện là một dòng với JSON văn bản.
