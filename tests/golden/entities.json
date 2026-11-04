@@ -2859,7 +2859,7 @@
       "table": "top_up_milestone_reward",
       "entity": "TopUpMilestoneRewardRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -4987,7 +4987,7 @@
       "table": "item_template",
       "entity": "ItemTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -5310,8 +5310,8 @@
       ],
       "collections": [
         {
-          "name": "BadgeTemplates",
-          "element": "BadgeTemplateRow",
+          "name": "DataBadgeses",
+          "element": "DataBadgesRow",
           "viaTable": "data_badges",
           "viaColumn": "id_item"
         },
@@ -5327,7 +5327,7 @@
       "table": "item_option_template",
       "entity": "ItemOptionTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -5391,7 +5391,7 @@
       "table": "item_shop",
       "entity": "ItemShopRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -5570,7 +5570,7 @@
       "table": "item_shop_option",
       "entity": "ItemShopOptionRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -5652,7 +5652,7 @@
       "table": "shop",
       "entity": "ShopRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -5736,7 +5736,7 @@
       "table": "tab_shop",
       "entity": "TabShopRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -6194,7 +6194,7 @@
       "table": "bg_item_template",
       "entity": "BgItemTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -6281,7 +6281,7 @@
       "table": "part",
       "entity": "PartRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -6338,7 +6338,7 @@
       "table": "flag_bag",
       "entity": "FlagBagRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -6440,7 +6440,7 @@
       "table": "head_avatar",
       "entity": "HeadAvatarRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "head_id"
       ],
@@ -6482,7 +6482,7 @@
       "table": "head_animation_frame",
       "entity": "HeadAnimationFrameRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -6522,16 +6522,16 @@
     },
     {
       "table": "img_by_name",
-      "entity": "ImageByNameRow",
+      "entity": "ImgByNameRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
       "columns": [
         {
           "explicitName": false,
-          "property": "ImageByNameId",
+          "property": "ImgByNameId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -6581,7 +6581,7 @@
       "table": "drop_item",
       "entity": "DropItemRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -6801,16 +6801,16 @@
     },
     {
       "table": "radar",
-      "entity": "RadarCardRow",
+      "entity": "RadarRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
       "columns": [
         {
           "explicitName": false,
-          "property": "RadarCardId",
+          "property": "RadarId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -6978,16 +6978,16 @@
     },
     {
       "table": "data_badges",
-      "entity": "BadgeTemplateRow",
+      "entity": "DataBadgesRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
       "columns": [
         {
           "explicitName": false,
-          "property": "BadgeTemplateId",
+          "property": "DataBadgesId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -7072,7 +7072,7 @@
       "table": "task_main_template",
       "entity": "TaskMainTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -7136,7 +7136,7 @@
       "table": "task_sub_template",
       "entity": "TaskSubTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "idmain"
       ],
@@ -7258,7 +7258,7 @@
       "table": "task_event_template",
       "entity": "TaskEventTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -7375,7 +7375,7 @@
       "table": "task_kol_template",
       "entity": "TaskKolTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -7430,16 +7430,16 @@
     },
     {
       "table": "task_badges_template",
-      "entity": "TaskBadgeTemplateRow",
+      "entity": "TaskBadgesTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
       "columns": [
         {
           "explicitName": false,
-          "property": "TaskBadgeTemplateId",
+          "property": "TaskBadgesTemplateId",
           "column": "id",
           "sourceColumn": "id",
           "csharpType": "int",
@@ -7504,7 +7504,7 @@
       "table": "side_task_template",
       "entity": "SideTaskTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -7621,7 +7621,7 @@
       "table": "clan_task_template",
       "entity": "ClanTaskTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -7738,7 +7738,7 @@
       "table": "achievement_template",
       "entity": "AchievementTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -7825,7 +7825,7 @@
       "table": "map_template",
       "entity": "MapTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -8047,7 +8047,7 @@
       "table": "mob_template",
       "entity": "MobTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -8209,7 +8209,7 @@
       "table": "npc_template",
       "entity": "NpcTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -8318,7 +8318,7 @@
       "table": "skill_template",
       "entity": "SkillTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "nclass_id",
         "id"
@@ -8523,7 +8523,7 @@
       "table": "intrinsic",
       "entity": "IntrinsicRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -8655,7 +8655,7 @@
       "table": "power_limit",
       "entity": "PowerLimitRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -8772,7 +8772,7 @@
       "table": "attribute_template",
       "entity": "AttributeTemplateRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -9247,7 +9247,7 @@
       "table": "notify",
       "entity": "NotifyRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -9304,7 +9304,7 @@
       "table": "caption",
       "entity": "CaptionRow",
       "folder": "StaticData",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],

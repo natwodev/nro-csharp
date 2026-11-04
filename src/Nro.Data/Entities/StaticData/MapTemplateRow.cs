@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu bản đồ trong hệ thống
 // Bảng cơ sở dữ liệu: map_template (sinh tự động, không sửa tay)
-[Table("map_template")]
 public class MapTemplateRow
 {
     // Khóa chính của bảng MapTemplate

@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu nhiệm vụ bang hội hằng ngày trong hệ thống
 // Bảng cơ sở dữ liệu: clan_task_template (sinh tự động, không sửa tay)
-[Table("clan_task_template")]
 public class ClanTaskTemplateRow
 {
     // Khóa chính của bảng ClanTaskTemplate

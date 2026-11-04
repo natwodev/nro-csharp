@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu quái trong hệ thống
 // Bảng cơ sở dữ liệu: mob_template (sinh tự động, không sửa tay)
-[Table("mob_template")]
 public class MobTemplateRow
 {
     // Khóa chính của bảng MobTemplate

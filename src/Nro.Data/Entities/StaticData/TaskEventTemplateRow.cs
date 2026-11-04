@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu nhiệm vụ sự kiện hằng ngày trong hệ thống
 // Bảng cơ sở dữ liệu: task_event_template (sinh tự động, không sửa tay)
-[Table("task_event_template")]
 public class TaskEventTemplateRow
 {
     // Khóa chính của bảng TaskEventTemplate

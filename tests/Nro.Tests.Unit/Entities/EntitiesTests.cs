@@ -54,6 +54,9 @@ public class EntitiesTests
         return System.Text.RegularExpressions.Regex.Replace(s, "_+", "_").ToLowerInvariant();
     }
 
+    /// <summary>Maps an entity class to its table by first removing the StaticData <c>Row</c> suffix, then applying snake_case.</summary>
+    private static string TableName(Type entity) => Snake(entity.Name.EndsWith("Row", StringComparison.Ordinal) ? entity.Name[..^3] : entity.Name);
+
     /// <summary>Maps the conventional single primary key <c>&lt;Entity&gt;Id</c> to <c>id</c>; other properties use snake_case.</summary>
     private static string ColumnName(PropertyInfo property)
     {
@@ -119,6 +122,16 @@ public class EntitiesTests
         }
     }
 
+    [Fact]
+    public void Generated_entities_do_not_use_Table_attributes()
+    {
+        foreach (GoldenEntity e in Golden.Value.Entities)
+        {
+            Assert.False(e.ExplicitTable);
+            Assert.Null(TypeOf(e).GetCustomAttribute<TableAttribute>());
+        }
+    }
+
     [Theory]
     [MemberData(nameof(Tables))]
     public void Table_columns_types_lengths_and_keys_match_the_golden(string table)
@@ -128,8 +141,9 @@ public class EntitiesTests
         var nullability = new NullabilityInfoContext();
 
         TableAttribute? tableAttribute = type.GetCustomAttribute<TableAttribute>();
-        Assert.Equal(e.ExplicitTable, tableAttribute is not null);
-        Assert.Equal(table, tableAttribute?.Name ?? Snake(type.Name));
+        Assert.False(e.ExplicitTable);
+        Assert.Null(tableAttribute);
+        Assert.Equal(table, TableName(type));
 
         PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
             .Where(IsScalar)

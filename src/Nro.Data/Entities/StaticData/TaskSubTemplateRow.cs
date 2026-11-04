@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu bước của nhiệm vụ chính trong hệ thống
 // Bảng cơ sở dữ liệu: task_sub_template (sinh tự động, không sửa tay)
-[Table("task_sub_template")]
 public class TaskSubTemplateRow
 {
     // Khóa ngoại liên kết với TaskMainTemplate (nhiệm vụ chính cha)

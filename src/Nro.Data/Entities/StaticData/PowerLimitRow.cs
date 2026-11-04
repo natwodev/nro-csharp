@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho bậc giới hạn sức mạnh trong hệ thống
 // Bảng cơ sở dữ liệu: power_limit (sinh tự động, không sửa tay)
-[Table("power_limit")]
 public class PowerLimitRow
 {
     // Khóa chính của bảng PowerLimit (tự tăng)

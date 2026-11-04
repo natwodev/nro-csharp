@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho cấu hình thưởng mốc nạp trong hệ thống
 // Bảng cơ sở dữ liệu: top_up_milestone_reward (sinh tự động, không sửa tay)
-[Table("top_up_milestone_reward")]
 public class TopUpMilestoneRewardRow
 {
     // Khóa chính của bảng TopUpMilestoneReward (tự tăng)

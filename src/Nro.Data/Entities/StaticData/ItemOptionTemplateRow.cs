@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu chỉ số vật phẩm trong hệ thống
 // Bảng cơ sở dữ liệu: item_option_template (sinh tự động, không sửa tay)
-[Table("item_option_template")]
 public class ItemOptionTemplateRow
 {
     // Khóa chính của bảng ItemOptionTemplate

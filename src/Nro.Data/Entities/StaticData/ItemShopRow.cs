@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho một mục trong cửa hàng trong hệ thống
 // Bảng cơ sở dữ liệu: item_shop (sinh tự động, không sửa tay)
-[Table("item_shop")]
 public class ItemShopRow
 {
     // Khóa chính của bảng ItemShop (tự tăng)

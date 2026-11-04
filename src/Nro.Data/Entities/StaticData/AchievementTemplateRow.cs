@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu thành tựu trong hệ thống
 // Bảng cơ sở dữ liệu: achievement_template (sinh tự động, không sửa tay)
-[Table("achievement_template")]
 public class AchievementTemplateRow
 {
     // Khóa chính của bảng AchievementTemplate (tự tăng)

@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho cờ bang hội hoặc vật phẩm đeo lưng trong hệ thống
 // Bảng cơ sở dữ liệu: flag_bag (sinh tự động, không sửa tay)
-[Table("flag_bag")]
 public class FlagBagRow
 {
     // Khóa chính của bảng FlagBag

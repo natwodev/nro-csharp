@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho thẻ trong cửa hàng trong hệ thống
 // Bảng cơ sở dữ liệu: tab_shop (sinh tự động, không sửa tay)
-[Table("tab_shop")]
 public class TabShopRow
 {
     // Khóa chính của bảng TabShop (tự tăng)

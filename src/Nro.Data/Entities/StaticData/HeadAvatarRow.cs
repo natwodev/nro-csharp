@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho ánh xạ bộ phận đầu sang avatar trong hệ thống
 // Bảng cơ sở dữ liệu: head_avatar (sinh tự động, không sửa tay)
-[Table("head_avatar")]
 public class HeadAvatarRow
 {
     // Khóa chính của bảng HeadAvatar

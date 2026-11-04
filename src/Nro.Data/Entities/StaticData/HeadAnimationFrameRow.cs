@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho hoạt ảnh đầu nhiều khung hình trong hệ thống
 // Bảng cơ sở dữ liệu: head_animation_frame (sinh tự động, không sửa tay)
-[Table("head_animation_frame")]
 public class HeadAnimationFrameRow
 {
     // Khóa chính của bảng HeadAnimationFrame (tự tăng)

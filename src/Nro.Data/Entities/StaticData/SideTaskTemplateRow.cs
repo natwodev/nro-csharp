@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu nhiệm vụ phụ hằng ngày trong hệ thống
 // Bảng cơ sở dữ liệu: side_task_template (sinh tự động, không sửa tay)
-[Table("side_task_template")]
 public class SideTaskTemplateRow
 {
     // Khóa chính của bảng SideTaskTemplate

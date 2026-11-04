@@ -5,13 +5,12 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho thẻ radar trong hệ thống
 // Bảng cơ sở dữ liệu: radar (sinh tự động, không sửa tay)
-[Table("radar")]
-public class RadarCardRow
+public class RadarRow
 {
-    // Khóa chính của bảng RadarCard
+    // Khóa chính của bảng Radar
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int RadarCardId { get; set; }
+    public int RadarId { get; set; }
 
     // Mã biểu tượng thẻ
     public int? IconId { get; set; }

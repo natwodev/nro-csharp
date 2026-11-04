@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu NPC trong hệ thống
 // Bảng cơ sở dữ liệu: npc_template (sinh tự động, không sửa tay)
-[Table("npc_template")]
 public class NpcTemplateRow
 {
     // Khóa chính của bảng NpcTemplate

@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu kỹ năng trong hệ thống
 // Bảng cơ sở dữ liệu: skill_template (sinh tự động, không sửa tay)
-[Table("skill_template")]
 public class SkillTemplateRow
 {
     // Một phần khóa chính ghép của bảng SkillTemplate

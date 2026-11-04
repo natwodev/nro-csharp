@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu vật trang trí nền bản đồ trong hệ thống
 // Bảng cơ sở dữ liệu: bg_item_template (sinh tự động, không sửa tay)
-[Table("bg_item_template")]
 public class BgItemTemplateRow
 {
     // Khóa chính của bảng BgItemTemplate

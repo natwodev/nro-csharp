@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu nội tại trong hệ thống
 // Bảng cơ sở dữ liệu: intrinsic (sinh tự động, không sửa tay)
-[Table("intrinsic")]
 public class IntrinsicRow
 {
     // Khóa chính của bảng Intrinsic

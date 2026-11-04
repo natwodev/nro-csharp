@@ -6,7 +6,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho loại buff toàn máy chủ trong hệ thống
 // Bảng cơ sở dữ liệu: attribute_template (sinh tự động, không sửa tay)
-[Table("attribute_template")]
 public class AttributeTemplateRow
 {
     // Khóa chính của bảng AttributeTemplate (tự tăng)

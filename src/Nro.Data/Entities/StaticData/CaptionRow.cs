@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho bậc danh hiệu theo sức mạnh trong hệ thống
 // Bảng cơ sở dữ liệu: caption (sinh tự động, không sửa tay)
-[Table("caption")]
 public class CaptionRow
 {
     // Khóa chính của bảng Caption (tự tăng)

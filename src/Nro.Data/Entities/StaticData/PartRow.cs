@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho bộ phận ngoại hình nhân vật trong hệ thống
 // Bảng cơ sở dữ liệu: part (sinh tự động, không sửa tay)
-[Table("part")]
 public class PartRow
 {
     // Khóa chính của bảng Part

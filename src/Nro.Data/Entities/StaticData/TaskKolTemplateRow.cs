@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu nhiệm vụ KOL trong hệ thống
 // Bảng cơ sở dữ liệu: task_kol_template (sinh tự động, không sửa tay)
-[Table("task_kol_template")]
 public class TaskKolTemplateRow
 {
     // Khóa chính của bảng TaskKolTemplate

@@ -5,7 +5,6 @@ namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu vật phẩm trong hệ thống
 // Bảng cơ sở dữ liệu: item_template (sinh tự động, không sửa tay)
-[Table("item_template")]
 public class ItemTemplateRow
 {
     // Khóa chính của bảng ItemTemplate
@@ -77,9 +76,9 @@ public class ItemTemplateRow
     // Cờ giới tính phụ (-1: mặc định)
     public short IsGender { get; set; }
 
-    // Collection các bản ghi BadgeTemplateRow thuộc ItemTemplate này
-    // Mối quan hệ one-to-many với BadgeTemplateRow
-    public ICollection<BadgeTemplateRow> BadgeTemplates { get; set; } = new List<BadgeTemplateRow>();
+    // Collection các bản ghi DataBadgesRow thuộc ItemTemplate này
+    // Mối quan hệ one-to-many với DataBadgesRow
+    public ICollection<DataBadgesRow> DataBadgeses { get; set; } = new List<DataBadgesRow>();
 
     // Collection các bản ghi ItemShopRow thuộc ItemTemplate này
     // Mối quan hệ one-to-many với ItemShopRow
