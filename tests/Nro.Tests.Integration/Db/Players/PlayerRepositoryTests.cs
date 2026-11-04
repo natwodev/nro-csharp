@@ -139,13 +139,13 @@ public class PlayerRepositoryTests : IClassFixture<PlayerRepositoryFixture>
             ["gender"] = 2,
             ["have_tennis_space_ship"] = true,
             ["last_time_drop_tail"] = 2_000_000_001L,
-            ["last_time_khi_su_kien"] = 2_000_000_002L,
-            ["isbienhinh"] = 91,
+            ["last_event_monkey_transformation_at"] = 2_000_000_002L,
+            ["is_transformed"] = 91,
             ["notify"] = "mutated notify",
-            ["lasttimepkcommeson"] = 2_000_000_003L,
+            ["last_commeson_boss_fight_at"] = 2_000_000_003L,
             ["dragon_christmas"] = 2_000_000_004L,
             ["dragon_halloween"] = 2_000_000_005L,
-            ["lastimelogin"] = DateTime.SpecifyKind(DateTime.UnixEpoch.AddSeconds(1), DateTimeKind.Unspecified),
+            ["initial_login_at"] = DateTime.SpecifyKind(DateTime.UnixEpoch.AddSeconds(1), DateTimeKind.Unspecified),
             ["first_time_login"] = DateTime.UnixEpoch.AddSeconds(2),
             ["last_time_login_game"] = DateTime.UnixEpoch.AddSeconds(3),
             ["data_inventory"] = "[8000000000,71,72,73]",
@@ -211,9 +211,9 @@ public class PlayerRepositoryTests : IClassFixture<PlayerRepositoryFixture>
 public sealed class PlayerRepositoryFixture : TestDatabase
 {
     private static readonly HashSet<string> IntegerColumns =
-    ["account_id", "head", "gender", "clan_id", "point_pvp", "whis_sparring", "isbienhinh", "rank", "event_point", "event_point_boss", "event_point_nhs", "event_point_quai", "diem_huy_diet", "diem_chien_truong_namek", "diem_su_kien_tet", "diem_su_kien_giangsinh", "diem_su_kien_halloween", "diem_su_kien_8_3", "diem_su_kien_trungthu", "diem_su_kien_hung_vuong", "diem_su_kien_black_friday", "diem_su_kien_20_10", "hp_point_fusion", "mp_point_fusion", "point_fusion_damage"];
-    private static readonly HashSet<string> BigintColumns = ["last_time_drop_tail", "last_time_khi_su_kien", "barracks_state", "lasttimepkcommeson", "dragon_christmas", "dragon_halloween", "last_time_update_task"];
-    private static readonly HashSet<string> TimestampColumns = ["create_time", "lastimelogin", "first_time_login", "last_time_login_game"];
+    ["account_id", "head", "gender", "clan_id", "point_pvp", "whis_sparring", "is_transformed", "rank", "event_point", "event_point_boss", "ngu_hanh_son_event_points", "monster_hunt_event_points", "destruction_points", "namek_battlefield_points", "lunar_new_year_event_points", "christmas_event_points", "halloween_event_points", "international_womens_day_event_points", "moon_festival_event_points", "hung_king_event_points", "black_friday_event_points", "vietnamese_womens_day_event_points", "hp_point_fusion", "mp_point_fusion", "point_fusion_damage"];
+    private static readonly HashSet<string> BigintColumns = ["last_time_drop_tail", "last_event_monkey_transformation_at", "barracks_state", "last_commeson_boss_fight_at", "dragon_christmas", "dragon_halloween", "last_time_update_task"];
+    private static readonly HashSet<string> TimestampColumns = ["create_time", "initial_login_at", "first_time_login", "last_time_login_game"];
 
     protected override async Task SeedAsync()
     {
@@ -270,7 +270,7 @@ public sealed class PlayerRepositoryFixture : TestDatabase
         "notify" => "notify text null",
         _ when IntegerColumns.Contains(column) => column + " integer not null",
         _ when BigintColumns.Contains(column) => column + " bigint not null",
-        _ when TimestampColumns.Contains(column) => column + (column == "lastimelogin" ? " timestamp not null" : " timestamptz not null"),
+        _ when TimestampColumns.Contains(column) => column + (column == "initial_login_at" ? " timestamp not null" : " timestamptz not null"),
         _ => column + " text not null",
     };
 
@@ -282,7 +282,7 @@ public sealed class PlayerRepositoryFixture : TestDatabase
         "notify" => null,
         _ when IntegerColumns.Contains(column) => 0,
         _ when BigintColumns.Contains(column) => 0L,
-        "lastimelogin" => DateTime.SpecifyKind(DateTime.UnixEpoch, DateTimeKind.Unspecified),
+        "initial_login_at" => DateTime.SpecifyKind(DateTime.UnixEpoch, DateTimeKind.Unspecified),
         _ when TimestampColumns.Contains(column) => DateTime.UnixEpoch,
         _ => "[]",
     };

@@ -59,7 +59,7 @@ public class PlayerPersistenceMapperTests
         Assert.Equal("[2000,99999999,99999999,0]", row["data_inventory"]);
         Assert.Equal("[0,1200,1200,1000,1000,100,100,15,0,0,0,100,100,15,100,100]", row["data_point"]);
         Assert.Equal(DateTimeKind.Utc, ((DateTime)row["create_time"]!).Kind);
-        Assert.Equal(DateTimeKind.Unspecified, ((DateTime)row["lastimelogin"]!).Kind);
+        Assert.Equal(DateTimeKind.Unspecified, ((DateTime)row["initial_login_at"]!).Kind);
     }
 
     [Fact]
@@ -249,7 +249,7 @@ public class PlayerPersistenceMapperTests
                     expected[property.Name] = property.Value.GetInt32() != 0;
                     break;
                 case "lastimelogin_epoch_ms":
-                    expected["lastimelogin"] = DateTime.SpecifyKind(DateTime.UnixEpoch.AddMilliseconds(property.Value.GetInt64()), DateTimeKind.Unspecified);
+                    expected["initial_login_at"] = DateTime.SpecifyKind(DateTime.UnixEpoch.AddMilliseconds(property.Value.GetInt64()), DateTimeKind.Unspecified);
                     break;
                 case "last_time_login_game_epoch_ms":
                     expected["last_time_login_game"] = DateTime.UnixEpoch.AddMilliseconds(property.Value.GetInt64());
@@ -258,7 +258,7 @@ public class PlayerPersistenceMapperTests
                     expected[property.Name] = property.Value.GetInt32();
                     break;
                 default:
-                    expected[property.Name] = property.Value.GetString();
+                    expected[PostgresColumn(property.Name)] = property.Value.GetString();
                     break;
             }
         }
@@ -302,7 +302,26 @@ public class PlayerPersistenceMapperTests
         return int.Parse(expression, CultureInfo.InvariantCulture);
     }
 
-    private static bool IsBigintColumn(string column) => column is "last_time_drop_tail" or "last_time_khi_su_kien" or "barracks_state" or "lasttimepkcommeson" or "dragon_christmas" or "dragon_halloween" or "last_time_update_task";
+    private static bool IsBigintColumn(string column) => column is "last_time_drop_tail" or "last_event_monkey_transformation_at" or "barracks_state" or "last_commeson_boss_fight_at" or "dragon_christmas" or "dragon_halloween" or "last_time_update_task";
+
+    // Golden tái hiện tham số Java; persistence dùng tên PostgreSQL trong name-map.csv.
+    private static string PostgresColumn(string sourceColumn) => sourceColumn switch
+    {
+        "items_daban" => "sold_items",
+        "data_luyentap" => "training_data",
+        "data_trong_dua_hau" => "watermelon_plant_data",
+        "master_does_not_attack_bo" => "father_does_not_attack",
+        "master_does_not_attack_me" => "mother_does_not_attack",
+        "conone_does_not_attack" => "first_child_does_not_attack",
+        "contwo_does_not_attack" => "second_child_does_not_attack",
+        "conthree_does_not_attack" => "third_child_does_not_attack",
+        "thanh_tich_bang" => "clan_treasure_under_sea_achievement",
+        "thanh_tich_bang2" => "clan_destron_gas_achievement",
+        "thanh_tich_bang3" => "clan_snake_way_achievement",
+        "data_nguoi_yeu" => "lover_data",
+        "data_event_models" => "daily_gift_activity_data",
+        _ => sourceColumn,
+    };
 
     private static string FindWorkspaceFile(params string[] parts)
     {

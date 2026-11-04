@@ -23,9 +23,9 @@ public sealed record TopPlayer(
 {
     public static readonly string[] TextColumns =
     [
-        "items_body", "items_bag", "items_box", "data_inventory", "data_point", "data_task", "data_luyentap", "pet", "vodaisinhtu",
-        "data_may_dam", "data_event_new_year", "data_event_christ_mas", "data_event_vulan", "data_event_halloween", "data_event_8_3",
-        "data_event_trung_thu", "data_event_hung_vuong", "data_event_black_friday",
+        "items_body", "items_bag", "items_box", "data_inventory", "data_point", "data_task", "training_data", "pet", "deathmatch_arena_data",
+        "punching_machine_data", "data_event_new_year", "christmas_event_data", "vu_lan_event_data", "data_event_halloween", "international_womens_day_event_data",
+        "moon_festival_event_data", "hung_king_event_data", "data_event_black_friday",
     ];
 
     public int AccountId => Id;
@@ -45,7 +45,7 @@ public sealed record TopPlayer(
     public static TopPlayer FromJson(JsonElement json)
     {
         var account = json.GetProperty("account");
-        var texts = TextColumns.ToDictionary(c => c, c => json.GetProperty(c).GetString()!);
+        var texts = TextColumns.ToDictionary(c => c, c => json.GetProperty(SourceColumn(c)).GetString()!);
         return new TopPlayer(
             json.GetProperty("id").GetInt32(),
             json.GetProperty("name").GetString()!,
@@ -63,6 +63,20 @@ public sealed record TopPlayer(
 
     private static long? OptionalLong(JsonElement owner, string name)
         => owner.GetProperty(name) is { ValueKind: not JsonValueKind.Null } value ? value.GetInt64() : null;
+
+    // Golden giữ khóa JSON/Java; fixture chuyển chúng sang tên cột PostgreSQL.
+    private static string SourceColumn(string column) => column switch
+    {
+        "training_data" => "data_luyentap",
+        "deathmatch_arena_data" => "vodaisinhtu",
+        "punching_machine_data" => "data_may_dam",
+        "christmas_event_data" => "data_event_christ_mas",
+        "vu_lan_event_data" => "data_event_vulan",
+        "international_womens_day_event_data" => "data_event_8_3",
+        "moon_festival_event_data" => "data_event_trung_thu",
+        "hung_king_event_data" => "data_event_hung_vuong",
+        _ => column,
+    };
 }
 
 /// <summary>Real PostgreSQL schema (nro_test, own schema) with the columns of <c>player</c>/<c>account</c>/<c>event</c> that the repositories read; types copied from <c>postgres/schema/schema.sql</c>.</summary>
@@ -71,10 +85,10 @@ public sealed class TopFixture : TestDatabase
     private const string InsertAccountSql = "insert into account(id, username, is_admin, cash, is_banned, vnd, coin, topped_up_amount) values (?, ?, 0, ?, ?, ?, ?, ?)";
 
     private const string InsertPlayerSql =
-        "insert into player(id, account_id, name, gender, last_time_login_game, diem_chien_truong_namek, point_pvp, "
-        + "items_body, items_bag, items_box, data_inventory, data_point, data_task, data_luyentap, pet, vodaisinhtu, data_may_dam, "
-        + "data_event_new_year, data_event_christ_mas, data_event_vulan, data_event_halloween, data_event_8_3, data_event_trung_thu, "
-        + "data_event_hung_vuong, data_event_black_friday) "
+        "insert into player(id, account_id, name, gender, last_time_login_game, namek_battlefield_points, point_pvp, "
+        + "items_body, items_bag, items_box, data_inventory, data_point, data_task, training_data, pet, deathmatch_arena_data, punching_machine_data, "
+        + "data_event_new_year, christmas_event_data, vu_lan_event_data, data_event_halloween, international_womens_day_event_data, moon_festival_event_data, "
+        + "hung_king_event_data, data_event_black_friday) "
         + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private string? _loadedDataset;
@@ -87,12 +101,12 @@ public sealed class TopFixture : TestDatabase
         await RunAsync(
             "create table player(id integer not null primary key, account_id integer, name citext not null, gender integer not null, "
             + "items_body text not null, items_bag text not null, items_box text not null, data_inventory text not null, data_point text not null, "
-            + "data_task text not null, data_luyentap text not null, pet text not null, vodaisinhtu varchar(255) not null default '[]', "
-            + "data_may_dam varchar(255) not null default '[0,0,0]', data_event_new_year varchar(100) not null default '[0,0,0,0]', "
-            + "data_event_christ_mas varchar(100) not null default '[0,0,0,0]', data_event_vulan varchar(100) not null default '[0,0,0]', "
-            + "data_event_halloween varchar(100) not null default '[0,0]', data_event_8_3 varchar(100) not null default '[0,0]', "
-            + "data_event_trung_thu varchar(100) not null default '[0,0]', data_event_hung_vuong varchar(100) not null default '[0,0,0,0,0,0]', "
-            + "data_event_black_friday varchar(100) not null default '[0,0]', diem_chien_truong_namek integer not null default 0, "
+            + "data_task text not null, training_data text not null, pet text not null, deathmatch_arena_data varchar(255) not null default '[]', "
+            + "punching_machine_data varchar(255) not null default '[0,0,0]', data_event_new_year varchar(100) not null default '[0,0,0,0]', "
+            + "christmas_event_data varchar(100) not null default '[0,0,0,0]', vu_lan_event_data varchar(100) not null default '[0,0,0]', "
+            + "data_event_halloween varchar(100) not null default '[0,0]', international_womens_day_event_data varchar(100) not null default '[0,0]', "
+            + "moon_festival_event_data varchar(100) not null default '[0,0]', hung_king_event_data varchar(100) not null default '[0,0,0,0,0,0]', "
+            + "data_event_black_friday varchar(100) not null default '[0,0]', namek_battlefield_points integer not null default 0, "
             + "point_pvp integer default 0, last_time_login_game timestamptz not null default now())");
         await RunAsync("create unique index ux_player_account_id on player (account_id)");
         await RunAsync("create table event(id integer generated by default as identity primary key, name citext not null, data text not null)");

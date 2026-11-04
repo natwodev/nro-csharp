@@ -488,7 +488,7 @@
   // PG: my_mother | "mẹ": chỉ INSERT "[]", không hàm nào đọc/ghi | C#: chưa có [không dùng]
   "myMother": [],
   "lastTimeDropTail": 0, // PG: last_time_drop_tail | lần rớt đuôi khỉ cuối (ms); Player ghi riêng bằng UPDATE theo name | C#: Player.LastTimeDropTail [dùng]
-  "lastTimeKhiSuKien": 0, // PG: last_time_khi_su_kien | lần hóa khỉ sự kiện cuối (ms); Service ghi riêng bằng UPDATE theo name | C#: Player.Lasttimekhisukien [dùng]
+  "lastTimeKhiSuKien": 0, // PG: last_event_monkey_transformation_at | lần hóa khỉ sự kiện cuối (ms); Service ghi riêng bằng UPDATE theo name | C#: Player.Lasttimekhisukien [dùng]
   // thưởng Ngọc rồng sao đen | C#: RewardBlackBall.TimeOutOfDateReward (chưa nạp) [dùng]
   "data_black_ball": [
     // data_black_ball[i] phần tử i = ngọc sao đen (i+1) sao, chuỗi JSON [3] [dùng]
@@ -570,8 +570,8 @@
     "errorPay": 0 // check_band_account[2] số lần vi phạm nạp (/3) | C#: Player.ErrorPay (chưa nạp) [dùng]
   },
   "masterDoesNotAttack": "false", // PG: master_does_not_attack | cờ sư phụ không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttack' không tồn tại → luôn false; trong RAM có dùng (Detu đặt và đọc) | C#: Player.DoesNotAttack (chưa nạp) [chỉ ghi]
-  "masterDoesNotAttackBo": "false", // PG: master_does_not_attack_bo | cờ bố không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttackBo' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackBo (chưa nạp) [không dùng]
-  "masterDoesNotAttackMe": "false", // PG: master_does_not_attack_me | cờ mẹ không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttackMe' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackMe (chưa nạp) [không dùng]
+  "masterDoesNotAttackBo": "false", // PG: father_does_not_attack | cờ bố không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttackBo' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackBo (chưa nạp) [không dùng]
+  "masterDoesNotAttackMe": "false", // PG: mother_does_not_attack | cờ mẹ không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttackMe' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackMe (chưa nạp) [không dùng]
   "notify": null, // thông báo 1 lần khi vào game (MySession gửi rồi xóa) | C#: Player.Notify [dùng]
   // Bản đồ kho báu; DEFAULT '[]' → load lỗi → (0, now) [dùng]
   "bandokhobau": {
@@ -732,24 +732,24 @@
   // "người yêu": tạo và mọi lần lưu đều ghi hằng "[]" (biến chết petNguoiyeuInfo/Point/Body/Skill), không ai đọc | C#: chưa có [không dùng]
   "data_nguoi_yeu": [],
   "NguoiYeuDoesNotAttack": "false", // PG: nguoi_yeu_does_not_attack | cờ người yêu không tấn công (text); login đọc 'NguoiYeuDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackNguoiYeu (chưa nạp) [không dùng]
-  "CononeDoesNotAttack": "false", // PG: conone_does_not_attack | cờ con thứ 1 không tấn công (text); login đọc 'CononeDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackConone (chưa nạp) [không dùng]
-  "ContwoDoesNotAttack": "false", // PG: contwo_does_not_attack | cờ con thứ 2 không tấn công (text); login đọc 'ContwoDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackContwo (chưa nạp) [không dùng]
-  "ConthreeDoesNotAttack": "false", // PG: conthree_does_not_attack | cờ con thứ 3 không tấn công (text); login đọc 'ConthreeDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackConthree (chưa nạp) [không dùng]
-  // PG: thanh_tich_bang | thành tích bang Bản đồ kho báu (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopTreasureUnderSea cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
+  "CononeDoesNotAttack": "false", // PG: first_child_does_not_attack | cờ con thứ 1 không tấn công (text); login đọc 'CononeDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackConone (chưa nạp) [không dùng]
+  "ContwoDoesNotAttack": "false", // PG: second_child_does_not_attack | cờ con thứ 2 không tấn công (text); login đọc 'ContwoDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackContwo (chưa nạp) [không dùng]
+  "ConthreeDoesNotAttack": "false", // PG: third_child_does_not_attack | cờ con thứ 3 không tấn công (text); login đọc 'ConthreeDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackConthree (chưa nạp) [không dùng]
+  // PG: clan_treasure_under_sea_achievement | thành tích bang Bản đồ kho báu (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopTreasureUnderSea cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
   "thanhTichBang": {
     "clanName": null, // thanhTichBang[0] tên bang (so1) | C#: chưa có [dùng]
     "levelDone": null, // thanhTichBang[1] cấp đã hoàn thành (so2, lọc > 0) | C#: chưa có [dùng]
     "timeDone": null, // thanhTichBang[2] thời gian hoàn thành (so3) | C#: chưa có [dùng]
     "updatedAt": null // thanhTichBang[3] lúc ghi (ms) (so4) | C#: chưa có [dùng]
   },
-  // PG: thanh_tich_bang2 | thành tích bang Khí gas hủy diệt (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopDestronGas cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
+  // PG: clan_destron_gas_achievement | thành tích bang Khí gas hủy diệt (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopDestronGas cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
   "thanhTichBang2": {
     "clanName": null, // thanhTichBang2[0] tên bang (so1) | C#: chưa có [dùng]
     "levelDone": null, // thanhTichBang2[1] cấp đã hoàn thành (so2, lọc > 0) | C#: chưa có [dùng]
     "timeDone": null, // thanhTichBang2[2] thời gian hoàn thành (so3) | C#: chưa có [dùng]
     "updatedAt": null // thanhTichBang2[3] lúc ghi (ms) (so4) | C#: chưa có [dùng]
   },
-  // PG: thanh_tich_bang3 | thành tích bang Con đường rắn độc (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopSnakeWay cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
+  // PG: clan_snake_way_achievement | thành tích bang Con đường rắn độc (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopSnakeWay cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
   "thanhTichBang3": {
     "clanName": null, // thanhTichBang3[0] tên bang (so1) | C#: chưa có [dùng]
     "levelDone": null, // thanhTichBang3[1] cấp đã hoàn thành (so2, lọc > 0) | C#: chưa có [dùng]

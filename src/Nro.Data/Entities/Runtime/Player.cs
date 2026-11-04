@@ -94,7 +94,7 @@ public class Player
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string ItemsDaban { get; set; } = default!;
+    public string SoldItems { get; set; } = default!;
 
     // Vật phẩm trong hòm thư (JSON)
     [Required]
@@ -160,7 +160,7 @@ public class Player
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string DataLuyentap { get; set; } = default!;
+    public string TrainingData { get; set; } = default!;
 
     // Đệ tử: thông tin, chỉ số, trang bị, kỹ năng (JSON)
     [Required]
@@ -183,8 +183,8 @@ public class Player
     // Lần rớt đuôi khỉ cuối (epoch ms)
     public long LastTimeDropTail { get; set; }
 
-    // Lần hóa khỉ sự kiện cuối (epoch ms)
-    public long LastTimeKhiSuKien { get; set; }
+    // Lần hóa khỉ sự kiện cuối (epoch ms) (nghĩa chưa chắc, cần chủ dự án duyệt)
+    public long LastEventMonkeyTransformationAt { get; set; }
 
     // Phần thưởng ngọc rồng đen (JSON)
     [Required]
@@ -233,7 +233,7 @@ public class Player
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string DataTrongDuaHau { get; set; } = default!;
+    public string WatermelonPlantData { get; set; } = default!;
 
     // Trạng thái hiệu ứng du hành (JSON)
     [Required]
@@ -245,13 +245,13 @@ public class Player
     public int WhisSparring { get; set; }
 
     // Trạng thái biến hình (0: không)
-    public int Isbienhinh { get; set; }
+    public int IsTransformed { get; set; }
 
-    // Bộ đếm chống gian lận và khóa tài khoản (JSON)
+    // Bộ đếm chống gian lận và khóa tài khoản (JSON) (nghĩa chưa chắc, cần chủ dự án duyệt)
     [Required]
     [MaxLength(100)]
     [JsonText]
-    public string CheckBandAccount { get; set; } = default!;
+    public string AccountBanCheckData { get; set; } = default!;
 
     // Cờ sư phụ không tấn công
     [Required]
@@ -261,12 +261,12 @@ public class Player
     // Cờ cha không tấn công
     [Required]
     [Column(TypeName = "text")]
-    public string MasterDoesNotAttackBo { get; set; } = default!;
+    public string FatherDoesNotAttack { get; set; } = default!;
 
     // Cờ mẹ không tấn công
     [Required]
     [Column(TypeName = "text")]
-    public string MasterDoesNotAttackMe { get; set; } = default!;
+    public string MotherDoesNotAttack { get; set; } = default!;
 
     // Thông báo đăng nhập một lần
     [Column(TypeName = "text")]
@@ -276,7 +276,7 @@ public class Player
     [Required]
     [MaxLength(250)]
     [JsonText]
-    public string Bandokhobau { get; set; } = default!;
+    public string TreasureUnderSeaUses { get; set; } = default!;
 
     // Lần vào Doanh Trại cuối (epoch ms)
     public long BarracksState { get; set; }
@@ -285,7 +285,7 @@ public class Player
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string Conduongrandoc { get; set; } = default!;
+    public string SnakeWayData { get; set; } = default!;
 
     // Nhiệm vụ bang hội hằng ngày (JSON)
     [Required]
@@ -304,24 +304,24 @@ public class Player
     [Column(TypeName = "text")]
     public string? DataVip { get; set; }
 
-    // Lần đánh boss Commeson cuối (epoch ms)
-    public long Lasttimepkcommeson { get; set; }
+    // Lần đánh boss Commeson cuối (epoch ms) (nghĩa chưa chắc, cần chủ dự án duyệt)
+    public long LastCommesonBossFightAt { get; set; }
 
     // Trạng thái Siêu Thần Thủy (JSON)
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string Sieuthanthuy { get; set; } = default!;
+    public string SuperDivineWaterState { get; set; } = default!;
 
     // Bảo vệ tài khoản (JSON)
     [Required]
     [MaxLength(1000)]
     [JsonText]
-    public string Baovetaikhoan { get; set; } = default!;
+    public string AccountProtectionData { get; set; } = default!;
 
     // Thời gian đăng nhập ban đầu
     [Column(TypeName = "timestamp without time zone")]
-    public DateTime Lastimelogin { get; set; }
+    public DateTime InitialLoginAt { get; set; }
 
     // Lần đăng nhập đầu của ngày gần nhất
     [Column(TypeName = "timestamp with time zone")]
@@ -347,13 +347,13 @@ public class Player
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string Ruonggo { get; set; } = default!;
+    public string WoodChestData { get; set; } = default!;
 
-    // Trạng thái võ đài sinh tử (JSON)
+    // Trạng thái võ đài sinh tử (JSON) (nghĩa chưa chắc, cần chủ dự án duyệt)
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string Vodaisinhtu { get; set; } = default!;
+    public string DeathmatchArenaData { get; set; } = default!;
 
     // Lần gọi rồng Giáng Sinh cuối (epoch ms)
     public long DragonChristmas { get; set; }
@@ -375,29 +375,29 @@ public class Player
     [JsonText]
     public string DataItemEvent { get; set; } = default!;
 
-    // Loại thẻ theo thời hạn (JSON)
+    // Loại thẻ theo thời hạn (JSON) (nghĩa chưa chắc, cần chủ dự án duyệt)
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string DataTheCard { get; set; } = default!;
+    public string CardData { get; set; } = default!;
 
     // Điểm danh theo từng kỳ (JSON)
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string DataDiemDanh { get; set; } = default!;
+    public string CheckInData { get; set; } = default!;
 
     // Điểm cao máy đấm (JSON)
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string DataMayDam { get; set; } = default!;
+    public string PunchingMachineData { get; set; } = default!;
 
     // Dữ liệu người yêu (JSON, không dùng)
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string DataNguoiYeu { get; set; } = default!;
+    public string LoverData { get; set; } = default!;
 
     // Cờ người yêu không tấn công
     [Required]
@@ -407,35 +407,35 @@ public class Player
     // Cờ con thứ nhất không tấn công
     [Required]
     [Column(TypeName = "text")]
-    public string CononeDoesNotAttack { get; set; } = default!;
+    public string FirstChildDoesNotAttack { get; set; } = default!;
 
     // Cờ con thứ hai không tấn công
     [Required]
     [Column(TypeName = "text")]
-    public string ContwoDoesNotAttack { get; set; } = default!;
+    public string SecondChildDoesNotAttack { get; set; } = default!;
 
     // Cờ con thứ ba không tấn công
     [Required]
     [Column(TypeName = "text")]
-    public string ConthreeDoesNotAttack { get; set; } = default!;
+    public string ThirdChildDoesNotAttack { get; set; } = default!;
 
     // Thành tích bang hội Kho Báu Dưới Biển
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string ThanhTichBang { get; set; } = default!;
+    public string ClanTreasureUnderSeaAchievement { get; set; } = default!;
 
     // Thành tích bang hội Hủy Diệt Khí Gas
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string ThanhTichBang2 { get; set; } = default!;
+    public string ClanDestronGasAchievement { get; set; } = default!;
 
     // Thành tích bang hội Con Đường Rắn Độc
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string ThanhTichBang3 { get; set; } = default!;
+    public string ClanSnakeWayAchievement { get; set; } = default!;
 
     // Quà hằng ngày (JSON)
     [Required]
@@ -459,43 +459,41 @@ public class Player
     // Điểm sự kiện boss
     public int EventPointBoss { get; set; }
 
-    // Điểm sự kiện Ngũ Hành Sơn
-    public int EventPointNhs { get; set; }
+    // Điểm sự kiện Ngũ Hành Sơn (nghĩa chưa chắc, cần chủ dự án duyệt)
+    public int NguHanhSonEventPoints { get; set; }
 
     // Điểm sự kiện săn quái
-    public int EventPointQuai { get; set; }
+    public int MonsterHuntEventPoints { get; set; }
 
     // Điểm Hủy Diệt (Hakai)
-    public int DiemHuyDiet { get; set; }
+    public int DestructionPoints { get; set; }
 
     // Điểm chiến trường Namếc
-    public int DiemChienTruongNamek { get; set; }
+    public int NamekBattlefieldPoints { get; set; }
 
     // Điểm sự kiện Tết Nguyên Đán
-    public int DiemSuKienTet { get; set; }
+    public int LunarNewYearEventPoints { get; set; }
 
     // Điểm sự kiện Giáng Sinh
-    public int DiemSuKienGiangsinh { get; set; }
+    public int ChristmasEventPoints { get; set; }
 
     // Điểm sự kiện Halloween
-    public int DiemSuKienHalloween { get; set; }
+    public int HalloweenEventPoints { get; set; }
 
     // Điểm sự kiện Quốc tế Phụ nữ (8/3)
-    [Column("diem_su_kien_8_3")]
-    public int DiemSuKien83 { get; set; }
+    public int InternationalWomensDayEventPoints { get; set; }
 
     // Điểm sự kiện Trung Thu
-    public int DiemSuKienTrungthu { get; set; }
+    public int MoonFestivalEventPoints { get; set; }
 
     // Điểm sự kiện Giỗ Tổ Hùng Vương
-    public int DiemSuKienHungVuong { get; set; }
+    public int HungKingEventPoints { get; set; }
 
     // Điểm sự kiện Black Friday
-    public int DiemSuKienBlackFriday { get; set; }
+    public int BlackFridayEventPoints { get; set; }
 
     // Điểm sự kiện Phụ nữ Việt Nam (20/10)
-    [Column("diem_su_kien_20_10")]
-    public int DiemSuKien2010 { get; set; }
+    public int VietnameseWomensDayEventPoints { get; set; }
 
     // Bộ đếm sự kiện Năm Mới (JSON)
     [Required]
@@ -507,13 +505,13 @@ public class Player
     [Required]
     [MaxLength(100)]
     [JsonText]
-    public string DataEventChristMas { get; set; } = default!;
+    public string ChristmasEventData { get; set; } = default!;
 
-    // Bộ đếm sự kiện Vu Lan (JSON)
+    // Bộ đếm sự kiện Vu Lan (JSON) (nghĩa chưa chắc, cần chủ dự án duyệt)
     [Required]
     [MaxLength(100)]
     [JsonText]
-    public string DataEventVulan { get; set; } = default!;
+    public string VuLanEventData { get; set; } = default!;
 
     // Bộ đếm sự kiện Halloween (JSON)
     [Required]
@@ -525,20 +523,19 @@ public class Player
     [Required]
     [MaxLength(100)]
     [JsonText]
-    [Column("data_event_8_3")]
-    public string DataEvent83 { get; set; } = default!;
+    public string InternationalWomensDayEventData { get; set; } = default!;
 
     // Bộ đếm sự kiện Trung Thu (JSON)
     [Required]
     [MaxLength(100)]
     [JsonText]
-    public string DataEventTrungThu { get; set; } = default!;
+    public string MoonFestivalEventData { get; set; } = default!;
 
     // Bộ đếm sự kiện Hùng Vương (JSON)
     [Required]
     [MaxLength(100)]
     [JsonText]
-    public string DataEventHungVuong { get; set; } = default!;
+    public string HungKingEventData { get; set; } = default!;
 
     // Bộ đếm sự kiện Black Friday (JSON)
     [Required]
@@ -550,13 +547,13 @@ public class Player
     [Required]
     [JsonText]
     [Column(TypeName = "text")]
-    public string DataEventModels { get; set; } = default!;
+    public string DailyGiftActivityData { get; set; } = default!;
 
     // Bộ đếm và cờ hằng ngày (JSON)
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string DataModels { get; set; } = default!;
+    public string DailyCounterData { get; set; } = default!;
 
     // Điểm cộng HP từ hợp thể
     public int HpPointFusion { get; set; }

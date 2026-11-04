@@ -95,7 +95,7 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
     public async Task A_player_without_an_account_row_is_not_ranked()
     {
         await _fixture.LoadAsync([P(1).With("data_point", Points(5))]);
-        await _fixture.RunAsync("insert into player(id, account_id, name, gender, items_body, items_bag, items_box, data_inventory, data_point, data_task, data_luyentap, pet) "
+        await _fixture.RunAsync("insert into player(id, account_id, name, gender, items_body, items_bag, items_box, data_inventory, data_point, data_task, training_data, pet) "
             + "values (2, 999, 'orphan', 0, '[]', '[]', '[]', '[]', '[13,999]', '[]', '[]', '[]')");
 
         Same([1], await PowerIds());
@@ -106,10 +106,10 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
     {
         await _fixture.LoadAsync(
         [
-            (P(1) with { Gender = 0 }).With("data_may_dam", "[5,50,500]"),
-            (P(2) with { Gender = 1 }).With("data_may_dam", "[6,60,600]"),
-            (P(3) with { Gender = 2 }).With("data_may_dam", "[7,70,700]"),
-            (P(4) with { Gender = 0 }).With("data_may_dam", "[9,1,1]"),
+            (P(1) with { Gender = 0 }).With("punching_machine_data", "[5,50,500]"),
+            (P(2) with { Gender = 1 }).With("punching_machine_data", "[6,60,600]"),
+            (P(3) with { Gender = 2 }).With("punching_machine_data", "[7,70,700]"),
+            (P(4) with { Gender = 0 }).With("punching_machine_data", "[9,1,1]"),
         ]);
 
         Same([4, 1], (await Repository.GetTopAsync(TopRanking.PunchingMachineEarthling)).Select(e => e.PlayerId));
@@ -168,8 +168,8 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
     [Fact]
     public async Task One_malformed_row_does_not_remove_the_other_rows_from_any_ranking()
     {
-        var broken = P(99).With("data_point", "][").With("pet", "garbage").With("data_task", "{").With("data_luyentap", "x").With("vodaisinhtu", "x")
-            .With("data_inventory", "x").With("data_may_dam", "x").With("data_event_new_year", "x").With("items_bag", "\"[457,").With("items_box", "\"[457,");
+        var broken = P(99).With("data_point", "][").With("pet", "garbage").With("data_task", "{").With("training_data", "x").With("deathmatch_arena_data", "x")
+            .With("data_inventory", "x").With("punching_machine_data", "x").With("data_event_new_year", "x").With("items_bag", "\"[457,").With("items_box", "\"[457,");
         await _fixture.LoadAsync([P(1).With("data_point", Points(5)), broken]);
 
         foreach (var ranking in Enum.GetValues<TopRanking>())
@@ -200,11 +200,11 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
     {
         await _fixture.LoadAsync(
         [
-            P(1).With("data_point", "[13,\"700\"]").With("data_may_dam", "[\"700\",0,0]"),
-            P(2).With("data_point", Points(3)).With("data_may_dam", "[3,0,0]"),
+            P(1).With("data_point", "[13,\"700\"]").With("punching_machine_data", "[\"700\",0,0]"),
+            P(2).With("data_point", Points(3)).With("punching_machine_data", "[3,0,0]"),
         ]);
 
-        // data_point is cast without JSON_UNQUOTE: the string "700" is 0; data_may_dam is unquoted: "700" is 700
+        // data_point is cast without JSON_UNQUOTE: the string "700" is 0; punching_machine_data is unquoted: "700" is 700
         Same([2, 1], await PowerIds());
         Same([1, 2], (await Repository.GetTopAsync(TopRanking.PunchingMachineEarthling)).Select(e => e.PlayerId));
     }
@@ -297,15 +297,15 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
         string Luyen(long top, string? time) => "[1,false,-1,10000000,1774835465038," + top + (time is null ? "" : "," + time) + ",0,0,0]";
         var players = new List<TopPlayer>
         {
-            P(1).With("data_luyentap", Luyen(0, "5")), // top 0: excluded
-            P(2).With("data_luyentap", Luyen(3, "50")),
-            P(3).With("data_luyentap", Luyen(3, "20")), // same top, faster: first
-            P(4).With("data_luyentap", Luyen(9, "900")),
-            P(5).With("data_luyentap", "[1,false,-1,1,1,3]"), // time missing = NULL: smallest in ASC, so ahead of 20
-            P(6).With("data_luyentap", "bad"),
-            P(7).With("data_luyentap", Luyen(-1, "1")), // negative wraps to a huge unsigned number: first
+            P(1).With("training_data", Luyen(0, "5")), // top 0: excluded
+            P(2).With("training_data", Luyen(3, "50")),
+            P(3).With("training_data", Luyen(3, "20")), // same top, faster: first
+            P(4).With("training_data", Luyen(9, "900")),
+            P(5).With("training_data", "[1,false,-1,1,1,3]"), // time missing = NULL: smallest in ASC, so ahead of 20
+            P(6).With("training_data", "bad"),
+            P(7).With("training_data", Luyen(-1, "1")), // negative wraps to a huge unsigned number: first
         };
-        players.AddRange(Enumerable.Range(10, 12).Select(i => P(i).With("data_luyentap", Luyen(1, i.ToString()))));
+        players.AddRange(Enumerable.Range(10, 12).Select(i => P(i).With("training_data", Luyen(1, i.ToString()))));
         await _fixture.LoadAsync(players);
 
         var top = await Repository.GetTopWhisAsync();
@@ -319,8 +319,8 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
     [Fact]
     public async Task Vdst_ranking_keeps_only_positive_time_and_stops_at_twenty()
     {
-        var players = new List<TopPlayer> { P(1).With("vodaisinhtu", "[false,0,7,0]"), P(2).With("vodaisinhtu", "[false,0,7,9]"), P(3).With("vodaisinhtu", "x") };
-        players.AddRange(Enumerable.Range(10, 25).Select(i => P(i).With("vodaisinhtu", "[false,0,0," + i + "]")));
+        var players = new List<TopPlayer> { P(1).With("deathmatch_arena_data", "[false,0,7,0]"), P(2).With("deathmatch_arena_data", "[false,0,7,9]"), P(3).With("deathmatch_arena_data", "x") };
+        players.AddRange(Enumerable.Range(10, 25).Select(i => P(i).With("deathmatch_arena_data", "[false,0,0," + i + "]")));
         await _fixture.LoadAsync(players);
 
         var top = await Repository.GetTopVdstAsync();

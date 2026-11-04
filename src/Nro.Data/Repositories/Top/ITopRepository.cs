@@ -11,10 +11,10 @@ public interface ITopRepository
     // Lấy TOP_NV theo nhiệm vụ, nhiệm vụ phụ, tiến độ giảm dần rồi thời điểm đăng nhập tăng dần.
     Task<IReadOnlyList<TopTaskEntry>> GetTopNvAsync(CancellationToken cancellationToken = default);
 
-    // Lấy TOP_WHIS với data_luyentap[5] lớn hơn 0, giảm dần rồi data_luyentap[6] tăng dần, tối đa 10 dòng.
+    // Lấy TOP_WHIS với training_data[5] lớn hơn 0, giảm dần rồi training_data[6] tăng dần, tối đa 10 dòng (Java: data_luyentap).
     Task<IReadOnlyList<TopWhisEntry>> GetTopWhisAsync(CancellationToken cancellationToken = default);
 
-    // Lấy TOP_VDST với vodaisinhtu[3] lớn hơn 0, giảm dần, tối đa 20 dòng.
+    // Lấy TOP_VDST với deathmatch_arena_data[3] lớn hơn 0, giảm dần, tối đa 20 dòng (Java: vodaisinhtu).
     Task<IReadOnlyList<TopVdstEntry>> GetTopVdstAsync(CancellationToken cancellationToken = default);
 
     // Lấy TOP_THOI_VANG theo thỏi vàng vật phẩm 457 trong túi và rương, không lọc ban như Java, tối đa 20 dòng.

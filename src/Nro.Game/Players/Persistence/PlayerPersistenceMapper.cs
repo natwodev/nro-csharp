@@ -25,11 +25,11 @@ public sealed class PlayerPersistenceMapper
             Id = GetInt(row, "id"), Account_id = GetInt(row, "account_id"), Name = GetString(row, "name"),
             Head = checked((short)GetInt(row, "head")), Gender = checked((sbyte)GetInt(row, "gender")),
             HaveTennisSpaceShip = GetBool(row, "have_tennis_space_ship"), LastTimeDropTail = GetLong(row, "last_time_drop_tail"),
-            LastEventGasTime = GetLong(row, "last_time_khi_su_kien"), TransformationState = GetInt(row, "isbienhinh"),
-            Notify = row["notify"] as string, LastPkCommesonTime = GetLong(row, "lasttimepkcommeson"),
+            LastEventGasTime = GetLong(row, "last_event_monkey_transformation_at"), TransformationState = GetInt(row, "is_transformed"),
+            Notify = row["notify"] as string, LastPkCommesonTime = GetLong(row, "last_commeson_boss_fight_at"),
             LastTimeShenronAppeared_Christmas = GetLong(row, "dragon_christmas"),
             LastTimeShenronAppeared_Halloween = GetLong(row, "dragon_halloween"),
-            Lastimelogin = row["lastimelogin"] as DateTime?, FirstTimeLogin = row["first_time_login"] as DateTime?,
+            Lastimelogin = row["initial_login_at"] as DateTime?, FirstTimeLogin = row["first_time_login"] as DateTime?,
             LastTimeLoginGame = row["last_time_login_game"] as DateTime?,
         };
         ReadInventory(player, GetString(row, "data_inventory"));
@@ -55,13 +55,13 @@ public sealed class PlayerPersistenceMapper
         saved = ReplaceWhenChanged(saved, original, "gender", (int)player.Gender, IntMatches);
         saved = ReplaceWhenChanged(saved, original, "have_tennis_space_ship", player.HaveTennisSpaceShip, BoolMatches);
         saved = ReplaceWhenChanged(saved, original, "last_time_drop_tail", player.LastTimeDropTail, LongMatches);
-        saved = ReplaceWhenChanged(saved, original, "last_time_khi_su_kien", player.LastEventGasTime, LongMatches);
-        saved = ReplaceWhenChanged(saved, original, "isbienhinh", player.TransformationState, IntMatches);
+        saved = ReplaceWhenChanged(saved, original, "last_event_monkey_transformation_at", player.LastEventGasTime, LongMatches);
+        saved = ReplaceWhenChanged(saved, original, "is_transformed", player.TransformationState, IntMatches);
         saved = ReplaceWhenChanged(saved, original, "notify", player.Notify, StringMatches);
-        saved = ReplaceWhenChanged(saved, original, "lasttimepkcommeson", player.LastPkCommesonTime, LongMatches);
+        saved = ReplaceWhenChanged(saved, original, "last_commeson_boss_fight_at", player.LastPkCommesonTime, LongMatches);
         saved = ReplaceWhenChanged(saved, original, "dragon_christmas", player.LastTimeShenronAppeared_Christmas, LongMatches);
         saved = ReplaceWhenChanged(saved, original, "dragon_halloween", player.LastTimeShenronAppeared_Halloween, LongMatches);
-        saved = ReplaceWhenChanged(saved, original, "lastimelogin", player.Lastimelogin, DateTimeMatches);
+        saved = ReplaceWhenChanged(saved, original, "initial_login_at", player.Lastimelogin, DateTimeMatches);
         saved = ReplaceWhenChanged(saved, original, "first_time_login", player.FirstTimeLogin, DateTimeMatches);
         saved = ReplaceWhenChanged(saved, original, "last_time_login_game", player.LastTimeLoginGame, DateTimeMatches);
         if (!InventoryMatches(player, original["data_inventory"] as string)) saved = saved.With("data_inventory", WriteInventory(player));
@@ -91,21 +91,21 @@ public sealed class PlayerPersistenceMapper
         values["items_box"] = NewBoxItems(nowMs);
         values["items_box_collection"] = NewEmptyItemSlots(20, nowMs);
         values["items_box_lucky_round"] = NewEmptyItemSlots(110, nowMs);
-        values["items_daban"] = NewEmptyItemSlots(20, nowMs);
+        values["sold_items"] = NewEmptyItemSlots(20, nowMs);
         values["item_mails_box"] = NewEmptyItemSlots(200, nowMs);
         values["friends"] = "[]"; values["enemies"] = "[]";
         values["data_intrinsic"] = ZeroArray(8); values["data_item_time"] = ZeroArray(79); values["data_task"] = "[0,0,0]";
         values["data_mabu_egg"] = "[]"; values["data_charm"] = RepeatedArray(nowMs, 21); values["skills"] = NewSkills(gender); values["skills_shortcut"] = NewSkillShortcut(gender);
-        values["data_luyentap"] = "[]"; values["pet"] = "[]"; values["my_father"] = "[]"; values["my_mother"] = "[]";
+        values["training_data"] = "[]"; values["pet"] = "[]"; values["my_father"] = "[]"; values["my_mother"] = "[]";
         values["data_black_ball"] = NestedRepeatedArray("[0,0,0]", 7); values["data_side_task"] = "[-1,0,0,0,20,0]";
-        values["data_kol_task"] = "[0,0]"; values["data_event_task"] = "[-1,0,0,0,20,0]"; values["data_event_models"] = ZeroArray(44);
-        values["bill_data"] = "[]"; values["data_trong_dua_hau"] = "[]"; values["data_nguoi_yeu"] = "[]";
+        values["data_kol_task"] = "[0,0]"; values["data_event_task"] = "[-1,0,0,0,20,0]"; values["daily_gift_activity_data"] = ZeroArray(44);
+        values["bill_data"] = "[]"; values["watermelon_plant_data"] = "[]"; values["lover_data"] = "[]";
         values["bought_skill"] = $"[{InitialSkill(gender)}]";
         values["create_time"] = utc; values["first_time_login"] = utc;
-        values["lastimelogin"] = DateTime.SpecifyKind(utc, DateTimeKind.Unspecified); values["last_time_login_game"] = utc;
-        values["master_does_not_attack"] = "false"; values["master_does_not_attack_bo"] = "false"; values["master_does_not_attack_me"] = "false";
-        values["notify"] = null; values["lover_does_not_attack"] = "false"; values["conone_does_not_attack"] = "false"; values["contwo_does_not_attack"] = "false"; values["conthree_does_not_attack"] = "false";
-        values["thanh_tich_bang"] = ""; values["thanh_tich_bang2"] = ""; values["thanh_tich_bang3"] = "";
+        values["initial_login_at"] = DateTime.SpecifyKind(utc, DateTimeKind.Unspecified); values["last_time_login_game"] = utc;
+        values["master_does_not_attack"] = "false"; values["father_does_not_attack"] = "false"; values["mother_does_not_attack"] = "false";
+        values["notify"] = null; values["lover_does_not_attack"] = "false"; values["first_child_does_not_attack"] = "false"; values["second_child_does_not_attack"] = "false"; values["third_child_does_not_attack"] = "false";
+        values["clan_treasure_under_sea_achievement"] = ""; values["clan_destron_gas_achievement"] = ""; values["clan_snake_way_achievement"] = "";
         values["data_badges"] = "[]"; values["data_task_badges"] = "[]"; values["daily_gift"] = "[]";
         return new PlayerPersistenceRecord(values);
     }
@@ -122,64 +122,64 @@ public sealed class PlayerPersistenceMapper
             ["have_tennis_space_ship"] = false,
             ["clan_id"] = -1,
             ["last_time_drop_tail"] = 0L,
-            ["last_time_khi_su_kien"] = 0L,
+            ["last_event_monkey_transformation_at"] = 0L,
             ["create_time"] = utc,
             ["point_pvp"] = 0,
             ["data_card"] = "[]",
             ["time_travel_duration"] = "[0,0]",
             ["whis_sparring"] = 0,
-            ["isbienhinh"] = 0,
-            ["check_band_account"] = "[0,0,0]",
+            ["is_transformed"] = 0,
+            ["account_ban_check_data"] = "[0,0,0]",
             ["master_does_not_attack"] = "false",
-            ["master_does_not_attack_bo"] = "false",
-            ["master_does_not_attack_me"] = "false",
-            ["bandokhobau"] = "[]",
+            ["father_does_not_attack"] = "false",
+            ["mother_does_not_attack"] = "false",
+            ["treasure_under_sea_uses"] = "[]",
             ["barracks_state"] = 0L,
-            ["conduongrandoc"] = "[]",
+            ["snake_way_data"] = "[]",
             ["data_clan_task"] = "[]",
             ["data_achievement"] = "[]",
             ["data_vip"] = "[]",
-            ["lasttimepkcommeson"] = 0L,
-            ["sieuthanthuy"] = "[]",
-            ["baovetaikhoan"] = "[]",
+            ["last_commeson_boss_fight_at"] = 0L,
+            ["super_divine_water_state"] = "[]",
+            ["account_protection_data"] = "[]",
             ["first_time_login"] = utc,
             ["last_time_login_game"] = utc,
-            ["ruonggo"] = "[]",
-            ["vodaisinhtu"] = "[]",
+            ["wood_chest_data"] = "[]",
+            ["deathmatch_arena_data"] = "[]",
             ["dragon_christmas"] = 0L,
             ["dragon_halloween"] = 0L,
             ["rank"] = 0,
             ["data_item_event"] = "[]",
-            ["data_the_card"] = "[0,0,0,0,0,0,0,0]",
-            ["data_diem_danh"] = "[0,0,0,0,0,0,0,0,0,0]",
-            ["data_may_dam"] = "[0,0,0]",
+            ["card_data"] = "[0,0,0,0,0,0,0,0]",
+            ["check_in_data"] = "[0,0,0,0,0,0,0,0,0,0]",
+            ["punching_machine_data"] = "[0,0,0]",
             ["lover_does_not_attack"] = "false",
-            ["conone_does_not_attack"] = "false",
-            ["contwo_does_not_attack"] = "false",
-            ["conthree_does_not_attack"] = "false",
+            ["first_child_does_not_attack"] = "false",
+            ["second_child_does_not_attack"] = "false",
+            ["third_child_does_not_attack"] = "false",
             ["event_point"] = 0,
             ["event_point_boss"] = 0,
-            ["event_point_nhs"] = 0,
-            ["event_point_quai"] = 0,
-            ["diem_huy_diet"] = 0,
-            ["diem_chien_truong_namek"] = 0,
-            ["diem_su_kien_tet"] = 0,
-            ["diem_su_kien_giangsinh"] = 0,
-            ["diem_su_kien_halloween"] = 0,
-            ["diem_su_kien_8_3"] = 0,
-            ["diem_su_kien_trungthu"] = 0,
-            ["diem_su_kien_hung_vuong"] = 0,
-            ["diem_su_kien_black_friday"] = 0,
-            ["diem_su_kien_20_10"] = 0,
+            ["ngu_hanh_son_event_points"] = 0,
+            ["monster_hunt_event_points"] = 0,
+            ["destruction_points"] = 0,
+            ["namek_battlefield_points"] = 0,
+            ["lunar_new_year_event_points"] = 0,
+            ["christmas_event_points"] = 0,
+            ["halloween_event_points"] = 0,
+            ["international_womens_day_event_points"] = 0,
+            ["moon_festival_event_points"] = 0,
+            ["hung_king_event_points"] = 0,
+            ["black_friday_event_points"] = 0,
+            ["vietnamese_womens_day_event_points"] = 0,
             ["data_event_new_year"] = "[0,0,0,0]",
-            ["data_event_christ_mas"] = "[0,0,0,0]",
-            ["data_event_vulan"] = "[0,0,0]",
+            ["christmas_event_data"] = "[0,0,0,0]",
+            ["vu_lan_event_data"] = "[0,0,0]",
             ["data_event_halloween"] = "[0,0]",
-            ["data_event_8_3"] = "[0,0]",
-            ["data_event_trung_thu"] = "[0,0]",
-            ["data_event_hung_vuong"] = "[0,0,0,0,0,0]",
+            ["international_womens_day_event_data"] = "[0,0]",
+            ["moon_festival_event_data"] = "[0,0]",
+            ["hung_king_event_data"] = "[0,0,0,0,0,0]",
             ["data_event_black_friday"] = "[0,0]",
-            ["data_models"] = "[0,0,0,0,0,0,0,0,0,0]",
+            ["daily_counter_data"] = "[0,0,0,0,0,0,0,0,0,0]",
             ["hp_point_fusion"] = 0,
             ["mp_point_fusion"] = 0,
             ["point_fusion_damage"] = 0,
@@ -225,7 +225,7 @@ public sealed class PlayerPersistenceMapper
     }
 
     private static readonly IReadOnlySet<string> DeferredColumns = new HashSet<string>(
-        PlayerPersistenceColumns.All.Where(static column => column is not "id" and not "account_id" and not "name" and not "head" and not "gender" and not "have_tennis_space_ship" and not "last_time_drop_tail" and not "last_time_khi_su_kien" and not "isbienhinh" and not "notify" and not "lasttimepkcommeson" and not "dragon_christmas" and not "dragon_halloween" and not "lastimelogin" and not "first_time_login" and not "last_time_login_game" and not "data_inventory" and not "data_point"), StringComparer.Ordinal);
+        PlayerPersistenceColumns.All.Where(static column => column is not "id" and not "account_id" and not "name" and not "head" and not "gender" and not "have_tennis_space_ship" and not "last_time_drop_tail" and not "last_event_monkey_transformation_at" and not "is_transformed" and not "notify" and not "last_commeson_boss_fight_at" and not "dragon_christmas" and not "dragon_halloween" and not "initial_login_at" and not "first_time_login" and not "last_time_login_game" and not "data_inventory" and not "data_point"), StringComparer.Ordinal);
 
     private static int GetInt(PlayerPersistenceRecord row, string column) => row[column] switch { int value => value, long value => checked((int)value), null => 0, _ => throw new FormatException($"Player column '{column}' is not an integer.") };
     private static long GetLong(PlayerPersistenceRecord row, string column) => row[column] switch { long value => value, int value => value, null => 0, _ => throw new FormatException($"Player column '{column}' is not an Int64.") };

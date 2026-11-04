@@ -130,7 +130,7 @@ public sealed class PlayerRepository : IPlayerRepository
         foreach (string column in PlayerPersistenceColumns.All)
         {
             object? value = row.GetObject(column);
-            if (column is "data_inventory" or "data_location" or "data_point" or "data_magic_tree" or "items_body" or "items_bag" or "items_box" or "items_box_collection" or "items_box_lucky_round" or "items_daban" or "item_mails_box" or "skills" or "pet")
+            if (column is "data_inventory" or "data_location" or "data_point" or "data_magic_tree" or "items_body" or "items_bag" or "items_box" or "items_box_collection" or "items_box_lucky_round" or "sold_items" or "item_mails_box" or "skills" or "pet")
             {
                 PlayerJsonCodec.ReadArray(value as string, column);
             }
