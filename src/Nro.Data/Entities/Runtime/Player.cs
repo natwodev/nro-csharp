@@ -39,145 +39,121 @@ public class Player
     // Tiền tệ (JSON: vàng, ngọc, hồng ngọc, điểm VIP)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataInventory { get; set; } = default!;
 
     // Vị trí cuối cùng (JSON: map, x, y)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataLocation { get; set; } = default!;
 
     // Chỉ số chiến đấu (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataPoint { get; set; } = default!;
 
     // Trạng thái cây đậu thần (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataMagicTree { get; set; } = default!;
 
     // Vật phẩm đang trang bị (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ItemsBody { get; set; } = default!;
 
     // Vật phẩm trong hành trang (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ItemsBag { get; set; } = default!;
 
     // Vật phẩm trong rương đồ cá nhân (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ItemsBox { get; set; } = default!;
 
     // Vật phẩm trong rương sưu tầm (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ItemsBoxCollection { get; set; } = default!;
 
     // Vật phẩm thưởng vòng quay may mắn (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ItemsBoxLuckyRound { get; set; } = default!;
 
     // Vật phẩm đã bán để mua lại (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string SoldItems { get; set; } = default!;
 
     // Vật phẩm trong hòm thư (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ItemMailsBox { get; set; } = default!;
 
     // Danh sách bạn bè (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Friends { get; set; } = default!;
 
     // Danh sách kẻ thù (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Enemies { get; set; } = default!;
 
     // Nội tại và trạng thái (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataIntrinsic { get; set; } = default!;
 
     // Hiệu ứng vật phẩm theo thời gian còn lại (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataItemTime { get; set; } = default!;
 
     // Tiến độ nhiệm vụ chính (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataTask { get; set; } = default!;
 
     // Trứng Mabu đang ấp (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataMabuEgg { get; set; } = default!;
 
     // Thời hạn bùa (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataCharm { get; set; } = default!;
 
     // Kỹ năng đã học (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Skills { get; set; } = default!;
 
     // Ô phím tắt kỹ năng (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string SkillsShortcut { get; set; } = default!;
 
     // Dữ liệu luyện tập và thách đấu Whis (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string TrainingData { get; set; } = default!;
 
     // Đệ tử: thông tin, chỉ số, trang bị, kỹ năng (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Pet { get; set; } = default!;
 
     // Nhân vật gia đình là cha (JSON, không dùng)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string MyFather { get; set; } = default!;
 
     // Nhân vật gia đình là mẹ (JSON, không dùng)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string MyMother { get; set; } = default!;
 
     // Lần rớt đuôi khỉ cuối (epoch ms)
@@ -189,29 +165,24 @@ public class Player
     // Phần thưởng ngọc rồng đen (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataBlackBall { get; set; } = default!;
 
     // Nhiệm vụ phụ hằng ngày (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataSideTask { get; set; } = default!;
 
     // Nhiệm vụ KOL (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataKolTask { get; set; } = default!;
 
     // Nhiệm vụ sự kiện (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataEventTask { get; set; } = default!;
 
     // Thời gian tạo bản ghi
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime CreateTime { get; set; }
 
     // Điểm PvP (không dùng)
@@ -226,13 +197,11 @@ public class Player
     // Trứng Bill đang ấp (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string BillData { get; set; } = default!;
 
     // Dưa hấu đang trồng (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string WatermelonPlantData { get; set; } = default!;
 
     // Trạng thái hiệu ứng du hành (JSON)
@@ -255,21 +224,17 @@ public class Player
 
     // Cờ sư phụ không tấn công
     [Required]
-    [Column(TypeName = "text")]
     public string MasterDoesNotAttack { get; set; } = default!;
 
     // Cờ cha không tấn công
     [Required]
-    [Column(TypeName = "text")]
     public string FatherDoesNotAttack { get; set; } = default!;
 
     // Cờ mẹ không tấn công
     [Required]
-    [Column(TypeName = "text")]
     public string MotherDoesNotAttack { get; set; } = default!;
 
     // Thông báo đăng nhập một lần
-    [Column(TypeName = "text")]
     public string? Notify { get; set; }
 
     // Lượt dùng bản đồ kho báu trong ngày (JSON)
@@ -296,12 +261,10 @@ public class Player
     // Tiến độ thành tựu (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataAchievement { get; set; } = default!;
 
     // Lượt dùng đặc quyền VIP (JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? DataVip { get; set; }
 
     // Lần đánh boss Commeson cuối (epoch ms) (nghĩa chưa chắc, cần chủ dự án duyệt)
@@ -324,23 +287,19 @@ public class Player
     public DateTime InitialLoginAt { get; set; }
 
     // Lần đăng nhập đầu của ngày gần nhất
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime FirstTimeLogin { get; set; }
 
     // Thời gian hoạt động cuối trong game
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime LastTimeLoginGame { get; set; }
 
     // Huy hiệu đang sở hữu (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataBadges { get; set; } = default!;
 
     // Nhiệm vụ huy hiệu (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataTaskBadges { get; set; } = default!;
 
     // Rương gỗ của giải đấu 23 (JSON)
@@ -366,7 +325,6 @@ public class Player
 
     // Dữ liệu đấu trường xếp hạng (JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? DataSuperRank { get; set; }
 
     // Bộ đếm vật phẩm sự kiện (JSON)
@@ -396,61 +354,50 @@ public class Player
     // Dữ liệu người yêu (JSON, không dùng)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string LoverData { get; set; } = default!;
 
     // Cờ người yêu không tấn công
     [Required]
-    [Column(TypeName = "text")]
     public string LoverDoesNotAttack { get; set; } = default!;
 
     // Cờ con thứ nhất không tấn công
     [Required]
-    [Column(TypeName = "text")]
     public string FirstChildDoesNotAttack { get; set; } = default!;
 
     // Cờ con thứ hai không tấn công
     [Required]
-    [Column(TypeName = "text")]
     public string SecondChildDoesNotAttack { get; set; } = default!;
 
     // Cờ con thứ ba không tấn công
     [Required]
-    [Column(TypeName = "text")]
     public string ThirdChildDoesNotAttack { get; set; } = default!;
 
     // Thành tích bang hội Kho Báu Dưới Biển
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ClanTreasureUnderSeaAchievement { get; set; } = default!;
 
     // Thành tích bang hội Hủy Diệt Khí Gas
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ClanDestronGasAchievement { get; set; } = default!;
 
     // Thành tích bang hội Con Đường Rắn Độc
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ClanSnakeWayAchievement { get; set; } = default!;
 
     // Quà hằng ngày (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DailyGift { get; set; } = default!;
 
     // Mã sách kỹ năng đã học đủ (JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? BoughtSkill { get; set; }
 
     // Kỹ năng đang học (JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? LearnSkill { get; set; }
 
     // Điểm sự kiện chung
@@ -546,7 +493,6 @@ public class Player
     // Bộ đếm hoạt động quà hằng ngày (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DailyGiftActivityData { get; set; } = default!;
 
     // Bộ đếm và cờ hằng ngày (JSON)

@@ -36,6 +36,5 @@ public class BankTransfer
     public DateTime? TransferredAt { get; set; }
 
     // Thời gian tạo dòng (UTC)
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime CreatedAt { get; set; }
 }

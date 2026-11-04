@@ -24,7 +24,6 @@ public class BankHistory
     public double? AmountCash { get; set; }
 
     // Nội dung chuyển khoản
-    [Column(TypeName = "text")]
     public string? Description { get; set; }
 
     // Mã giao dịch duy nhất

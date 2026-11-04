@@ -18,6 +18,5 @@ public class PartRow
     // Các mảnh hình ảnh của bộ phận (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Data { get; set; } = default!;
 }

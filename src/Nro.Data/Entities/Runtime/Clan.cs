@@ -45,12 +45,10 @@ public class Clan
     // Thành viên bang hội (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Members { get; set; } = default!;
 
     // Thành viên nổi bật (không dùng)
     [Required]
-    [Column(TypeName = "text")]
     public string Tops { get; set; } = default!;
 
     // Thông tin bang chủ (không dùng)
@@ -89,7 +87,6 @@ public class Clan
     // Vật phẩm trong rương bang hội (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string ItemsBoxClan { get; set; } = default!;
 
     // Lượt boss bang hội hiện tại trong ngày
@@ -98,11 +95,9 @@ public class Clan
     // Thời hạn bùa bang hội (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string DataCharms { get; set; } = default!;
 
     // Thời gian tạo bang hội
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime CreateTime { get; set; }
 
     // Collection các bản ghi Player thuộc Clan này

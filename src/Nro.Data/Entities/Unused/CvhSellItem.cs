@@ -23,12 +23,10 @@ public class CvhSellItem
 
     // Chỉ số vật phẩm (dạng text)
     [Required]
-    [Column(TypeName = "text")]
     public string Options { get; set; } = default!;
 
     // Danh sách người mua
     [Required]
-    [Column(TypeName = "text")]
     public string UsersBuy { get; set; } = default!;
 
     // Trạng thái tin rao bán

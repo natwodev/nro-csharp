@@ -58,7 +58,6 @@ public class CvhSiteSetting
     // Liên kết tải game và mạng xã hội
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Download { get; set; } = default!;
 
     // Cờ kích hoạt thành viên
@@ -77,7 +76,6 @@ public class CvhSiteSetting
 
     // Nội dung thông báo
     [Required]
-    [Column(TypeName = "text")]
     public string NdThongbao { get; set; } = default!;
 
     // Biểu tượng favicon

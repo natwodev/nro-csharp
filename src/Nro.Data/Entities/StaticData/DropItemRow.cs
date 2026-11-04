@@ -42,19 +42,15 @@ public class DropItemRow
 
     // Chỉ số vật phẩm (JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? Options { get; set; }
 
     // Điều kiện rơi bổ sung (JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? Conditions { get; set; }
 
     // Thời gian tạo
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime CreatedAt { get; set; }
 
     // Thời gian cập nhật gần nhất
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime UpdatedAt { get; set; }
 }

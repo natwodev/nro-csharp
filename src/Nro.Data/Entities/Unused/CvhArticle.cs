@@ -19,7 +19,6 @@ public class CvhArticle
 
     // Nội dung bài viết (HTML)
     [Required]
-    [Column(TypeName = "text")]
     public string Content { get; set; } = default!;
 
     // Cờ đăng bởi quản trị viên
@@ -29,17 +28,14 @@ public class CvhArticle
 
     // Số lượt xem (dạng text)
     [Required]
-    [Column(TypeName = "text")]
     public string Views { get; set; } = default!;
 
     // Số lượt thích (dạng text)
     [Required]
-    [Column(TypeName = "text")]
     public string Likes { get; set; } = default!;
 
     // Bình luận của bài viết (dạng text)
     [Required]
-    [Column(TypeName = "text")]
     public string Comments { get; set; } = default!;
 
     // Trạng thái bài viết
@@ -54,7 +50,6 @@ public class CvhArticle
     public string Poster { get; set; } = default!;
 
     // Ngày tạo
-    [Column(TypeName = "date")]
     public DateOnly Created { get; set; }
 
     // Thời gian tạo hoặc sửa (dạng text)

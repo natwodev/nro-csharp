@@ -22,12 +22,10 @@ public class CvhGiftCode
 
     // Vật phẩm thưởng
     [Required]
-    [Column(TypeName = "text")]
     public string Item { get; set; } = default!;
 
     // Chỉ số của vật phẩm thưởng
     [Required]
-    [Column(TypeName = "text")]
     public string Option { get; set; } = default!;
 
     // Trạng thái mã (dạng text)

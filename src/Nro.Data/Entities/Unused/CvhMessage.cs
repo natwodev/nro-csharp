@@ -19,7 +19,6 @@ public class CvhMessage
 
     // Nội dung tin nhắn
     [Required]
-    [Column(TypeName = "text")]
     public string Message { get; set; } = default!;
 
     // Thời gian gửi (dạng text)

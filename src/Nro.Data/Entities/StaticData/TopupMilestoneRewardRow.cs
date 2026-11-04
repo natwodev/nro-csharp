@@ -20,10 +20,8 @@ public class TopUpMilestoneRewardRow
 
     // Vật phẩm thưởng của mốc (mảng JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? RewardJson { get; set; }
 
     // Thời gian tạo (UTC)
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime CreatedAt { get; set; }
 }

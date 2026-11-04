@@ -14,12 +14,10 @@ public class AchievementTemplateRow
 
     // Tên thành tựu
     [Required]
-    [Column(TypeName = "text")]
     public string Info1 { get; set; } = default!;
 
     // Mô tả điều kiện
     [Required]
-    [Column(TypeName = "text")]
     public string Info2 { get; set; } = default!;
 
     // Số thưởng (hồng ngọc và thỏi vàng)

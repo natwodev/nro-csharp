@@ -47,6 +47,5 @@ public class SkillTemplateRow
     // Chỉ số kỹ năng theo cấp (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Skills { get; set; } = default!;
 }

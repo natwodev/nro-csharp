@@ -25,6 +25,5 @@ public class SicBoRound
     public bool IsHighResult { get; set; }
 
     // Thời điểm kết thúc ván
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime SettledAt { get; set; }
 }

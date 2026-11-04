@@ -19,7 +19,6 @@ public class ForumPost
 
     // Nội dung bài viết (HTML)
     [Required]
-    [Column(TypeName = "text")]
     public string Description { get; set; } = default!;
 
     // Cờ ghim bài (1: ghim, 0: thường)
@@ -28,10 +27,8 @@ public class ForumPost
 
     // Bình luận của bài viết (mảng JSON)
     [JsonText]
-    [Column(TypeName = "text")]
     public string? Comments { get; set; }
 
     // Thời gian tạo
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime? CreatedAt { get; set; }
 }

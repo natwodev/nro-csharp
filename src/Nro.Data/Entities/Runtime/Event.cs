@@ -20,6 +20,5 @@ public class Event
     // Trạng thái sự kiện (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Data { get; set; } = default!;
 }

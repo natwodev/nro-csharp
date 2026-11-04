@@ -15,7 +15,6 @@ public class AttributeTemplateRow
 
     // Nội dung hiển thị buff (#value)
     [Required]
-    [Column(TypeName = "text")]
     public string Name { get; set; } = default!;
 
     // Collection các bản ghi AttributeServer thuộc AttributeTemplate này

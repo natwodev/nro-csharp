@@ -32,18 +32,15 @@ public class Account
     // Email và thông tin xác thực (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Email { get; set; } = default!;
 
     // Thời gian tạo tài khoản (UTC)
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime? AccountCreatedAt { get; set; }
 
     // Số ngày kích hoạt đặc quyền (mặc định 45)
     public int AccountAgeDays { get; set; }
 
     // Thời gian cập nhật gần nhất
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime? UpdateTime { get; set; }
 
     // Cờ người sáng lập (quản trị cao nhất)
@@ -71,11 +68,9 @@ public class Account
     public int VipPoint { get; set; }
 
     // Thời gian đăng nhập gần nhất (epoch ms)
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime LastTimeLogin { get; set; }
 
     // Thời gian đăng xuất gần nhất (epoch ms)
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime LastTimeLogout { get; set; }
 
     // Địa chỉ IP đăng nhập web gần nhất

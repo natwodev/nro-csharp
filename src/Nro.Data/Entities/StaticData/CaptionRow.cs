@@ -14,17 +14,14 @@ public class CaptionRow
 
     // Tên danh hiệu Trái Đất
     [Required]
-    [Column(TypeName = "text")]
     public string Earth { get; set; } = default!;
 
     // Tên danh hiệu Xayda
     [Required]
-    [Column(TypeName = "text")]
     public string Saiya { get; set; } = default!;
 
     // Tên danh hiệu Namếc
     [Required]
-    [Column(TypeName = "text")]
     public string Namek { get; set; } = default!;
 
     // Sức mạnh tối thiểu của bậc

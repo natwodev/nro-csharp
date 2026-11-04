@@ -47,19 +47,16 @@ public class MapTemplateRow
     // Các điểm chuyển map (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Waypoints { get; set; } = default!;
 
     // Quái đặt sẵn (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Mobs { get; set; } = default!;
 
     // NPC đặt sẵn (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Npcs { get; set; } = default!;
 
     // Hành tinh sở hữu (0: Trái Đất, 1: Namếc, 2: Xayda)

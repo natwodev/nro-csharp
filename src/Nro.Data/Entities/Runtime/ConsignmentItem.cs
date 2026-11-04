@@ -18,7 +18,6 @@ public class ConsignmentItem
 
     // Tên người bán
     [Required]
-    [Column(TypeName = "text")]
     public string PlayerName { get; set; } = default!;
 
     // Thẻ (0: trang bị, 1: phụ kiện, 2: hỗ trợ, 3: khác)

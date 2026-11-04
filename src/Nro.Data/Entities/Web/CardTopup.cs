@@ -39,7 +39,6 @@ public class CardTopup
     public int Status { get; set; }
 
     // Thời gian gửi (UTC)
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime? CreatedAt { get; set; }
 
     // Mã yêu cầu của cổng thanh toán

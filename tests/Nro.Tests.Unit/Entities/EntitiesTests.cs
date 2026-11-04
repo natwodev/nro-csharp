@@ -17,6 +17,7 @@ public class EntitiesTests
 
     private sealed record GoldenColumn(
         bool ExplicitName, string Property, string Column, string CsharpType, bool Nullable, bool Json, int? MaxLength, string? SqlTypeName,
+        bool ExplicitTypeName,
         bool PrimaryKey, bool Identity, GoldenForeignKey? ForeignKey);
 
     private sealed record GoldenCollection(string Name, string Element, string ViaTable, string ViaColumn);
@@ -85,6 +86,16 @@ public class EntitiesTests
         bool nullable = Nullable.GetUnderlyingType(t) is not null || (t == typeof(string) && info.WriteState == NullabilityState.Nullable);
         return nullable ? name + "?" : name;
     }
+
+    /// <summary>SQL type Npgsql selects without an explicit <see cref="ColumnAttribute.TypeName"/>.</summary>
+    private static string? DefaultSqlTypeName(string csharpType) => csharpType.TrimEnd('?') switch
+    {
+        "string" => "text",
+        "DateTime" => "timestamp with time zone",
+        "DateOnly" => "date",
+        "decimal" => "numeric",
+        _ => null,
+    };
 
     [Fact]
     public void There_is_one_entity_per_table_and_every_column_is_covered()
@@ -160,7 +171,11 @@ public class EntitiesTests
             Assert.True(c.Column == (col?.Name ?? ColumnName(p)), $"{where}: column name differs");
             Assert.True(c.Column == c.Column.ToLowerInvariant() && !c.Column.Contains("__"), $"{where}: column is not lower-case snake_case");
             Assert.True(c.CsharpType == CSharpName(p.PropertyType, nullability.Create(p)), $"{where}: type differs");
-            Assert.True(c.SqlTypeName == col?.TypeName, $"{where}: SQL type name differs");
+            Assert.True(c.ExplicitTypeName == (col?.TypeName is not null), $"{where}: [Column(TypeName)] presence differs");
+            if (c.SqlTypeName is not null)
+            {
+                Assert.True(c.SqlTypeName == (col?.TypeName ?? DefaultSqlTypeName(c.CsharpType)), $"{where}: SQL type name differs");
+            }
             Assert.True(c.MaxLength == p.GetCustomAttribute<MaxLengthAttribute>()?.Length, $"{where}: max length differs");
             Assert.True(c.Json == (p.GetCustomAttribute<JsonTextAttribute>() is not null), $"{where}: JSON marker differs");
             Assert.True(c.PrimaryKey == (p.GetCustomAttribute<KeyAttribute>() is not null), $"{where}: key marker differs");
@@ -188,6 +203,25 @@ public class EntitiesTests
             int[] orders = props.Where(p => p.GetCustomAttribute<KeyAttribute>() is not null)
                 .Select(p => p.GetCustomAttribute<ColumnAttribute>()!.Order).Order().ToArray();
             Assert.Equal(Enumerable.Range(0, e.PrimaryKey.Length), orders);
+        }
+    }
+
+    [Fact]
+    public void Column_TypeName_is_present_exactly_for_non_default_Npgsql_types()
+    {
+        foreach (GoldenEntity e in Golden.Value.Entities)
+        {
+            foreach (GoldenColumn c in e.Columns)
+            {
+                PropertyInfo p = TypeOf(e).GetProperty(c.Property)!;
+                string? typeName = p.GetCustomAttribute<ColumnAttribute>()?.TypeName;
+
+                Assert.Equal(c.ExplicitTypeName, typeName is not null);
+                if (c.SqlTypeName is not null)
+                {
+                    Assert.Equal(c.ExplicitTypeName, c.SqlTypeName != DefaultSqlTypeName(c.CsharpType));
+                }
+            }
         }
     }
 

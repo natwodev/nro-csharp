@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Nro.Data.Entities.Web;
 
@@ -12,11 +11,9 @@ public class SiteSetting
     public string? Title { get; set; }
 
     // Mô tả website (SEO)
-    [Column(TypeName = "text")]
     public string? Description { get; set; }
 
     // Từ khóa SEO
-    [Column(TypeName = "text")]
     public string? Keywords { get; set; }
 
     // Khóa công khai reCAPTCHA của website

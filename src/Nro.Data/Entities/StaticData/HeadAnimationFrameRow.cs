@@ -15,6 +15,5 @@ public class HeadAnimationFrameRow
     // Mã bộ phận đầu của hoạt ảnh (mảng JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Data { get; set; } = default!;
 }

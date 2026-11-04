@@ -21,13 +21,11 @@ public class DataBadgesRow
 
     // Tên huy hiệu
     [Required]
-    [Column(TypeName = "text")]
     public string Name { get; set; } = default!;
 
     // Chỉ số cộng thêm (JSON)
     [Required]
     [JsonText]
-    [Column(TypeName = "text")]
     public string Options { get; set; } = default!;
 
     // Navigation property đến entity ItemTemplateRow

@@ -39,7 +39,6 @@ public class ItemShopRow
     public int? IconSpec { get; set; }
 
     // Thời gian tạo
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime? CreateTime { get; set; }
 
     // Navigation property đến entity TabShopRow

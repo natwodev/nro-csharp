@@ -14,7 +14,6 @@ public class EventServer
 
     // Tên định danh sự kiện
     [Required]
-    [Column(TypeName = "text")]
     public string NameEvent { get; set; } = default!;
 
     // Điểm và cờ sự kiện

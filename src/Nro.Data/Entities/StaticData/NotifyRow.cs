@@ -14,11 +14,9 @@ public class NotifyRow
 
     // Tiêu đề thông báo
     [Required]
-    [Column(TypeName = "text")]
     public string Name { get; set; } = default!;
 
     // Nội dung thông báo
     [Required]
-    [Column(TypeName = "text")]
     public string Text { get; set; } = default!;
 }

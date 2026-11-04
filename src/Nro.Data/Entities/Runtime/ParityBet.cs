@@ -27,7 +27,6 @@ public class ParityBet
     public bool IsRewardClaimed { get; set; }
 
     // Thời điểm cược (cập nhật khi nhận thưởng)
-    [Column(TypeName = "timestamp with time zone")]
     public DateTime BetAt { get; set; }
 
     // Navigation property đến entity ParitySession

@@ -34,7 +34,6 @@ public class BankPayment
     public string Status { get; set; } = default!;
 
     // Thời gian giao dịch (văn bản, UTC+7)
-    [Column(TypeName = "text")]
     public string? Date { get; set; }
 
     // Tên ngân hàng
