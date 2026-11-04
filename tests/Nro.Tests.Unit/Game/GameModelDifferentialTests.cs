@@ -524,7 +524,7 @@ public class GameModelDifferentialTests
                         else
                         {
                             // Java's other branch is Util.formatNumber, which is compared with the JDK in UtilDifferentialTests; here only the boundary: above 10000 the text is the Vietnamese format.
-                            Assert.Equal(Util.FormatNumber(L(row[1]), Nro.Core.Util.FormatStyle.VIETNAMESE), service.NumberToString(L(row[1])));
+                            Assert.Equal(Util.FormatNumber(L(row[1]), Nro.Core.Enums.FormatStyle.VIETNAMESE), service.NumberToString(L(row[1])));
                         }
 
                         break;

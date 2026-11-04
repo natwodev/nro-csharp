@@ -1,4 +1,5 @@
 using Nro.Data.Db;
+using Nro.Core.Enums;
 namespace Nro.Data.Repositories.Top;
 
 // Cung cấp hợp đồng tải bảng xếp hạng TopDAO trên PostgreSQL.

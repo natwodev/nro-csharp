@@ -1,16 +1,5 @@
 namespace Nro.Game.World.Mobs.Ports;
 
-// Xác định bộ năm món để quy tắc rơi đồ đếm.
-// Nguồn Java: Item.isDTL() và Item.isDHD().
-public enum BodySetKind
-{
-    // Bộ đồ Thần Linh.
-    Dtl,
-
-    // Bộ đồ Hủy Diệt.
-    Dhd,
-}
-
 // Ảnh chụp các dữ kiện player mà quy tắc rơi đồ cần.
 // Nguồn Java: player.nPoint.*, player.itemTime.*, player.getSession() và player.clan.
 public sealed record MobLootPlayerView

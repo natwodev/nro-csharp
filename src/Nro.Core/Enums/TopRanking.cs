@@ -1,5 +1,4 @@
-using Nro.Data.Db;
-namespace Nro.Data.Repositories.Top;
+namespace Nro.Core.Enums;
 
 // Liệt kê các bảng xếp hạng một giá trị; các bảng nhiều giá trị có phương thức riêng trong ITopRepository.
 // Nguồn Java: jbcd/dao/TopDAO.java (mỗi giá trị tương ứng một hằng String Java; TOP_NV, TOP_WHIS, TOP_VDST và TOP_THOI_VANG được truy vấn riêng).

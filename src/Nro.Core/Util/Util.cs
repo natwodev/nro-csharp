@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 
 using Nro.Core.Consts;
+using Nro.Core.Enums;
 using Nro.Core.Time;
 
 namespace Nro.Core.Util;

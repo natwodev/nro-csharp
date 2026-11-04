@@ -1,3 +1,4 @@
+global using Nro.Core.Enums;
 global using Nro.Game.Items.Core;
 global using Nro.Game.Items.Cards;
 global using Nro.Game.Items.Combine;
