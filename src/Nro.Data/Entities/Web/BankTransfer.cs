@@ -16,7 +16,7 @@ public class BankTransfer
     // Mã tham chiếu giao dịch SePay
     [Required]
     [MaxLength(100)]
-    public string Tid { get; set; } = default!;
+    public string TransactionId { get; set; } = default!;
 
     // Nội dung chuyển khoản
     [MaxLength(255)]
@@ -32,9 +32,9 @@ public class BankTransfer
     // Trạng thái xử lý (1: đã xử lý)
     public short? Status { get; set; }
 
-    // Thời gian giao dịch ngân hàng (văn bản)
+    // Thời điểm giao dịch ngân hàng
     [Column(TypeName = "timestamp without time zone")]
-    public DateTime? Time { get; set; }
+    public DateTime? TransferredAt { get; set; }
 
     // Thời gian tạo dòng (UTC)
     [Column(TypeName = "timestamp with time zone")]

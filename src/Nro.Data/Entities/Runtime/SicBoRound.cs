@@ -14,21 +14,18 @@ public class SicBoRound
     public int SicBoRoundId { get; set; }
 
     // Xúc xắc thứ nhất (1-6)
-    [Column("number_1")]
-    public int Number1 { get; set; }
+    public int FirstDie { get; set; }
 
     // Xúc xắc thứ hai (1-6)
-    [Column("number_2")]
-    public int Number2 { get; set; }
+    public int SecondDie { get; set; }
 
     // Xúc xắc thứ ba (1-6)
-    [Column("number_3")]
-    public int Number3 { get; set; }
+    public int ThirdDie { get; set; }
 
-    // Cờ kết quả (không dùng)
-    public bool Result { get; set; }
+    // Cờ kết quả Tài/Xỉu (nghĩa chưa chắc, cần chủ dự án duyệt)
+    public bool IsHighResult { get; set; }
 
-    // Thời gian kết thúc ván
+    // Thời điểm kết thúc ván
     [Column(TypeName = "timestamp with time zone")]
-    public DateTime Time { get; set; }
+    public DateTime SettledAt { get; set; }
 }

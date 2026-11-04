@@ -2749,8 +2749,8 @@
         },
         {
           "explicitName": false,
-          "property": "Tid",
-          "column": "tid",
+          "property": "TransactionId",
+          "column": "transaction_id",
           "sourceColumn": "tid",
           "csharpType": "string",
           "pgType": "varchar(100)",
@@ -2824,8 +2824,8 @@
         },
         {
           "explicitName": false,
-          "property": "Time",
-          "column": "time",
+          "property": "TransferredAt",
+          "column": "transferred_at",
           "sourceColumn": "time",
           "csharpType": "DateTime?",
           "pgType": "timestamp",
@@ -9526,9 +9526,9 @@
           "foreignKey": null
         },
         {
-          "explicitName": true,
-          "property": "Number1",
-          "column": "number_1",
+          "explicitName": false,
+          "property": "FirstDie",
+          "column": "first_die",
           "sourceColumn": "number_1",
           "csharpType": "int",
           "pgType": "integer",
@@ -9541,9 +9541,9 @@
           "foreignKey": null
         },
         {
-          "explicitName": true,
-          "property": "Number2",
-          "column": "number_2",
+          "explicitName": false,
+          "property": "SecondDie",
+          "column": "second_die",
           "sourceColumn": "number_2",
           "csharpType": "int",
           "pgType": "integer",
@@ -9556,9 +9556,9 @@
           "foreignKey": null
         },
         {
-          "explicitName": true,
-          "property": "Number3",
-          "column": "number_3",
+          "explicitName": false,
+          "property": "ThirdDie",
+          "column": "third_die",
           "sourceColumn": "number_3",
           "csharpType": "int",
           "pgType": "integer",
@@ -9572,8 +9572,8 @@
         },
         {
           "explicitName": false,
-          "property": "Result",
-          "column": "result",
+          "property": "IsHighResult",
+          "column": "is_high_result",
           "sourceColumn": "result",
           "csharpType": "bool",
           "pgType": "boolean",
@@ -9587,8 +9587,8 @@
         },
         {
           "explicitName": false,
-          "property": "Time",
-          "column": "time",
+          "property": "SettledAt",
+          "column": "settled_at",
           "sourceColumn": "time",
           "csharpType": "DateTime",
           "pgType": "timestamptz",
@@ -9684,8 +9684,8 @@
       "columns": [
         {
           "explicitName": false,
-          "property": "IdSession",
-          "column": "id_session",
+          "property": "SessionId",
+          "column": "session_id",
           "sourceColumn": "id_session",
           "csharpType": "int",
           "pgType": "integer",
@@ -9704,8 +9704,8 @@
         },
         {
           "explicitName": false,
-          "property": "IdPlayer",
-          "column": "id_player",
+          "property": "PlayerId",
+          "column": "player_id",
           "sourceColumn": "id_player",
           "csharpType": "int",
           "pgType": "integer",
@@ -9719,8 +9719,8 @@
         },
         {
           "explicitName": false,
-          "property": "RubyQuantity",
-          "column": "ruby_quantity",
+          "property": "BetGoldBarCount",
+          "column": "bet_gold_bar_count",
           "sourceColumn": "ruby_quantity",
           "csharpType": "int",
           "pgType": "integer",
@@ -9764,8 +9764,8 @@
         },
         {
           "explicitName": false,
-          "property": "Reward",
-          "column": "reward",
+          "property": "IsRewardClaimed",
+          "column": "is_reward_claimed",
           "sourceColumn": "reward",
           "csharpType": "bool",
           "pgType": "boolean",
@@ -9779,8 +9779,8 @@
         },
         {
           "explicitName": false,
-          "property": "Time",
-          "column": "time",
+          "property": "BetAt",
+          "column": "bet_at",
           "sourceColumn": "time",
           "csharpType": "DateTime",
           "pgType": "timestamptz",
@@ -9820,9 +9820,9 @@
           "foreignKey": null
         },
         {
-          "explicitName": true,
-          "property": "Number1",
-          "column": "number_1",
+          "explicitName": false,
+          "property": "FirstDie",
+          "column": "first_die",
           "sourceColumn": "number_1",
           "csharpType": "int",
           "pgType": "integer",
@@ -9835,9 +9835,9 @@
           "foreignKey": null
         },
         {
-          "explicitName": true,
-          "property": "Number2",
-          "column": "number_2",
+          "explicitName": false,
+          "property": "SecondDie",
+          "column": "second_die",
           "sourceColumn": "number_2",
           "csharpType": "int",
           "pgType": "integer",
@@ -9850,9 +9850,9 @@
           "foreignKey": null
         },
         {
-          "explicitName": true,
-          "property": "Number3",
-          "column": "number_3",
+          "explicitName": false,
+          "property": "ThirdDie",
+          "column": "third_die",
           "sourceColumn": "number_3",
           "csharpType": "int",
           "pgType": "integer",
@@ -9866,8 +9866,8 @@
         },
         {
           "explicitName": false,
-          "property": "Result",
-          "column": "result",
+          "property": "IsOdd",
+          "column": "is_odd",
           "sourceColumn": "result",
           "csharpType": "bool",
           "pgType": "boolean",
@@ -9881,8 +9881,8 @@
         },
         {
           "explicitName": false,
-          "property": "Time",
-          "column": "time",
+          "property": "SettledAt",
+          "column": "settled_at",
           "sourceColumn": "time",
           "csharpType": "DateTime",
           "pgType": "timestamptz",
@@ -9900,7 +9900,7 @@
           "name": "PariryPlayers",
           "element": "PariryPlayer",
           "viaTable": "pariry_players",
-          "viaColumn": "id_session"
+          "viaColumn": "session_id"
         }
       ]
     }
