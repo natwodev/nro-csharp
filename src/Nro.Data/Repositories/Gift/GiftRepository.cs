@@ -8,9 +8,9 @@ namespace Nro.Data.Repositories.Gift;
 // Nguồn Java: jbcd/dao/GiftDAO.java (truy vấn có tham số; tải hoặc tạo trong giao dịch và lỗi cơ sở dữ liệu được truyền lên thay vì bị nuốt).
 public sealed class GiftRepository : IGiftRepository
 {
-    private const string SelectSql = "select gold_tan_thu, gem_tan_thu from gift where player_id = ?";
+    private const string SelectSql = "select is_newbie_gold_claimed, is_newbie_gem_claimed from gift where player_id = ?";
     internal const string InsertSql = "insert into gift (player_id) values (?) on conflict (player_id) do nothing";
-    private const string UpdateSql = "update gift set gold_tan_thu = ?, gem_tan_thu = ? where player_id = ?";
+    private const string UpdateSql = "update gift set is_newbie_gold_claimed = ?, is_newbie_gem_claimed = ? where player_id = ?";
     private readonly NroDatabase _database;
 
     // Tạo kho quà tân thủ với truy cập cơ sở dữ liệu.
@@ -27,7 +27,7 @@ public sealed class GiftRepository : IGiftRepository
             using IResultSnapshot rows = await transaction.ExecuteQueryAsync(SelectSql, [playerId], cancellationToken);
             if (rows.Next())
             {
-                return new GiftPlayerState(rows.GetBoolean("gold_tan_thu"), rows.GetBoolean("gem_tan_thu"));
+                return new GiftPlayerState(rows.GetBoolean("is_newbie_gold_claimed"), rows.GetBoolean("is_newbie_gem_claimed"));
             }
 
             await transaction.ExecuteUpdateAsync(InsertSql, [playerId], cancellationToken);

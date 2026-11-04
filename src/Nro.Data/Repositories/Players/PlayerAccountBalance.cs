@@ -7,4 +7,4 @@ namespace Nro.Data.Repositories.Players;
 // Số dư ví VND ban đầu.
 // Tổng tiền đã nạp ban đầu.
 // Số dư coin ban đầu.
-public sealed record PlayerAccountBalance(int AccountId, int Vnd, int TongNap, int Coin);
+public sealed record PlayerAccountBalance(int AccountId, int Vnd, int TotalTopUp, int Coin);

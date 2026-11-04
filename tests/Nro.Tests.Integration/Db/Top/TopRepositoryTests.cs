@@ -83,7 +83,7 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
         var bar = "[\"[457,10,[]]\"]";
         await _fixture.LoadAsync(
         [
-            (P(1) with { Ban = 1 }).With("data_point", Points(999)).With("items_bag", bar),
+            (P(1) with { IsBanned = 1 }).With("data_point", Points(999)).With("items_bag", bar),
             P(2).With("data_point", Points(5)).With("items_bag", bar),
         ]);
 
@@ -256,11 +256,11 @@ public class TopRepositoryTests : IClassFixture<TopFixture>, IAsyncLifetime
     [Fact]
     public async Task Dead_rankings_keep_their_special_filters_and_limits()
     {
-        var players = Enumerable.Range(1, 30).Select(i => P(i) with { Cash = i, Danap = 100_000 + i, PointPvp = -i });
-        await _fixture.LoadAsync(players.Append((P(31) with { Cash = null, Danap = 5, Ban = 1 })));
+        var players = Enumerable.Range(1, 30).Select(i => P(i) with { Cash = i, ToppedUpAmount = 100_000 + i, PointPvp = -i });
+        await _fixture.LoadAsync(players.Append((P(31) with { Cash = null, ToppedUpAmount = 5, IsBanned = 1 })));
 
         var nap = await Repository.GetTopAsync(TopRanking.TopUp); // no ban filter, 20 rows, NULL last
-        var duaNap = await Repository.GetTopAsync(TopRanking.TopUpRace); // danap >= 100000, 10 rows
+        var duaNap = await Repository.GetTopAsync(TopRanking.TopUpRace); // topped_up_amount >= 100000, 10 rows
         var pvp = await Repository.GetTopAsync(TopRanking.Pvp); // CAST(pointPvp AS UNSIGNED): -1 wraps to the top
 
         Assert.Equal(20, nap.Count);

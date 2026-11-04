@@ -7,36 +7,36 @@ namespace Nro.Data.Repositories.Top;
 // Nguồn Java: jbcd/dao/TopDAO.java (dùng truy vấn có tham số, không phân tích JSON tại PostgreSQL; chỉ đọc items_body của người thắng, và bảo toàn thứ tự hòa theo id).
 public sealed class TopRepository : ITopRepository
 {
-    // SQL Java nối player với account và chỉ giữ account.ban = 0, trừ TOP_THOI_VANG, TOP_NAP và TOP_DUA_NAP.
+    // SQL Java nối player với account và chỉ giữ account.is_banned = 0, trừ TOP_THOI_VANG, TOP_NAP và TOP_DUA_NAP.
     // SQL bảng xếp hạng máy đấm Trái Đất (Java: mayDamTraiDatSql).
-    private const string PunchingMachineEarthlingSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 0";
+    private const string PunchingMachineEarthlingSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.is_banned = 0 and p.gender = 0";
     // SQL bảng xếp hạng máy đấm Namếc (Java: mayDamNamecSql).
-    private const string PunchingMachineNamekianSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 1";
+    private const string PunchingMachineNamekianSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.is_banned = 0 and p.gender = 1";
     // SQL bảng xếp hạng máy đấm Xayda (Java: mayDamXaydaSql).
-    private const string PunchingMachineSaiyanSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 2";
-    private const string DataPointSql = "select p.id as pid, p.data_point as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string PetSql = "select p.id as pid, p.pet as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string VndSql = "select p.id as pid, a.vnd as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string CoinSql = "select p.id as pid, a.coin as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string DaNapSql = "select p.id as pid, a.danap as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string DataInventorySql = "select p.id as pid, p.data_inventory as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string NamekWarSql = "select p.id as pid, p.diem_chien_truong_namek as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string NewYearSql = "select p.id as pid, p.data_event_new_year as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string ChristmasSql = "select p.id as pid, p.data_event_christ_mas as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string VuLanSql = "select p.id as pid, p.data_event_vulan as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string HalloweenSql = "select p.id as pid, p.data_event_halloween as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string Event83Sql = "select p.id as pid, p.data_event_8_3 as k from player p join account a on a.id = p.account_id where a.ban = 0";
+    private const string PunchingMachineSaiyanSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.is_banned = 0 and p.gender = 2";
+    private const string DataPointSql = "select p.id as pid, p.data_point as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string PetSql = "select p.id as pid, p.pet as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string VndSql = "select p.id as pid, a.vnd as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string CoinSql = "select p.id as pid, a.coin as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string DaNapSql = "select p.id as pid, a.topped_up_amount as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string DataInventorySql = "select p.id as pid, p.data_inventory as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string NamekWarSql = "select p.id as pid, p.diem_chien_truong_namek as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string NewYearSql = "select p.id as pid, p.data_event_new_year as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string ChristmasSql = "select p.id as pid, p.data_event_christ_mas as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string VuLanSql = "select p.id as pid, p.data_event_vulan as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string HalloweenSql = "select p.id as pid, p.data_event_halloween as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string Event83Sql = "select p.id as pid, p.data_event_8_3 as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
     // SQL bảng xếp hạng Trung Thu (Java: trungThuSql).
-    private const string MoonFestivalSql = "select p.id as pid, p.data_event_trung_thu as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string HungVuongSql = "select p.id as pid, p.data_event_hung_vuong as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string BlackFridaySql = "select p.id as pid, p.data_event_black_friday as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string PvpSql = "select p.id as pid, p.point_pvp as k from player p join account a on a.id = p.account_id where a.ban = 0";
+    private const string MoonFestivalSql = "select p.id as pid, p.data_event_trung_thu as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string HungVuongSql = "select p.id as pid, p.data_event_hung_vuong as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string BlackFridaySql = "select p.id as pid, p.data_event_black_friday as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string PvpSql = "select p.id as pid, p.point_pvp as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
     private const string NapSql = "select p.id as pid, a.cash as k from player p join account a on a.id = p.account_id";
-    private const string DuaNapSql = "select p.id as pid, a.danap as k from player p join account a on a.id = p.account_id where a.danap >= 100000";
+    private const string DuaNapSql = "select p.id as pid, a.topped_up_amount as k from player p join account a on a.id = p.account_id where a.topped_up_amount >= 100000";
 
-    private const string TaskSql = "select p.id as pid, p.data_task as k, p.last_time_login_game as login from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string WhisSql = "select p.id as pid, p.data_luyentap as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string VdstSql = "select p.id as pid, p.vodaisinhtu as k from player p join account a on a.id = p.account_id where a.ban = 0";
+    private const string TaskSql = "select p.id as pid, p.data_task as k, p.last_time_login_game as login from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string WhisSql = "select p.id as pid, p.data_luyentap as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
+    private const string VdstSql = "select p.id as pid, p.vodaisinhtu as k from player p join account a on a.id = p.account_id where a.is_banned = 0";
 
     // strpos tương đương LIKE '%"[457,%' nhưng không có ký tự đại diện.
     // SQL bảng xếp hạng thỏi vàng (Java: thoiVangSql).

@@ -16,7 +16,7 @@ public class CardTopup
     // Tên đăng nhập của người nạp
     [Required]
     [MaxLength(100)]
-    public string UserNap { get; set; } = default!;
+    public string TopUpUsername { get; set; } = default!;
 
     // Nhà mạng hoặc loại thẻ
     [Required]

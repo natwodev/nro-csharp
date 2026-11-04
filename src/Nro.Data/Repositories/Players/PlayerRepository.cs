@@ -10,7 +10,7 @@ public sealed class PlayerRepository : IPlayerRepository
     // Giữ tham số chuỗi không ép kiểu để PostgreSQL chọn toán tử bằng của citext.
     private const string SelectByNameSql = "select * from player where name = ?";
     private const string SelectByAccountSql = "select * from player where account_id = ?";
-    private const string UpdateAccountSql = "update account set vnd = ?, tongnap = ?, coin = ? where id = ?";
+    private const string UpdateAccountSql = "update account set vnd = ?, total_top_up = ?, coin = ? where id = ?";
     private static readonly string[] WritableColumns = PlayerPersistenceColumns.All.Where(static column => column != "id").ToArray();
     private static readonly string InsertSql = BuildInsertSql();
     private readonly NroDatabase _database;
@@ -49,7 +49,7 @@ public sealed class PlayerRepository : IPlayerRepository
         {
             int accountRowsAffected = await transaction.ExecuteUpdateAsync(
                 UpdateAccountSql,
-                [accountBalance.Vnd, accountBalance.TongNap, accountBalance.Coin, accountBalance.AccountId],
+                [accountBalance.Vnd, accountBalance.TotalTopUp, accountBalance.Coin, accountBalance.AccountId],
                 cancellationToken);
             if (accountRowsAffected != 1)
             {

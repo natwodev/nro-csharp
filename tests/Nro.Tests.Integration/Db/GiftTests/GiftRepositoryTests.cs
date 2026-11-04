@@ -21,8 +21,8 @@ public sealed class GiftRepositoryTests : IClassFixture<GiftRepositoryFixture>, 
 
         Assert.Equal(new GiftPlayerState(false, false), state);
         Assert.Equal(1L, await _fixture.ScalarAsync<long>("select count(*) from gift where player_id = 101"));
-        Assert.False(await _fixture.ScalarAsync<bool>("select gold_tan_thu from gift where player_id = 101"));
-        Assert.False(await _fixture.ScalarAsync<bool>("select gem_tan_thu from gift where player_id = 101"));
+        Assert.False(await _fixture.ScalarAsync<bool>("select is_newbie_gold_claimed from gift where player_id = 101"));
+        Assert.False(await _fixture.ScalarAsync<bool>("select is_newbie_gem_claimed from gift where player_id = 101"));
     }
 
     [Fact]
@@ -32,8 +32,8 @@ public sealed class GiftRepositoryTests : IClassFixture<GiftRepositoryFixture>, 
         await Repository.SaveAsync(102, new GiftPlayerState(true, false));
 
         Assert.Equal(new GiftPlayerState(true, false), await Repository.LoadOrCreateAsync(102));
-        Assert.True(await _fixture.ScalarAsync<bool>("select gold_tan_thu from gift where player_id = 102"));
-        Assert.False(await _fixture.ScalarAsync<bool>("select gem_tan_thu from gift where player_id = 102"));
+        Assert.True(await _fixture.ScalarAsync<bool>("select is_newbie_gold_claimed from gift where player_id = 102"));
+        Assert.False(await _fixture.ScalarAsync<bool>("select is_newbie_gem_claimed from gift where player_id = 102"));
     }
 
     [Fact]
@@ -64,8 +64,8 @@ public sealed class GiftRepositoryTests : IClassFixture<GiftRepositoryFixture>, 
             transaction => transaction.ExecuteUpdateAsync(GiftRepository.InsertSql, playerId)));
 
         Assert.Equal(1L, await _fixture.ScalarAsync<long>("select count(*) from gift where player_id = 106"));
-        Assert.True(await _fixture.ScalarAsync<bool>("select gold_tan_thu from gift where player_id = 106"));
-        Assert.True(await _fixture.ScalarAsync<bool>("select gem_tan_thu from gift where player_id = 106"));
+        Assert.True(await _fixture.ScalarAsync<bool>("select is_newbie_gold_claimed from gift where player_id = 106"));
+        Assert.True(await _fixture.ScalarAsync<bool>("select is_newbie_gem_claimed from gift where player_id = 106"));
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public sealed class GiftRepositoryFixture : TestDatabase
 {
     protected override async Task SeedAsync()
     {
-        await RunAsync("create table gift(player_id integer not null primary key, gold_tan_thu boolean not null default false, gem_tan_thu boolean not null default false)");
+        await RunAsync("create table gift(player_id integer not null primary key, is_newbie_gold_claimed boolean not null default false, is_newbie_gem_claimed boolean not null default false)");
         await RunAsync("create table gift_attempt(player_id integer not null)");
     }
 

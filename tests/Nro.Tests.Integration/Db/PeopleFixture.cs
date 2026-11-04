@@ -14,7 +14,7 @@ public sealed class PeopleFixture : TestDatabase
         await RunAsync("create view v_people as select id, name from people");
         await RunAsync(
             "create table account(id serial primary key, username citext, password text, is_jail boolean, active boolean, vnd integer, "
-            + "bd_player double precision, last_time_logout timestamp, gender smallint, vethang_expire bigint, nickname text, Vip_Point integer)");
+            + "player_bd_multiplier double precision, last_time_logout timestamp, gender smallint, monthly_pass_expires_at bigint, nickname text, Vip_Point integer)");
         await RunAsync("create table accounts(id integer primary key, username citext, active boolean, level integer, born timestamp, profile jsonb)");
     }
 

@@ -13,8 +13,8 @@ public class GiftSchemaTests
 
         string ddl = string.Join(Environment.NewLine, lines[(start + 1)..end]);
         Assert.Contains("player_id integer NOT NULL", ddl, StringComparison.Ordinal);
-        Assert.Contains("gold_tan_thu boolean NOT NULL DEFAULT false", ddl, StringComparison.Ordinal);
-        Assert.Contains("gem_tan_thu boolean NOT NULL DEFAULT false", ddl, StringComparison.Ordinal);
+        Assert.Contains("is_newbie_gold_claimed boolean NOT NULL DEFAULT false", ddl, StringComparison.Ordinal);
+        Assert.Contains("is_newbie_gem_claimed boolean NOT NULL DEFAULT false", ddl, StringComparison.Ordinal);
         Assert.Contains("PRIMARY KEY (player_id)", ddl, StringComparison.Ordinal);
     }
 

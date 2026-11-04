@@ -40,7 +40,7 @@ public class GiftCode
     // Thời gian tạo (dạng text)
     [Required]
     [Column(TypeName = "text")]
-    public string Datecreate { get; set; } = default!;
+    public string CreatedAt { get; set; } = default!;
 
     // Thời gian hết hạn (dạng text)
     [Required]

@@ -16,7 +16,8 @@ public class BlockedIp
     // Địa chỉ IP bị chặn
     [Required]
     [MaxLength(64)]
-    public string BlockerIp { get; set; } = default!;
+    [Column("blocked_ip")]
+    public string BlockedIpValue { get; set; } = default!;
 
     // Lý do chặn
     [MaxLength(255)]

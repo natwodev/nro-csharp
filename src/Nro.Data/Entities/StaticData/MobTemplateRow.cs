@@ -34,7 +34,7 @@ public class MobTemplateRow
     public short DartType { get; set; }
 
     // Sức đánh (% HP tối đa)
-    public short PercentDame { get; set; }
+    public short DamagePercent { get; set; }
 
     // Tiềm năng thưởng (% HP)
     public short PercentPotential { get; set; }

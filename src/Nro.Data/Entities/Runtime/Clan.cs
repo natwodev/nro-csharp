@@ -20,8 +20,7 @@ public class Clan
     // Tên viết tắt của bang hội
     [Required]
     [MaxLength(4)]
-    [Column("name_2")]
-    public string Name2 { get; set; } = default!;
+    public string ShortName { get; set; } = default!;
 
     // Khẩu hiệu bang hội
     [Required]
@@ -58,34 +57,34 @@ public class Clan
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string ThongTinLeader { get; set; } = default!;
+    public string LeaderInfo { get; set; } = default!;
 
     // Thành tích hầm Hủy Diệt Khí Gas
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string ThanhTichKhiGas { get; set; } = default!;
+    public string DestronGasAchievement { get; set; } = default!;
 
     // Thành tích hầm Bản Đồ Kho Báu
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string ThanhTichBdkb { get; set; } = default!;
+    public string TreasureUnderSeaAchievement { get; set; } = default!;
 
     // Thành tích hầm Con Đường Rắn Độc
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string ThanhTichCdrd { get; set; } = default!;
+    public string SnakeWayAchievement { get; set; } = default!;
 
     // Hệ số tăng kinh nghiệm của bang hội
     public int BuffExp { get; set; }
 
     // Thời điểm bắt đầu tăng kinh nghiệm (epoch ms)
-    public long LasttimeBuffExp { get; set; }
+    public long ExperienceBuffStartedAt { get; set; }
 
     // Thời lượng tăng kinh nghiệm (ms)
-    public long TimeStarBuffExp { get; set; }
+    public long ExperienceBuffDuration { get; set; }
 
     // Vật phẩm trong rương bang hội (JSON)
     [Required]

@@ -540,7 +540,7 @@ public class NroDatabaseQueryTests : IClassFixture<PeopleFixture>, IAsyncLifetim
         // The same calls that GodGK.login (Java) uses, on the PostgreSQL columns the data model plans: serial, citext, boolean, smallint, bigint, timestamp.
         var logged = new DateTime(2024, 5, 6, 7, 8, 9);
         await Db.ExecuteUpdateAsync(
-            "insert into account(username, password, is_jail, active, vnd, bd_player, last_time_logout, gender, vethang_expire, Vip_Point) values()",
+            "insert into account(username, password, is_jail, active, vnd, player_bd_multiplier, last_time_logout, gender, monthly_pass_expires_at, Vip_Point) values()",
             "Admin", "pw", false, true, 100, 1.5d, logged, (short)2, 1_700_000_000_000L, 7);
 
         var rs = await Db.ExecuteQueryAsync("select * from account where username = ? and password = ?", "admin", "pw");
@@ -550,11 +550,11 @@ public class NroDatabaseQueryTests : IClassFixture<PeopleFixture>, IAsyncLifetim
         Assert.False(rs.GetBoolean("is_jail"));
         Assert.True(rs.GetBoolean("active"));
         Assert.Equal(100, rs.GetInt("vnd"));
-        Assert.Equal(1.5d, rs.GetDouble("account.bd_player"));
+        Assert.Equal(1.5d, rs.GetDouble("account.player_bd_multiplier"));
         Assert.Equal(logged, rs.GetTimestamp("last_time_logout"));
         Assert.Equal((sbyte)2, rs.GetByte("gender"));              // smallint becomes int so getByte/getShort work like MySQL TINYINT
         Assert.Equal((short)2, rs.GetShort("gender"));
-        Assert.Equal(1_700_000_000_000L, rs.GetLong("vethang_expire"));
+        Assert.Equal(1_700_000_000_000L, rs.GetLong("monthly_pass_expires_at"));
         Assert.Equal(7, rs.GetInt("Vip_Point"));                   // Java's mixed-case column names can still be looked up
         Assert.Equal("null", rs.GetString("nickname"));            // NULL becomes "null" like String.valueOf
 

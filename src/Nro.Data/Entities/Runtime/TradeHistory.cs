@@ -37,25 +37,25 @@ public class TradeHistory
 
     // Hành trang bên 1 trước giao dịch
     [Required]
-    [Column("bag_1_before_tran", TypeName = "text")]
-    public string Bag1BeforeTran { get; set; } = default!;
+    [Column(TypeName = "text")]
+    public string FirstPlayerBagBeforeTransaction { get; set; } = default!;
 
     // Hành trang bên 2 trước giao dịch
     [Required]
-    [Column("bag_2_before_tran", TypeName = "text")]
-    public string Bag2BeforeTran { get; set; } = default!;
+    [Column(TypeName = "text")]
+    public string SecondPlayerBagBeforeTransaction { get; set; } = default!;
 
     // Hành trang bên 1 sau giao dịch
     [Required]
-    [Column("bag_1_after_tran", TypeName = "text")]
-    public string Bag1AfterTran { get; set; } = default!;
+    [Column(TypeName = "text")]
+    public string FirstPlayerBagAfterTransaction { get; set; } = default!;
 
     // Hành trang bên 2 sau giao dịch
     [Required]
-    [Column("bag_2_after_tran", TypeName = "text")]
-    public string Bag2AfterTran { get; set; } = default!;
+    [Column(TypeName = "text")]
+    public string SecondPlayerBagAfterTransaction { get; set; } = default!;
 
     // Thời gian giao dịch (UTC)
     [Column(TypeName = "timestamp with time zone")]
-    public DateTime TimeTran { get; set; }
+    public DateTime TransactedAt { get; set; }
 }

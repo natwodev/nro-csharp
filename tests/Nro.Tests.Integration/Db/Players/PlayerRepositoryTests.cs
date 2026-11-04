@@ -34,7 +34,7 @@ public class PlayerRepositoryTests : IClassFixture<PlayerRepositoryFixture>
 
         Assert.True(created.Id > 0);
         Assert.Equal(999L, await _fixture.ScalarAsync<long>("select vnd from account where id = $1", 10));
-        Assert.Equal(123L, await _fixture.ScalarAsync<long>("select tongnap from account where id = $1", 10));
+        Assert.Equal(123L, await _fixture.ScalarAsync<long>("select total_top_up from account where id = $1", 10));
         Assert.Equal(456L, await _fixture.ScalarAsync<long>("select coin from account where id = $1", 10));
         Assert.Equal(created.Id, (await repository.FindByNameAsync("SAIYAN"))!.Id);
         Assert.Equal(created.Id, (await repository.FindByNameAsync("SaiYan"))!.Id);
@@ -57,7 +57,7 @@ public class PlayerRepositoryTests : IClassFixture<PlayerRepositoryFixture>
         await Assert.ThrowsAnyAsync<Exception>(() => repository.CreateAsync(invalid, new PlayerAccountBalance(20, 999, 123, 456)));
 
         Assert.Equal(0L, await _fixture.ScalarAsync<long>("select vnd from account where id = $1", 20));
-        Assert.Equal(0L, await _fixture.ScalarAsync<long>("select tongnap from account where id = $1", 20));
+        Assert.Equal(0L, await _fixture.ScalarAsync<long>("select total_top_up from account where id = $1", 20));
         Assert.Equal(0L, await _fixture.ScalarAsync<long>("select coin from account where id = $1", 20));
         Assert.Equal(0L, await _fixture.ScalarAsync<long>("select count(*) from player"));
     }
@@ -217,7 +217,7 @@ public sealed class PlayerRepositoryFixture : TestDatabase
 
     protected override async Task SeedAsync()
     {
-        await RunAsync("create table account(id integer primary key, vnd bigint not null default 0, tongnap bigint not null default 0, coin bigint not null default 0)");
+        await RunAsync("create table account(id integer primary key, vnd bigint not null default 0, total_top_up bigint not null default 0, coin bigint not null default 0)");
         string columns = string.Join(",", PlayerPersistenceColumns.All.Select(ColumnDefinition));
         await RunAsync("create table player (" + columns + ")"); // lint-ok: L08 test schema uses fixed whitelist
         await RunAsync("create unique index ux_player_account_id on player(account_id)");

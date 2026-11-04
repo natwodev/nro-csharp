@@ -11,10 +11,10 @@ public sealed record TopPlayer(
     int Id,
     string Name,
     int Gender = 0,
-    int Ban = 0,
+    int IsBanned = 0,
     long? Vnd = 0,
     long? Coin = 0,
-    long Danap = 0,
+    long ToppedUpAmount = 0,
     int? Cash = 0,
     int NamekWar = 0,
     int? PointPvp = 0,
@@ -68,7 +68,7 @@ public sealed record TopPlayer(
 /// <summary>Real PostgreSQL schema (nro_test, own schema) with the columns of <c>player</c>/<c>account</c>/<c>event</c> that the repositories read; types copied from <c>postgres/schema/schema.sql</c>.</summary>
 public sealed class TopFixture : TestDatabase
 {
-    private const string InsertAccountSql = "insert into account(id, username, is_admin, cash, ban, vnd, coin, danap) values (?, ?, 0, ?, ?, ?, ?, ?)";
+    private const string InsertAccountSql = "insert into account(id, username, is_admin, cash, is_banned, vnd, coin, topped_up_amount) values (?, ?, 0, ?, ?, ?, ?, ?)";
 
     private const string InsertPlayerSql =
         "insert into player(id, account_id, name, gender, last_time_login_game, diem_chien_truong_namek, point_pvp, "
@@ -83,7 +83,7 @@ public sealed class TopFixture : TestDatabase
     {
         await RunAsync(
             "create table account(id integer not null primary key, username citext not null, is_admin smallint not null default 0, cash integer default 0, "
-            + "ban smallint not null default 0, vnd bigint default 0, coin bigint default 0, danap bigint not null default 0)");
+            + "is_banned smallint not null default 0, vnd bigint default 0, coin bigint default 0, topped_up_amount bigint not null default 0)");
         await RunAsync(
             "create table player(id integer not null primary key, account_id integer, name citext not null, gender integer not null, "
             + "items_body text not null, items_bag text not null, items_box text not null, data_inventory text not null, data_point text not null, "
@@ -109,7 +109,7 @@ public sealed class TopFixture : TestDatabase
     {
         foreach (var p in players)
         {
-            await Db.ExecuteUpdateAsync(InsertAccountSql, p.AccountId, "u" + p.Name, p.Cash, p.Ban, p.Vnd, p.Coin, p.Danap);
+            await Db.ExecuteUpdateAsync(InsertAccountSql, p.AccountId, "u" + p.Name, p.Cash, p.IsBanned, p.Vnd, p.Coin, p.ToppedUpAmount);
             var args = new List<object?> { p.Id, p.AccountId, p.Name, p.Gender, p.LastLogin, p.NamekWar, p.PointPvp };
             args.AddRange(TopPlayer.TextColumns.Select(c => (object?)p.Text(c)));
             await Db.ExecuteUpdateAsync(InsertPlayerSql, args.ToArray());

@@ -37,7 +37,7 @@ public class Account
 
     // Thời gian tạo tài khoản (UTC)
     [Column(TypeName = "timestamp with time zone")]
-    public DateTime? AccountCreatedTimes { get; set; }
+    public DateTime? AccountCreatedAt { get; set; }
 
     // Số ngày kích hoạt đặc quyền (mặc định 45)
     public int AccountAgeDays { get; set; }
@@ -53,7 +53,7 @@ public class Account
     public int IsJail { get; set; }
 
     // Cờ bị khóa (1: bị khóa)
-    public short Ban { get; set; }
+    public short IsBanned { get; set; }
 
     // Điểm bài đăng diễn đàn (cũ)
     public int PointPost { get; set; }
@@ -65,7 +65,7 @@ public class Account
     public int Role { get; set; }
 
     // Cờ điều hành viên
-    public short IsQuanTriVien { get; set; }
+    public short IsModerator { get; set; }
 
     // Số lần nâng cấp VIP đã mua (tối đa 20)
     public int VipPoint { get; set; }
@@ -91,11 +91,11 @@ public class Account
     // Máy chủ đăng nhập gần nhất (-1: chưa có)
     public int ServerLogin { get; set; }
 
-    // Hệ số bd của người chơi (mặc định 1)
-    public double? BdPlayer { get; set; }
+    // Hệ số bd của người chơi (mặc định 1) (nghĩa chưa chắc, cần chủ dự án duyệt)
+    public double? PlayerBdMultiplier { get; set; }
 
     // Tổng số tiền đã nạp (VND)
-    public long Tongnap { get; set; }
+    public long TotalTopUp { get; set; }
 
     // Số dư ví VND
     public long? Vnd { get; set; }
@@ -103,14 +103,14 @@ public class Account
     // Số dư coin
     public long? Coin { get; set; }
 
-    // Số tiền đã nạp
-    public long Danap { get; set; }
+    // Số tiền đã nạp (nghĩa chưa chắc, cần chủ dự án duyệt)
+    public long ToppedUpAmount { get; set; }
 
-    // Phần thứ hai của khóa chính ghép
+    // Phần thứ hai của khóa chính ghép (nghĩa chưa chắc, cần chủ dự án duyệt)
     [Required]
     [MaxLength(100)]
     [JsonText]
-    public string Mkc2 { get; set; } = default!;
+    public string SecondaryKeyPart { get; set; } = default!;
 
     // Thời gian tạo tài khoản (giờ địa phương)
     [Column(TypeName = "timestamp without time zone")]
@@ -126,10 +126,10 @@ public class Account
     [Required]
     [MaxLength(50)]
     [JsonText]
-    public string Mocnap { get; set; } = default!;
+    public string TopUpMilestones { get; set; } = default!;
 
-    // Bộ đếm tổng nạp thứ hai
-    public long TongNap2 { get; set; }
+    // Bộ đếm tổng nạp thứ hai (nghĩa chưa chắc, cần chủ dự án duyệt)
+    public long SecondaryTotalTopUp { get; set; }
 
     // Số dư hồng ngọc
     public int? Ruby { get; set; }
@@ -138,16 +138,16 @@ public class Account
     public int? CountCard { get; set; }
 
     // Cờ vé tuần (1: có)
-    public int Vetuan { get; set; }
+    public int WeeklyPass { get; set; }
 
     // Cờ vé tháng (1: có)
-    public int Vethang { get; set; }
+    public int MonthlyPass { get; set; }
 
     // Hạn vé tháng (UTC epoch ms, 0: không có)
-    public long VethangExpire { get; set; }
+    public long MonthlyPassExpiresAt { get; set; }
 
     // Hạn vé tuần (UTC epoch ms, 0: không có)
-    public long VetuanExpire { get; set; }
+    public long WeeklyPassExpiresAt { get; set; }
 
     // Collection các bản ghi Player thuộc Account này
     // Mối quan hệ one-to-many với Player

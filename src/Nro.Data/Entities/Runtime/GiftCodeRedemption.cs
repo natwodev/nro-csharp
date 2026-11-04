@@ -18,11 +18,11 @@ public class GiftCodeRedemption
 
     // Mã quà tặng đã nhập
     [MaxLength(255)]
-    public string? CodeDaNhap { get; set; }
+    public string? RedeemedCode { get; set; }
 
     // Thời gian nhập mã
     [Column(TypeName = "timestamp without time zone")]
-    public DateTime? TgianNhap { get; set; }
+    public DateTime? RedeemedAt { get; set; }
 
     // Navigation property đến entity Player
     public Player? Player { get; set; }

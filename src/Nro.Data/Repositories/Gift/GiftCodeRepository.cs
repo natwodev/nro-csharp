@@ -8,7 +8,7 @@ public sealed class GiftCodeRepository : IGiftCodeRepository
 {
     private const string SelectCountLeftSql = "select count_left from giftcode where code = ? order by id limit 1";
     private const string UpdateCountLeftSql = "update giftcode set count_left = ? where id = (select id from giftcode where code = ? order by id limit 1)";
-    private const string InsertUseSql = "insert into giftcode_save (id, player_id, code_da_nhap, tgian_nhap) values (?, ?, ?, ?)";
+    private const string InsertUseSql = "insert into giftcode_save (id, player_id, redeemed_code, redeemed_at) values (?, ?, ?, ?)";
 
     private readonly NroDatabase _database;
 
