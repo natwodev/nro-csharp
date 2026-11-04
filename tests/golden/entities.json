@@ -12,7 +12,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "PlayerId",
           "column": "id",
           "sourceColumn": "id",
@@ -653,8 +653,8 @@
         },
         {
           "explicitName": false,
-          "property": "Thoigianduhanh",
-          "column": "thoigianduhanh",
+          "property": "TimeTravelDuration",
+          "column": "time_travel_duration",
           "sourceColumn": "thoigianduhanh",
           "csharpType": "string",
           "pgType": "varchar(100)",
@@ -668,8 +668,8 @@
         },
         {
           "explicitName": false,
-          "property": "Thachdauwhis",
-          "column": "thachdauwhis",
+          "property": "WhisSparring",
+          "column": "whis_sparring",
           "sourceColumn": "thachdauwhis",
           "csharpType": "int",
           "pgType": "integer",
@@ -788,8 +788,8 @@
         },
         {
           "explicitName": false,
-          "property": "Doanhtrai",
-          "column": "doanhtrai",
+          "property": "BarracksState",
+          "column": "barracks_state",
           "sourceColumn": "doanhtrai",
           "csharpType": "long",
           "pgType": "bigint",
@@ -1148,8 +1148,8 @@
         },
         {
           "explicitName": false,
-          "property": "NguoiYeuDoesNotAttack",
-          "column": "nguoi_yeu_does_not_attack",
+          "property": "LoverDoesNotAttack",
+          "column": "lover_does_not_attack",
           "sourceColumn": "NguoiYeuDoesNotAttack",
           "csharpType": "string",
           "pgType": "text",
@@ -1688,8 +1688,8 @@
         },
         {
           "explicitName": false,
-          "property": "DamePointFusion",
-          "column": "dame_point_fusion",
+          "property": "PointFusionDamage",
+          "column": "point_fusion_damage",
           "sourceColumn": "dame_point_fusion",
           "csharpType": "int",
           "pgType": "integer",
@@ -1718,8 +1718,8 @@
         },
         {
           "explicitName": false,
-          "property": "DanhHieu",
-          "column": "danh_hieu",
+          "property": "Title",
+          "column": "title",
           "sourceColumn": "danh_hieu",
           "csharpType": "string",
           "pgType": "varchar(255)",
@@ -1763,7 +1763,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "AccountId",
           "column": "id",
           "sourceColumn": "id",
@@ -2079,8 +2079,8 @@
         },
         {
           "explicitName": false,
-          "property": "ThoiVang",
-          "column": "thoi_vang",
+          "property": "GoldBarCount",
+          "column": "gold_bar_count",
           "sourceColumn": "thoi_vang",
           "csharpType": "long",
           "pgType": "bigint",
@@ -2382,7 +2382,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "BlockedIpId",
           "column": "id",
           "sourceColumn": "id",
@@ -2454,7 +2454,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CardTopupId",
           "column": "id",
           "sourceColumn": "id",
@@ -2601,7 +2601,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "BankPaymentId",
           "column": "id",
           "sourceColumn": "id",
@@ -2733,7 +2733,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "BankTransferId",
           "column": "id",
           "sourceColumn": "id",
@@ -2865,7 +2865,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "TopupMilestoneRewardId",
           "column": "id",
           "sourceColumn": "id",
@@ -2952,7 +2952,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ActivationHistoryId",
           "column": "id",
           "sourceColumn": "id",
@@ -3009,7 +3009,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "BankHistoryId",
           "column": "id",
           "sourceColumn": "id",
@@ -3126,7 +3126,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ExchangeHistoryId",
           "column": "id",
           "sourceColumn": "id",
@@ -3228,7 +3228,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "GoldHistoryId",
           "column": "id",
           "sourceColumn": "id",
@@ -3435,7 +3435,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "TradeHistoryId",
           "column": "id",
           "sourceColumn": "id",
@@ -3597,7 +3597,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CvhArticleId",
           "column": "id",
           "sourceColumn": "id",
@@ -3789,7 +3789,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CvhGiftCodeId",
           "column": "id",
           "sourceColumn": "id",
@@ -3921,7 +3921,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CvhGiftCodeHistoryId",
           "column": "id",
           "sourceColumn": "id",
@@ -3993,7 +3993,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CvhMessageId",
           "column": "id",
           "sourceColumn": "id",
@@ -4065,7 +4065,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CvhRechargeId",
           "column": "id",
           "sourceColumn": "id",
@@ -4227,7 +4227,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CvhSellItemId",
           "column": "id",
           "sourceColumn": "id",
@@ -4359,7 +4359,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CvhSiteSettingId",
           "column": "id",
           "sourceColumn": "id",
@@ -4555,8 +4555,8 @@
         },
         {
           "explicitName": false,
-          "property": "Thongbao",
-          "column": "thongbao",
+          "property": "Notification",
+          "column": "notification",
           "sourceColumn": "thongbao",
           "csharpType": "string",
           "pgType": "varchar(99)",
@@ -4611,7 +4611,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ForumPostId",
           "column": "id",
           "sourceColumn": "id",
@@ -4993,7 +4993,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ItemTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -5333,7 +5333,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ItemOptionTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -5397,7 +5397,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ItemShopId",
           "column": "id",
           "sourceColumn": "id",
@@ -5576,7 +5576,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ItemShopOptionId",
           "column": "id",
           "sourceColumn": "id",
@@ -5658,7 +5658,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ShopId",
           "column": "id",
           "sourceColumn": "id",
@@ -5742,7 +5742,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "TabShopId",
           "column": "id",
           "sourceColumn": "id",
@@ -5811,7 +5811,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ConsignItemId",
           "column": "id",
           "sourceColumn": "id",
@@ -5993,7 +5993,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "GiftCodeId",
           "column": "id",
           "sourceColumn": "id",
@@ -6200,7 +6200,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "BgItemTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -6287,7 +6287,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "PartId",
           "column": "id",
           "sourceColumn": "id",
@@ -6344,7 +6344,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "FlagBagId",
           "column": "id",
           "sourceColumn": "id",
@@ -6488,7 +6488,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ArrayHead2FramesId",
           "column": "id",
           "sourceColumn": "id",
@@ -6530,7 +6530,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ImageByNameId",
           "column": "id",
           "sourceColumn": "id",
@@ -6587,7 +6587,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "DropItemId",
           "column": "id",
           "sourceColumn": "id",
@@ -6809,7 +6809,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "RadarCardId",
           "column": "id",
           "sourceColumn": "id",
@@ -6986,7 +6986,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "BadgeTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7078,7 +7078,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "TaskMainTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7264,7 +7264,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "TaskEventTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7381,7 +7381,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "TaskKolTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7438,7 +7438,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "TaskBadgeTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7510,7 +7510,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "SideTaskTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7627,7 +7627,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ClanTaskTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7744,7 +7744,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "AchievementTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -7831,7 +7831,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "MapTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -8053,7 +8053,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "MobTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -8174,8 +8174,8 @@
         },
         {
           "explicitName": false,
-          "property": "PercentTiemNang",
-          "column": "percent_tiem_nang",
+          "property": "PercentPotential",
+          "column": "percent_potential",
           "sourceColumn": "percent_tiem_nang",
           "csharpType": "short",
           "pgType": "smallint",
@@ -8215,7 +8215,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "NpcTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -8487,7 +8487,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "NClassId",
           "column": "id",
           "sourceColumn": "id",
@@ -8529,7 +8529,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "IntrinsicId",
           "column": "id",
           "sourceColumn": "id",
@@ -8661,7 +8661,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "PowerLimitId",
           "column": "id",
           "sourceColumn": "id",
@@ -8778,7 +8778,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "AttributeTemplateId",
           "column": "id",
           "sourceColumn": "id",
@@ -8827,7 +8827,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "AttributeServerId",
           "column": "id",
           "sourceColumn": "id",
@@ -8904,7 +8904,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ClanId",
           "column": "id",
           "sourceColumn": "id",
@@ -9253,7 +9253,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "NotifyId",
           "column": "id",
           "sourceColumn": "id",
@@ -9310,7 +9310,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "CaptionId",
           "column": "id",
           "sourceColumn": "id",
@@ -9397,7 +9397,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "EventId",
           "column": "id",
           "sourceColumn": "id",
@@ -9511,7 +9511,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "SicBoRoundId",
           "column": "id",
           "sourceColumn": "id",
@@ -9613,7 +9613,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "EvenOddSpinId",
           "column": "id",
           "sourceColumn": "id",
@@ -9805,7 +9805,7 @@
       ],
       "columns": [
         {
-          "explicitName": true,
+          "explicitName": false,
           "property": "ParirySessionId",
           "column": "id",
           "sourceColumn": "id",

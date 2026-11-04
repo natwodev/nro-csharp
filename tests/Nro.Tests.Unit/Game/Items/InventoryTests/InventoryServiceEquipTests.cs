@@ -296,7 +296,7 @@ public class InventoryServiceEquipTests
     {
         InvKit k = WithArmor(out _, gender: 1);
         Player master = k.NewPlayer(9);
-        k.Player.IsDeTu = true;
+        k.Player.IsPet = true;
         k.Host.PetMaster = master;
 
         k.Service.ItemBagToBody(k.Player, 2);
@@ -310,7 +310,7 @@ public class InventoryServiceEquipTests
         var k = new InvKit();
         k.Define(545, 5, name: "Cai trang");
         k.Put(k.Inv.ItemsBag, 0, k.Item(545));
-        k.Player.IsDeTu = true;
+        k.Player.IsPet = true;
         k.Host.PetMaster = k.NewPlayer(9);
 
         k.Service.ItemBagToBody(k.Player, 0);
@@ -357,7 +357,7 @@ public class InventoryServiceEquipTests
         var k = new InvKit();
         k.Define(10, 0);
         k.Put(k.Inv.ItemsBag, 0, k.Item(10, 1, (38, 0)));
-        k.Player.IsDeTu = true;
+        k.Player.IsPet = true;
         k.Host.PetMaster = k.NewPlayer(9);
 
         k.Service.ItemBagToBody(k.Player, 0);
@@ -443,7 +443,7 @@ public class InventoryServiceEquipTests
     public void ItemBodyToBag_a_disciple_keeps_its_follower()
     {
         var k = new InvKit();
-        k.Player.IsDeTu = true;
+        k.Player.IsPet = true;
         k.Put(k.Inv.ItemsBody, 7, k.Item(10));
         k.Player.PetFollow = k.NewFollow(55);
 
@@ -500,8 +500,8 @@ public class InventoryServiceEquipTests
         k.Service.ItemBagToPetBody(k.Player, 0);
         Assert.Equal(new[] { "SendNotification:Đệ tử phải đạt 1tr5 sức mạnh mới có thể mặc" }, k.Notifier.Calls);
 
-        Detu pet = k.NewDetu(2);
-        k.Player.Detu = pet;
+        Pet pet = k.NewPet(2);
+        k.Player.Pet = pet;
         k.Host.PetMaster = k.Player;
         k.Host.PowerOf[pet] = 1_499_999;
         k.Notifier.Calls.Clear();
@@ -516,8 +516,8 @@ public class InventoryServiceEquipTests
         var k = new InvKit();
         k.Define(10, 0);
         Item item = k.Put(k.Inv.ItemsBag, 0, k.Item(10));
-        Detu pet = k.NewDetu(2);
-        k.Player.Detu = pet;
+        Pet pet = k.NewPet(2);
+        k.Player.Pet = pet;
         k.Host.PetMaster = k.Player;
         k.Host.PowerOf[pet] = 1_500_000;
         k.Player.TypeTabPet = 3;
@@ -538,8 +538,8 @@ public class InventoryServiceEquipTests
         var k = new InvKit();
         k.Define(10, 50);
         Item item = k.Put(k.Inv.ItemsBag, 0, k.Item(10));
-        Detu pet = k.NewDetu(2);
-        k.Player.Detu = pet;
+        Pet pet = k.NewPet(2);
+        k.Player.Pet = pet;
         k.Host.PetMaster = k.Player;
         k.Host.PowerOf[pet] = 2_000_000;
 
@@ -554,8 +554,8 @@ public class InventoryServiceEquipTests
     public void ItemBagToPetBody_failure_is_answered_with_a_message()
     {
         var k = new InvKit();
-        Detu pet = k.NewDetu(2);
-        k.Player.Detu = pet;
+        Pet pet = k.NewPet(2);
+        k.Player.Pet = pet;
         k.Host.PetMaster = k.Player;
         k.Host.PowerOf[pet] = 2_000_000;
 
@@ -568,8 +568,8 @@ public class InventoryServiceEquipTests
     public void ItemPetBodyToBag_moves_the_disciples_item_to_the_bag()
     {
         var k = new InvKit();
-        Detu pet = k.NewDetu(2);
-        k.Player.Detu = pet;
+        Pet pet = k.NewPet(2);
+        k.Player.Pet = pet;
         k.Host.PetMaster = k.Player;
         k.Define(10, 0);
         Item item = k.Put(pet.Inventory.ItemsBody, 1, k.Item(10));
@@ -586,8 +586,8 @@ public class InventoryServiceEquipTests
     public void ItemPetBodyToBag_other_tabs_do_not_show_the_pet_info_and_a_full_bag_stops_it()
     {
         var k = new InvKit();
-        Detu pet = k.NewDetu(2);
-        k.Player.Detu = pet;
+        Pet pet = k.NewPet(2);
+        k.Player.Pet = pet;
         k.Host.PetMaster = k.Player;
         k.Player.TypeTabPet = 1;
         k.Put(pet.Inventory.ItemsBody, 1, k.Item(10));

@@ -34,8 +34,8 @@ public class KingOctopus : BigBoss
             int px = player != null ? Rt.Players.GetX(player) : 0;
             if (player != null && px > 440 && px < 950)
             {
-                double dameMob = Point.GetDamageAttack();
-                double dame = Rt.Players.Injured(player, null, dameMob, false, true);
+                double mobDamage = Point.GetDamageAttack();
+                double damage = Rt.Players.Injured(player, null, mobDamage, false, true);
                 Action = 3;
                 int dis = Distance(player);
                 if (dis <= 100)
@@ -60,7 +60,7 @@ public class KingOctopus : BigBoss
                     {
                         msg.Writer().WriteByte(1);
                         msg.Writer().WriteInt(unchecked((int)player.Id));
-                        msg.WriteCris(Rt.CrisGH(dame), Rt.ReadInt);
+                        msg.WriteCris(Rt.CrisGH(damage), Rt.ReadInt);
                     }
                     else
                     {

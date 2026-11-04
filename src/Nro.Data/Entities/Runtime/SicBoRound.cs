@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class SicBoRound
     // Khóa chính của bảng SicBoRound (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
     public int SicBoRoundId { get; set; }
 
     // Xúc xắc thứ nhất (1-6)

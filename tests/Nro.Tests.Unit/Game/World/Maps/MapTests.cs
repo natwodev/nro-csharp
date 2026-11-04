@@ -223,7 +223,7 @@ public class MapTests
     public void InitMob_CreatesAMobPerTemplateEntryInEveryZone_WithTheTemplateValues()
     {
         FakeGame g = new(seed: 3);
-        g.MobTemplates[25] = new MobTemplate { Id = 25, Type = 4, PercentDame = 6, PercentTiemNang = 9, Percent_gold = 2 };
+        g.MobTemplates[25] = new MobTemplate { Id = 25, Type = 4, PercentDame = 6, PercentPotential = 9, Percent_gold = 2 };
         Map map = MapTestKit.BuildMap(g, 60, zones: 2);
         map.InitMob([25, 25, 99], [3, 4, 5], [1000, 2000, 3000], [10, 20, 30], [40, 50, 60]);
         foreach (Zone z in map.Zones)
@@ -243,7 +243,7 @@ public class MapTests
     public void InitMob_CopiesTheMobButNotItsPercentGold_AsJavaDid()
     {
         FakeGame g = new(seed: 3);
-        g.MobTemplates[25] = new MobTemplate { Id = 25, Type = 4, PercentDame = 6, PercentTiemNang = 9, Percent_gold = 2 };
+        g.MobTemplates[25] = new MobTemplate { Id = 25, Type = 4, PercentDame = 6, PercentPotential = 9, Percent_gold = 2 };
         Map map = MapTestKit.BuildMap(g, 60);
         map.InitMob([25], [3], [1000], [10], [40]);
         Mob zoneMob = map.Zones[0].Mobs[0];

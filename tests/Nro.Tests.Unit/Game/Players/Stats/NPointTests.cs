@@ -545,8 +545,8 @@ public class NPointTests
         n.InitPowerLimit();
         h.Facts.Zone = new NPointZoneFacts();
         h.Facts.Server.RateExpServer = 1;
-        h.Facts.Player.IsDeTu = true;
-        h.Facts.Player.DetuTypeDeTu = 0;
+        h.Facts.Player.IsPet = true;
+        h.Facts.Player.PetType = 0;
         h.Facts.Master = new NPointMasterFacts { ItemTimeIsUsePetPowerPotentialCharm = true, PetPowerPotentialPercent = -100 };
         // 1000 + 1000*2 + 1000*10 = 13000; the pet-potential term is 1000/100*(−100+100) = 0
         Assert.Equal(13_000, n.CalculatePowerPotential(1000));
@@ -554,12 +554,12 @@ public class NPointTests
 
     // ---- spending potential ----
 
-    private static (NPoint, FakeHost) Spender(long tiemNang)
+    private static (NPoint, FakeHost) Spender(long potential)
     {
         (NPoint n, FakeHost h, _) = Make();
         h.Limits[0] = new PowerLimitInfo(1_000_000, 20_000, 20_000, 1000, 100, 5);
         n.InitPowerLimit();
-        n.Potential = tiemNang;
+        n.Potential = potential;
         n.BaseHp = 2000;
         n.BaseMp = 2000;
         n.BaseDamage = 100;
@@ -602,10 +602,10 @@ public class NPointTests
     public void IncreasePoint_does_nothing_for_protected_accounts_zero_points_or_no_limit()
     {
         (NPoint n, FakeHost h) = Spender(1_000_000_000);
-        n.Player.Baovetaikhoan = true;
+        n.Player.IsAccountProtected = true;
         n.IncreasePoint(0, 1, false);
         Assert.Equal(new[] { "tb Chức năng bảo vệ đã được bật. Bạn vui lòng kiểm tra lại" }, h.Calls);
-        n.Player.Baovetaikhoan = false;
+        n.Player.IsAccountProtected = false;
         h.Calls.Clear();
         n.IncreasePoint(0, 0, false);
         n.IncreasePoint(0, -4, false);
@@ -642,7 +642,7 @@ public class NPointTests
     public void IncreasePoint_for_the_pet_refreshes_its_panels()
     {
         (NPoint n, FakeHost h) = Spender(1_000_000_000);
-        n.Player.Detu = new Detu();
+        n.Player.Pet = new Pet();
         n.IncreasePoint(2, 1, true);
         Assert.Equal(new[] { "usetn", "point", "point" }, h.Calls);
     }
@@ -769,7 +769,7 @@ public class NPointTests
     [Fact]
     public void Update_sends_no_stamina_packet_for_a_boss_or_a_pet()
     {
-        foreach (Action<Player> mark in new Action<Player>[] { p => p.IsBoss = true, p => p.IsDeTu = true, p => p.IsBo = true, p => p.IsMe = true, p => p.IsNguoiYeu = true, p => p.IsConOne = true })
+        foreach (Action<Player> mark in new Action<Player>[] { p => p.IsBoss = true, p => p.IsPet = true, p => p.IsFather = true, p => p.IsMother = true, p => p.IsLover = true, p => p.IsChildOne = true })
         {
             (NPoint n, FakeHost h, _) = Make();
             mark(n.Player);
@@ -799,23 +799,23 @@ public class NPointTests
     [Fact]
     public void The_default_host_reads_the_player_shell_flags()
     {
-        Player p = new() { IsPlayer = true, Id = 42, THE_TUAN = 2, LASTTIME_THE_TUAN = 99, Isbienhinh = 3, Buff = Buff.BUFF_HP };
+        Player p = new() { IsPlayer = true, Id = 42, WeeklyCard = 2, LastWeeklyCardTime = 99, TransformationState = 3, Buff = Buff.BUFF_HP };
         NPointFacts facts = PlayerNPointHost.Shared.Capture(new NPoint(p));
         Assert.True(facts.Player.IsPl);
         Assert.True(facts.Player.IsPlMan);
         Assert.Equal(42, facts.Player.Id);
-        Assert.Equal(2, facts.Player.THE_TUAN);
-        Assert.Equal(3, facts.Player.Isbienhinh);
+        Assert.Equal(2, facts.Player.WeeklyCard);
+        Assert.Equal(3, facts.Player.TransformationState);
         Assert.Equal(Buff.BUFF_HP, facts.Player.Buff);
-        Assert.Null(facts.Detu);
+        Assert.Null(facts.Pet);
     }
 
     [Fact]
     public void The_default_host_tells_a_boss_from_a_player()
     {
         Assert.False(PlayerNPointHost.IsPl(new Player { IsPlayer = true, IsBoss = true }));
-        Assert.False(PlayerNPointHost.IsPl(new Player { IsPlayer = true, IsDeTu = true }));
-        Assert.True(PlayerNPointHost.IsPlMan(new Player { IsDeTu = true }));
+        Assert.False(PlayerNPointHost.IsPl(new Player { IsPlayer = true, IsPet = true }));
+        Assert.True(PlayerNPointHost.IsPlMan(new Player { IsPet = true }));
         Assert.False(PlayerNPointHost.IsPlMan(new Player { IsPlayer = true, IsBot = true }));
     }
 
@@ -823,12 +823,12 @@ public class NPointTests
     public void The_default_host_exposes_the_pet_numbers_after_the_pet_recalculated()
     {
         (NPoint master, FakeHost host, _) = Make();
-        Player pet = new Detu { IsDeTu = true };
+        Player pet = new Pet { IsPet = true };
         pet.NPoint = new NPoint(pet) { Host = host };
         pet.NPoint.HpMax = 777;
-        master.Player.Detu = (Detu)pet;
+        master.Player.Pet = (Pet)pet;
         NPointFacts facts = PlayerNPointHost.Shared.Capture(master);
-        Assert.Equal(777, facts.Detu!.HpMax);
+        Assert.Equal(777, facts.Pet!.HpMax);
     }
     // ---- the default host reads the real components of the player ----
 
@@ -947,12 +947,12 @@ public class NPointTests
         Player p = RealPlayer();
         Assert.Throws<NullReferenceException>(() => PlayerNPointHost.Shared.CaptureAttack(p.NPoint));
         NPointAttackFacts af = new();
-        af.EffectSkin.IsChargedBlast = false;
-        af.EffectSkin.IsDamageBoosted = true;
-        af.EffectSkin.LastTimeChargedBlast = 77;
+        af.EffectSkin.IsBlastDamageMultiplierReady = false;
+        af.EffectSkin.IsBlastDamageMultiplierApplied = true;
+        af.EffectSkin.LastTimeBlastDamageMultiplier = 77;
         PlayerNPointHost.Shared.CommitAttack(p.NPoint, af);
-        Assert.False(p.EffectSkin.IsChargedBlast);
-        Assert.True(p.EffectSkin.IsDamageBoosted);
-        Assert.Equal(77, p.EffectSkin.LastTimeChargedBlast);
+        Assert.False(p.EffectSkin.IsBlastDamageMultiplierReady);
+        Assert.True(p.EffectSkin.IsBlastDamageMultiplierApplied);
+        Assert.Equal(77, p.EffectSkin.LastTimeBlastDamageMultiplier);
     }
 }

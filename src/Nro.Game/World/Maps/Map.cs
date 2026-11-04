@@ -214,7 +214,7 @@ public class Map
                 mob.Location.Y = mobY[i];
                 mob.Point.Sethp(mob.Point.GetHpFull());
                 mob.DamagePercent = temp.PercentDame;
-                mob.PotentialPercent = temp.PercentTiemNang;
+                mob.PotentialPercent = temp.PercentPotential;
                 mob.Percent_gold = temp.Percent_gold;
                 mob.Type = temp.Type;
                 mob.SetPotential();

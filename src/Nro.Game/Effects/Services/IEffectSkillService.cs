@@ -90,7 +90,7 @@ public interface IEffectSkillService
     void RemovePvpCommeson(Player player);
 
     // Thực hiện thao tác hiệu ứng tương ứng (Java: setDameBuff).
-    void SetDamageBuff(Player player, int time, int tiLe);
+    void SetDamageBuff(Player player, int time, int percent);
 
     // Thực hiện thao tác hiệu ứng tương ứng (Java: removeDameBuff).
     void RemoveDamageBuff(Player player);
@@ -114,10 +114,10 @@ public interface IEffectSkillService
     void RemoveHalloween(Player player);
 
     // Thực hiện thao tác hiệu ứng tương ứng (Java: setChibi).
-    void SetMiniature(Player player, int time);
+    void SetChibiBird(Player player, int time);
 
     // Thực hiện thao tác hiệu ứng tương ứng (Java: removeChibi).
-    void RemoveMiniature(Player player);
+    void RemoveChibiBird(Player player);
 
     // ---- Mafuba, intrinsic, stone, body change, invisibility ----------------------------------------------------------------------------------------------------
 
@@ -222,7 +222,7 @@ public interface IEffectSkillService
     void RemoveTeleportBlind(Player player);
 
     // Thực hiện thao tác hiệu ứng tương ứng (Java: setStartHuytSao).
-    void StartWhistle(Player player, int tiLeHP);
+    void StartWhistle(Player player, int hpPercent);
 
     // Thực hiện thao tác hiệu ứng tương ứng (Java: removeHuytSao).
     void RemoveWhistle(Player player);

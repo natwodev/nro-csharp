@@ -134,7 +134,7 @@ public partial class NPoint
             NPointSetClothesFacts sc = facts.SetClothes;
             NPointZoneFacts? zone = facts.Zone;
             NPointServerFacts server = facts.Server;
-            NPointDetuFacts? detu = facts.Detu;
+            NPointPetFacts? pet = facts.Pet;
 
             long hpMax = BaseHp + HpBonus;
             foreach (int tl in HpPercents)
@@ -143,7 +143,7 @@ public partial class NPoint
             }
 
             // Tinh An (full seal set)
-            if (HasFull5TinhAn())
+            if (HasFullFiveStarSeal())
             {
                 hpMax += CalculatePercent(hpMax, 15);
             }
@@ -163,47 +163,47 @@ public partial class NPoint
                 hpMax += CalculatePercent(hpMax, p.ClanHpBonusPercent);
             }
 
-            if (p.IsPhanThan)
+            if (p.IsBodyClone)
             {
                 hpMax = CalculatePercent(RequireMaster(facts).HpMax, NPointSkillMath.GetClonePercent(facts.SkillSelect));
             }
 
-            if (p.THE_TUAN == 1 && p.LASTTIME_THE_TUAN > now)
+            if (p.WeeklyCard == 1 && p.LastWeeklyCardTime > now)
             {
                 hpMax += CalculatePercent(hpMax, 3);
             }
 
-            if (p.THE_TUAN == 2 && p.LASTTIME_THE_TUAN > now)
+            if (p.WeeklyCard == 2 && p.LastWeeklyCardTime > now)
             {
                 hpMax += CalculatePercent(hpMax, 5);
             }
 
-            if (p.THE_THANG == 1 && p.LASTTIME_THE_THANG > now)
+            if (p.MonthlyCard == 1 && p.LastMonthlyCardTime > now)
             {
                 hpMax += CalculatePercent(hpMax, 7);
             }
 
-            if (p.THE_THANG == 2 && p.LASTTIME_THE_THANG > now)
+            if (p.MonthlyCard == 2 && p.LastMonthlyCardTime > now)
             {
                 hpMax += CalculatePercent(hpMax, 10);
             }
 
-            if (p.THE_NAM == 1 && p.LASTTIME_THE_NAM > now)
+            if (p.YearlyCard == 1 && p.LastYearlyCardTime > now)
             {
                 hpMax += CalculatePercent(hpMax, 15);
             }
 
-            if (p.THE_NAM == 2 && p.LASTTIME_THE_NAM > now)
+            if (p.YearlyCard == 2 && p.LastYearlyCardTime > now)
             {
                 hpMax += CalculatePercent(hpMax, 18);
             }
 
-            if (p.THE_CHI_TON == 1 && p.LASTTIME_THE_CHI_TON > now)
+            if (p.SupremeCard == 1 && p.LastSupremeCardTime > now)
             {
                 hpMax += CalculatePercent(hpMax, 20);
             }
 
-            if (p.IsPl && p.IsUseDanhHieu_ThienTu && p.LastTimeDanhHieu_ThienTu > 0)
+            if (p.IsPl && p.UsesEmperorTitle && p.LastEmperorTitleTime > 0)
             {
                 hpMax += CalculatePercent(hpMax, 5);
             }
@@ -252,7 +252,7 @@ public partial class NPoint
 
             if (es.IsMonkey)
             {
-                if (!p.IsDeTu || (p.IsDeTu && p.DetuStatus != NPointFacts.DetuFusionStatus))
+                if (!p.IsPet || (p.IsPet && p.PetStatus != NPointFacts.PetFusionStatus))
                 {
                     int percent = NPointSkillMath.GetPercentHpMonkey(es.LevelMonkey);
                     hpMax += hpMax * percent / 100;
@@ -273,26 +273,26 @@ public partial class NPoint
                 hpMax *= facts.EffectSkin.HpKiMultiplier;
             }
 
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                if (detu.TypeDeTu == 1)
+                if (pet.PetType == 1)
                 {
-                    hpMax += detu.HpMax * 20 / 100L;
+                    hpMax += pet.HpMax * 20 / 100L;
                 }
             }
 
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                if (detu.TypeDeTu == 5)
+                if (pet.PetType == 5)
                 {
-                    hpMax += detu.HpMax * 40 / 100L;
+                    hpMax += pet.HpMax * 40 / 100L;
                 }
             }
 
             // + pet hp
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                hpMax += detu.HpMax;
+                hpMax += pet.HpMax;
             }
 
             if (facts.TypeFusion == ConstPlayer.PORATA_FUSION_2)
@@ -316,7 +316,7 @@ public partial class NPoint
             }
 
             // whistle
-            if (!p.IsDeTu || (p.IsDeTu && p.DetuStatus != NPointFacts.DetuFusionStatus))
+            if (!p.IsPet || (p.IsPet && p.PetStatus != NPointFacts.PetFusionStatus))
             {
                 if (es.HpWhistlePercent != 0)
                 {
@@ -372,7 +372,7 @@ public partial class NPoint
             }
 
             // mabu map scroll
-            if (p.IsPhuHoMapMabu)
+            if (p.IsMabuMapProtected)
             {
                 hpMax += 1_000_000;
             }
@@ -511,7 +511,7 @@ public partial class NPoint
             NPointSetClothesFacts sc = facts.SetClothes;
             NPointZoneFacts? zone = facts.Zone;
             NPointServerFacts server = facts.Server;
-            NPointDetuFacts? detu = facts.Detu;
+            NPointPetFacts? pet = facts.Pet;
 
             long mpMax = BaseMp + MpBonus;
             foreach (int tl in MpPercents)
@@ -546,47 +546,47 @@ public partial class NPoint
                 mpMax += CalculatePercent(mpMax, p.ClanMpBonusPercent);
             }
 
-            if (p.IsPhanThan)
+            if (p.IsBodyClone)
             {
                 mpMax = CalculatePercent(RequireMaster(facts).MpMax, NPointSkillMath.GetClonePercent(facts.SkillSelect));
             }
 
-            if (p.THE_TUAN == 1 && p.LASTTIME_THE_TUAN > now)
+            if (p.WeeklyCard == 1 && p.LastWeeklyCardTime > now)
             {
                 mpMax += CalculatePercent(mpMax, 3);
             }
 
-            if (p.THE_TUAN == 2 && p.LASTTIME_THE_TUAN > now)
+            if (p.WeeklyCard == 2 && p.LastWeeklyCardTime > now)
             {
                 mpMax += CalculatePercent(mpMax, 5);
             }
 
-            if (p.THE_THANG == 1 && p.LASTTIME_THE_THANG > now)
+            if (p.MonthlyCard == 1 && p.LastMonthlyCardTime > now)
             {
                 mpMax += CalculatePercent(mpMax, 7);
             }
 
-            if (p.THE_THANG == 2 && p.LASTTIME_THE_THANG > now)
+            if (p.MonthlyCard == 2 && p.LastMonthlyCardTime > now)
             {
                 mpMax += CalculatePercent(mpMax, 10);
             }
 
-            if (p.THE_NAM == 1 && p.LASTTIME_THE_NAM > now)
+            if (p.YearlyCard == 1 && p.LastYearlyCardTime > now)
             {
                 mpMax += CalculatePercent(mpMax, 15);
             }
 
-            if (p.THE_NAM == 2 && p.LASTTIME_THE_NAM > now)
+            if (p.YearlyCard == 2 && p.LastYearlyCardTime > now)
             {
                 mpMax += CalculatePercent(mpMax, 18);
             }
 
-            if (p.THE_CHI_TON == 1 && p.LASTTIME_THE_CHI_TON > now)
+            if (p.SupremeCard == 1 && p.LastSupremeCardTime > now)
             {
                 mpMax += CalculatePercent(mpMax, 20);
             }
 
-            if (p.IsPl && p.IsUseDanhHieu_ThienTu && p.LastTimeDanhHieu_ThienTu > 0)
+            if (p.IsPl && p.UsesEmperorTitle && p.LastEmperorTitleTime > 0)
             {
                 mpMax += CalculatePercent(mpMax, 5);
             }
@@ -612,7 +612,7 @@ public partial class NPoint
             }
 
             // mabu map scroll
-            if (p.IsPhuHoMapMabu)
+            if (p.IsMabuMapProtected)
             {
                 mpMax += 1_000_000;
             }
@@ -640,26 +640,26 @@ public partial class NPoint
                 mpMax += CalculatePercent(mpMax, 10);
             }
 
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                if (detu.TypeDeTu == 1)
+                if (pet.PetType == 1)
                 {
-                    mpMax += detu.MpMax * 20 / 100L;
+                    mpMax += pet.MpMax * 20 / 100L;
                 }
             }
 
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                if (detu.TypeDeTu == 5)
+                if (pet.PetType == 5)
                 {
-                    mpMax += detu.MpMax * 40 / 100L;
+                    mpMax += pet.MpMax * 40 / 100L;
                 }
             }
 
             // fusion
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                mpMax += detu.MpMax;
+                mpMax += pet.MpMax;
             }
 
             if (facts.TypeFusion == ConstPlayer.PORATA_FUSION_2)
@@ -845,6 +845,6 @@ public partial class NPoint
 
     private static NPointMasterFacts RequireMaster(NPointFacts facts)
     {
-        return facts.Master ?? throw new InvalidOperationException("The player is flagged as a clone (isPhanThan) but the host supplied no master; the Java cast ((PhanThan) player).master would have thrown.");
+        return facts.Master ?? throw new InvalidOperationException("The player is flagged as a body clone (Java: isPhanThan) but the host supplied no master; the Java cast ((PhanThan) player).master would have thrown.");
     }
 }

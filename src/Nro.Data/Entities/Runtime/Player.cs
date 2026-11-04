@@ -1,9 +1,6 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities.Logs;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nro.Data.Entities.Logs;
 
 namespace Nro.Data.Entities.Runtime;
 
@@ -14,7 +11,6 @@ public class Player
     // Khóa chính của bảng Player (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
     public int PlayerId { get; set; }
 
     // Khóa ngoại liên kết với Account (tài khoản sở hữu)
@@ -243,10 +239,10 @@ public class Player
     [Required]
     [MaxLength(100)]
     [JsonText]
-    public string Thoigianduhanh { get; set; } = default!;
+    public string TimeTravelDuration { get; set; } = default!;
 
     // Giá trị thách đấu Whis (không dùng)
-    public int Thachdauwhis { get; set; }
+    public int WhisSparring { get; set; }
 
     // Trạng thái biến hình (0: không)
     public int Isbienhinh { get; set; }
@@ -283,7 +279,7 @@ public class Player
     public string Bandokhobau { get; set; } = default!;
 
     // Lần vào Doanh Trại cuối (epoch ms)
-    public long Doanhtrai { get; set; }
+    public long BarracksState { get; set; }
 
     // Tiến độ Con Đường Rắn Độc (JSON)
     [Required]
@@ -406,7 +402,7 @@ public class Player
     // Cờ người yêu không tấn công
     [Required]
     [Column(TypeName = "text")]
-    public string NguoiYeuDoesNotAttack { get; set; } = default!;
+    public string LoverDoesNotAttack { get; set; } = default!;
 
     // Cờ con thứ nhất không tấn công
     [Required]
@@ -569,7 +565,7 @@ public class Player
     public int MpPointFusion { get; set; }
 
     // Điểm cộng sức đánh từ hợp thể
-    public int DamePointFusion { get; set; }
+    public int PointFusionDamage { get; set; }
 
     // Lần cập nhật nhiệm vụ cuối (epoch ms)
     public long LastTimeUpdateTask { get; set; }
@@ -578,7 +574,7 @@ public class Player
     [Required]
     [MaxLength(255)]
     [JsonText]
-    public string DanhHieu { get; set; } = default!;
+    public string Title { get; set; } = default!;
 
     // Navigation property đến entity Account
     public Account? Account { get; set; }

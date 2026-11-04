@@ -68,12 +68,12 @@ internal sealed class InvKit
     /// <summary>A player with empty bag, body, box and collection box.</summary>
     public Player NewPlayer(long id) => Prepare(new Player { Id = id });
 
-    /// <summary>A disciple (a <see cref="Detu"/> made without running its constructor); <see cref="FakeHost.PetMaster"/> is not set.</summary>
-    public Detu NewDetu(long id)
+    /// <summary>A disciple (a <see cref="Pet"/> made without running its constructor); <see cref="FakeHost.PetMaster"/> is not set.</summary>
+    public Pet NewPet(long id)
     {
-        Detu pet = Raw<Detu>();
+        Pet pet = Raw<Pet>();
         pet.Id = id;
-        pet.IsDeTu = true;
+        pet.IsPet = true;
         Prepare(pet);
         return pet;
     }

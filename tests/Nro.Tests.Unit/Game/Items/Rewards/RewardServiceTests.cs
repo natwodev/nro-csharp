@@ -285,7 +285,7 @@ public class RewardServiceTests
         var rig = new Rig();
         Item stone = ItemTestKit.MakeItem(rig.Catalog, id);
 
-        rig.Rewards.InitBaseOptionSaoPhaLe(stone);
+        rig.Rewards.InitializeCrystalStarBaseOption(stone);
 
         Assert.Equal(optionId + ":" + param, ItemTestKit.Dump(stone.ItemOptions));
     }
@@ -300,7 +300,7 @@ public class RewardServiceTests
         var rig = new Rig();
         Item stone = ItemTestKit.MakeItem(rig.Catalog, id, 0, (47, 1));
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => rig.Rewards.InitBaseOptionSaoPhaLe(stone));
+        Assert.Throws<ArgumentOutOfRangeException>(() => rig.Rewards.InitializeCrystalStarBaseOption(stone));
 
         Assert.Equal("47:1", ItemTestKit.Dump(stone.ItemOptions));
     }
@@ -382,7 +382,7 @@ public class RewardServiceTests
     public void Be_na_gives_one_to_five_of_item_758_and_marks_the_player()
     {
         var rig = new Rig(null, 4);
-        var player = new Player { CanReward_PeNa = true };
+        var player = new Player { CanReceiveEventReward_PeNa = true };
 
         rig.Rewards.RewardBeNa(player);
 
@@ -390,8 +390,8 @@ public class RewardServiceTests
         Assert.Equal(758, given.Template!.Id);
         Assert.Equal(5, given.Quantity);
         Assert.Equal("86:0,93:30", ItemTestKit.Dump(given.ItemOptions));
-        Assert.False(player.CanReward_PeNa);
-        Assert.True(player.HaveReward_PeNa);
+        Assert.False(player.CanReceiveEventReward_PeNa);
+        Assert.True(player.HasEventReward_PeNa);
         Assert.Equal("Bạn vừa nhận được 5 Item758", rig.Host.Notifications.Single());
         Assert.Equal(new[] { "add", "bag", "notify" }, rig.Host.Calls);
         Assert.Equal(5, (int)rig.Random.Calls.Single().Bound!);
@@ -401,43 +401,43 @@ public class RewardServiceTests
     public void Pi_long_gives_one_to_five_of_item_1187()
     {
         var rig = new Rig(null, 0);
-        var player = new Player { CanReward_PiLong = true };
+        var player = new Player { CanReceiveEventReward_PiLong = true };
 
         rig.Rewards.RewardPiLong(player);
 
         Assert.Equal(1187, rig.Host.BagAdds.Single().Template!.Id);
         Assert.Equal(1, rig.Host.BagAdds.Single().Quantity);
-        Assert.False(player.CanReward_PiLong);
-        Assert.True(player.HaveReward_PiLong);
+        Assert.False(player.CanReceiveEventReward_PiLong);
+        Assert.True(player.HasEventReward_PiLong);
     }
 
     [Fact]
     public void Meo_den_gives_one_to_three_of_item_1187()
     {
         var rig = new Rig(null, 2);
-        var player = new Player { CanReward_MeoDen = true };
+        var player = new Player { CanReceiveEventReward_MeoDen = true };
 
         rig.Rewards.RewardMeoDen(player);
 
         Assert.Equal(3, rig.Host.BagAdds.Single().Quantity);
         Assert.Equal(1187, rig.Host.BagAdds.Single().Template!.Id);
         Assert.Equal(3, (int)rig.Random.Calls.Single().Bound!);
-        Assert.False(player.CanReward_MeoDen);
-        Assert.True(player.HaveReward_MeoDen);
+        Assert.False(player.CanReceiveEventReward_MeoDen);
+        Assert.True(player.HasEventReward_MeoDen);
     }
 
     [Fact]
     public void Lan_con_gives_one_to_three_of_item_758()
     {
         var rig = new Rig(null, 1);
-        var player = new Player { CanReward = true };
+        var player = new Player { CanReceiveEventReward = true };
 
         rig.Rewards.RewardLancon(player);
 
         Assert.Equal(758, rig.Host.BagAdds.Single().Template!.Id);
         Assert.Equal(2, rig.Host.BagAdds.Single().Quantity);
-        Assert.False(player.CanReward);
-        Assert.True(player.HaveReward);
+        Assert.False(player.CanReceiveEventReward);
+        Assert.True(player.HasEventReward);
     }
 
     [Fact]
@@ -445,7 +445,7 @@ public class RewardServiceTests
     {
         var rig = new Rig();
         rig.Host.EmptyBagSlots = 0;
-        var player = new Player { CanReward_PeNa = true, CanReward_PiLong = true, CanReward_MeoDen = true, CanReward = true, CanReward_TuanLoc = true };
+        var player = new Player { CanReceiveEventReward_PeNa = true, CanReceiveEventReward_PiLong = true, CanReceiveEventReward_MeoDen = true, CanReceiveEventReward = true, CanReward_TuanLoc = true };
 
         rig.Rewards.RewardBeNa(player);
         rig.Rewards.RewardPiLong(player);
@@ -455,8 +455,8 @@ public class RewardServiceTests
 
         Assert.Equal(5, rig.Host.Notifications.Count);
         Assert.All(rig.Host.Notifications, n => Assert.Equal("Cần 1 ô hành trang trống", n));
-        Assert.True(player.CanReward_PeNa && player.CanReward_PiLong && player.CanReward_MeoDen && player.CanReward && player.CanReward_TuanLoc);
-        Assert.False(player.HaveReward_PeNa || player.HaveReward_PiLong || player.HaveReward_MeoDen || player.HaveReward || player.HaveReward_TuanLoc);
+        Assert.True(player.CanReceiveEventReward_PeNa && player.CanReceiveEventReward_PiLong && player.CanReceiveEventReward_MeoDen && player.CanReceiveEventReward && player.CanReward_TuanLoc);
+        Assert.False(player.HasEventReward_PeNa || player.HasEventReward_PiLong || player.HasEventReward_MeoDen || player.HasEventReward || player.HasReward_TuanLoc);
         Assert.Empty(rig.Host.BagAdds);
         Assert.Empty(rig.Random.Calls);
     }
@@ -476,7 +476,7 @@ public class RewardServiceTests
         Assert.Equal(1654, given.Template!.Id);
         Assert.Equal("50:15,77:16,103:17,106:0,93:15", ItemTestKit.Dump(given.ItemOptions));
         Assert.False(player.CanReward_TuanLoc);
-        Assert.True(player.HaveReward_TuanLoc);
+        Assert.True(player.HasReward_TuanLoc);
         Assert.Equal("Bạn vừa nhận được Item1654", rig.Host.Notifications.Single());
     }
 

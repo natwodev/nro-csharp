@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,7 +10,6 @@ public class Account
     // Khóa chính của bảng Account (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
     public int AccountId { get; set; }
 
     // Tên đăng nhập
@@ -90,7 +86,7 @@ public class Account
     public int Active { get; set; }
 
     // Số thỏi vàng chưa nhận
-    public long ThoiVang { get; set; }
+    public long GoldBarCount { get; set; }
 
     // Máy chủ đăng nhập gần nhất (-1: chưa có)
     public int ServerLogin { get; set; }

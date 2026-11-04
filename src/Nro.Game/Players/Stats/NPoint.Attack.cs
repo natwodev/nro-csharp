@@ -22,321 +22,322 @@ public partial class NPoint
             NPointSetClothesFacts sc = facts.SetClothes;
             NPointZoneFacts? zone = facts.Zone;
             NPointServerFacts server = facts.Server;
-            NPointDetuFacts? detu = facts.Detu;
+            NPointPetFacts? pet = facts.Pet;
 
-            long dame = BaseDamage + DamageBonus;
+            // Sát thương đang tính (Java: dame).
+            long damage = BaseDamage + DamageBonus;
             foreach (int tl in DamagePercents)
             {
-                dame += dame * tl / 100L;
+                damage += damage * tl / 100L;
             }
 
             // Nguyet An: five pieces give +15% attack
             if (HasFull5NguyetAn())
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (p.IsPl)
             {
                 if (facts.Inventory.HasRongNhi)
                 {
-                    dame += CalculatePercent(dame, 1);
+                    damage += CalculatePercent(damage, 1);
                 }
 
-                dame += CalculatePercent(dame, facts.Inventory.DamageItemsInBox);
+                damage += CalculatePercent(damage, facts.Inventory.DamageItemsInBox);
             }
 
             if (sc.Cumber == 5)
             {
-                dame += CalculatePercent(dame, 20);
+                damage += CalculatePercent(damage, 20);
             }
 
-            if (p.IsPhanThan)
+            if (p.IsBodyClone)
             {
-                dame = CalculatePercent(RequireMaster(facts).Damage, NPointSkillMath.GetClonePercent(facts.SkillSelect));
+                damage = CalculatePercent(RequireMaster(facts).Damage, NPointSkillMath.GetClonePercent(facts.SkillSelect));
             }
 
-            if (p.THE_TUAN == 1 && p.LASTTIME_THE_TUAN > now)
+            if (p.WeeklyCard == 1 && p.LastWeeklyCardTime > now)
             {
-                dame += CalculatePercent(dame, 3);
+                damage += CalculatePercent(damage, 3);
             }
 
-            if (p.THE_TUAN == 2 && p.LASTTIME_THE_TUAN > now)
+            if (p.WeeklyCard == 2 && p.LastWeeklyCardTime > now)
             {
-                dame += CalculatePercent(dame, 5);
+                damage += CalculatePercent(damage, 5);
             }
 
-            if (p.THE_THANG == 1 && p.LASTTIME_THE_THANG > now)
+            if (p.MonthlyCard == 1 && p.LastMonthlyCardTime > now)
             {
-                dame += CalculatePercent(dame, 7);
+                damage += CalculatePercent(damage, 7);
             }
 
-            if (p.THE_THANG == 2 && p.LASTTIME_THE_THANG > now)
+            if (p.MonthlyCard == 2 && p.LastMonthlyCardTime > now)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
-            if (p.THE_NAM == 1 && p.LASTTIME_THE_NAM > now)
+            if (p.YearlyCard == 1 && p.LastYearlyCardTime > now)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
-            if (p.THE_NAM == 2 && p.LASTTIME_THE_NAM > now)
+            if (p.YearlyCard == 2 && p.LastYearlyCardTime > now)
             {
-                dame += CalculatePercent(dame, 18);
+                damage += CalculatePercent(damage, 18);
             }
 
-            if (p.THE_CHI_TON == 1 && p.LASTTIME_THE_CHI_TON > now)
+            if (p.SupremeCard == 1 && p.LastSupremeCardTime > now)
             {
-                dame += CalculatePercent(dame, 20);
+                damage += CalculatePercent(damage, 20);
             }
 
             if (p.ClanDamageBonusPercent > 0)
             {
-                dame += CalculatePercent(dame, p.ClanDamageBonusPercent);
+                damage += CalculatePercent(damage, p.ClanDamageBonusPercent);
             }
 
             if (server.InternationalWomansDay)
             {
-                dame += CalculatePercent(dame, server.WomansDayDame);
+                damage += CalculatePercent(damage, server.WomansDayDame);
             }
 
             if (es.IsVirus)
             {
-                dame -= CalculatePercent(dame, 10);
+                damage -= CalculatePercent(damage, 10);
             }
 
-            dame += dame * SexyDamagePercent / 100;
+            damage += damage * SexyDamagePercent / 100;
 
-            dame += dame * CoolDamagePercent / 100;
+            damage += damage * CoolDamagePercent / 100;
 
-            dame += dame * CuteDamagePercent / 100;
+            damage += damage * CuteDamagePercent / 100;
 
-            if (p.IsPl && p.IsUseDanhHieu_ThienTu && p.LastTimeDanhHieu_ThienTu > 0)
+            if (p.IsPl && p.UsesEmperorTitle && p.LastEmperorTitleTime > 0)
             {
-                dame += CalculatePercent(dame, 5);
+                damage += CalculatePercent(damage, 5);
             }
 
             if (it.HasMonkeyTail)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             if (p.Buff == Buff.BUFF_ATK)
             {
-                dame += CalculatePercent(dame, 20);
+                damage += CalculatePercent(damage, 20);
             }
 
             if (it.IsUseRabbitMooncake1)
             {
-                dame += CalculatePercent(dame, 5);
+                damage += CalculatePercent(damage, 5);
             }
 
             if (it.IsUseRabbitMooncake2)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             if (it.IsUseRabbitMooncake3)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (it.IsUseMoonFestivalOneEgg)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             if (it.IsUseMoonFestivalTwoEgg)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (it.IsUseSpecialMoonFestival)
             {
-                dame += CalculatePercent(dame, 20);
+                damage += CalculatePercent(damage, 20);
             }
 
             if (it.IsUseMoonFestivalCakeBox)
             {
-                dame += CalculatePercent(dame, 25);
+                damage += CalculatePercent(damage, 25);
             }
 
             if (it.IsUseRocket1h)
             {
-                dame += CalculatePercent(dame, 20);
+                damage += CalculatePercent(damage, 20);
             }
 
             if (es.IsSnowflake)
             {
-                dame -= CalculatePercent(dame, 20);
+                damage -= CalculatePercent(damage, 20);
             }
 
             if (it.IsBoneDragon2)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (facts.EffectSkin.IsRabbitLeader)
             {
-                dame -= CalculatePercent(dame, 15);
+                damage -= CalculatePercent(damage, 15);
             }
 
             // world cup set
             if (sc.Worldcup == 2)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             // food. Java precedence: (!isDeTu && itemTime.isEatMeal) || (isDeTu && master.itemTime.isEatMeal)
-            if ((!p.IsDeTu && it.IsEatMeal) || (p.IsDeTu && RequireMaster(facts).ItemTimeIsEatMeal))
+            if ((!p.IsPet && it.IsEatMeal) || (p.IsPet && RequireMaster(facts).ItemTimeIsEatMeal))
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                if (detu.TypeDeTu >= 5)
+                if (pet.PetType >= 5)
                 {
-                    dame += detu.Damage * facts.DameFusion / 100L;
+                    damage += pet.Damage * facts.FusionDamage / 100L;
                 }
             }
 
             // fusion
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                if (detu.TypeDeTu == 1)
+                if (pet.PetType == 1)
                 {
-                    dame += detu.Damage * 20 / 100L;
+                    damage += pet.Damage * 20 / 100L;
                 }
             }
 
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                if (detu.TypeDeTu == 5)
+                if (pet.PetType == 5)
                 {
-                    dame += detu.Damage * 40 / 100L;
+                    damage += pet.Damage * 40 / 100L;
                 }
             }
 
-            if (detu is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
+            if (pet is not null && facts.TypeFusion != ConstPlayer.NON_FUSION)
             {
-                dame += detu.Damage;
+                damage += pet.Damage;
             }
 
             if (facts.TypeFusion == ConstPlayer.PORATA_FUSION_2)
             {
-                dame += CalculatePercent(dame, 5);
+                damage += CalculatePercent(damage, 5);
             }
 
             if (facts.TypeFusion == ConstPlayer.PORATA_FUSION_3)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             if (facts.TypeFusion == ConstPlayer.PORATA_FUSION_4)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (facts.TypeFusion == ConstPlayer.PORATA_FUSION_5)
             {
-                dame += CalculatePercent(dame, 20);
+                damage += CalculatePercent(damage, 20);
             }
 
             // rage
             if (it.IsUseRage)
             {
-                dame *= 2;
+                damage *= 2;
             }
 
             if (it.IsUseRedPeach)
             {
-                dame += CalculatePercent(dame, 1);
+                damage += CalculatePercent(damage, 1);
             }
 
             // peach juices
             if (it.IsUseRedPeach0)
             {
-                dame -= CalculatePercent(dame, 99);
+                damage -= CalculatePercent(damage, 99);
             }
 
             if (it.IsUseRedPeach1)
             {
-                dame += CalculatePercent(dame, 2);
+                damage += CalculatePercent(damage, 2);
             }
 
             if (it.IsUseRedPeach3)
             {
-                dame += CalculatePercent(dame, 3);
+                damage += CalculatePercent(damage, 3);
             }
 
             if (it.IsUseRedPeach5)
             {
-                dame += CalculatePercent(dame, 5);
+                damage += CalculatePercent(damage, 5);
             }
 
             if (it.IsUseRedPeach10)
             {
-                dame += CalculatePercent(dame, 8);
+                damage += CalculatePercent(damage, 8);
             }
 
             if (it.IsUseRedPeach25)
             {
-                dame += CalculatePercent(dame, 12);
+                damage += CalculatePercent(damage, 12);
             }
 
             if (it.IsUseRedPeach50)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (it.IsUseRedPeach99)
             {
-                dame += CalculatePercent(dame, 20);
+                damage += CalculatePercent(damage, 20);
             }
 
             if (it.IsUseRedPeach999)
             {
-                dame += CalculatePercent(dame, 100);
+                damage += CalculatePercent(damage, 100);
             }
 
             if (it.IsUseRage2)
             {
-                dame = JavaNumbers.ToLong(dame * 2.2);
+                damage = JavaNumbers.ToLong(damage * 2.2);
             }
 
             if (it.HasDamageBoost30)
             {
-                dame += CalculatePercent(dame, 30);
+                damage += CalculatePercent(damage, 30);
             }
 
             if (it.HasDamageBoost15)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (it.IsUseCylindricalRiceCake)
             {
-                dame += CalculatePercent(dame, 15);
+                damage += CalculatePercent(damage, 15);
             }
 
             if (it.IsUseSquareRiceCake)
             {
-                dame += CalculatePercent(dame, 25);
+                damage += CalculatePercent(damage, 25);
             }
 
             // mabu map scroll
-            if (p.IsPhuHoMapMabu)
+            if (p.IsMabuMapProtected)
             {
-                dame += 10_000;
+                damage += 10_000;
             }
 
             if (p.IsPlMan)
             {
                 if (server.AttributeSucDanhActive)
                 {
-                    dame += CalculatePercent(dame, server.AttributeSucDanhValue);
+                    damage += CalculatePercent(damage, server.AttributeSucDanhValue);
                 }
             }
 
@@ -349,23 +350,23 @@ public partial class NPoint
                     int playerRank = GetPlayerRank(list, p.Id);
                     if (playerRank == 1)
                     {
-                        dame += CalculatePercent(dame, 30);
+                        damage += CalculatePercent(damage, 30);
                     }
                     else if (playerRank == 2)
                     {
-                        dame += CalculatePercent(dame, 20);
+                        damage += CalculatePercent(damage, 20);
                     }
                     else if (playerRank == 3)
                     {
-                        dame += CalculatePercent(dame, 10);
+                        damage += CalculatePercent(damage, 10);
                     }
                     else if (playerRank >= 4 && playerRank <= 5)
                     {
-                        dame += CalculatePercent(dame, 5);
+                        damage += CalculatePercent(damage, 5);
                     }
                     else if (playerRank >= 6 && playerRank <= 10)
                     {
-                        dame += CalculatePercent(dame, 3);
+                        damage += CalculatePercent(damage, 3);
                     }
                 }
             }
@@ -373,81 +374,82 @@ public partial class NPoint
             // Breakthrough power skill
             if (p.IsPl && facts.SkillSelect is not null)
             {
-                int tiLeDameSucManhBocPha = NPointSkillMath.GetPowerBurstDamagePercent(facts.SkillSelect.Point);
+                // Tỷ lệ sát thương sức mạnh bộc phá (Java: tiLeDameSucManhBocPha).
+                int powerBurstDamagePercent = NPointSkillMath.GetPowerBurstDamagePercent(facts.SkillSelect.Point);
                 if (es.IsPowerBurst)
                 {
-                    dame += dame * tiLeDameSucManhBocPha / 100;
+                    damage += damage * powerBurstDamagePercent / 100;
                 }
             }
 
             // option "reduce attack"
-            dame -= dame * DamageReductionPercent / 100;
+            damage -= damage * DamageReductionPercent / 100;
 
             if (!p.IsBoss && !p.IsBotAny && zone is not null && zone.IsMapCold && !IsColdImmune)
             {
-                dame /= 2;
+                damage /= 2;
             }
 
             if (!p.IsBoss && !p.IsBotAny && zone is not null && zone.IsMapChristMasEvent && !IsColdImmune)
             {
-                dame /= 2;
+                damage /= 2;
             }
 
             if (!p.IsBoss && !p.IsBotAny && zone is not null && zone.IsMap5000NamTruoc)
             {
-                dame -= CalculatePercent(dame, 90);
+                damage -= CalculatePercent(damage, 90);
             }
 
             if (p.Gender == ConstPlayer.SAIYAN)
             {
                 if (!p.IsBoss && !p.IsBotAny && zone is not null && zone.IsMapCereal)
                 {
-                    dame /= 2;
+                    damage /= 2;
                 }
             }
 
             // black ball 1 star
             if (facts.BlackBallTimeOut[0] > now)
             {
-                dame += dame * RewardBlackBall.R1S_2 / 100;
+                damage += damage * RewardBlackBall.R1S_2 / 100;
             }
 
             if (es.IsMonkey)
             {
-                if (!p.IsDeTu || (p.IsDeTu && p.DetuStatus != NPointFacts.DetuFusionStatus))
+                if (!p.IsPet || (p.IsPet && p.PetStatus != NPointFacts.PetFusionStatus))
                 {
                     int percent = NPointSkillMath.GetMonkeyDamagePercent(es.LevelMonkey);
-                    dame += dame * percent / 100;
+                    damage += damage * percent / 100;
                 }
             }
 
             // scroll (black ball war)
             if (zone is not null && zone.IsMapBlackBallWar)
             {
-                dame *= facts.EffectSkin.DamageMultiplier;
+                damage *= facts.EffectSkin.DamageMultiplier;
             }
 
             if (it.IsUseCaterpillarHamburger)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             if (it.IsUseStandardIpanaOintment)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             if (it.IsUseSpecialIpanaOintment)
             {
-                dame += CalculatePercent(dame, 10);
+                damage += CalculatePercent(damage, 10);
             }
 
             if (it.IsUseTamarindCrab)
             {
-                dame += CalculatePercent(dame, 5);
+                damage += CalculatePercent(damage, 5);
             }
 
-            Damage = dame;
+            Damage = damage;
         }
     }
 
@@ -560,7 +562,7 @@ public partial class NPoint
                 Defense = (int)(Defense + ((long)Defense * RewardBlackBall.R2S_2 / 100));
             }
 
-            switch (facts.Player.Isbienhinh)
+            switch (facts.Player.TransformationState)
             {
                 case 1:
                     Defense += 5000;
@@ -710,7 +712,7 @@ public partial class NPoint
                 CriticalChance += 10;
             }
 
-            switch (p.Isbienhinh)
+            switch (p.TransformationState)
             {
                 case 1:
                     CriticalChance += 10;
@@ -741,8 +743,8 @@ public partial class NPoint
         }
     }
 
-    // Thêm thưởng bộ đồ và thuốc vào danh sách sát thương chí mạng và đồng thời vào tổng CriticalDamagePercent.
-    private void SetCritDame(NPointFacts facts)
+    // Thêm thưởng bộ đồ và thuốc vào danh sách sát thương chí mạng và đồng thời vào tổng CriticalDamagePercent (Java: setCritDame).
+    private void SetCriticalDamage(NPointFacts facts)
     {
         NPointItemTimeFacts it = facts.ItemTime;
         NPointSetClothesFacts sc = facts.SetClothes;
@@ -835,21 +837,24 @@ public partial class NPoint
     public double GetDamageAttack(bool isAttackMob)
     {
         NPointAttackFacts af = Host.CaptureAttack(this);
-        double result = ComputeDameAttack(isAttackMob, af);
+        double result = ComputeAttackDamage(isAttackMob, af);
         Host.CommitAttack(this, af);
         return result;
     }
 
-    private double ComputeDameAttack(bool isAttackMob, NPointAttackFacts af)
+    // Tính sát thương tấn công (Java: computeDameAttack).
+    private double ComputeAttackDamage(bool isAttackMob, NPointAttackFacts af)
     {
         unchecked
         {
             SetIsCrit();
-            long dameAttack = Damage;
+            // Sát thương tấn công đang tính (Java: dameAttack).
+            long attackDamage = Damage;
             intrinsic = af.Intrinsic;
             percentDameIntrinsic = 0;
-            int percentDameSkill = 0;
-            sbyte percentXDame = 0;
+            // Phần trăm sát thương kỹ năng và sát thương bổ sung (Java: percentDameSkill, percentXDame).
+            int skillDamagePercent = 0;
+            sbyte extraDamagePercent = 0;
             NPointSkillFacts skillSelect = af.SkillSelect;
             NPointSetClothesFacts sc = af.SetClothes;
             if (skillSelect.TemplateId != Skill.DICH_CHUYEN_TUC_THOI && IsTeleportCritical)
@@ -866,7 +871,7 @@ public partial class NPoint
                         percentDameIntrinsic = intrinsic.Param1;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     break;
                 case Skill.KAMEJOKO:
                     if (intrinsic.Id == 2)
@@ -874,10 +879,10 @@ public partial class NPoint
                         percentDameIntrinsic = intrinsic.Param1;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     if (sc.Songoku == 5)
                     {
-                        percentXDame = 100;
+                        extraDamagePercent = 100;
                     }
 
                     break;
@@ -887,10 +892,10 @@ public partial class NPoint
                         percentDameIntrinsic = intrinsic.Param1;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     if (sc.Kakarot == 5)
                     {
-                        percentXDame = 100;
+                        extraDamagePercent = 100;
                     }
 
                     break;
@@ -900,7 +905,7 @@ public partial class NPoint
                         percentDameIntrinsic = intrinsic.Param1;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     break;
                 case Skill.DEMON:
                     if (intrinsic.Id == 8)
@@ -908,7 +913,7 @@ public partial class NPoint
                         percentDameIntrinsic = intrinsic.Param1;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     break;
                 case Skill.MASENKO:
                     if (intrinsic.Id == 9)
@@ -918,10 +923,10 @@ public partial class NPoint
 
                     if (sc.Nail == 5)
                     {
-                        percentXDame = 50;
+                        extraDamagePercent = 50;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     break;
                 case Skill.LIEN_HOAN:
                     if (intrinsic.Id == 13)
@@ -929,10 +934,10 @@ public partial class NPoint
                         percentDameIntrinsic = intrinsic.Param1;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     if (sc.OcTieu == 5)
                     {
-                        percentXDame = 100;
+                        extraDamagePercent = 100;
                     }
 
                     break;
@@ -942,86 +947,89 @@ public partial class NPoint
                         percentDameIntrinsic = intrinsic.Param1;
                     }
 
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     if (sc.Yamcha == 5)
                     {
-                        percentXDame = 100;
+                        extraDamagePercent = 100;
                     }
                     else if (sc.ThanVuTruKaio == 5)
                     {
-                        percentXDame = 30;
+                        extraDamagePercent = 30;
                     }
 
                     break;
                 case Skill.TU_SAT:
-                    percentDameSkill = skillSelect.Damage;
+                    skillDamagePercent = skillSelect.Damage;
                     if (sc.CadicM == 4)
                     {
-                        percentXDame = 20;
+                        extraDamagePercent = 20;
                     }
                     else if (sc.CadicM == 5)
                     {
-                        percentXDame = 40;
+                        extraDamagePercent = 40;
                     }
 
                     break;
                 case Skill.DICH_CHUYEN_TUC_THOI:
                     IsCritical = true;
                     IsTeleportCritical = true;
-                    dameAttack = Rand.NextLong(
-                        Util.CrisGH(dameAttack - (dameAttack / 100 * 5), af.ReadInt),
-                        Util.CrisGH(dameAttack + (dameAttack / 100 * 5), af.ReadInt));
+                    attackDamage = Rand.NextLong(
+                        Util.CrisGH(attackDamage - (attackDamage / 100 * 5), af.ReadInt),
+                        Util.CrisGH(attackDamage + (attackDamage / 100 * 5), af.ReadInt));
                     break;
                 case Skill.MAKANKOSAPPO:
-                    percentDameSkill = skillSelect.Damage;
-                    long dameSkill = Util.CrisGH(MpMax * percentDameSkill / 100, af.ReadInt);
-                    return dameSkill;
+                    skillDamagePercent = skillSelect.Damage;
+                    // Sát thương kỹ năng (Java: dameSkill).
+                    long skillDamage = Util.CrisGH(MpMax * skillDamagePercent / 100, af.ReadInt);
+                    return skillDamage;
                 case Skill.QUA_CAU_KENH_KHI:
                     long hpmob = af.AroundMobHp;
                     long hppl = af.AroundPlayerHp;
-                    long dameqckk = (hpmob * 10 / 100) + (hppl * 10 / 100) + (Damage * 10);
+                    // Sát thương kỹ năng đặc biệt (Java: dameqckk).
+                    long specialSkillDamage = (hpmob * 10 / 100) + (hppl * 10 / 100) + (Damage * 10);
 
                     if (sc.Kirin == 5)
                     {
-                        dameqckk *= 2;
+                        specialSkillDamage *= 2;
                     }
 
-                    dameqckk = dameqckk + (Rand.NextInt(-5, 5) * dameqckk / 100);
+                    specialSkillDamage = specialSkillDamage + (Rand.NextInt(-5, 5) * specialSkillDamage / 100);
 
-                    return dameqckk;
+                    return specialSkillDamage;
                 case Skill.DE_TRUNG:
                     if (sc.PikkoroDaimao == 5)
                     {
-                        dameAttack *= 2;
+                        attackDamage *= 2;
                     }
 
-                    return dameAttack;
+                    return attackDamage;
             }
 
-            if (percentDameSkill != 0)
+            if (skillDamagePercent != 0)
             {
-                dameAttack = dameAttack * percentDameSkill / 100;
+                attackDamage = attackDamage * skillDamagePercent / 100;
             }
 
-            dameAttack += dameAttack * percentDameIntrinsic / 100;
-            dameAttack += dameAttack * DamageAfter / 100;
+            attackDamage += attackDamage * percentDameIntrinsic / 100;
+            attackDamage += attackDamage * DamageAfter / 100;
 
             if (af.EffectSkill.IsDamageBuff && (SexyDamagePercent == 0 || CoolDamagePercent == 0 || CuteDamagePercent == 0))
             {
-                int tiLeDame = af.EffectSkill.DamageBuffPercent;
-                dameAttack += dameAttack * tiLeDame / 100L;
+                // Tỷ lệ sát thương tăng cường (Java: tiLeDame).
+                int damagePercent = af.EffectSkill.DamageBuffPercent;
+                attackDamage += attackDamage * damagePercent / 100L;
             }
 
             if (isAttackMob)
             {
                 foreach (int tl in MobAttackDamagePercents)
                 {
-                    dameAttack += dameAttack * tl / 100;
+                    attackDamage += attackDamage * tl / 100;
                 }
 
-                if (af.IsDeTu && af.MasterCharmsTdDeTu > Now())
+                if (af.IsPet && af.MasterPetCharmTraining > Now())
                 {
-                    dameAttack *= 2;
+                    attackDamage *= 2;
                 }
             }
 
@@ -1029,37 +1037,38 @@ public partial class NPoint
 
             if (IsCritical)
             {
-                dameAttack *= 2;
-                dameAttack += dameAttack * CriticalDamagePercent / 100;
+                attackDamage *= 2;
+                attackDamage += attackDamage * CriticalDamagePercent / 100;
             }
 
             if (isAttackMob)
             {
                 foreach (int tl in MobAttackDamagePercents)
                 {
-                    dameAttack += dameAttack * tl / 100;
+                    attackDamage += attackDamage * tl / 100;
                 }
             }
 
-            dameAttack += dameAttack * percentXDame / 100;
+            attackDamage += attackDamage * extraDamagePercent / 100;
 
-            long tempDameAttack = dameAttack / 100L * 5L;
-            if (tempDameAttack <= 0)
+            // Biên độ sát thương tấn công tạm thời (Java: tempDameAttack).
+            long temporaryAttackDamage = attackDamage / 100L * 5L;
+            if (temporaryAttackDamage <= 0)
             {
-                tempDameAttack = 1;
+                temporaryAttackDamage = 1;
             }
 
-            dameAttack += Rand.GetOne(-1, 1) * Rand.Crisnext((double)tempDameAttack) + 1;
+            attackDamage += Rand.GetOne(-1, 1) * Rand.Crisnext((double)temporaryAttackDamage) + 1;
 
-            if (af.EffectSkin.IsChargedBlast && (skillSelect.TemplateId == Skill.KAMEJOKO || skillSelect.TemplateId == Skill.ANTOMIC || skillSelect.TemplateId == Skill.MASENKO))
+            if (af.EffectSkin.IsBlastDamageMultiplierReady && (skillSelect.TemplateId == Skill.KAMEJOKO || skillSelect.TemplateId == Skill.ANTOMIC || skillSelect.TemplateId == Skill.MASENKO))
             {
-                dameAttack *= ChargedBlastLevel;
-                af.EffectSkin.IsDamageBoosted = true;
-                af.EffectSkin.IsChargedBlast = false;
-                af.EffectSkin.LastTimeChargedBlast = Now();
+                attackDamage *= BlastDamageMultiplier;
+                af.EffectSkin.IsBlastDamageMultiplierApplied = true;
+                af.EffectSkin.IsBlastDamageMultiplierReady = false;
+                af.EffectSkin.LastTimeBlastDamageMultiplier = Now();
             }
 
-            return dameAttack;
+            return attackDamage;
         }
     }
 }

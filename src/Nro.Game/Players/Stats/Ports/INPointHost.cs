@@ -16,7 +16,7 @@ public interface INPointHost
     // Chụp dữ liệu GetDamageAttack cần; với Quả cầu kênh khí còn nạp HP quái và người chơi xung quanh.
     NPointAttackFacts CaptureAttack(NPoint npoint);
 
-    // Ghi trả các cờ EffectSkin GetDamageAttack thay đổi sau đòn Chưởng nạp: IsDamageBoosted, IsChargedBlast và LastTimeChargedBlast.
+    // Ghi trả các cờ EffectSkin GetDamageAttack thay đổi sau đòn Chưởng nạp: IsBlastDamageMultiplierApplied, IsBlastDamageMultiplierReady và LastTimeBlastDamageMultiplier.
     void CommitAttack(NPoint npoint, NPointAttackFacts facts);
 
     // Chụp trạng thái Update cần cho mỗi tick.

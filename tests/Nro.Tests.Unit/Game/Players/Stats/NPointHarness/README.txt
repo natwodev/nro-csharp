@@ -2,7 +2,7 @@ NPoint characterization harness (task E-01)
 ===========================================
 
 What it is: the ORIGINAL nro/player/NPoint.java (copied unchanged from the Java source tree at build time) compiled against small test doubles of the
-classes around it (Player, Detu, ItemTime, EffectSkill, SetClothes, MapService, InventoryService, ...), driven by the scenarios in
+classes around it (Player, Pet, ItemTime, EffectSkill, SetClothes, MapService, InventoryService, ...), driven by the scenarios in
 nro/harness/NPointScenarios.java.txt. Its output (the inputs of every scenario plus everything the original did) is ../npoint-characterization.json, which
 NPointCharacterizationTests replays on the C# port.
 

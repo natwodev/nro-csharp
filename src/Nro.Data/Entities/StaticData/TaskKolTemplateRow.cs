@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class TaskKolTemplateRow
     // Khóa chính của bảng TaskKolTemplate
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Column("id")]
     public int TaskKolTemplateId { get; set; }
 
     // Mục tiêu nhiệm vụ (%1: số lượng cần)

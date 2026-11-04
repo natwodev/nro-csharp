@@ -222,9 +222,9 @@ public class BigBoss : Mob
                     int dir = 0;
                     foreach (Player pl in players)
                     {
-                        double dame = gateway.Injured(pl, null, Point.GetDamageAttack(), false, true);
+                        double damage = gateway.Injured(pl, null, Point.GetDamageAttack(), false, true);
                         msg.Writer().WriteInt(unchecked((int)pl.Id));
-                        msg.WriteCris(Rt.CrisGH(dame), Rt.ReadInt);
+                        msg.WriteCris(Rt.CrisGH(damage), Rt.ReadInt);
                         dir = gateway.GetX(pl) < Location.X ? -1 : 1;
                     }
 

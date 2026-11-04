@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class CvhSiteSetting
     // Khóa chính của bảng CvhSiteSetting (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
     public int CvhSiteSettingId { get; set; }
 
     // Tiêu đề website
@@ -78,7 +74,7 @@ public class CvhSiteSetting
     // Cờ bật thông báo
     [Required]
     [MaxLength(99)]
-    public string Thongbao { get; set; } = default!;
+    public string Notification { get; set; } = default!;
 
     // Nội dung thông báo
     [Required]

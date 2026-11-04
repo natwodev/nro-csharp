@@ -343,7 +343,7 @@ public class AchievementServiceTests
     public async Task ConfirmAchievement_is_refused_when_the_account_protection_is_on()
     {
         (AchievementService service, FakeAchievementHost host, _, Player player) = await MakeAsync();
-        player.Baovetaikhoan = true;
+        player.IsAccountProtected = true;
         player.Achievement.AchievementList[3] = new AchievementQuest(100, false);
 
         service.ConfirmAchievement(player, 3);

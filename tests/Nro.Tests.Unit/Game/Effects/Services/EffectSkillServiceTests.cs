@@ -313,7 +313,7 @@ public class EffectSkillServiceTests
         var rig = new EffectRig();
         rig.Random.Enqueue(3);
         Player p = rig.Add(1, configure: s => s.NPoint = s.NPoint with { Hp = 10, HpMax = 777 });
-        rig.Env.Skills.SetMiniature(p, 60_000);
+        rig.Env.Skills.SetChibiBird(p, 60_000);
         Assert.True(p.EffectSkill.IsChibi);
         Assert.Equal(3, p.TypeChibi);
         Assert.Equal((60_000, rig.Now), (p.EffectSkill.TimeChibi, p.EffectSkill.LastTimeChibi));
@@ -327,12 +327,12 @@ public class EffectSkillServiceTests
         var rig = new EffectRig();
         rig.Random.Enqueue(2);
         Player p = rig.Add(1);
-        rig.Env.Skills.SetMiniature(p, 5000);
+        rig.Env.Skills.SetChibiBird(p, 5000);
         Assert.Equal(2, p.TypeChibi);
         Assert.Equal(["ItemTime:1:433:5", "Chibi:1", "ChibiFollow:1"], rig.World.Calls);
 
         rig.World.Calls.Clear();
-        rig.Env.Skills.RemoveMiniature(p);
+        rig.Env.Skills.RemoveChibiBird(p);
         Assert.False(p.EffectSkill.IsChibi);
         Assert.Equal(-1, p.TypeChibi);
         Assert.Equal(["ItemTime:1:433:0", "Chibi:1", "ChibiFollow:1"], rig.World.Calls);
@@ -618,7 +618,7 @@ public class EffectSkillServiceTests
     public void SetIsMonkey_skips_the_hp_mp_refresh_for_pets_and_clones()
     {
         var rig = new EffectRig();
-        Player p = AddSkilled(rig, 1, configurePlayer: x => x.IsDeTu = true);
+        Player p = AddSkilled(rig, 1, configurePlayer: x => x.IsPet = true);
         rig.Env.Skills.SetIsMonkey(p);
         Assert.DoesNotContain("InfoHpMp:1", rig.World.Calls);
         Assert.Contains("Point:1", rig.World.Calls);
@@ -778,11 +778,11 @@ public class EffectSkillServiceTests
         var rig = new EffectRig();
         Player binder = rig.Add(1);
         Player bound = rig.Add(2);
-        var clone = new PhanThan { Id = 3 };
+        var clone = new BodyClone { Id = 3 };
         rig.World.Adopt(rig.Env, clone);
         var mob = new FakeMob { Id = 4 };
 
-        binder.PhanThan = clone;
+        binder.BodyClone = clone;
         binder.EffectSkill.IsBinding = true;
         binder.EffectSkill.BoundPlayer = bound;
         binder.EffectSkill.BoundMob = mob;
@@ -812,9 +812,9 @@ public class EffectSkillServiceTests
     {
         var rig = new EffectRig();
         Player binder = rig.Add(1);
-        var clone = new PhanThan { Id = 3 };
+        var clone = new BodyClone { Id = 3 };
         rig.World.Adopt(rig.Env, clone);
-        binder.PhanThan = clone;
+        binder.BodyClone = clone;
         binder.EffectSkill.IsBinding = true;
         rig.Env.Skills.RemoveBinding(binder);
         Assert.Single(rig.World.Packets);
@@ -1065,10 +1065,10 @@ public class EffectSkillServiceTests
     {
         var rig = new EffectRig();
         Player p = AddSkilled(rig, 1);
-        p.Isbienhinh = 7;
+        p.TransformationState = 7;
         rig.Env.Skills.SetTransformation(p);
 
-        Assert.Equal(0, p.Isbienhinh);
+        Assert.Equal(0, p.TransformationState);
         Assert.Equal([(1L, 0)], rig.World.SavedBienHinh);
         Assert.True(p.EffectSkill.IsTransformation);
         Assert.Equal(300_000, p.EffectSkill.TimeTransformation);
@@ -1083,12 +1083,12 @@ public class EffectSkillServiceTests
     {
         var rig = new EffectRig();
         Player p = AddSkilled(rig, 1, configure: s => s.NPoint = s.NPoint with { Hp = 5000, HpMax = 1000 });
-        p.Isbienhinh = 3;
+        p.TransformationState = 3;
         p.EffectSkill.IsTransformation = true;
         p.EffectSkill.TransformationLevel = 4;
         rig.Env.Skills.RemoveTransformation(p);
 
-        Assert.Equal(0, p.Isbienhinh);
+        Assert.Equal(0, p.TransformationState);
         Assert.Equal([(1L, 0)], rig.World.SavedBienHinh);
         Assert.False(p.EffectSkill.IsTransformation);
         Assert.Equal(0, p.EffectSkill.TransformationLevel);
@@ -1101,17 +1101,17 @@ public class EffectSkillServiceTests
     {
         var rig = new EffectRig();
         Player p = AddSkilled(rig, 1, configure: s => s.NPoint = s.NPoint with { Hp = 5000, HpMax = 1000 });
-        p.Isbienhinh = 3;
+        p.TransformationState = 3;
         rig.Env.Skills.SetEvolution(p);
         Assert.True(p.EffectSkill.IsEvolution);
         Assert.Equal((300_000, rig.Now), (p.EffectSkill.TimeEvolution, p.EffectSkill.LastTimeEvolution));
         Assert.Equal(["Caitrang:1", "Point:1"], rig.World.Calls);
-        Assert.Equal(3, p.Isbienhinh); // setting does not touch it
+        Assert.Equal(3, p.TransformationState); // setting does not touch it
 
         rig.World.Calls.Clear();
         rig.Env.Skills.RemoveEvolution(p);
         Assert.False(p.EffectSkill.IsEvolution);
-        Assert.Equal(0, p.Isbienhinh);
+        Assert.Equal(0, p.TransformationState);
         Assert.Equal(["SetHp:1:1000", "NotVolution:1", "Caitrang:1", "Point:1", "InfoHpMp:1", "InfoNv:1"], rig.World.Calls);
     }
 

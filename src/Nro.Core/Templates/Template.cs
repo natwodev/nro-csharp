@@ -88,8 +88,8 @@ public class Template
         }
     }
 
-    // Dữ liệu cược Bầu Cua.
-    public class BauCuaData
+    // Dữ liệu cược Bầu Cua (Java: BauCuaData).
+    public class GourdCrabData
     {
         // Mã người chơi (Java: playerId)
         public long PlayerId { get; set; }
@@ -112,7 +112,7 @@ public class Template
         // Giá trị cược gà (Java: ga)
         public long Ga { get; set; }
 
-        public BauCuaData(long playerId, long bau, long cua, long tom, long ca, long nai, long ga)
+        public GourdCrabData(long playerId, long bau, long cua, long tom, long ca, long nai, long ga)
         {
             PlayerId = playerId;
             Bau = bau;

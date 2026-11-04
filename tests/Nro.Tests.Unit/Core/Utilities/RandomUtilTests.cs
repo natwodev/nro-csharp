@@ -206,14 +206,14 @@ public class RandomUtilTests
         Assert.All(random.Calls, call => Assert.Equal(max, call.Bound));
     }
 
-    // ---- Crisnext / GioiHannext ----
+    // ---- Crisnext / NextWithinLimit ----
 
     [Fact]
-    public void Crisnext_and_GioiHannext_add_a_draw_below_to_minus_from_plus_one_and_cut_to_long()
+    public void Crisnext_and_NextWithinLimit_add_a_draw_below_to_minus_from_plus_one_and_cut_to_long()
     {
         (RandomUtil util, ScriptedRandomProvider random) = Create(3, 3, 0, 6);
         Assert.Equal(8L, util.Crisnext(5.0, 9.0)); // 5 + 3 of [0,5)
-        Assert.Equal(8L, util.GioiHannext(5.0, 9.0));
+        Assert.Equal(8L, util.NextWithinLimit(5.0, 9.0));
         Assert.Equal(0L, util.Crisnext(7.9)); // (int) 7.9 = 7: draw of [0,7)
         Assert.Equal(6L, util.Crisnext(7.0));
         Assert.Equal(new object?[] { 5, 5, 7, 7 }, random.Calls.Select(c => c.Bound).ToArray());
@@ -228,10 +228,10 @@ public class RandomUtilTests
     }
 
     [Fact]
-    public void GioiHannextdame_returns_a_double_without_cutting_it()
+    public void NextDamageWithinLimit_returns_a_double_without_cutting_it()
     {
         (RandomUtil util, ScriptedRandomProvider random) = Create(1);
-        Assert.Equal(2.5, util.GioiHannextdame(1.5, 3.4));
+        Assert.Equal(2.5, util.NextDamageWithinLimit(1.5, 3.4));
         Assert.Equal(2, random.Calls[0].Bound);
     }
 

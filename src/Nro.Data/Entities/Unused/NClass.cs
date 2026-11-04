@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class NClass
     // Khóa chính của bảng NClass
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Column("id")]
     public int NClassId { get; set; }
 
     // Tên lớp

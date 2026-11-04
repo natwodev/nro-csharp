@@ -24,11 +24,11 @@ public class ItemTimeService
 
     private long Now => clock.CurrentTimeMillis();
 
-    // Thực hiện build can auto play message; giữ nguyên điều kiện, thứ tự và số học của Java (Java: sendCanAutoPlay).
-    internal static Message BuildCanAutoPlayMessage(bool isUseTDLT)
+    // Tạo gói tin báo bật tự động luyện tập; giữ nguyên điều kiện, thứ tự và số học của Java (Java: sendCanAutoPlay).
+    internal static Message BuildCanAutoPlayMessage(bool isAutoTrainingEnabled)
     {
         var msg = new Message(-116);
-        msg.Writer().WriteByte(isUseTDLT ? 1 : 0);
+        msg.Writer().WriteByte(isAutoTrainingEnabled ? 1 : 0);
         return msg;
     }
 
@@ -113,9 +113,9 @@ public class ItemTimeService
             SendItemTime(player, 11493, (int)((TIME_ITEM_60M - (Now - t.LastTimeUseSoulScanner)) / 1000));
         }
 
-        if (t.IsUseSuperDigestiveScanner)
+        if (t.IsUsingSuperTransformationStoneDetector)
         {
-            SendItemTime(player, 27021, (int)((TIME_ITEM_60M - (Now - t.LastTimeUseSuperDigestiveScanner)) / 1000));
+            SendItemTime(player, 27021, (int)((TIME_ITEM_60M - (Now - t.SuperTransformationStoneDetectorStartTime)) / 1000));
         }
 
         if (t.IsUsePetPowerPotentialCharm)
@@ -238,9 +238,9 @@ public class ItemTimeService
             SendItemTime(player, 11173, (int)((TIME_ITEM_30M - (Now - t.LastTimeUseElectricRiceCooker)) / 1000));
         }
 
-        if (t.IsUseComboSkill)
+        if (t.HasMagicDispel)
         {
-            SendItemTime(player, 3778, (int)((TIME_ITEM_10M - (Now - t.LastTimeUseComboSkill)) / 1000));
+            SendItemTime(player, 3778, (int)((TIME_ITEM_10M - (Now - t.MagicDispelStartTime)) / 1000));
         }
 
         if (t.IsPowerBurst)
@@ -532,7 +532,7 @@ public class ItemTimeService
             t.IsUseSoulScanner = false;
             RemoveItemTime(player, 11493);
 
-            t.IsUseSuperDigestiveScanner = false;
+            t.IsUsingSuperTransformationStoneDetector = false;
             RemoveItemTime(player, 27021);
 
             t.IsUsePetPowerPotentialCharm = false;
@@ -607,7 +607,7 @@ public class ItemTimeService
             t.IsUseElectricRiceCooker = false;
             RemoveItemTime(player, 11173);
 
-            t.IsUseComboSkill = false;
+            t.HasMagicDispel = false;
             RemoveItemTime(player, 3778);
 
             t.IsPowerBurst = false;

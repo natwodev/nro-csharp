@@ -228,6 +228,7 @@ public class TemplatesParityTests(ITestOutputHelper output)
     [InlineData("isRecieve", "IsRecieve")]
     [InlineData("ruby_sell", "Ruby_sell")]
     [InlineData("percent_gold", "Percent_gold")]
+    [InlineData("percentTiemNang", "PercentPotential")]
     [InlineData("TypeEvent", "TypeEvent")]
     [InlineData("LUNNAR_NEW_YEAR", "LUNNAR_NEW_YEAR")]
     [InlineData("chanX15", "ChanX15")]
@@ -260,7 +261,7 @@ public class TemplatesParityTests(ITestOutputHelper output)
     [InlineData(typeof(MobTemplate), "Speed", typeof(sbyte))]
     [InlineData(typeof(MobTemplate), "DartType", typeof(sbyte))]
     [InlineData(typeof(MobTemplate), "PercentDame", typeof(sbyte))]
-    [InlineData(typeof(MobTemplate), "PercentTiemNang", typeof(sbyte))]
+    [InlineData(typeof(MobTemplate), "PercentPotential", typeof(sbyte))]
     [InlineData(typeof(MobTemplate), "Percent_gold", typeof(sbyte))]
     [InlineData(typeof(MobTemplate), "Hp", typeof(int))]
     [InlineData(typeof(FlagBag), "IconId", typeof(short))]
@@ -275,7 +276,7 @@ public class TemplatesParityTests(ITestOutputHelper output)
     [InlineData(typeof(TileSetInfoData), "Data", typeof(int[]))]
     [InlineData(typeof(WaitSuperRank), "RivalId", typeof(long))]
     [InlineData(typeof(Template.XocDiaData), "LeX15", typeof(long))]
-    [InlineData(typeof(Template.BauCuaData), "Ga", typeof(long))]
+    [InlineData(typeof(Template.GourdCrabData), "Ga", typeof(long))]
     public void Canary_hand_written_property_types_without_reading_golden(Type owner, string property, Type expected)
     {
         PropertyInfo? p = owner.GetProperty(property, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);

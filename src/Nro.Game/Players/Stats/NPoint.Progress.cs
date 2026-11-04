@@ -10,13 +10,13 @@ namespace Nro.Game.Players.Stats;
 public partial class NPoint
 {
     // Tính tiềm năng/sức mạnh mỗi lần hạ quái: trả 0 khi không có zone hoặc map loại 3, 10 khi chạm giới hạn, còn lại cộng thưởng, chia ở map đặc biệt và theo hệ số đệ tử, nhân hệ số server, trừ CalculatePowerPotentialReduction rồi tối thiểu 1. Giữ đặc tính Java: bùa TNSM đệ tử được kiểm hai lần (+2x và +10x lượng gốc), hệ số đệ tử là phép chia double rồi cắt long.
-    public long CalculatePowerPotential(long tiemNang)
+    public long CalculatePowerPotential(long potential)
     {
         NPointFacts facts = Host.Capture(this);
-        return CalculatePowerPotential(tiemNang, facts);
+        return CalculatePowerPotential(potential, facts);
     }
 
-    private long CalculatePowerPotential(long tiemNang, NPointFacts facts)
+    private long CalculatePowerPotential(long potential, NPointFacts facts)
     {
         unchecked
         {
@@ -40,19 +40,20 @@ public partial class NPoint
             NPointItemTimeFacts it = facts.ItemTime;
             NPointServerFacts server = facts.Server;
             long now = Now();
-            long originalTiemNang = tiemNang;
+            // Tiềm năng ban đầu (Java: tiemNang).
+            long originalPotential = potential;
 
             // Phần trăm cộng từ tùy chọn vật phẩm.
             foreach (int tl in PowerPotentialPercents)
             {
-                tiemNang += CalculatePercent(tiemNang, tl);
+                potential += CalculatePercent(potential, tl);
             }
 
             // flag
             if (p.CFlag != 0)
             {
                 int percent = p.CFlag == 8 ? 10 : 5;
-                tiemNang += CalculatePercent(tiemNang, percent);
+                potential += CalculatePercent(potential, percent);
             }
 
             // server attribute
@@ -60,35 +61,35 @@ public partial class NPoint
             {
                 if (server.AttributeTnsmActive)
                 {
-                    tiemNang += CalculatePercent(tiemNang, server.AttributeTnsmValue);
+                    potential += CalculatePercent(potential, server.AttributeTnsmValue);
                 }
             }
 
             // week / month / year / supreme cards
-            if (p.THE_TUAN != 0 && p.LASTTIME_THE_TUAN > now)
+            if (p.WeeklyCard != 0 && p.LastWeeklyCardTime > now)
             {
-                tiemNang += CalculatePercent(tiemNang, p.THE_TUAN == 1 ? 20 : 50);
+                potential += CalculatePercent(potential, p.WeeklyCard == 1 ? 20 : 50);
             }
 
-            if (p.THE_THANG != 0 && p.LASTTIME_THE_THANG > now)
+            if (p.MonthlyCard != 0 && p.LastMonthlyCardTime > now)
             {
-                tiemNang += CalculatePercent(tiemNang, p.THE_THANG == 1 ? 100 : 150);
+                potential += CalculatePercent(potential, p.MonthlyCard == 1 ? 100 : 150);
             }
 
-            if (p.THE_NAM != 0 && p.LASTTIME_THE_NAM > now)
+            if (p.YearlyCard != 0 && p.LastYearlyCardTime > now)
             {
-                tiemNang += CalculatePercent(tiemNang, p.THE_NAM == 1 ? 200 : 300);
+                potential += CalculatePercent(potential, p.YearlyCard == 1 ? 200 : 300);
             }
 
-            if (p.THE_CHI_TON != 0 && p.LASTTIME_THE_CHI_TON > now)
+            if (p.SupremeCard != 0 && p.LastSupremeCardTime > now)
             {
-                tiemNang += CalculatePercent(tiemNang, 500);
+                potential += CalculatePercent(potential, 500);
             }
 
             // mask
             if (it.IsFaceMask)
             {
-                tiemNang += CalculatePercent(tiemNang, 20);
+                potential += CalculatePercent(potential, 20);
             }
 
             // wisdom charm
@@ -129,18 +130,18 @@ public partial class NPoint
                 charmBonusMultiplier += 19;
             }
 
-            tiemNang += originalTiemNang * charmBonusMultiplier;
+            potential += originalPotential * charmBonusMultiplier;
 
             // Nội tại của lần tấn công trước, xem SetOptions.
             if (intrinsic is not null && intrinsic.Id == 24)
             {
-                tiemNang += CalculatePercent(tiemNang, intrinsic.Param1);
+                potential += CalculatePercent(potential, intrinsic.Param1);
             }
 
             // chibi
             if (facts.EffectSkill.IsChibi && p.TypeChibi == 2)
             {
-                tiemNang += originalTiemNang * 2;
+                potential += originalPotential * 2;
             }
 
             // clan buff
@@ -149,174 +150,174 @@ public partial class NPoint
             {
                 if (now <= clan.LasttimeBuffExp + clan.TimeStarBuffExp)
                 {
-                    tiemNang += originalTiemNang * clan.AddPotentialSucManhToanBangHoi;
+                    potential += originalPotential * clan.ClanPowerPotentialBonus;
                 }
 
-                if (now <= clan.BuaTriTue)
+                if (now <= clan.WisdomCharmExpiry)
                 {
                     int bonusPercent = Math.Min(clan.Level * 20, 200);
-                    tiemNang += CalculatePercent(originalTiemNang, bonusPercent);
+                    potential += CalculatePercent(originalPotential, bonusPercent);
                 }
             }
 
             // satellite
             if (p.SatelliteIsIntelligent)
             {
-                tiemNang += CalculatePercent(originalTiemNang, 20);
+                potential += CalculatePercent(originalPotential, 20);
             }
 
             // VIP
             if (p.HasVipPoint)
             {
-                tiemNang += originalTiemNang * 2;
+                potential += originalPotential * 2;
             }
 
             // item time
             if (it.IsBoneDragon3)
             {
-                tiemNang += originalTiemNang * 3;
+                potential += originalPotential * 3;
             }
 
             if (it.IsUseMonkeyTailPowerPotential)
             {
-                tiemNang += originalTiemNang * 10;
+                potential += originalPotential * 10;
             }
 
             // Cộng 20% kinh nghiệm khi đánh quái; Java đọc player.nPoint, chính là đối tượng này.
             if (Grants20ExperienceOnMobAttack)
             {
-                tiemNang += CalculatePercent(tiemNang, 20);
+                potential += CalculatePercent(potential, 20);
             }
 
             // goten set
             if (facts.SetClothes.Goten == 5)
             {
-                tiemNang += originalTiemNang * 5;
+                potential += originalPotential * 5;
             }
 
             // Đệ tử nhận các thưởng của chủ.
-            if (p.IsDeTu)
+            if (p.IsPet)
             {
                 NPointMasterFacts? master = facts.Master;
                 if (master is not null)
                 {
                     if (master.ItemTimeIsUsePetPowerPotentialCharm)
                     {
-                        tiemNang += originalTiemNang * 2;
+                        potential += originalPotential * 2;
                     }
 
                     if (master.ItemTimeIsUsePetPowerPotentialCharm)
                     {
-                        tiemNang += originalTiemNang * 10;
+                        potential += originalPotential * 10;
                     }
 
                     long masterNow = now;
                     NPointCharmsFacts mc = master.Charms;
-                    if (mc.TdDeTu > masterNow)
+                    if (mc.PetTraining > masterNow)
                     {
-                        tiemNang += originalTiemNang * 2;
+                        potential += originalPotential * 2;
                     }
 
-                    if (mc.TdDeTu2 > masterNow)
+                    if (mc.PetTraining2 > masterNow)
                     {
-                        tiemNang += originalTiemNang * 3;
+                        potential += originalPotential * 3;
                     }
 
-                    if (mc.TdDeTu3 > masterNow)
+                    if (mc.PetTraining3 > masterNow)
                     {
-                        tiemNang += originalTiemNang * 4;
+                        potential += originalPotential * 4;
                     }
 
-                    if (mc.TdDeTu4 > masterNow)
+                    if (mc.PetTraining4 > masterNow)
                     {
-                        tiemNang += originalTiemNang * 5;
+                        potential += originalPotential * 5;
                     }
 
-                    if (mc.TdDeTu5 > masterNow)
+                    if (mc.PetTraining5 > masterNow)
                     {
-                        tiemNang += originalTiemNang * 6;
+                        potential += originalPotential * 6;
                     }
 
-                    if (mc.TdDeTu7 > masterNow)
+                    if (mc.PetTraining7 > masterNow)
                     {
-                        tiemNang += originalTiemNang * 8;
+                        potential += originalPotential * 8;
                     }
 
-                    if (mc.TdDeTu10 > masterNow)
+                    if (mc.PetTraining10 > masterNow)
                     {
-                        tiemNang += originalTiemNang * 10;
+                        potential += originalPotential * 10;
                     }
 
-                    if (mc.TdDeTu20 > masterNow)
+                    if (mc.PetTraining20 > masterNow)
                     {
-                        tiemNang += originalTiemNang * 20;
+                        potential += originalPotential * 20;
                     }
 
                     if (master.ItemTimeIsBoneDragon)
                     {
-                        tiemNang += originalTiemNang * 3;
+                        potential += originalPotential * 3;
                     }
 
-                    if (master.THE_TUAN != 0 && master.LASTTIME_THE_TUAN > masterNow)
+                    if (master.WeeklyCard != 0 && master.LastWeeklyCardTime > masterNow)
                     {
-                        tiemNang += CalculatePercent(tiemNang, master.THE_TUAN == 1 ? 20 : 50);
+                        potential += CalculatePercent(potential, master.WeeklyCard == 1 ? 20 : 50);
                     }
 
-                    if (master.THE_THANG != 0 && master.LASTTIME_THE_THANG > masterNow)
+                    if (master.MonthlyCard != 0 && master.LastMonthlyCardTime > masterNow)
                     {
-                        tiemNang += CalculatePercent(tiemNang, master.THE_THANG == 1 ? 100 : 150);
+                        potential += CalculatePercent(potential, master.MonthlyCard == 1 ? 100 : 150);
                     }
 
-                    if (master.THE_NAM != 0 && master.LASTTIME_THE_NAM > masterNow)
+                    if (master.YearlyCard != 0 && master.LastYearlyCardTime > masterNow)
                     {
-                        tiemNang += CalculatePercent(tiemNang, master.THE_NAM == 1 ? 200 : 300);
+                        potential += CalculatePercent(potential, master.YearlyCard == 1 ? 200 : 300);
                     }
 
-                    if (master.THE_CHI_TON != 0 && master.LASTTIME_THE_CHI_TON > masterNow)
+                    if (master.SupremeCard != 0 && master.LastSupremeCardTime > masterNow)
                     {
-                        tiemNang += CalculatePercent(tiemNang, 500);
+                        potential += CalculatePercent(potential, 500);
                     }
 
-                    // originalTiemNang / 100 first (cut), then times (tlTNSMPet + 100)
-                    tiemNang += originalTiemNang / 100 * (master.PetPowerPotentialPercent + 100);
+                    // originalPotential / 100 first (cut), then times (tlTNSMPet + 100)
+                    potential += originalPotential / 100 * (master.PetPowerPotentialPercent + 100);
 
                     if (zone.IsMapKVTH)
                     {
-                        tiemNang *= 2;
+                        potential *= 2;
                     }
                 }
             }
 
             // father / mother
-            if (p.IsBo)
+            if (p.IsFather)
             {
-                tiemNang += originalTiemNang * 2;
+                potential += originalPotential * 2;
             }
 
-            if (p.IsMe)
+            if (p.IsMother)
             {
-                tiemNang += originalTiemNang * 2;
+                potential += originalPotential * 2;
             }
 
             // special maps
-            if (zone.IsMapBanDoKhoBau)
+            if (zone.IsTreasureUnderSeaMap)
             {
-                tiemNang *= 6;
+                potential *= 6;
             }
 
-            if (zone.IsMapDoanhTrai)
+            if (zone.IsBarracksMap)
             {
-                tiemNang *= 3;
+                potential *= 3;
             }
 
-            if (zone.IsTnsmDividedMap)
+            if (zone.IsPowerPotentialDividedMap)
             {
-                tiemNang = tiemNang / 10;
+                potential = potential / 10;
             }
 
-            if (p.IsDeTu)
+            if (p.IsPet)
             {
-                int type = p.DetuTypeDeTu;
+                int type = p.PetType;
                 double factor = 1.0; // default: normal pet (type 0) = 1x
 
                 switch (type)
@@ -337,26 +338,26 @@ public partial class NPoint
                         break;
                 }
 
-                tiemNang = JavaNumbers.ToLong(tiemNang / factor);
+                potential = JavaNumbers.ToLong(potential / factor);
             }
 
             // server rate
-            tiemNang *= server.RateExpServer;
+            potential *= server.RateExpServer;
 
             // Giảm theo mốc sức mạnh và giới hạn trên.
-            tiemNang = CalculatePowerPotentialReduction(tiemNang);
+            potential = CalculatePowerPotentialReduction(potential);
 
-            if (tiemNang <= 0)
+            if (potential <= 0)
             {
-                tiemNang = 1;
+                potential = 1;
             }
 
-            return tiemNang;
+            return potential;
         }
     }
 
     // Giảm tiềm năng theo sức mạnh: 0 ở giới hạn; từ 100/50/40 tỷ còn 1%/20%/50%, tối đa 20 triệu.
-    public long CalculatePowerPotentialReduction(long tiemNang)
+    public long CalculatePowerPotentialReduction(long potential)
     {
         if (Power >= GetPowerLimit())
         {
@@ -365,28 +366,28 @@ public partial class NPoint
 
         if (Power >= 120_000_000_000L)
         {
-            tiemNang = CalculatePercent(tiemNang, 1);
+            potential = CalculatePercent(potential, 1);
         }
         else if (Power >= 100_000_000_000L)
         {
-            tiemNang = CalculatePercent(tiemNang, 1);
+            potential = CalculatePercent(potential, 1);
         }
         else if (Power >= 50_000_000_000L)
         {
-            tiemNang = CalculatePercent(tiemNang, 20);
+            potential = CalculatePercent(potential, 20);
         }
         else if (Power >= 40_000_000_000L)
         {
-            tiemNang = CalculatePercent(tiemNang, 50);
+            potential = CalculatePercent(potential, 50);
         }
 
         // cap at 20 million
-        if (tiemNang > 20_000_000L)
+        if (potential > 20_000_000L)
         {
-            tiemNang = 20_000_000L;
+            potential = 20_000_000L;
         }
 
-        return tiemNang;
+        return potential;
     }
 
     // Cho biết sức mạnh đã đạt giới hạn của cấp hiện tại.
@@ -423,9 +424,9 @@ public partial class NPoint
     }
 
     // Cộng tiềm năng.
-    public void IncreasePotential(long tiemNang)
+    public void IncreasePotential(long potential)
     {
-        Potential = unchecked(Potential + tiemNang);
+        Potential = unchecked(Potential + potential);
     }
 
     // Dùng tiềm năng tăng chỉ số gốc: 0 HP, 1 KI, 2 sát thương, 3 phòng thủ, 4 chí mạng. Giữ kiểu số Java: giá phòng thủ int có thể tràn, giá chí mạng nhân 5 theo từng điểm và có thể tràn long. Chạm trần chỉ gửi thông báo/gói tiền, không trừ; không làm gì khi bảo vệ tài khoản bật, chưa nạp ngưỡng hoặc point không dương.
@@ -433,7 +434,7 @@ public partial class NPoint
     {
         unchecked
         {
-            if (Player.Baovetaikhoan)
+            if (Player.IsAccountProtected)
             {
                 Host.SendNotification(Player, "Chức năng bảo vệ đã được bật. Bạn vui lòng kiểm tra lại");
                 return;
@@ -450,14 +451,15 @@ public partial class NPoint
             }
 
             bool updatePoint = false;
-            long tiemNangUse;
+            // Chi phí tiềm năng (Java: tiemNangUse).
+            long potentialCost;
             if (type == 0)
             {
                 int pointHp = point * 20;
-                tiemNangUse = point * ((2 * (BaseHp + 1000)) + pointHp - 20) / 2;
+                potentialCost = point * ((2 * (BaseHp + 1000)) + pointHp - 20) / 2;
                 if ((BaseHp + pointHp) <= PowerLimit.Hp)
                 {
-                    if (DoUseTiemNang(tiemNangUse))
+                    if (TrySpendPotential(potentialCost))
                     {
                         BaseHp += pointHp;
                         updatePoint = true;
@@ -474,10 +476,10 @@ public partial class NPoint
             if (type == 1)
             {
                 int pointMp = point * 20;
-                tiemNangUse = point * ((2 * (BaseMp + 1000)) + pointMp - 20) / 2;
+                potentialCost = point * ((2 * (BaseMp + 1000)) + pointMp - 20) / 2;
                 if ((BaseMp + pointMp) <= PowerLimit.Mp)
                 {
-                    if (DoUseTiemNang(tiemNangUse))
+                    if (TrySpendPotential(potentialCost))
                     {
                         BaseMp += pointMp;
                         updatePoint = true;
@@ -493,10 +495,10 @@ public partial class NPoint
 
             if (type == 2)
             {
-                tiemNangUse = point * ((2 * BaseDamage) + point - 1) / 2 * 100;
+                potentialCost = point * ((2 * BaseDamage) + point - 1) / 2 * 100;
                 if ((BaseDamage + point) <= PowerLimit.Damage)
                 {
-                    if (DoUseTiemNang(tiemNangUse))
+                    if (TrySpendPotential(potentialCost))
                     {
                         BaseDamage += point;
                         updatePoint = true;
@@ -513,10 +515,10 @@ public partial class NPoint
             if (type == 3)
             {
                 // Số học int Java: 2*(BaseDefense+5)/2*100000 có thể tràn trước khi mở rộng sang long.
-                tiemNangUse = 2 * (BaseDefense + 5) / 2 * 100000;
+                potentialCost = 2 * (BaseDefense + 5) / 2 * 100000;
                 if ((BaseDefense + point) <= PowerLimit.Defense)
                 {
-                    if (DoUseTiemNang(tiemNangUse))
+                    if (TrySpendPotential(potentialCost))
                     {
                         BaseDefense += point;
                         updatePoint = true;
@@ -532,15 +534,15 @@ public partial class NPoint
 
             if (type == 4)
             {
-                tiemNangUse = 50000000L;
+                potentialCost = 50000000L;
                 for (int i = 0; i < BaseCriticalChance; i++)
                 {
-                    tiemNangUse *= 5L;
+                    potentialCost *= 5L;
                 }
 
                 if ((BaseCriticalChance + point) <= PowerLimit.Critical)
                 {
-                    if (DoUseTiemNang(tiemNangUse))
+                    if (TrySpendPotential(potentialCost))
                     {
                         BaseCriticalChance += point;
                         updatePoint = true;
@@ -561,7 +563,7 @@ public partial class NPoint
 
             if (manualForPet)
             {
-                if (Player.Detu is not null)
+                if (Player.Pet is not null)
                 {
                     Host.SendBasePetInfo(Player);
                     Host.ShowInfoPet(Player);
@@ -571,17 +573,18 @@ public partial class NPoint
         }
     }
 
-    private bool DoUseTiemNang(long tiemNang)
+    // Thử tiêu tiềm năng (Java: subTiemNang).
+    private bool TrySpendPotential(long potential)
     {
-        if (Potential < tiemNang)
+        if (Potential < potential)
         {
             Host.SendNotificationOk(Player, "Bạn không đủ tiềm năng");
             return false;
         }
 
-        if (Potential >= tiemNang && unchecked(Potential - tiemNang) >= 0)
+        if (Potential >= potential && unchecked(Potential - potential) >= 0)
         {
-            Potential = unchecked(Potential - tiemNang);
+            Potential = unchecked(Potential - potential);
             Host.CheckPotentialUseTaskCompletion(Player);
             return true;
         }
@@ -608,11 +611,12 @@ public partial class NPoint
 
         if (uf.IsCharging && uf.CountCharging < 10)
         {
-            int tiLeHoiPhuc = NPointSkillMath.GetPercentCharge(uf.SkillSelectPoint);
+            // Tỷ lệ hồi phục khi nạp kỹ năng (Java: tiLeHoiPhuc).
+            int regenPercent = NPointSkillMath.GetPercentCharge(uf.SkillSelectPoint);
             if (uf.IsCharging && Hp > 0 && !uf.IsHaveEffectSkill && (Hp < HpMax || Mp < MpMax))
             {
-                long hpRecovered = unchecked(HpMax / 100 * tiLeHoiPhuc);
-                long mpRecovered = unchecked(MpMax / 100 * tiLeHoiPhuc);
+                long hpRecovered = unchecked(HpMax / 100 * regenPercent);
+                long mpRecovered = unchecked(MpMax / 100 * regenPercent);
 
                 Host.RestoreHpMp(Player, Util.CrisGH(hpRecovered, uf.ReadInt), Util.CrisGH(mpRecovered, uf.ReadInt));
 
@@ -632,24 +636,24 @@ public partial class NPoint
             }
         }
 
-        if (CanDoWithTime(now, lastTimeHoiPhuc, 30000))
+        if (CanDoWithTime(now, lastRegenTime, 30000))
         {
             Host.RestoreHpMp(Player, Util.CrisGH(HpRegen, uf.ReadInt), Util.CrisGH(MpRegen, uf.ReadInt));
-            lastTimeHoiPhuc = now;
+            lastRegenTime = now;
         }
 
-        if (CanDoWithTime(now, lastTimeHoiPhuc10s, 10000))
+        if (CanDoWithTime(now, lastRegen10sTime, 10000))
         {
             Host.RestoreHpMp(Player, SelfAndAllyHpRegenPercent, 0);
-            lastTimeHoiPhuc10s = now;
+            lastRegen10sTime = now;
         }
 
-        if (CanDoWithTime(now, lastTimeHoiStamina, 60000) && Stamina < MaxStamina)
+        if (CanDoWithTime(now, lastStaminaRegenTime, 60000) && Stamina < MaxStamina)
         {
             Stamina++;
-            lastTimeHoiStamina = now;
+            lastStaminaRegenTime = now;
 
-            if (!Player.IsBoss && !Player.IsDeTu && !Player.IsBo && !Player.IsMe && !Player.IsNguoiYeu && !Player.IsConOne && !Player.IsConTwo && !Player.IsConThree)
+            if (!Player.IsBoss && !Player.IsPet && !Player.IsFather && !Player.IsMother && !Player.IsLover && !Player.IsChildOne && !Player.IsChildTwo && !Player.IsChildThree)
             {
                 Host.SendCurrentStamina(Player);
             }

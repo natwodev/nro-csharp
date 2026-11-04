@@ -309,7 +309,7 @@ public sealed partial class InventoryService : IInventoryService
             if (itemThrow != null)
             {
                 if ((!itemThrow.HaveOption(93) && Tpl(itemThrow).Type == 5)
-                    || itemThrow.HaveSetKichHoat()
+                    || itemThrow.HasActivationSet()
                     || itemThrow.HaveOption(107))
                 {
                     player.TempItemIndex = index;
@@ -339,7 +339,7 @@ public sealed partial class InventoryService : IInventoryService
                 }
 
                 if ((!itemThrow.HaveOption(93) && Tpl(itemThrow).Type == 5)
-                    || itemThrow.HaveSetKichHoat()
+                    || itemThrow.HasActivationSet()
                     || itemThrow.HaveOption(107))
                 {
                     player.TempItemIndex = index;
@@ -390,7 +390,7 @@ public sealed partial class InventoryService : IInventoryService
 
     public void RemoveItemPetBody(Player player, int index)
     {
-        Player pet = player.Detu ?? throw new InvalidOperationException("the player has no disciple (Java: NullPointerException)");
+        Player pet = player.Pet ?? throw new InvalidOperationException("the player has no disciple (Java: NullPointerException)");
         RemoveItemBody(pet, index);
     }
 

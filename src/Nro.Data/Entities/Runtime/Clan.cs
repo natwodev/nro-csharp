@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,7 +10,6 @@ public class Clan
     // Khóa chính của bảng Clan
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Column("id")]
     public int ClanId { get; set; }
 
     // Tên bang hội

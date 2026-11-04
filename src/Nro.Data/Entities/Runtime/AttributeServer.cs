@@ -1,8 +1,6 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nro.Data.Entities.StaticData;
 
 namespace Nro.Data.Entities.Runtime;
 
@@ -13,7 +11,6 @@ public class AttributeServer
     // Khóa chính của bảng AttributeServer (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
     public int AttributeServerId { get; set; }
 
     // Khóa ngoại liên kết với AttributeTemplate (loại buff)

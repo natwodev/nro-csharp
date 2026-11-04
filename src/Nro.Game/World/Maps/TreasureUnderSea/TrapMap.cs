@@ -20,5 +20,5 @@ public class TrapMap
     public int EffectId { get; set; }
 
     // Sát thương của bẫy (Java: dame).
-    public long Dame { get; set; }
+    public long Damage { get; set; }
 }

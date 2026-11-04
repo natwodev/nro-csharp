@@ -43,7 +43,7 @@ public interface IMapPlayerGateway
     bool IsNonInteractiveNpc(Player player);
 
     // Kiểm tra Player là hình nhân thử sát thương (Java: instanceof TestDame).
-    bool IsTestDame(Player player);
+    bool IsDamageTestPlayer(Player player);
 
     // Kiểm tra candidate là TrainningBoss đang tấn công owner (Java: instanceof TrainningBoss và playerAtt.equals).
     bool IsTrainingBossOf(Player candidate, Player owner);
@@ -61,7 +61,7 @@ public interface IMapPlayerGateway
     bool HasSatellite(Player player);
 
     // Tính sức mạnh/tiềm năng nhận được (Java: pl.nPoint.calSucManhTiemNang).
-    double CalculatePowerPotential(Player player, long tiemNang);
+    double CalculatePowerPotential(Player player, long potential);
 
     // Lấy dữ kiện người chơi phong ấn quái bằng Ma Phong Ba: điểm kỹ năng, HP tối đa, loại bình và vật phẩm mới; null khi playerSkill null trong Java.
     MafubaInfo? GetMafubaInfo(Player player);

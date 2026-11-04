@@ -68,7 +68,7 @@ public interface IEffectPlayerAccess
     void StopDuoiKhi(Player player);
 
     // Lưu cờ biến hình; không được ném lỗi vì Java chỉ log rồi tiếp tục (Java: PlayerDAO.saveisBienHinh).
-    void SaveIsBienHinh(Player player);
+    void SaveTransformationState(Player player);
 
     // Làm nạn nhân bị thương; hiệu ứng không dùng kết quả trả về của Java (Java: victim.injured).
     void Injure(Player victim, Player? attacker, double damage, bool piercing, bool isMobAttack);

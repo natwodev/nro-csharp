@@ -95,11 +95,11 @@ public class ItemMap
     // Id bang được quyền dùng vật phẩm vệ tinh; -1 là không giới hạn bang.
     public int ClanId { get; set; } = -1;
 
-    // Cho biết đây là ngọc doanh trại.
-    public bool IsDoanhTraiBall { get; set; }
+    // Cho biết đây là ngọc doanh trại (Java: isDoanhTraiBall).
+    public bool IsBarracksBall { get; set; }
 
-    // Cho biết đây là ngọc Namek tranh đoạt.
-    public bool IsNamecBallTranhDoat { get; set; }
+    // Cho biết đây là ngọc Namek tranh đoạt (Java: isNamecBallTranhDoat).
+    public bool IsContestedNamekBall { get; set; }
 
     // Loại người đang giữ ngọc tranh đoạt; -1 là không có.
     public sbyte TypeHaveBallTranhDoat { get; set; } = -1;
@@ -188,7 +188,7 @@ public class ItemMap
         if (((rt.CanDoWithTime(CreateTime, 50000) && IsNotNullItem() && ItemTemplate!.Type != 22) || rt.CanDoWithTime(CreateTime, 180000)) && !IsNamecBall)
         {
             if (Zone != null && Zone.Map.MapId != 21 && Zone.Map.MapId != 22 && Zone.Map.MapId != 23 && ItemTemplate!.Id != 78 && ItemTemplate.Id != 726
-                && !(rt.Rules.IsMapDoanhTrai(Zone.Map.MapId) && ItemTemplate.Id >= 14 && ItemTemplate.Id <= 20))
+                && !(rt.Rules.IsBarracksMap(Zone.Map.MapId) && ItemTemplate.Id >= 14 && ItemTemplate.Id <= 20))
             {
                 rt.World.RemoveItemMapAndSendClient(this);
             }

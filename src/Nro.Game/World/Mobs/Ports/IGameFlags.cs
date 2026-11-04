@@ -19,8 +19,8 @@ public interface IGameFlags
     // Cho biết sự kiện 8/3 đang bật.
     bool InternationalWomansDay { get; }
 
-    // Cho biết sự kiện Trung Thu đang bật.
-    bool TrungThu { get; }
+    // Cho biết sự kiện Trung Thu đang bật (Java: trungThu).
+    bool MoonFestival { get; }
 
     // Cho biết sự kiện Hùng Vương đang bật.
     bool HungVuong { get; }

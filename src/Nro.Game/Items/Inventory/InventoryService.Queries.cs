@@ -315,7 +315,7 @@ public sealed partial class InventoryService
             return false;
         }
 
-        int[] longDenIds = [467, 468, 469, 470, 471, 800, 801, 802, 803, 804, 1047, 1303, 1675];
+        int[] lanternTemplateIds = [467, 468, 469, 470, 471, 800, 801, 802, 803, 804, 1047, 1303, 1675];
         for (int m = 0; m < memberIds.Count; m++)
         {
             Player? member = host.GetPlayerById(memberIds[m]);
@@ -324,18 +324,18 @@ public sealed partial class InventoryService
                 return false;
             }
 
-            bool hasLongDen = false;
+            bool hasLantern = false;
             List<Item> body = member.Inventory.ItemsBody;
-            for (int i = 0; i < body.Count && !hasLongDen; i++)
+            for (int i = 0; i < body.Count && !hasLantern; i++)
             {
                 Item item = body[i];
                 if (item != null && item.IsNotNullItem())
                 {
-                    hasLongDen = Array.IndexOf(longDenIds, (int)Tpl(item).Id) >= 0;
+                    hasLantern = Array.IndexOf(lanternTemplateIds, (int)Tpl(item).Id) >= 0;
                 }
             }
 
-            if (!hasLongDen)
+            if (!hasLantern)
             {
                 return false;
             }

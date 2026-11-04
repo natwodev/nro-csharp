@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class PartRow
     // Khóa chính của bảng Part
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Column("id")]
     public int PartId { get; set; }
 
     // Loại bộ phận (0: đầu, 1: thân, 2: chân)

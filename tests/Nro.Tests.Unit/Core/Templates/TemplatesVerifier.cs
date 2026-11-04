@@ -128,7 +128,7 @@ internal static class TemplatesVerifier
             r.Error(jc, $"nested class must be inside {jc.Enclosing}");
         }
 
-        string[] javaNested = jc.Nested.Select(n => n[(n.LastIndexOf('$') + 1)..]).Order(StringComparer.Ordinal).ToArray();
+        string[] javaNested = jc.Nested.Select(n => JavaTypeMap.ToClrClassName(n[(n.LastIndexOf('$') + 1)..])).Order(StringComparer.Ordinal).ToArray();
         string[] clrNested = clr.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic)
             .Where(t => t.GetCustomAttribute<CompilerGeneratedAttribute>() is null)
             .Select(t => t.Name)

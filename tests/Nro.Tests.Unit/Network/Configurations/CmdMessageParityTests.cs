@@ -9,11 +9,20 @@ namespace Nro.Tests.Unit.Network.Configurations;
 /// <summary>
 /// Compares the C# <see cref="Cmd_message"/> with the REAL values of the Java class <c>network/logic/Cmd_message.java</c>
 /// (tests/golden/cmd-message.json, produced by port-csharp/tools/network/gen_cmd_message.py from the class compiled with javac).
-/// Every Java constant must exist in C# with the same value and the C# class must have no extra constant.
+/// Every Java constant must exist in C# with the same value after the explicit Java-to-C# name mapping, and the C# class must have no extra constant.
 /// </summary>
 public class CmdMessageParityTests
 {
     private static readonly Lazy<JsonDocument> Doc = new(() => GoldenFile.Open("cmd-message.json"));
+
+    // Tên hằng Java gốc -> tên hằng C# đã Anh hóa; golden giữ nguyên giao thức Java.
+    private static readonly IReadOnlyDictionary<string, string> RenamedConstants = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["STAMINA"] = "STAMINA_STATUS",
+        ["THACHDAU"] = "SPARRING",
+        ["THELUC"] = "STAMINA",
+        ["DUAHAU"] = "WATERMELON",
+    };
 
     private static Dictionary<string, int> GoldenValues()
     {
@@ -32,6 +41,9 @@ public class CmdMessageParityTests
         typeof(Cmd_message).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
             .ToDictionary(f => f.Name, f => Convert.ToInt32(f.GetRawConstantValue()), StringComparer.Ordinal);
 
+    private static Dictionary<string, int> ExpectedCSharpValues() => GoldenValues()
+        .ToDictionary(pair => RenamedConstants.GetValueOrDefault(pair.Key) ?? pair.Key, pair => pair.Value, StringComparer.Ordinal);
+
     [Fact]
     public void Golden_describes_one_class_with_288_byte_constants()
     {
@@ -45,12 +57,12 @@ public class CmdMessageParityTests
     [Fact]
     public void Every_Java_constant_exists_in_CSharp_with_the_same_value_and_there_are_no_extras()
     {
-        Dictionary<string, int> java = GoldenValues();
+        Dictionary<string, int> expected = ExpectedCSharpValues();
         Dictionary<string, int> cs = CSharpValues();
 
-        Assert.Empty(java.Keys.Except(cs.Keys));
-        Assert.Empty(cs.Keys.Except(java.Keys));
-        foreach ((string name, int value) in java)
+        Assert.Empty(expected.Keys.Except(cs.Keys));
+        Assert.Empty(cs.Keys.Except(expected.Keys));
+        foreach ((string name, int value) in expected)
         {
             Assert.True(cs[name] == value, $"{name}: Java {value}, C# {cs[name]}");
         }
@@ -70,18 +82,18 @@ public class CmdMessageParityTests
     [Fact]
     public void The_comparison_has_teeth_a_wrong_value_a_missing_and_an_extra_constant_are_all_detected()
     {
-        Dictionary<string, int> java = GoldenValues();
+        Dictionary<string, int> expected = ExpectedCSharpValues();
         Dictionary<string, int> cs = CSharpValues();
 
         var wrong = new Dictionary<string, int>(cs) { ["LOGIN"] = cs["LOGIN"] + 1 };
-        Assert.Contains(java, kv => wrong[kv.Key] != kv.Value);
+        Assert.Contains(expected, kv => wrong[kv.Key] != kv.Value);
 
         var missing = new Dictionary<string, int>(cs);
         missing.Remove("GET_SESSION_ID");
-        Assert.NotEmpty(java.Keys.Except(missing.Keys));
+        Assert.NotEmpty(expected.Keys.Except(missing.Keys));
 
         var extra = new Dictionary<string, int>(cs) { ["EXTRA"] = 1 };
-        Assert.NotEmpty(extra.Keys.Except(java.Keys));
+        Assert.NotEmpty(extra.Keys.Except(expected.Keys));
     }
 
     [Fact]

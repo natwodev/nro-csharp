@@ -73,7 +73,7 @@ public class MapMobDifferentialTests
             long maxTn = c[1].GetInt64();
             int levelPlayer = c[2].GetInt32();
             int mobLevel = c[3].GetInt32();
-            double dame = c[4].GetDouble();
+            double damage = c[4].GetDouble();
             long expected = c[5].GetInt64();
             FakeGame g = new() { CurrLevel = levelPlayer };
             Zone z = MapTestKit.BuildZone(g);
@@ -81,7 +81,7 @@ public class MapMobDifferentialTests
             mob.Level = (sbyte)mobLevel;
             maxPotential.SetValue(mob, maxTn);
             Player p = MapTestKit.NewPlayerIn(g, z, 1);
-            Assert.True(expected == mob.GetPotentialForPlayer(p, dame), $"case {count}: hp {hpFull} max {maxTn} lv {levelPlayer}/{mobLevel} dame {dame}");
+            Assert.True(expected == mob.GetPotentialForPlayer(p, damage), $"case {count}: hp {hpFull} max {maxTn} lv {levelPlayer}/{mobLevel} damage {damage}");
             count++;
         }
 
@@ -122,7 +122,7 @@ public class MapMobDifferentialTests
             FakeGame g = new(seed);
             Zone z = MapTestKit.BuildZone(g);
 
-            // the prototype draws nothing; the Hirudegarn copy constructor draws once (setTiemNang), exactly like the Java constructor the generator mimics
+            // the prototype draws nothing; the Hirudegarn copy constructor draws once (Java: setTiemNang), exactly like the Java constructor the generator mimics
             Mob proto = new(g.Runtime) { Id = 0, TempId = Nro.Core.Consts.ConstMob.HIRUDEGARN, Zone = z };
             proto.Point.SetHpFull(maxHp);
             proto.Point.Hp = maxHp;

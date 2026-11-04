@@ -15,7 +15,7 @@ public class ItemEventTests
     private static readonly (string Name, Func<ItemEvent, int, bool> Drop, Func<ItemEvent, int> Remaining, Func<ItemEvent, long> Last)[] Kinds =
     [
         ("tree decoration", (e, n) => e.CanDropTatVoGiangSinh(n), e => e.RemainingTVGSCount, e => e.LastTVGSTime),
-        ("candy", (e, n) => e.CanDropKeoGiangSinh(n), e => e.RemainingKeoGiangSinhCount, e => e.LastKeoGiangSinhTime),
+        ("candy", (e, n) => e.CanDropChristmasCandy(n), e => e.RemainingChristmasCandyCount, e => e.LastChristmasCandyTime),
         ("rose", (e, n) => e.CanDropHoaHong(n), e => e.RemainingHHCount, e => e.LastHHTime),
         ("water bottle", (e, n) => e.CanDropBinhNuoc(n), e => e.RemainingBNCount, e => e.LastBNTime),
     ];
@@ -97,7 +97,7 @@ public class ItemEventTests
 
         e.CanDropTatVoGiangSinh(0);
         Assert.False(e.CanDropTatVoGiangSinh(0));
-        Assert.True(e.CanDropKeoGiangSinh(0));
+        Assert.True(e.CanDropChristmasCandy(0));
         Assert.True(e.CanDropHoaHong(0));
         Assert.True(e.CanDropBinhNuoc(0));
     }

@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class MobTemplateRow
     // Khóa chính của bảng MobTemplate
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Column("id")]
     public int MobTemplateId { get; set; }
 
     // Loại hành vi của quái
@@ -41,7 +37,7 @@ public class MobTemplateRow
     public short PercentDame { get; set; }
 
     // Tiềm năng thưởng (% HP)
-    public short PercentTiemNang { get; set; }
+    public short PercentPotential { get; set; }
 
     // Vàng rơi thêm
     public short PercentGold { get; set; }

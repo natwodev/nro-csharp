@@ -95,7 +95,7 @@ public class MapTickLoopTests
     [Fact]
     public void Update_AFailingPhaseOrMobDoesNotStopTheZone_Over100Turns()
     {
-        FakeGame g = new() { TranhNgocFailure = new InvalidOperationException("war service down") };
+        FakeGame g = new() { NamekWarFailure = new InvalidOperationException("war service down") };
         Map map = MapTestKit.BuildMap(g, 1, zones: 2);
         List<string> log = [];
         OrderMob good = AddMob(map.Zones[0], log, "good");

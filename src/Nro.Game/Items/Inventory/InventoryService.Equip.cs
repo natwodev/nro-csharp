@@ -87,7 +87,7 @@ public sealed partial class InventoryService
     }
 
     // Who gets the "cannot wear" notices: a disciple's master, otherwise the player.
-    private Player NoticeTarget(Player player) => player.IsDeTu ? host.GetPetMaster(player) : player;
+    private Player NoticeTarget(Player player) => player.IsPet ? host.GetPetMaster(player) : player;
 
     // Java putItemBody: tries to wear item; returns the item that left the slot (to put in the source slot) or item itself when it could not be worn
     // (a notice has been sent). Equipment types 0-5 go to the slot of the same number; 32 to 6, 21 to 7, 11 to 8, 23 and 24 to 9, 35 to 10, 39 to 11. Types 70-75 pass the first check and then
@@ -149,7 +149,7 @@ public sealed partial class InventoryService
             return sItem;
         }
 
-        if (item.IsItemTemplateToPlayer() && player.IsDeTu)
+        if (item.IsItemTemplateToPlayer() && player.IsPet)
         {
             notifier.SendNotification(NoticeTarget(player), "Không thể cho đệ tử mặc Cải Trang này");
             return sItem;
@@ -157,11 +157,11 @@ public sealed partial class InventoryService
 
         if (item.HaveOption(38) && host.GetTypeFusion(player) == ConstPlayer.NON_FUSION)
         {
-            notifier.SendNotification(NoticeTarget(player), player.IsDeTu ? "Không thể cho đệ tử sử dụng" : "Chỉ khi hợp thể mới sử dụng được");
+            notifier.SendNotification(NoticeTarget(player), player.IsPet ? "Không thể cho đệ tử sử dụng" : "Chỉ khi hợp thể mới sử dụng được");
             return sItem;
         }
 
-        if (item.IsItemTemplateToPet() && !player.IsDeTu)
+        if (item.IsItemTemplateToPet() && !player.IsPet)
         {
             notifier.SendNotification(player, "Chỉ sử dụng được cho đệ tử");
             return sItem;
@@ -203,7 +203,7 @@ public sealed partial class InventoryService
         if (index >= body.Count)
         {
             // Java sent both messages to ((Detu) player).master, so a non-disciple here throws ClassCastException; GetPetMaster keeps that.
-            if (player.IsDeTu)
+            if (player.IsPet)
             {
                 notifier.SendNotification(host.GetPetMaster(player), "Đệ tử không thể sử dụng vật phẩm này !");
             }
@@ -273,7 +273,7 @@ public sealed partial class InventoryService
 
         if (item.IsNotNullItem())
         {
-            if (index == 7 && !player.IsDeTu && player.PetFollow != null)
+            if (index == 7 && !player.IsPet && player.PetFollow != null)
             {
                 host.ExitMap(player.PetFollow);
                 host.DisposePlayer(player.PetFollow);
@@ -306,7 +306,7 @@ public sealed partial class InventoryService
     {
         try
         {
-            Player? pet = player.Detu;
+            Player? pet = player.Pet;
             if (pet != null && host.GetPower(pet) >= 1_500_000)
             {
                 Item item = player.Inventory.ItemsBag[index];
@@ -349,7 +349,7 @@ public sealed partial class InventoryService
         }
 
         // Java: switch (player.typeTabPet) { case 0: petPl = player.Detu; default: petPl = player.Detu; }
-        Player petPl = player.Detu ?? throw new InvalidOperationException("the player has no disciple (Java: NullPointerException)");
+        Player petPl = player.Pet ?? throw new InvalidOperationException("the player has no disciple (Java: NullPointerException)");
         Item item = petPl.Inventory.ItemsBody[index];
         if (item.IsNotNullItem())
         {

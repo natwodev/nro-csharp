@@ -1,7 +1,7 @@
 namespace Nro.Network.Configurations;
 
 // Các mã lệnh số của giao thức client-server.
-// Nguồn Java: network/logic/Cmd_message.java (giữ nguyên tuyệt đối tên hằng số Java, giá trị sbyte có dấu và các giá trị trùng theo từng pha; mã được sinh để đối chiếu Java).
+// Nguồn Java: network/logic/Cmd_message.java (giữ nguyên giá trị sbyte có dấu và các giá trị trùng theo từng pha; tên C# khác Java được đối chiếu qua bảng ánh xạ test).
 
 public static class Cmd_message
 {
@@ -351,8 +351,8 @@ public static class Cmd_message
     // Mã lệnh giao thức MAXSTAMINA; giữ nguyên tên hằng số Java.
     public const sbyte MAXSTAMINA = -69;
 
-    // Mã lệnh giao thức STAMINA; giữ nguyên tên hằng số Java.
-    public const sbyte STAMINA = -68;
+    // Mã lệnh giao thức thể lực hiện tại (Java: STAMINA).
+    public const sbyte STAMINA_STATUS = -68;
 
     // Mã lệnh giao thức REQUEST_ICON; giữ nguyên tên hằng số Java.
     public const sbyte REQUEST_ICON = -67;
@@ -813,11 +813,11 @@ public static class Cmd_message
     // Mã lệnh giao thức MABU; giữ nguyên tên hằng số Java.
     public const sbyte MABU = -117;
 
-    // Mã lệnh giao thức THACHDAU; giữ nguyên tên hằng số Java.
-    public const sbyte THACHDAU = -118;
+    // Mã lệnh giao thức thách đấu (Java: THACHDAU; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public const sbyte SPARRING = -118;
 
-    // Mã lệnh giao thức THELUC; giữ nguyên tên hằng số Java.
-    public const sbyte THELUC = -119;
+    // Mã lệnh giao thức thể lực (Java: THELUC; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public const sbyte STAMINA = -119;
 
     // Mã lệnh giao thức UPDATECHAR_MP; giữ nguyên tên hằng số Java.
     public const sbyte UPDATECHAR_MP = -123;
@@ -837,8 +837,8 @@ public static class Cmd_message
     // Mã lệnh giao thức BIG_BOSS_2; giữ nguyên tên hằng số Java.
     public const sbyte BIG_BOSS_2 = 102;
 
-    // Mã lệnh giao thức DUAHAU; giữ nguyên tên hằng số Java.
-    public const sbyte DUAHAU = -122;
+    // Mã lệnh giao thức dưa hấu (Java: DUAHAU; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public const sbyte WATERMELON = -122;
 
     // Mã lệnh giao thức QUAYSO; giữ nguyên tên hằng số Java.
     public const sbyte QUAYSO = -126;

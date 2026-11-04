@@ -81,9 +81,9 @@ public class Player
         [32, 33, 34, 35, 36, 37],
     ];
 
-    // Lưu trạng thái HienThiHopThe (Java: hienThiHopThe).
+    // Lưu trạng thái FusionDisplayState (Java: hienThiHopThe).
 
-    public int HienThiHopThe { get; set; } = 1;
+    public int FusionDisplayState { get; set; } = 1;
 
     // Lưu trạng thái LastTimeEatPea (Java: lastTimeEatPea).
 
@@ -138,25 +138,25 @@ public class Player
     public bool HaveTennisSpaceShip { get; set; }
     private long ResetDateOut { get; set; }
 
-    // Lưu trạng thái Resetdame (Java: resetdame).
+    // Lưu trạng thái ResetDamage (Java: resetdame).
 
-    public bool Resetdame { get; set; }
+    public bool ResetDamage { get; set; }
 
-    // Lưu trạng thái LastTimeDame (Java: lastTimeDame).
+    // Lưu trạng thái LastDamageTime (Java: lastTimeDame).
 
-    public long LastTimeDame { get; set; }
+    public long LastDamageTime { get; set; }
 
-    // Lưu trạng thái Dametong (Java: dametong).
+    // Lưu trạng thái TotalDamage (Java: dametong).
 
-    public long Dametong { get; set; }
+    public long TotalDamage { get; set; }
 
-    // Lưu trạng thái LastTimeDameMayDam (Java: lastTimeDameMayDam).
+    // Lưu trạng thái LastPunchingMachineDamageTime (Java: lastTimeDameMayDam).
 
-    public long LastTimeDameMayDam { get; set; }
+    public long LastPunchingMachineDamageTime { get; set; }
 
-    // Lưu trạng thái TotalDameMayDam (Java: totalDameMayDam).
+    // Lưu trạng thái PunchingMachineTotalDamage (Java: totalDameMayDam).
 
-    public long TotalDameMayDam { get; set; }
+    public long PunchingMachineTotalDamage { get; set; }
 
     // Lưu trạng thái Lastimelogin (Java: lastimelogin).
 
@@ -174,21 +174,21 @@ public class Player
 
     public long LastTimeAttack { get; set; }
 
-    // Lưu trạng thái TlDameAdd (Java: tlDameAdd).
+    // Lưu trạng thái DamageBonusPercent (Java: tlDameAdd).
 
-    public int TlDameAdd { get; set; }
+    public int DamageBonusPercent { get; set; }
 
-    // Lưu trạng thái TlDameClanAdd (Java: tlDameClanAdd).
+    // Lưu trạng thái ClanDamageBonusPercent (Java: tlDameClanAdd).
 
-    public int TlDameClanAdd { get; set; }
+    public int ClanDamageBonusPercent { get; set; }
 
-    // Lưu trạng thái TlHpClanAdd (Java: tlHpClanAdd).
+    // Lưu trạng thái ClanHpBonusPercent (Java: tlHpClanAdd).
 
-    public int TlHpClanAdd { get; set; }
+    public int ClanHpBonusPercent { get; set; }
 
-    // Lưu trạng thái TlMpClanAdd (Java: tlMpClanAdd).
+    // Lưu trạng thái ClanMpBonusPercent (Java: tlMpClanAdd).
 
-    public int TlMpClanAdd { get; set; }
+    public int ClanMpBonusPercent { get; set; }
 
     // Lưu trạng thái CanGeFirstTimeLogin (Java: canGeFirstTimeLogin).
 
@@ -206,21 +206,21 @@ public class Player
 
     public Item? Item_ChangePet { get; set; }
 
-    // Lưu trạng thái TrangThaiLichSuGd (Java: trangThaiLichSuGd).
+    // Lưu trạng thái TransactionHistoryStatus (Java: trangThaiLichSuGd).
 
-    public int TrangThaiLichSuGd { get; set; }
+    public int TransactionHistoryStatus { get; set; }
 
-    // Lưu trạng thái TopMayDamTraiDat (Java: topMayDamTraiDat).
+    // Lưu trạng thái EarthlingPunchingMachineRank (Java: topMayDamTraiDat).
 
-    public long TopMayDamTraiDat { get; set; }
+    public long EarthlingPunchingMachineRank { get; set; }
 
-    // Lưu trạng thái TopMayDamNamec (Java: topMayDamNamec).
+    // Lưu trạng thái NamekianPunchingMachineRank (Java: topMayDamNamec).
 
-    public long TopMayDamNamec { get; set; }
+    public long NamekianPunchingMachineRank { get; set; }
 
-    // Lưu trạng thái TopMayDamXayda (Java: topMayDamXayda).
+    // Lưu trạng thái SaiyanPunchingMachineRank (Java: topMayDamXayda).
 
-    public long TopMayDamXayda { get; set; }
+    public long SaiyanPunchingMachineRank { get; set; }
 
     // Lưu trạng thái NumUseSkill (Java: numUseSkill).
 
@@ -230,29 +230,29 @@ public class Player
 
     public long LastTimeHoiskill { get; set; }
 
-    // Lưu trạng thái DiemDanhBangHoi (Java: diemDanhBangHoi).
+    // Lưu trạng thái ClanCheckInCount (Java: diemDanhBangHoi).
 
-    public int DiemDanhBangHoi { get; set; }
+    public int ClanCheckInCount { get; set; }
 
-    // Lưu trạng thái VeTangNgoc_SoLuongNgoc (Java: veTangNgoc_SoLuongNgoc).
+    // Lưu trạng thái GiftGemVoucherCount (Java: veTangNgoc_SoLuongNgoc).
 
-    public int VeTangNgoc_SoLuongNgoc { get; set; }
+    public int GiftGemVoucherCount { get; set; }
 
-    // Lưu trạng thái Player_NhanNgoc (Java: player_NhanNgoc).
+    // Lưu trạng thái GemRecipient (Java: player_NhanNgoc).
 
-    public Player? Player_NhanNgoc { get; set; }
+    public Player? GemRecipient { get; set; }
 
-    // Lưu trạng thái VeTangHongNgoc_SoLuongHongNgoc (Java: veTangHongNgoc_SoLuongHongNgoc).
+    // Lưu trạng thái GiftRubyVoucherCount (Java: veTangHongNgoc_SoLuongHongNgoc).
 
-    public int VeTangHongNgoc_SoLuongHongNgoc { get; set; }
+    public int GiftRubyVoucherCount { get; set; }
 
-    // Lưu trạng thái Player_NhanHongNgoc (Java: player_NhanHongNgoc).
+    // Lưu trạng thái RubyRecipient (Java: player_NhanHongNgoc).
 
-    public Player? Player_NhanHongNgoc { get; set; }
+    public Player? RubyRecipient { get; set; }
 
-    // Lưu trạng thái Cuoc (Java: cuoc).
+    // Lưu trạng thái BetAmount (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: cuoc).
 
-    public int Cuoc { get; set; }
+    public int BetAmount { get; set; }
 
     // Lưu trạng thái RubyWin (Java: rubyWin).
 
@@ -275,26 +275,26 @@ public class Player
     public long MapTransitionTime { get; set; }
     private int WrongPasswordAttempts { get; set; }
 
-    // Lưu trạng thái RestartNauBanh (Java: restartNauBanh).
+    // Lưu trạng thái RestartCakeCooking (Java: restartNauBanh). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public sbyte RestartNauBanh { get; set; }
+    public sbyte RestartCakeCooking { get; set; }
 
-    // Lưu trạng thái Khisukien (Java: khisukien).
+    // Lưu trạng thái IsEventGasActive (Java: khisukien). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public bool Khisukien { get; set; }
+    public bool IsEventGasActive { get; set; }
 
-    // Lưu trạng thái LastTimeCallKhi (Java: lastTimeCallKhi).
+    // Lưu trạng thái LastGasCallTime (Java: lastTimeCallKhi). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public long LastTimeCallKhi { get; set; }
+    public long LastGasCallTime { get; set; }
 
-    // Lưu trạng thái Lasttimekhisukien (Java: lasttimekhisukien).
+    // Lưu trạng thái LastEventGasTime (Java: lasttimekhisukien). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public long Lasttimekhisukien { get; set; }
+    public long LastEventGasTime { get; set; }
     private long LastTimeBom { get; set; }
 
-    // Lưu trạng thái PartDanhHieu (Java: partDanhHieu).
+    // Lưu trạng thái TitlePart (Java: partDanhHieu).
 
-    public int PartDanhHieu { get; set; }
+    public int TitlePart { get; set; }
 
     // Lưu trạng thái Titleitem (Java: titleitem).
 
@@ -320,357 +320,357 @@ public class Player
 
     public bool IsPlayer { get; set; }
 
-    // Lưu trạng thái IsDeTu (Java: isDeTu).
+    // Lưu trạng thái IsPet (Java: isDeTu).
 
-    public bool IsDeTu { get; set; }
+    public bool IsPet { get; set; }
 
-    // Lưu trạng thái IsBo (Java: isBo).
+    // Lưu trạng thái IsFather (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isBo).
 
-    public bool IsBo { get; set; }
+    public bool IsFather { get; set; }
 
-    // Lưu trạng thái IsMe (Java: isMe).
+    // Lưu trạng thái IsMother (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isMe).
 
-    public bool IsMe { get; set; }
+    public bool IsMother { get; set; }
 
     // Lưu trạng thái IsPetFollow (Java: isPetFollow).
 
     public bool IsPetFollow { get; set; }
 
-    // Lưu trạng thái IsDuongTang (Java: isDuongTang).
+    // Lưu trạng thái IsTangMonk (Java: isDuongTang).
 
-    public bool IsDuongTang { get; set; }
+    public bool IsTangMonk { get; set; }
 
     // Lưu trạng thái IsBoss (Java: isBoss).
 
     public bool IsBoss { get; set; }
 
-    // Lưu trạng thái IsNguoiYeu (Java: isNguoiYeu).
+    // Lưu trạng thái IsLover (Java: isNguoiYeu).
 
-    public bool IsNguoiYeu { get; set; }
+    public bool IsLover { get; set; }
 
-    // Lưu trạng thái IsConOne (Java: isConOne).
+    // Lưu trạng thái IsChildOne (Java: isConOne).
 
-    public bool IsConOne { get; set; }
+    public bool IsChildOne { get; set; }
 
-    // Lưu trạng thái IsConTwo (Java: isConTwo).
+    // Lưu trạng thái IsChildTwo (Java: isConTwo).
 
-    public bool IsConTwo { get; set; }
+    public bool IsChildTwo { get; set; }
 
-    // Lưu trạng thái IsConThree (Java: isConThree).
+    // Lưu trạng thái IsChildThree (Java: isConThree).
 
-    public bool IsConThree { get; set; }
+    public bool IsChildThree { get; set; }
 
-    // Lưu trạng thái IsPhanThan (Java: isPhanThan).
+    // Lưu trạng thái IsBodyClone (Java: isPhanThan).
 
-    public bool IsPhanThan { get; set; }
+    public bool IsBodyClone { get; set; }
 
-    // Lưu trạng thái NhapNgocRongTimes (Java: nhapNgocRongTimes).
+    // Lưu trạng thái DragonBallInsertCount (Java: nhapNgocRongTimes).
 
-    public int NhapNgocRongTimes { get; set; } = 1;
+    public int DragonBallInsertCount { get; set; } = 1;
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_1 (Java: nhanKeoHayBiGheoNpc_1).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_1 (Java: nhanKeoHayBiGheoNpc_1). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_1 { get; set; }
+    public int HalloweenNpcCandyOutcome_1 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_2 (Java: nhanKeoHayBiGheoNpc_2).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_2 (Java: nhanKeoHayBiGheoNpc_2). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_2 { get; set; }
+    public int HalloweenNpcCandyOutcome_2 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_3 (Java: nhanKeoHayBiGheoNpc_3).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_3 (Java: nhanKeoHayBiGheoNpc_3). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_3 { get; set; }
+    public int HalloweenNpcCandyOutcome_3 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_4 (Java: nhanKeoHayBiGheoNpc_4).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_4 (Java: nhanKeoHayBiGheoNpc_4). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_4 { get; set; }
+    public int HalloweenNpcCandyOutcome_4 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_5 (Java: nhanKeoHayBiGheoNpc_5).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_5 (Java: nhanKeoHayBiGheoNpc_5). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_5 { get; set; }
+    public int HalloweenNpcCandyOutcome_5 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_6 (Java: nhanKeoHayBiGheoNpc_6).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_6 (Java: nhanKeoHayBiGheoNpc_6). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_6 { get; set; }
+    public int HalloweenNpcCandyOutcome_6 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_7 (Java: nhanKeoHayBiGheoNpc_7).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_7 (Java: nhanKeoHayBiGheoNpc_7). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_7 { get; set; }
+    public int HalloweenNpcCandyOutcome_7 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_8 (Java: nhanKeoHayBiGheoNpc_8).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_8 (Java: nhanKeoHayBiGheoNpc_8). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_8 { get; set; }
+    public int HalloweenNpcCandyOutcome_8 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_9 (Java: nhanKeoHayBiGheoNpc_9).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_9 (Java: nhanKeoHayBiGheoNpc_9). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_9 { get; set; }
+    public int HalloweenNpcCandyOutcome_9 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_10 (Java: nhanKeoHayBiGheoNpc_10).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_10 (Java: nhanKeoHayBiGheoNpc_10). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_10 { get; set; }
+    public int HalloweenNpcCandyOutcome_10 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_11 (Java: nhanKeoHayBiGheoNpc_11).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_11 (Java: nhanKeoHayBiGheoNpc_11). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_11 { get; set; }
+    public int HalloweenNpcCandyOutcome_11 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_12 (Java: nhanKeoHayBiGheoNpc_12).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_12 (Java: nhanKeoHayBiGheoNpc_12). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_12 { get; set; }
+    public int HalloweenNpcCandyOutcome_12 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_13 (Java: nhanKeoHayBiGheoNpc_13).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_13 (Java: nhanKeoHayBiGheoNpc_13). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_13 { get; set; }
+    public int HalloweenNpcCandyOutcome_13 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_14 (Java: nhanKeoHayBiGheoNpc_14).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_14 (Java: nhanKeoHayBiGheoNpc_14). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_14 { get; set; }
+    public int HalloweenNpcCandyOutcome_14 { get; set; }
 
-    // Lưu trạng thái NhanKeoHayBiGheoNpc_15 (Java: nhanKeoHayBiGheoNpc_15).
+    // Lưu trạng thái HalloweenNpcCandyOutcome_15 (Java: nhanKeoHayBiGheoNpc_15). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int NhanKeoHayBiGheoNpc_15 { get; set; }
+    public int HalloweenNpcCandyOutcome_15 { get; set; }
 
-    // Lưu trạng thái CheckTrongNgay (Java: checkTrongNgay).
+    // Lưu trạng thái DailyCheckTimestamp (Java: checkTrongNgay). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public long CheckTrongNgay { get; set; }
+    public long DailyCheckTimestamp { get; set; }
 
-    // Lưu trạng thái DuaTopTangLiXi (Java: duaTopTangLiXi).
+    // Lưu trạng thái GiveLuckyMoneyRankingScore (Java: duaTopTangLiXi).
 
-    public int DuaTopTangLiXi { get; set; }
+    public int GiveLuckyMoneyRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoLiXi (Java: duaTopMoLiXi).
+    // Lưu trạng thái OpenLuckyMoneyRankingScore (Java: duaTopMoLiXi).
 
-    public int DuaTopMoLiXi { get; set; }
+    public int OpenLuckyMoneyRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopBanPhaoHoa (Java: duaTopBanPhaoHoa).
+    // Lưu trạng thái LaunchFireworksRankingScore (Java: duaTopBanPhaoHoa).
 
-    public int DuaTopBanPhaoHoa { get; set; }
+    public int LaunchFireworksRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopBanPhaoHoaVIP (Java: duaTopBanPhaoHoaVIP).
+    // Lưu trạng thái LaunchVipFireworksRankingScore (Java: duaTopBanPhaoHoaVIP).
 
-    public int DuaTopBanPhaoHoaVIP { get; set; }
+    public int LaunchVipFireworksRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopTrangTriCayNoel (Java: duaTopTrangTriCayNoel).
+    // Lưu trạng thái DecorateChristmasTreeRankingScore (Java: duaTopTrangTriCayNoel).
 
-    public int DuaTopTrangTriCayNoel { get; set; }
+    public int DecorateChristmasTreeRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopCheTaoNguoiTuyet (Java: duaTopCheTaoNguoiTuyet).
+    // Lưu trạng thái CraftSnowmanRankingScore (Java: duaTopCheTaoNguoiTuyet).
 
-    public int DuaTopCheTaoNguoiTuyet { get; set; }
+    public int CraftSnowmanRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopCheTaoNguoiTuyetBangGia (Java: duaTopCheTaoNguoiTuyetBangGia).
+    // Lưu trạng thái CraftFrozenSnowmanRankingScore (Java: duaTopCheTaoNguoiTuyetBangGia).
 
-    public int DuaTopCheTaoNguoiTuyetBangGia { get; set; }
+    public int CraftFrozenSnowmanRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopDotDiem (Java: duaTopDotDiem).
+    // Lưu trạng thái BurnMatchesRankingScore (Java: duaTopDotDiem).
 
-    public int DuaTopDotDiem { get; set; }
+    public int BurnMatchesRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopPhaoHoaVuLan (Java: duaTopPhaoHoaVuLan).
+    // Lưu trạng thái LaunchVuLanFirecrackersRankingScore (Java: duaTopPhaoHoaVuLan).
 
-    public int DuaTopPhaoHoaVuLan { get; set; }
+    public int LaunchVuLanFirecrackersRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopHoaDang (Java: duaTopHoaDang).
+    // Lưu trạng thái FlowerLanternRankingScore (Java: duaTopHoaDang).
 
-    public int DuaTopHoaDang { get; set; }
+    public int FlowerLanternRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopHoaDangCoLoiChuc (Java: duaTopHoaDangCoLoiChuc).
+    // Lưu trạng thái WishLanternRankingScore (Java: duaTopHoaDangCoLoiChuc).
 
-    public int DuaTopHoaDangCoLoiChuc { get; set; }
+    public int WishLanternRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoHopMaQuy (Java: duaTopMoHopMaQuy).
+    // Lưu trạng thái OpenGhostGiftBoxRankingScore (Java: duaTopMoHopMaQuy).
 
-    public int DuaTopMoHopMaQuy { get; set; }
+    public int OpenGhostGiftBoxRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopThiepHalloween (Java: duaTopThiepHalloween).
+    // Lưu trạng thái HalloweenCardRankingScore (Java: duaTopThiepHalloween).
 
-    public int DuaTopThiepHalloween { get; set; }
+    public int HalloweenCardRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoThiep83 (Java: duaTopMoThiep83).
+    // Lưu trạng thái OpenWomensDayCardRankingScore (Java: duaTopMoThiep83).
 
-    public int DuaTopMoThiep83 { get; set; }
+    public int OpenWomensDayCardRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopTangBongHoaHong (Java: duaTopTangBongHoaHong).
+    // Lưu trạng thái GiveRosesRankingScore (Java: duaTopTangBongHoaHong).
 
-    public int DuaTopTangBongHoaHong { get; set; }
+    public int GiveRosesRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopLamBanhTrungThu (Java: duaTopLamBanhTrungThu).
+    // Lưu trạng thái MakeMoonCakeRankingScore (Java: duaTopLamBanhTrungThu).
 
-    public int DuaTopLamBanhTrungThu { get; set; }
+    public int MakeMoonCakeRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoHopTrungThuDacBiet (Java: duaTopMoHopTrungThuDacBiet).
+    // Lưu trạng thái OpenSpecialMoonCakeRankingScore (Java: duaTopMoHopTrungThuDacBiet).
 
-    public int DuaTopMoHopTrungThuDacBiet { get; set; }
+    public int OpenSpecialMoonCakeRankingScore { get; set; }
 
-    // Lưu trạng thái UocMienPhi (Java: uocMienPhi).
+    // Lưu trạng thái FreeWishCount (Java: uocMienPhi).
 
-    public int UocMienPhi { get; set; }
+    public int FreeWishCount { get; set; }
 
-    // Lưu trạng thái NhanQuaHungVuongFree (Java: nhanQuaHungVuongFree).
+    // Lưu trạng thái ReceivedHungKingFreeGift (Java: nhanQuaHungVuongFree).
 
-    public int NhanQuaHungVuongFree { get; set; }
+    public int ReceivedHungKingFreeGift { get; set; }
 
-    // Lưu trạng thái LastTimeNauBanhHungVuong (Java: lastTimeNauBanhHungVuong).
+    // Lưu trạng thái LastHungKingCakeCookingTime (Java: lastTimeNauBanhHungVuong).
 
-    public long LastTimeNauBanhHungVuong { get; set; }
+    public long LastHungKingCakeCookingTime { get; set; }
 
-    // Lưu trạng thái TypeBanhDangNau (Java: typeBanhDangNau).
+    // Lưu trạng thái CookingCakeType (Java: typeBanhDangNau).
 
-    public int TypeBanhDangNau { get; set; }
+    public int CookingCakeType { get; set; }
 
-    // Lưu trạng thái DuaTopMoHopQuaGioTo (Java: duaTopMoHopQuaGioTo).
+    // Lưu trạng thái OpenHungKingGiftBoxRankingScore (Java: duaTopMoHopQuaGioTo).
 
-    public int DuaTopMoHopQuaGioTo { get; set; }
+    public int OpenHungKingGiftBoxRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopDangBanhHungVuong (Java: duaTopDangBanhHungVuong).
+    // Lưu trạng thái OfferHungKingCakesRankingScore (Java: duaTopDangBanhHungVuong).
 
-    public int DuaTopDangBanhHungVuong { get; set; }
+    public int OfferHungKingCakesRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoTrungRongVang (Java: duaTopMoTrungRongVang).
+    // Lưu trạng thái OpenGoldenDragonEggRankingScore (Java: duaTopMoTrungRongVang).
 
-    public int DuaTopMoTrungRongVang { get; set; }
+    public int OpenGoldenDragonEggRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopDoiDuaHau (Java: duaTopDoiDuaHau).
+    // Lưu trạng thái ExchangeWatermelonRankingScore (Java: duaTopDoiDuaHau).
 
-    public int DuaTopDoiDuaHau { get; set; }
+    public int ExchangeWatermelonRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoHopBlackFriday (Java: duaTopMoHopBlackFriday).
+    // Lưu trạng thái OpenBlackFridayBoxRankingScore (Java: duaTopMoHopBlackFriday). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int DuaTopMoHopBlackFriday { get; set; }
+    public int OpenBlackFridayBoxRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMuaSamBlackFriday (Java: duaTopMuaSamBlackFriday).
+    // Lưu trạng thái BlackFridayShoppingRankingScore (Java: duaTopMuaSamBlackFriday). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int DuaTopMuaSamBlackFriday { get; set; }
+    public int BlackFridayShoppingRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoHop20_10 (Java: duaTopMoHop20_10).
+    // Lưu trạng thái OpenWomensDayGiftBoxRankingScore (Java: duaTopMoHop20_10). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int DuaTopMoHop20_10 { get; set; }
+    public int OpenWomensDayGiftBoxRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopMoThiepChuc (Java: duaTopMoThiepChuc).
+    // Lưu trạng thái OpenGreetingCardRankingScore (Java: duaTopMoThiepChuc). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int DuaTopMoThiepChuc { get; set; }
+    public int OpenGreetingCardRankingScore { get; set; }
 
-    // Lưu trạng thái DuaTopTangThiepChuc (Java: duaTopTangThiepChuc).
+    // Lưu trạng thái GiveGreetingCardRankingScore (Java: duaTopTangThiepChuc). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int DuaTopTangThiepChuc { get; set; }
+    public int GiveGreetingCardRankingScore { get; set; }
 
-    // Lưu trạng thái HoTongDuongTang (Java: hoTongDuongTang).
+    // Lưu trạng thái IsEscortingTangMonk (Java: hoTongDuongTang).
 
-    public bool HoTongDuongTang { get; set; }
+    public bool IsEscortingTangMonk { get; set; }
 
-    // Lưu trạng thái MapHoTong (Java: mapHoTong).
+    // Lưu trạng thái TangMonkEscortMapId (Java: mapHoTong).
 
-    public int MapHoTong { get; set; }
+    public int TangMonkEscortMapId { get; set; }
 
-    // Lưu trạng thái LastTimeDuongTang (Java: lastTimeDuongTang).
+    // Lưu trạng thái LastTangMonkTime (Java: lastTimeDuongTang).
 
-    public long LastTimeDuongTang { get; set; }
+    public long LastTangMonkTime { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_1 (Java: nhanLiXiForNPC_1).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_1 (Java: nhanLiXiForNPC_1).
 
-    public int NhanLiXiForNPC_1 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_1 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_2 (Java: nhanLiXiForNPC_2).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_2 (Java: nhanLiXiForNPC_2).
 
-    public int NhanLiXiForNPC_2 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_2 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_3 (Java: nhanLiXiForNPC_3).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_3 (Java: nhanLiXiForNPC_3).
 
-    public int NhanLiXiForNPC_3 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_3 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_4 (Java: nhanLiXiForNPC_4).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_4 (Java: nhanLiXiForNPC_4).
 
-    public int NhanLiXiForNPC_4 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_4 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_5 (Java: nhanLiXiForNPC_5).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_5 (Java: nhanLiXiForNPC_5).
 
-    public int NhanLiXiForNPC_5 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_5 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_6 (Java: nhanLiXiForNPC_6).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_6 (Java: nhanLiXiForNPC_6).
 
-    public int NhanLiXiForNPC_6 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_6 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_7 (Java: nhanLiXiForNPC_7).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_7 (Java: nhanLiXiForNPC_7).
 
-    public int NhanLiXiForNPC_7 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_7 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_8 (Java: nhanLiXiForNPC_8).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_8 (Java: nhanLiXiForNPC_8).
 
-    public int NhanLiXiForNPC_8 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_8 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_9 (Java: nhanLiXiForNPC_9).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_9 (Java: nhanLiXiForNPC_9).
 
-    public int NhanLiXiForNPC_9 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_9 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_10 (Java: nhanLiXiForNPC_10).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_10 (Java: nhanLiXiForNPC_10).
 
-    public int NhanLiXiForNPC_10 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_10 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_11 (Java: nhanLiXiForNPC_11).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_11 (Java: nhanLiXiForNPC_11).
 
-    public int NhanLiXiForNPC_11 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_11 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_12 (Java: nhanLiXiForNPC_12).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_12 (Java: nhanLiXiForNPC_12).
 
-    public int NhanLiXiForNPC_12 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_12 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_13 (Java: nhanLiXiForNPC_13).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_13 (Java: nhanLiXiForNPC_13).
 
-    public int NhanLiXiForNPC_13 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_13 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_14 (Java: nhanLiXiForNPC_14).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_14 (Java: nhanLiXiForNPC_14).
 
-    public int NhanLiXiForNPC_14 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_14 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_15 (Java: nhanLiXiForNPC_15).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_15 (Java: nhanLiXiForNPC_15).
 
-    public int NhanLiXiForNPC_15 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_15 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_16 (Java: nhanLiXiForNPC_16).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_16 (Java: nhanLiXiForNPC_16).
 
-    public int NhanLiXiForNPC_16 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_16 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_17 (Java: nhanLiXiForNPC_17).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_17 (Java: nhanLiXiForNPC_17).
 
-    public int NhanLiXiForNPC_17 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_17 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_18 (Java: nhanLiXiForNPC_18).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_18 (Java: nhanLiXiForNPC_18).
 
-    public int NhanLiXiForNPC_18 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_18 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_19 (Java: nhanLiXiForNPC_19).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_19 (Java: nhanLiXiForNPC_19).
 
-    public int NhanLiXiForNPC_19 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_19 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_20 (Java: nhanLiXiForNPC_20).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_20 (Java: nhanLiXiForNPC_20).
 
-    public int NhanLiXiForNPC_20 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_20 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_21 (Java: nhanLiXiForNPC_21).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_21 (Java: nhanLiXiForNPC_21).
 
-    public int NhanLiXiForNPC_21 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_21 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_22 (Java: nhanLiXiForNPC_22).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_22 (Java: nhanLiXiForNPC_22).
 
-    public int NhanLiXiForNPC_22 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_22 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_23 (Java: nhanLiXiForNPC_23).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_23 (Java: nhanLiXiForNPC_23).
 
-    public int NhanLiXiForNPC_23 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_23 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_24 (Java: nhanLiXiForNPC_24).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_24 (Java: nhanLiXiForNPC_24).
 
-    public int NhanLiXiForNPC_24 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_24 { get; set; }
 
-    // Lưu trạng thái NhanLiXiForNPC_25 (Java: nhanLiXiForNPC_25).
+    // Lưu trạng thái LuckyMoneyReceivedFromNpc_25 (Java: nhanLiXiForNPC_25).
 
-    public int NhanLiXiForNPC_25 { get; set; }
+    public int LuckyMoneyReceivedFromNpc_25 { get; set; }
 
-    // Lưu trạng thái IsHoldNamecBallTranhDoat (Java: isHoldNamecBallTranhDoat).
+    // Lưu trạng thái IsHoldingContestedNamekBall (Java: isHoldNamecBallTranhDoat).
 
-    public bool IsHoldNamecBallTranhDoat { get; set; }
+    public bool IsHoldingContestedNamekBall { get; set; }
 
-    // Lưu trạng thái TempIdNamecBallHoldTranhDoat (Java: tempIdNamecBallHoldTranhDoat).
+    // Lưu trạng thái ContestedNamekBallTemplateId (Java: tempIdNamecBallHoldTranhDoat).
 
-    public int TempIdNamecBallHoldTranhDoat { get; set; } = -1;
+    public int ContestedNamekBallTemplateId { get; set; } = -1;
 
     // Lưu trạng thái LastTimePickItem (Java: lastTimePickItem).
 
@@ -684,21 +684,21 @@ public class Player
 
     public long TotalDamageTaken { get; set; }
 
-    // Lưu trạng thái ThongBaoChangeMap (Java: thongBaoChangeMap).
+    // Lưu trạng thái ShowMapChangeNotification (Java: thongBaoChangeMap).
 
-    public bool ThongBaoChangeMap { get; set; }
+    public bool ShowMapChangeNotification { get; set; }
 
-    // Lưu trạng thái TextThongBaoChangeMap (Java: textThongBaoChangeMap).
+    // Lưu trạng thái MapChangeNotificationText (Java: textThongBaoChangeMap).
 
-    public string? TextThongBaoChangeMap { get; set; }
+    public string? MapChangeNotificationText { get; set; }
 
-    // Lưu trạng thái ThongBaoThua (Java: thongBaoThua).
+    // Lưu trạng thái ShowLossNotification (Java: thongBaoThua).
 
-    public bool ThongBaoThua { get; set; }
+    public bool ShowLossNotification { get; set; }
 
-    // Lưu trạng thái TextThongBaoThua (Java: textThongBaoThua).
+    // Lưu trạng thái LossNotificationText (Java: textThongBaoThua).
 
-    public string? TextThongBaoThua { get; set; }
+    public string? LossNotificationText { get; set; }
 
     // Lưu trạng thái LevelWoodChest (Java: levelWoodChest).
 
@@ -744,37 +744,37 @@ public class Player
 
     public bool HaveRewardVDST { get; set; }
 
-    // Lưu trạng thái ThoiVangVoDaiSinhTu (Java: thoiVangVoDaiSinhTu).
+    // Lưu trạng thái DeathmatchGoldTime (Java: thoiVangVoDaiSinhTu). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int ThoiVangVoDaiSinhTu { get; set; }
+    public int DeathmatchGoldTime { get; set; }
 
     // Lưu trạng thái TimePKVDST (Java: timePKVDST).
 
     public long TimePKVDST { get; set; }
 
-    // Lưu trạng thái BinhChonHatMit (Java: binhChonHatMit).
+    // Lưu trạng thái JackfruitVote (Java: binhChonHatMit). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int BinhChonHatMit { get; set; }
+    public int JackfruitVote { get; set; }
 
-    // Lưu trạng thái BinhChonPlayer (Java: binhChonPlayer).
+    // Lưu trạng thái PlayerVote (Java: binhChonPlayer). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int BinhChonPlayer { get; set; }
+    public int PlayerVote { get; set; }
 
-    // Lưu trạng thái ZoneBinhChon (Java: zoneBinhChon).
+    // Lưu trạng thái VotingZone (Java: zoneBinhChon). (nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public Zone? ZoneBinhChon { get; set; }
+    public Zone? VotingZone { get; set; }
 
     // Lưu trạng thái Mbv (Java: mbv).
 
     public int Mbv { get; set; }
 
-    // Lưu trạng thái Baovetaikhoan (Java: baovetaikhoan).
+    // Lưu trạng thái IsAccountProtected (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: baovetaikhoan).
 
-    public bool Baovetaikhoan { get; set; }
+    public bool IsAccountProtected { get; set; }
 
-    // Lưu trạng thái Mbvtime (Java: mbvtime).
+    // Lưu trạng thái AccountProtectionTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: mbvtime).
 
-    public long Mbvtime { get; set; }
+    public long AccountProtectionTime { get; set; }
 
     // Lưu trạng thái Captcha (Java: captcha).
 
@@ -808,9 +808,9 @@ public class Player
 
     public int PrecentMabuHold { get; set; }
 
-    // Lưu trạng thái IsPhuHoMapMabu (Java: isPhuHoMapMabu).
+    // Lưu trạng thái IsMabuMapProtected (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isPhuHoMapMabu).
 
-    public bool IsPhuHoMapMabu { get; set; }
+    public bool IsMabuMapProtected { get; set; }
 
     // Lưu trạng thái IsCopy (Java: isCopy).
 
@@ -820,85 +820,85 @@ public class Player
 
     public long LastPkCommesonTime { get; set; }
 
-    // Lưu trạng thái TimesPerDayCuuSat (Java: timesPerDayCuuSat).
+    // Lưu trạng thái SheepSlaughterAttemptsToday (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timesPerDayCuuSat).
 
-    public int TimesPerDayCuuSat { get; set; }
+    public int SheepSlaughterAttemptsToday { get; set; }
 
-    // Lưu trạng thái LastTimeCuuSat (Java: lastTimeCuuSat).
+    // Lưu trạng thái LastSheepSlaughterTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeCuuSat).
 
-    public long LastTimeCuuSat { get; set; }
+    public long LastSheepSlaughterTime { get; set; }
 
-    // Lưu trạng thái NhanVangNangVIP (Java: nhanVangNangVIP).
+    // Lưu trạng thái ReceivedVipGoldBoost (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: nhanVangNangVIP).
 
-    public bool NhanVangNangVIP { get; set; }
+    public bool ReceivedVipGoldBoost { get; set; }
 
-    // Lưu trạng thái NhanDeTuNangVIP (Java: nhanDeTuNangVIP).
+    // Lưu trạng thái ReceivedVipPetUpgrade (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: nhanDeTuNangVIP).
 
-    public bool NhanDeTuNangVIP { get; set; }
+    public bool ReceivedVipPetUpgrade { get; set; }
 
-    // Lưu trạng thái NhanSKHVIP (Java: nhanSKHVIP).
+    // Lưu trạng thái ReceivedVipActivationSet (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: nhanSKHVIP).
 
-    public bool NhanSKHVIP { get; set; }
+    public bool ReceivedVipActivationSet { get; set; }
 
-    // Lưu trạng thái CanReward_TuanLoc (Java: canReward_TuanLoc).
+    // Lưu trạng thái CanReward_TuanLoc (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: canReward_TuanLoc).
 
     public bool CanReward_TuanLoc { get; set; }
 
-    // Lưu trạng thái ChangeMapVIP_TuanLoc (Java: changeMapVIP_TuanLoc).
+    // Lưu trạng thái UseVipMap_TuanLoc (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: changeMapVIP_TuanLoc).
 
-    public bool ChangeMapVIP_TuanLoc { get; set; }
+    public bool UseVipMap_TuanLoc { get; set; }
 
-    // Lưu trạng thái HaveReward_TuanLoc (Java: haveReward_TuanLoc).
+    // Lưu trạng thái HasReward_TuanLoc (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: haveReward_TuanLoc).
 
-    public bool HaveReward_TuanLoc { get; set; }
+    public bool HasReward_TuanLoc { get; set; }
 
-    // Lưu trạng thái CanReward (Java: canReward).
+    // Lưu trạng thái CanReceiveEventReward (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: canReward).
 
-    public bool CanReward { get; set; }
+    public bool CanReceiveEventReward { get; set; }
 
-    // Lưu trạng thái ChangeMapVIP (Java: changeMapVIP).
+    // Lưu trạng thái UseVipEventMap (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: changeMapVIP).
 
-    public bool ChangeMapVIP { get; set; }
+    public bool UseVipEventMap { get; set; }
 
-    // Lưu trạng thái HaveReward (Java: haveReward).
+    // Lưu trạng thái HasEventReward (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: haveReward).
 
-    public bool HaveReward { get; set; }
+    public bool HasEventReward { get; set; }
 
-    // Lưu trạng thái CanReward_MeoDen (Java: canReward_MeoDen).
+    // Lưu trạng thái CanReceiveEventReward_MeoDen (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: canReward_MeoDen).
 
-    public bool CanReward_MeoDen { get; set; }
+    public bool CanReceiveEventReward_MeoDen { get; set; }
 
-    // Lưu trạng thái ChangeMapVIP_MeoDen (Java: changeMapVIP_MeoDen).
+    // Lưu trạng thái UseVipEventMap_MeoDen (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: changeMapVIP_MeoDen).
 
-    public bool ChangeMapVIP_MeoDen { get; set; }
+    public bool UseVipEventMap_MeoDen { get; set; }
 
-    // Lưu trạng thái HaveReward_MeoDen (Java: haveReward_MeoDen).
+    // Lưu trạng thái HasEventReward_MeoDen (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: haveReward_MeoDen).
 
-    public bool HaveReward_MeoDen { get; set; }
+    public bool HasEventReward_MeoDen { get; set; }
 
-    // Lưu trạng thái CanReward_PiLong (Java: canReward_PiLong).
+    // Lưu trạng thái CanReceiveEventReward_PiLong (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: canReward_PiLong).
 
-    public bool CanReward_PiLong { get; set; }
+    public bool CanReceiveEventReward_PiLong { get; set; }
 
-    // Lưu trạng thái ChangeMapVIP_PiLong (Java: changeMapVIP_PiLong).
+    // Lưu trạng thái UseVipEventMap_PiLong (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: changeMapVIP_PiLong).
 
-    public bool ChangeMapVIP_PiLong { get; set; }
+    public bool UseVipEventMap_PiLong { get; set; }
 
-    // Lưu trạng thái HaveReward_PiLong (Java: haveReward_PiLong).
+    // Lưu trạng thái HasEventReward_PiLong (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: haveReward_PiLong).
 
-    public bool HaveReward_PiLong { get; set; }
+    public bool HasEventReward_PiLong { get; set; }
 
-    // Lưu trạng thái CanReward_PeNa (Java: canReward_PeNa).
+    // Lưu trạng thái CanReceiveEventReward_PeNa (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: canReward_PeNa).
 
-    public bool CanReward_PeNa { get; set; }
+    public bool CanReceiveEventReward_PeNa { get; set; }
 
-    // Lưu trạng thái ChangeMapVIP_PeNa (Java: changeMapVIP_PeNa).
+    // Lưu trạng thái UseVipEventMap_PeNa (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: changeMapVIP_PeNa).
 
-    public bool ChangeMapVIP_PeNa { get; set; }
+    public bool UseVipEventMap_PeNa { get; set; }
 
-    // Lưu trạng thái HaveReward_PeNa (Java: haveReward_PeNa).
+    // Lưu trạng thái HasEventReward_PeNa (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: haveReward_PeNa).
 
-    public bool HaveReward_PeNa { get; set; }
+    public bool HasEventReward_PeNa { get; set; }
 
     // Lưu trạng thái LastTimeJoinDT (Java: lastTimeJoinDT).
 
@@ -908,97 +908,97 @@ public class Player
 
     public bool JoinCDRD { get; set; }
 
-    // Lưu trạng thái LastTimeJoinCDRD (Java: lastTimeJoinCDRD).
+    // Lưu trạng thái LastSnakeWayJoinTime (Java: lastTimeJoinCDRD).
 
-    public long LastTimeJoinCDRD { get; set; }
+    public long LastSnakeWayJoinTime { get; set; }
 
-    // Lưu trạng thái TalkToThuongDe (Java: talkToThuongDe).
+    // Lưu trạng thái HasTalkedToKami (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: talkToThuongDe).
 
-    public bool TalkToThuongDe { get; set; }
+    public bool HasTalkedToKami { get; set; }
 
-    // Lưu trạng thái TalkToThanMeo (Java: talkToThanMeo).
+    // Lưu trạng thái HasTalkedToKarin (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: talkToThanMeo).
 
-    public bool TalkToThanMeo { get; set; }
+    public bool HasTalkedToKarin { get; set; }
 
     // Lưu trạng thái TimeChangeMap144 (Java: timeChangeMap144).
 
     public long TimeChangeMap144 { get; set; }
 
-    // Lưu trạng thái LevelCDRDDone (Java: levelCDRDDone).
+    // Lưu trạng thái SnakeWayCompletedLevel (Java: levelCDRDDone).
 
-    public int LevelCDRDDone { get; set; }
+    public int SnakeWayCompletedLevel { get; set; }
 
-    // Lưu trạng thái TimeCDRDDone (Java: timeCDRDDone).
+    // Lưu trạng thái SnakeWayCompletionTime (Java: timeCDRDDone).
 
-    public long TimeCDRDDone { get; set; }
+    public long SnakeWayCompletionTime { get; set; }
 
-    // Lưu trạng thái LastTimeUpdateTopCDRD (Java: lastTimeUpdateTopCDRD).
+    // Lưu trạng thái LastSnakeWayRankingUpdate (Java: lastTimeUpdateTopCDRD).
 
-    public long LastTimeUpdateTopCDRD { get; set; }
+    public long LastSnakeWayRankingUpdate { get; set; }
 
-    // Lưu trạng thái LevelKhiGasDone (Java: levelKhiGasDone).
+    // Lưu trạng thái DestronGasCompletedLevel (Java: levelKhiGasDone).
 
-    public int LevelKhiGasDone { get; set; }
+    public int DestronGasCompletedLevel { get; set; }
 
-    // Lưu trạng thái TimeKhiGasDone (Java: timeKhiGasDone).
+    // Lưu trạng thái DestronGasCompletionTime (Java: timeKhiGasDone).
 
-    public long TimeKhiGasDone { get; set; }
+    public long DestronGasCompletionTime { get; set; }
 
-    // Lưu trạng thái LastTimeUpdateTopKhiGas (Java: lastTimeUpdateTopKhiGas).
+    // Lưu trạng thái LastDestronGasRankingUpdate (Java: lastTimeUpdateTopKhiGas).
 
-    public long LastTimeUpdateTopKhiGas { get; set; }
+    public long LastDestronGasRankingUpdate { get; set; }
 
-    // Lưu trạng thái TimesPerDayBDKB (Java: timesPerDayBDKB).
+    // Lưu trạng thái TreasureUnderSeaAttemptsToday (Java: timesPerDayBDKB).
 
-    public int TimesPerDayBDKB { get; set; }
+    public int TreasureUnderSeaAttemptsToday { get; set; }
 
     // Lưu trạng thái LastTimeJoinBDKB (Java: lastTimeJoinBDKB).
 
     public long LastTimeJoinBDKB { get; set; }
 
-    // Lưu trạng thái Bdkb_countPerDay (Java: bdkb_countPerDay).
+    // Lưu trạng thái TreasureUnderSeaAttemptCount (Java: bdkb_countPerDay).
 
-    public int Bdkb_countPerDay { get; set; }
+    public int TreasureUnderSeaAttemptCount { get; set; }
 
-    // Lưu trạng thái Bdkb_lastTimeJoin (Java: bdkb_lastTimeJoin).
+    // Lưu trạng thái LastTreasureUnderSeaJoinTime (Java: bdkb_lastTimeJoin).
 
-    public long Bdkb_lastTimeJoin { get; set; }
+    public long LastTreasureUnderSeaJoinTime { get; set; }
 
-    // Lưu trạng thái Bdkb_isJoinBdkb (Java: bdkb_isJoinBdkb).
+    // Lưu trạng thái IsInTreasureUnderSea (Java: bdkb_isJoinBdkb).
 
-    public bool Bdkb_isJoinBdkb { get; set; }
+    public bool IsInTreasureUnderSea { get; set; }
 
-    // Lưu trạng thái LevelBDKBDone (Java: levelBDKBDone).
+    // Lưu trạng thái TreasureUnderSeaCompletedLevel (Java: levelBDKBDone).
 
-    public int LevelBDKBDone { get; set; }
+    public int TreasureUnderSeaCompletedLevel { get; set; }
 
-    // Lưu trạng thái TimeBDKBDone (Java: timeBDKBDone).
+    // Lưu trạng thái TreasureUnderSeaCompletionTime (Java: timeBDKBDone).
 
-    public long TimeBDKBDone { get; set; }
+    public long TreasureUnderSeaCompletionTime { get; set; }
 
-    // Lưu trạng thái LastTimeUpdateTopBDKB (Java: lastTimeUpdateTopBDKB).
+    // Lưu trạng thái LastTreasureUnderSeaRankingUpdate (Java: lastTimeUpdateTopBDKB).
 
-    public long LastTimeUpdateTopBDKB { get; set; }
+    public long LastTreasureUnderSeaRankingUpdate { get; set; }
 
     // Lưu trạng thái CallBossPocolo (Java: callBossPocolo).
 
     public bool CallBossPocolo { get; set; }
 
-    // Lưu trạng thái ZoneSieuThanhThuy (Java: zoneSieuThanhThuy).
+    // Lưu trạng thái SuperDivineWaterZone (Java: zoneSieuThanhThuy).
 
-    public Zone? ZoneSieuThanhThuy { get; set; }
+    public Zone? SuperDivineWaterZone { get; set; }
 
-    // Lưu trạng thái WinSTT (Java: winSTT).
+    // Lưu trạng thái WonSuperDivineWater (Java: winSTT).
 
-    public bool WinSTT { get; set; }
+    public bool WonSuperDivineWater { get; set; }
 
-    // Lưu trạng thái LastTimeWinSTT (Java: lastTimeWinSTT).
+    // Lưu trạng thái LastSuperDivineWaterWinTime (Java: lastTimeWinSTT).
 
-    public long LastTimeWinSTT { get; set; }
+    public long LastSuperDivineWaterWinTime { get; set; }
 
-    // Lưu trạng thái LastTimeUpdateSTT (Java: lastTimeUpdateSTT).
+    // Lưu trạng thái LastSuperDivineWaterUpdate (Java: lastTimeUpdateSTT).
 
-    public long LastTimeUpdateSTT { get; set; }
+    public long LastSuperDivineWaterUpdate { get; set; }
 
     // Lưu trạng thái Notify (Java: notify).
 
@@ -1008,29 +1008,29 @@ public class Player
 
     public bool IsOffline { get; set; }
 
-    // Lưu trạng thái LevelLuyenTap (Java: levelLuyenTap).
+    // Lưu trạng thái TrainingLevel (Java: levelLuyenTap).
 
-    public int LevelLuyenTap { get; set; }
+    public int TrainingLevel { get; set; }
 
-    // Lưu trạng thái IsThachDau (Java: isThachDau).
+    // Lưu trạng thái IsSparring (Java: isThachDau).
 
-    public bool IsThachDau { get; set; }
+    public bool IsSparring { get; set; }
 
-    // Lưu trạng thái TnsmLuyenTap (Java: tnsmLuyenTap).
+    // Lưu trạng thái TrainingPowerPotential (Java: tnsmLuyenTap).
 
-    public int TnsmLuyenTap { get; set; }
+    public int TrainingPowerPotential { get; set; }
 
-    // Lưu trạng thái DangKyTapTuDong (Java: dangKyTapTuDong).
+    // Lưu trạng thái IsAutoTrainingRegistered (Java: dangKyTapTuDong).
 
-    public bool DangKyTapTuDong { get; set; }
+    public bool IsAutoTrainingRegistered { get; set; }
 
     // Lưu trạng thái LastTimeOffline (Java: lastTimeOffline).
 
     public long LastTimeOffline { get; set; }
 
-    // Lưu trạng thái MapIdDangTapTuDong (Java: mapIdDangTapTuDong).
+    // Lưu trạng thái AutoTrainingMapId (Java: mapIdDangTapTuDong).
 
-    public int MapIdDangTapTuDong { get; set; }
+    public int AutoTrainingMapId { get; set; }
 
     // Lưu trạng thái LastMapOffline (Java: lastMapOffline).
 
@@ -1044,17 +1044,17 @@ public class Player
 
     public int LastXOffline { get; set; }
 
-    // Lưu trạng thái ThongBaoTapTuDong (Java: thongBaoTapTuDong).
+    // Lưu trạng thái AutoTrainingNotification (Java: thongBaoTapTuDong).
 
-    public string? ThongBaoTapTuDong { get; set; }
+    public string? AutoTrainingNotification { get; set; }
 
-    // Lưu trạng thái TeleTapTuDong (Java: teleTapTuDong).
+    // Lưu trạng thái AutoTrainTeleport (Java: teleTapTuDong).
 
-    public bool TeleTapTuDong { get; set; }
+    public bool AutoTrainTeleport { get; set; }
 
-    // Lưu trạng thái Traning (Java: traning).
+    // Lưu trạng thái Training (Java: traning).
 
-    public Traning Traning { get; set; } = null!;
+    public Training Training { get; set; } = null!;
 
     // Lưu trạng thái DoesNotAttack (Java: doesNotAttack).
 
@@ -1081,157 +1081,157 @@ public class Player
     public long LastTimeRevived { get; set; }
 
 
-    // Lưu trạng thái DoesNotAttackBo (Java: doesNotAttackBo).
+    // Lưu trạng thái FatherDoesNotAttack (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: doesNotAttackBo).
 
-    public bool DoesNotAttackBo { get; set; }
+    public bool FatherDoesNotAttack { get; set; }
 
-    // Lưu trạng thái LastTimePlayerNotAttackBo (Java: lastTimePlayerNotAttackBo).
+    // Lưu trạng thái LastFatherAttackBlockPlayerTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimePlayerNotAttackBo).
 
-    public long LastTimePlayerNotAttackBo { get; set; }
+    public long LastFatherAttackBlockPlayerTime { get; set; }
 
-    // Lưu trạng thái TimeNotAttackBo (Java: timeNotAttackBo).
+    // Lưu trạng thái FatherAttackBlockDuration (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timeNotAttackBo).
 
-    public int TimeNotAttackBo { get; set; } = 1800000;
+    public int FatherAttackBlockDuration { get; set; } = 1800000;
 
-    // Lưu trạng thái TemporaryEnemiesBo (Java: temporaryEnemiesBo).
+    // Lưu trạng thái FatherTemporaryEnemies (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: temporaryEnemiesBo).
 
-    public List<Player> TemporaryEnemiesBo { get; set; } = [];
+    public List<Player> FatherTemporaryEnemies { get; set; } = [];
 
-    // Lưu trạng thái JustRevivedBo (Java: justRevivedBo).
+    // Lưu trạng thái FatherJustRevived (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: justRevivedBo).
 
-    public bool JustRevivedBo { get; set; }
+    public bool FatherJustRevived { get; set; }
 
-    // Lưu trạng thái LastTimeRevivedBo (Java: lastTimeRevivedBo).
+    // Lưu trạng thái LastFatherRevivedTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeRevivedBo).
 
-    public long LastTimeRevivedBo { get; set; }
+    public long LastFatherRevivedTime { get; set; }
 
     // Lưu trạng thái NameFather (Java: nameFather).
 
     public string? NameFather { get; set; }
 
-    // Lưu trạng thái DoesNotAttackMe (Java: doesNotAttackMe).
+    // Lưu trạng thái MotherDoesNotAttack (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: doesNotAttackMe).
 
-    public bool DoesNotAttackMe { get; set; }
+    public bool MotherDoesNotAttack { get; set; }
 
-    // Lưu trạng thái LastTimePlayerNotAttackMe (Java: lastTimePlayerNotAttackMe).
+    // Lưu trạng thái LastMotherAttackBlockPlayerTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimePlayerNotAttackMe).
 
-    public long LastTimePlayerNotAttackMe { get; set; }
+    public long LastMotherAttackBlockPlayerTime { get; set; }
 
-    // Lưu trạng thái TimeNotAttackMe (Java: timeNotAttackMe).
+    // Lưu trạng thái MotherAttackBlockDuration (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timeNotAttackMe).
 
-    public int TimeNotAttackMe { get; set; } = 1800000;
+    public int MotherAttackBlockDuration { get; set; } = 1800000;
 
-    // Lưu trạng thái TemporaryEnemiesMe (Java: temporaryEnemiesMe).
+    // Lưu trạng thái MotherTemporaryEnemies (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: temporaryEnemiesMe).
 
-    public List<Player> TemporaryEnemiesMe { get; set; } = [];
+    public List<Player> MotherTemporaryEnemies { get; set; } = [];
 
-    // Lưu trạng thái JustRevivedMe (Java: justRevivedMe).
+    // Lưu trạng thái MotherJustRevived (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: justRevivedMe).
 
-    public bool JustRevivedMe { get; set; }
+    public bool MotherJustRevived { get; set; }
 
-    // Lưu trạng thái LastTimeRevivedMe (Java: lastTimeRevivedMe).
+    // Lưu trạng thái LastMotherRevivedTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeRevivedMe).
 
-    public long LastTimeRevivedMe { get; set; }
+    public long LastMotherRevivedTime { get; set; }
 
     // Lưu trạng thái NameMother (Java: nameMother).
 
     public string? NameMother { get; set; }
 
-    // Lưu trạng thái DoesNotAttackNguoiYeu (Java: doesNotAttackNguoiYeu).
+    // Lưu trạng thái LoverDoesNotAttack (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: doesNotAttackNguoiYeu).
 
-    public bool DoesNotAttackNguoiYeu { get; set; }
+    public bool LoverDoesNotAttack { get; set; }
 
-    // Lưu trạng thái LastTimePlayerNotAttackNguoiYeu (Java: lastTimePlayerNotAttackNguoiYeu).
+    // Lưu trạng thái LastLoverAttackBlockPlayerTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimePlayerNotAttackNguoiYeu).
 
-    public long LastTimePlayerNotAttackNguoiYeu { get; set; }
+    public long LastLoverAttackBlockPlayerTime { get; set; }
 
-    // Lưu trạng thái TimeNotAttackNguoiYeu (Java: timeNotAttackNguoiYeu).
+    // Lưu trạng thái LoverAttackBlockDuration (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timeNotAttackNguoiYeu).
 
-    public int TimeNotAttackNguoiYeu { get; set; } = 1800000;
+    public int LoverAttackBlockDuration { get; set; } = 1800000;
 
-    // Lưu trạng thái TemporaryEnemiesNguoiYeu (Java: temporaryEnemiesNguoiYeu).
+    // Lưu trạng thái LoverTemporaryEnemies (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: temporaryEnemiesNguoiYeu).
 
-    public List<Player> TemporaryEnemiesNguoiYeu { get; set; } = [];
+    public List<Player> LoverTemporaryEnemies { get; set; } = [];
 
-    // Lưu trạng thái JustRevivedNguoiYeu (Java: justRevivedNguoiYeu).
+    // Lưu trạng thái LoverJustRevived (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: justRevivedNguoiYeu).
 
-    public bool JustRevivedNguoiYeu { get; set; }
+    public bool LoverJustRevived { get; set; }
 
-    // Lưu trạng thái LastTimeRevivedNguoiYeu (Java: lastTimeRevivedNguoiYeu).
+    // Lưu trạng thái LastLoverRevivedTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeRevivedNguoiYeu).
 
-    public long LastTimeRevivedNguoiYeu { get; set; }
+    public long LastLoverRevivedTime { get; set; }
 
-    // Lưu trạng thái DoesNotAttackConone (Java: doesNotAttackConone).
+    // Lưu trạng thái ChildOneDoesNotAttack (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: doesNotAttackConone).
 
-    public bool DoesNotAttackConone { get; set; }
+    public bool ChildOneDoesNotAttack { get; set; }
 
-    // Lưu trạng thái LastTimePlayerNotAttackConone (Java: lastTimePlayerNotAttackConone).
+    // Lưu trạng thái LastChildOneAttackBlockPlayerTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimePlayerNotAttackConone).
 
-    public long LastTimePlayerNotAttackConone { get; set; }
+    public long LastChildOneAttackBlockPlayerTime { get; set; }
 
-    // Lưu trạng thái TimeNotAttackConone (Java: timeNotAttackConone).
+    // Lưu trạng thái ChildOneAttackBlockDuration (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timeNotAttackConone).
 
-    public int TimeNotAttackConone { get; set; } = 1800000;
+    public int ChildOneAttackBlockDuration { get; set; } = 1800000;
 
-    // Lưu trạng thái TemporaryEnemiesConone (Java: temporaryEnemiesConone).
+    // Lưu trạng thái ChildOneTemporaryEnemies (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: temporaryEnemiesConone).
 
-    public List<Player> TemporaryEnemiesConone { get; set; } = [];
+    public List<Player> ChildOneTemporaryEnemies { get; set; } = [];
 
-    // Lưu trạng thái JustRevivedConone (Java: justRevivedConone).
+    // Lưu trạng thái ChildOneJustRevived (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: justRevivedConone).
 
-    public bool JustRevivedConone { get; set; }
+    public bool ChildOneJustRevived { get; set; }
 
-    // Lưu trạng thái LastTimeRevivedConone (Java: lastTimeRevivedConone).
+    // Lưu trạng thái LastChildOneRevivedTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeRevivedConone).
 
-    public long LastTimeRevivedConone { get; set; }
+    public long LastChildOneRevivedTime { get; set; }
 
-    // Lưu trạng thái DoesNotAttackContwo (Java: doesNotAttackContwo).
+    // Lưu trạng thái ChildTwoDoesNotAttack (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: doesNotAttackContwo).
 
-    public bool DoesNotAttackContwo { get; set; }
+    public bool ChildTwoDoesNotAttack { get; set; }
 
-    // Lưu trạng thái LastTimePlayerNotAttackContwo (Java: lastTimePlayerNotAttackContwo).
+    // Lưu trạng thái LastChildTwoAttackBlockPlayerTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimePlayerNotAttackContwo).
 
-    public long LastTimePlayerNotAttackContwo { get; set; }
+    public long LastChildTwoAttackBlockPlayerTime { get; set; }
 
-    // Lưu trạng thái TimeNotAttackContwo (Java: timeNotAttackContwo).
+    // Lưu trạng thái ChildTwoAttackBlockDuration (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timeNotAttackContwo).
 
-    public int TimeNotAttackContwo { get; set; } = 1800000;
+    public int ChildTwoAttackBlockDuration { get; set; } = 1800000;
 
-    // Lưu trạng thái TemporaryEnemiesContwo (Java: temporaryEnemiesContwo).
+    // Lưu trạng thái ChildTwoTemporaryEnemies (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: temporaryEnemiesContwo).
 
-    public List<Player> TemporaryEnemiesContwo { get; set; } = [];
+    public List<Player> ChildTwoTemporaryEnemies { get; set; } = [];
 
-    // Lưu trạng thái JustRevivedContwo (Java: justRevivedContwo).
+    // Lưu trạng thái ChildTwoJustRevived (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: justRevivedContwo).
 
-    public bool JustRevivedContwo { get; set; }
+    public bool ChildTwoJustRevived { get; set; }
 
-    // Lưu trạng thái LastTimeRevivedContwo (Java: lastTimeRevivedContwo).
+    // Lưu trạng thái LastChildTwoRevivedTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeRevivedContwo).
 
-    public long LastTimeRevivedContwo { get; set; }
+    public long LastChildTwoRevivedTime { get; set; }
 
-    // Lưu trạng thái DoesNotAttackConthree (Java: doesNotAttackConthree).
+    // Lưu trạng thái ChildThreeDoesNotAttack (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: doesNotAttackConthree).
 
-    public bool DoesNotAttackConthree { get; set; }
+    public bool ChildThreeDoesNotAttack { get; set; }
 
-    // Lưu trạng thái LastTimePlayerNotAttackConthree (Java: lastTimePlayerNotAttackConthree).
+    // Lưu trạng thái LastChildThreeAttackBlockPlayerTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimePlayerNotAttackConthree).
 
-    public long LastTimePlayerNotAttackConthree { get; set; }
+    public long LastChildThreeAttackBlockPlayerTime { get; set; }
 
-    // Lưu trạng thái TimeNotAttackConthree (Java: timeNotAttackConthree).
+    // Lưu trạng thái ChildThreeAttackBlockDuration (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timeNotAttackConthree).
 
-    public int TimeNotAttackConthree { get; set; } = 1800000;
+    public int ChildThreeAttackBlockDuration { get; set; } = 1800000;
 
-    // Lưu trạng thái TemporaryEnemiesConthree (Java: temporaryEnemiesConthree).
+    // Lưu trạng thái ChildThreeTemporaryEnemies (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: temporaryEnemiesConthree).
 
-    public List<Player> TemporaryEnemiesConthree { get; set; } = [];
+    public List<Player> ChildThreeTemporaryEnemies { get; set; } = [];
 
-    // Lưu trạng thái JustRevivedConthree (Java: justRevivedConthree).
+    // Lưu trạng thái ChildThreeJustRevived (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: justRevivedConthree).
 
-    public bool JustRevivedConthree { get; set; }
+    public bool ChildThreeJustRevived { get; set; }
 
-    // Lưu trạng thái LastTimeRevivedConthree (Java: lastTimeRevivedConthree).
+    // Lưu trạng thái LastChildThreeRevivedTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeRevivedConthree).
 
-    public long LastTimeRevivedConthree { get; set; }
+    public long LastChildThreeRevivedTime { get; set; }
 
     // Lưu trạng thái XSend (Java: xSend).
 
@@ -1334,121 +1334,121 @@ public class Player
 
     public bool AutoSD { get; set; }
 
-    // Lưu trạng thái AutoGiap (Java: autoGiap).
+    // Lưu trạng thái AutoArmor (Java: autoGiap).
 
-    public bool AutoGiap { get; set; }
+    public bool AutoArmor { get; set; }
 
-    // Lưu trạng thái THE_TUAN (Java: THE_TUAN).
+    // Lưu trạng thái WeeklyCard (Java: THE_TUAN).
 
-    public int THE_TUAN { get; set; }
+    public int WeeklyCard { get; set; }
 
-    // Lưu trạng thái LASTTIME_THE_TUAN (Java: LASTTIME_THE_TUAN).
+    // Lưu trạng thái LastWeeklyCardTime (Java: LASTTIME_THE_TUAN).
 
-    public long LASTTIME_THE_TUAN { get; set; }
+    public long LastWeeklyCardTime { get; set; }
 
-    // Lưu trạng thái THE_THANG (Java: THE_THANG).
+    // Lưu trạng thái MonthlyCard (Java: THE_THANG).
 
-    public int THE_THANG { get; set; }
+    public int MonthlyCard { get; set; }
 
-    // Lưu trạng thái LASTTIME_THE_THANG (Java: LASTTIME_THE_THANG).
+    // Lưu trạng thái LastMonthlyCardTime (Java: LASTTIME_THE_THANG).
 
-    public long LASTTIME_THE_THANG { get; set; }
+    public long LastMonthlyCardTime { get; set; }
 
-    // Lưu trạng thái THE_NAM (Java: THE_NAM).
+    // Lưu trạng thái YearlyCard (Java: THE_NAM).
 
-    public int THE_NAM { get; set; }
+    public int YearlyCard { get; set; }
 
-    // Lưu trạng thái LASTTIME_THE_NAM (Java: LASTTIME_THE_NAM).
+    // Lưu trạng thái LastYearlyCardTime (Java: LASTTIME_THE_NAM).
 
-    public long LASTTIME_THE_NAM { get; set; }
+    public long LastYearlyCardTime { get; set; }
 
-    // Lưu trạng thái THE_CHI_TON (Java: THE_CHI_TON).
+    // Lưu trạng thái SupremeCard (Java: THE_CHI_TON).
 
-    public int THE_CHI_TON { get; set; }
+    public int SupremeCard { get; set; }
 
-    // Lưu trạng thái LASTTIME_THE_CHI_TON (Java: LASTTIME_THE_CHI_TON).
+    // Lưu trạng thái LastSupremeCardTime (Java: LASTTIME_THE_CHI_TON).
 
-    public long LASTTIME_THE_CHI_TON { get; set; }
+    public long LastSupremeCardTime { get; set; }
 
-    // Lưu trạng thái DIEM_DANH (Java: DIEM_DANH).
+    // Lưu trạng thái CheckInCount (Java: DIEM_DANH).
 
-    public int DIEM_DANH { get; set; }
+    public int CheckInCount { get; set; }
 
-    // Lưu trạng thái CHECK_DAY_ON_ONE (Java: CHECK_DAY_ON_ONE).
+    // Lưu trạng thái DailyCheckInMarker (Java: CHECK_DAY_ON_ONE).
 
-    public int CHECK_DAY_ON_ONE { get; set; }
+    public int DailyCheckInMarker { get; set; }
 
-    // Lưu trạng thái DIEM_DANH_TUAN (Java: DIEM_DANH_TUAN).
+    // Lưu trạng thái WeeklyCheckInCount (Java: DIEM_DANH_TUAN).
 
-    public int DIEM_DANH_TUAN { get; set; }
+    public int WeeklyCheckInCount { get; set; }
 
-    // Lưu trạng thái CHECK_DAY_ON_TUAN (Java: CHECK_DAY_ON_TUAN).
+    // Lưu trạng thái WeeklyCheckInMarker (Java: CHECK_DAY_ON_TUAN).
 
-    public int CHECK_DAY_ON_TUAN { get; set; }
+    public int WeeklyCheckInMarker { get; set; }
 
-    // Lưu trạng thái DIEM_DANH_THANG (Java: DIEM_DANH_THANG).
+    // Lưu trạng thái MonthlyCheckInCount (Java: DIEM_DANH_THANG).
 
-    public int DIEM_DANH_THANG { get; set; }
+    public int MonthlyCheckInCount { get; set; }
 
-    // Lưu trạng thái CHECK_DAY_ON_THANG (Java: CHECK_DAY_ON_THANG).
+    // Lưu trạng thái MonthlyCheckInMarker (Java: CHECK_DAY_ON_THANG).
 
-    public int CHECK_DAY_ON_THANG { get; set; }
+    public int MonthlyCheckInMarker { get; set; }
 
-    // Lưu trạng thái DIEM_DANH_NAM (Java: DIEM_DANH_NAM).
+    // Lưu trạng thái YearlyCheckInCount (Java: DIEM_DANH_NAM).
 
-    public int DIEM_DANH_NAM { get; set; }
+    public int YearlyCheckInCount { get; set; }
 
-    // Lưu trạng thái CHECK_DAY_ON_NAM (Java: CHECK_DAY_ON_NAM).
+    // Lưu trạng thái YearlyCheckInMarker (Java: CHECK_DAY_ON_NAM).
 
-    public int CHECK_DAY_ON_NAM { get; set; }
+    public int YearlyCheckInMarker { get; set; }
 
-    // Lưu trạng thái DIEM_DANH_CHI_TON (Java: DIEM_DANH_CHI_TON).
+    // Lưu trạng thái SupremeCheckInCount (Java: DIEM_DANH_CHI_TON).
 
-    public int DIEM_DANH_CHI_TON { get; set; }
+    public int SupremeCheckInCount { get; set; }
 
-    // Lưu trạng thái CHECK_DAY_ON_CHI_TON (Java: CHECK_DAY_ON_CHI_TON).
+    // Lưu trạng thái SupremeCheckInMarker (Java: CHECK_DAY_ON_CHI_TON).
 
-    public int CHECK_DAY_ON_CHI_TON { get; set; }
+    public int SupremeCheckInMarker { get; set; }
 
-    // Lưu trạng thái IsUseDanhHieu_ThienTu (Java: isUseDanhHieu_ThienTu).
+    // Lưu trạng thái UsesEmperorTitle (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isUseDanhHieu_ThienTu).
 
-    public bool IsUseDanhHieu_ThienTu { get; set; }
+    public bool UsesEmperorTitle { get; set; }
 
-    // Lưu trạng thái LastTimeDanhHieu_ThienTu (Java: lastTimeDanhHieu_ThienTu).
+    // Lưu trạng thái LastEmperorTitleTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeDanhHieu_ThienTu).
 
-    public long LastTimeDanhHieu_ThienTu { get; set; }
+    public long LastEmperorTitleTime { get; set; }
 
-    // Lưu trạng thái IsUseDanhHieu_2 (Java: isUseDanhHieu_2).
+    // Lưu trạng thái UsesTitle_2 (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isUseDanhHieu_2).
 
-    public bool IsUseDanhHieu_2 { get; set; }
+    public bool UsesTitle_2 { get; set; }
 
-    // Lưu trạng thái LastTimeDanhHieu_2 (Java: lastTimeDanhHieu_2).
+    // Lưu trạng thái LastTitleTime_2 (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeDanhHieu_2).
 
-    public long LastTimeDanhHieu_2 { get; set; }
+    public long LastTitleTime_2 { get; set; }
 
-    // Lưu trạng thái IsUseDanhHieu_3 (Java: isUseDanhHieu_3).
+    // Lưu trạng thái UsesTitle_3 (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isUseDanhHieu_3).
 
-    public bool IsUseDanhHieu_3 { get; set; }
+    public bool UsesTitle_3 { get; set; }
 
-    // Lưu trạng thái LastTimeDanhHieu_3 (Java: lastTimeDanhHieu_3).
+    // Lưu trạng thái LastTitleTime_3 (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeDanhHieu_3).
 
-    public long LastTimeDanhHieu_3 { get; set; }
+    public long LastTitleTime_3 { get; set; }
 
-    // Lưu trạng thái IsUseDanhHieu_4 (Java: isUseDanhHieu_4).
+    // Lưu trạng thái UsesTitle_4 (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isUseDanhHieu_4).
 
-    public bool IsUseDanhHieu_4 { get; set; }
+    public bool UsesTitle_4 { get; set; }
 
-    // Lưu trạng thái LastTimeDanhHieu_4 (Java: lastTimeDanhHieu_4).
+    // Lưu trạng thái LastTitleTime_4 (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: lastTimeDanhHieu_4).
 
-    public long LastTimeDanhHieu_4 { get; set; }
+    public long LastTitleTime_4 { get; set; }
 
-    // Lưu trạng thái SlBanhChung (Java: slBanhChung).
+    // Lưu trạng thái SquareRiceCakeCount (Java: slBanhChung).
 
-    public int SlBanhChung { get; set; }
+    public int SquareRiceCakeCount { get; set; }
 
-    // Lưu trạng thái SlBanhTet (Java: slBanhTet).
+    // Lưu trạng thái CylindricalRiceCakeCount (Java: slBanhTet).
 
-    public int SlBanhTet { get; set; }
+    public int CylindricalRiceCakeCount { get; set; }
 
     // Lưu trạng thái ItemsTradeWVP (Java: itemsTradeWVP).
 
@@ -1466,13 +1466,13 @@ public class Player
 
     public long PlIdWVP { get; set; }
 
-    // Lưu trạng thái LastTimeTranformation (Java: lastTimeTranformation).
+    // Lưu trạng thái LastTransformationTime (Java: lastTimeTranformation).
 
-    public long LastTimeTranformation { get; set; }
+    public long LastTransformationTime { get; set; }
 
-    // Lưu trạng thái Isbienhinh (Java: isbienhinh).
+    // Lưu trạng thái TransformationState (Java: isbienhinh).
 
-    public int Isbienhinh { get; set; }
+    public int TransformationState { get; set; }
 
     // Lưu trạng thái CountBDKB (Java: countBDKB).
 
@@ -1486,17 +1486,17 @@ public class Player
 
     public long LastimeJoinBDKB { get; set; }
 
-    // Lưu trạng thái GoldTai (Java: goldTai).
+    // Lưu trạng thái HighBetGold (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: goldTai).
 
-    public int GoldTai { get; set; }
+    public int HighBetGold { get; set; }
 
     // Lưu trạng thái Last_time_dd (Java: last_time_dd).
 
     public long Last_time_dd { get; set; }
 
-    // Lưu trạng thái GoldXiu (Java: goldXiu).
+    // Lưu trạng thái LowBetGold (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: goldXiu).
 
-    public int GoldXiu { get; set; }
+    public int LowBetGold { get; set; }
 
     // Lưu trạng thái BeforeDispose (Java: beforeDispose).
 
@@ -1514,65 +1514,65 @@ public class Player
 
     public sbyte ErrorPay { get; set; }
 
-    // Lưu trạng thái Thoigianduhanh (Java: thoigianduhanh).
+    // Lưu trạng thái TimeTravelDuration (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: thoigianduhanh).
 
-    public long Thoigianduhanh { get; set; }
+    public long TimeTravelDuration { get; set; }
 
-    // Lưu trạng thái Isthoigianduhanh (Java: isthoigianduhanh).
+    // Lưu trạng thái IsTimeTraveling (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: isthoigianduhanh).
 
-    public bool Isthoigianduhanh { get; set; }
+    public bool IsTimeTraveling { get; set; }
 
-    // Lưu trạng thái ThueOil (Java: thueOil).
+    // Lưu trạng thái RentsOil (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: thueOil).
 
-    public bool ThueOil { get; set; }
+    public bool RentsOil { get; set; }
 
-    // Lưu trạng thái ThueMacki (Java: thueMacki).
+    // Lưu trạng thái RentsMacki (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: thueMacki).
 
-    public bool ThueMacki { get; set; }
+    public bool RentsMacki { get; set; }
 
-    // Lưu trạng thái ThueGas (Java: thueGas).
+    // Lưu trạng thái RentsGas (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: thueGas).
 
-    public bool ThueGas { get; set; }
+    public bool RentsGas { get; set; }
 
-    // Lưu trạng thái ThueElec (Java: thueElec).
+    // Lưu trạng thái RentsElectric (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: thueElec).
 
-    public bool ThueElec { get; set; }
+    public bool RentsElectric { get; set; }
 
-    // Lưu trạng thái GiaiPhongAnNgoKhong (Java: giaiPhongAnNgoKhong).
+    // Lưu trạng thái IsWukongSealReleased (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: giaiPhongAnNgoKhong).
 
-    public bool GiaiPhongAnNgoKhong { get; set; }
+    public bool IsWukongSealReleased { get; set; }
 
     // Lưu trạng thái IsBossFlag (Java: isBossFlag).
 
     public bool IsBossFlag { get; set; }
 
-    // Lưu trạng thái Giaiphongan (Java: giaiphongan).
+    // Lưu trạng thái WukongSealReleaseState (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: giaiphongan).
 
-    public sbyte Giaiphongan { get; set; }
+    public sbyte WukongSealReleaseState { get; set; }
 
     // Lưu trạng thái Solanhotong (Java: solanhotong).
 
     public short Solanhotong { get; set; }
 
-    // Lưu trạng thái NhanThuocTrongNgay (Java: nhanThuocTrongNgay).
+    // Lưu trạng thái DailyMedicineReceived (Java: nhanThuocTrongNgay).
 
-    public sbyte NhanThuocTrongNgay { get; set; }
+    public sbyte DailyMedicineReceived { get; set; }
 
-    // Lưu trạng thái TimeTrongNgay (Java: timeTrongNgay).
+    // Lưu trạng thái DailyMedicineTime (Java: timeTrongNgay).
 
-    public long TimeTrongNgay { get; set; }
+    public long DailyMedicineTime { get; set; }
 
-    // Lưu trạng thái Bosshoimau (Java: bosshoimau).
+    // Lưu trạng thái BossRegeneratesHealth (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: bosshoimau).
 
-    public bool Bosshoimau { get; set; }
+    public bool BossRegeneratesHealth { get; set; }
 
     // Lưu trạng thái Trbne (Java: trbne).
 
     public sbyte Trbne { get; set; }
 
-    // Lưu trạng thái Trbgiap (Java: trbgiap).
+    // Lưu trạng thái ArmorAssistLevel (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: trbgiap).
 
-    public sbyte Trbgiap { get; set; }
+    public sbyte ArmorAssistLevel { get; set; }
 
     // Lưu trạng thái Actived (Java: actived).
 
@@ -1582,21 +1582,21 @@ public class Player
 
     public int Account_id { get; set; }
 
-    // Lưu trạng thái Demthoigian (Java: demthoigian).
+    // Lưu trạng thái ElapsedTimeCounter (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: demthoigian).
 
-    public long Demthoigian { get; set; }
+    public long ElapsedTimeCounter { get; set; }
 
     // Lưu trạng thái Timeres (Java: timeres).
 
     public long Timeres { get; set; }
 
-    // Lưu trạng thái Timedanhboss (Java: timedanhboss).
+    // Lưu trạng thái BossFightTime (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: timedanhboss).
 
-    public int Timedanhboss { get; set; }
+    public int BossFightTime { get; set; }
 
-    // Lưu trạng thái Bossxuathien (Java: bossxuathien).
+    // Lưu trạng thái BossSpawned (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: bossxuathien).
 
-    public int Bossxuathien { get; set; }
+    public int BossSpawned { get; set; }
 
     // Lưu trạng thái Pvp (Java: pvp).
 
@@ -1646,9 +1646,9 @@ public class Player
 
     public int MapIdBeforeLogout { get; set; }
 
-    // Lưu trạng thái PhanThan (Java: phanThan).
+    // Lưu trạng thái BodyClone (Java: phanThan).
 
-    public PhanThan? PhanThan { get; set; }
+    public BodyClone? BodyClone { get; set; }
 
     // Lưu trạng thái MapBlackBall (Java: mapBlackBall).
 
@@ -1682,17 +1682,17 @@ public class Player
 
     public List<Zone>? MapCapsule { get; set; }
 
-    // Lưu trạng thái Detu (Java: detu).
+    // Lưu trạng thái Pet (Java: detu).
 
-    public Detu? Detu { get; set; }
+    public Pet? Pet { get; set; }
 
     // Lưu trạng thái PetFollow (Java: petFollow).
 
     public PetFollow? PetFollow { get; set; }
 
-    // Lưu trạng thái Duongtang (Java: duongtang).
+    // Lưu trạng thái TangMonk (Java: duongtang).
 
-    public DuongTang? Duongtang { get; set; }
+    public TangMonk? TangMonk { get; set; }
 
     // Lưu trạng thái SuperRank (Java: superRank).
 
@@ -1722,9 +1722,9 @@ public class Player
 
     public BillEgg? BillEgg { get; set; }
 
-    // Lưu trạng thái Duahau (Java: duahau).
+    // Lưu trạng thái WatermelonPlant (Java: duahau).
 
-    public MelonPlant? Duahau { get; set; }
+    public MelonPlant? WatermelonPlant { get; set; }
 
     // Lưu trạng thái PlayerTask (Java: playerTask).
 
@@ -1823,17 +1823,17 @@ public class Player
 
     public List<Card> Cards { get; set; } = [];
 
-    // Lưu trạng thái IsAutoHoiSinh (Java: isAutoHoiSinh).
+    // Lưu trạng thái IsAutoRespawn (Java: isAutoHoiSinh).
 
-    public bool IsAutoHoiSinh { get; set; }
+    public bool IsAutoRespawn { get; set; }
 
-    // Lưu trạng thái SoNgayTaoAcc (Java: soNgayTaoAcc).
+    // Lưu trạng thái AccountAgeDays (Java: soNgayTaoAcc).
 
-    public int SoNgayTaoAcc { get; set; }
+    public int AccountAgeDays { get; set; }
 
-    // Lưu trạng thái QuocTich (Java: quocTich).
+    // Lưu trạng thái Nationality (Java: quocTich).
 
-    public sbyte QuocTich { get; set; }
+    public sbyte Nationality { get; set; }
 
     // Lưu trạng thái TimeChangeZone (Java: timeChangeZone).
 
@@ -1843,13 +1843,13 @@ public class Player
 
     public long LastUseOptionTime { get; set; }
 
-    // Lưu trạng thái LastTimeHoiPhuc (Java: lastTimeHoiPhuc).
+    // Lưu trạng thái LastRegenTime (Java: lastTimeHoiPhuc).
 
-    public long LastTimeHoiPhuc { get; set; }
+    public long LastRegenTime { get; set; }
 
-    // Lưu trạng thái DucNTdamethanmeo (Java: ducNTdamethanmeo).
+    // Lưu trạng thái CatGodItemDamageValue (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: ducNTdamethanmeo).
 
-    public float DucNTdamethanmeo { get; set; }
+    public float CatGodItemDamageValue { get; set; }
 
     // Lưu trạng thái TimeChatKhukhu (Java: timeChatKhukhu).
 
@@ -1883,9 +1883,9 @@ public class Player
 
     public bool ReceivedGift100k { get; set; }
 
-    // Lưu trạng thái Mocnap (Java: mocnap).
+    // Lưu trạng thái TopUpMilestones (nghĩa chưa chắc, cần chủ dự án duyệt) (Java: mocnap).
 
-    public int[] Mocnap { get; set; } = [0, 0, 0, 0, 0];
+    public int[] TopUpMilestones { get; set; } = [0, 0, 0, 0, 0];
 
     // Lưu trạng thái LastTimeSendTextTime (Java: lastTimeSendTextTime).
 
@@ -1927,7 +1927,7 @@ public class Player
         ItemEvent = new ItemEvent(this);
         Badges = new Badges();
         Event = new PlayerEvent(this);
-        Traning = new Traning();
+        Training = new Training();
         Pointfusion = new PointFusion(this);
         Buff = Buff.NONE;
     }

@@ -232,8 +232,8 @@ public class InventoryServiceSearchTests
         Assert.Throws<InvalidOperationException>(() => k.Service.RemoveItemPetBody(k.Player, 0));
 
         Player pet = k.NewPlayer(2);
-        k.Player.Detu = InvKit.Raw<Detu>();
-        k.Player.Detu.Inventory = pet.Inventory;
+        k.Player.Pet = InvKit.Raw<Pet>();
+        k.Player.Pet.Inventory = pet.Inventory;
         k.Put(pet.Inventory.ItemsBody, 3, k.Item(10));
 
         k.Service.RemoveItemPetBody(k.Player, 3);

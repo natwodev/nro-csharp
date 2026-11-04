@@ -7,7 +7,8 @@ namespace Nro.Game.Items.Core;
 // Nguồn Java: models/Item/Item.java (thời điểm tạo và ItemCatalog được tiêm thay System.currentTimeMillis/singleton để kiểm thử; danh sách tùy chọn luôn không null và Dispose chỉ làm rỗng; thiếu template ném InvalidOperationException thay NullPointerException; CloneItem sao chép từng ItemOption nhưng không sao chép quantityGD).
 public class Item
 {
-    private static readonly HashSet<int> KichHoatIds = [127, 128, 129, 130, 131, 132, 133, 134, 135];
+    // Mã tùy chọn nhận diện bộ kích hoạt (Java: KichHoatIds).
+    private static readonly HashSet<int> ActivationSetIds = [127, 128, 129, 130, 131, 132, 133, 134, 135];
 
     // Thực hiện template; giữ nguyên điều kiện, thứ tự và số học của Java (Java: template).
     public ItemTemplate? Template { get; set; }
@@ -173,11 +174,11 @@ public class Item
         _ => -1,
     };
 
-    // Java isSachTuyetKy(). (Java: isSachTuyetKy()).
-    public bool IsSachTuyetKy() => T.Id == 1044 || T.Id == 1211 || T.Id == 1212;
+    // Kiểm tra sách tuyệt kỹ (Java: isSachTuyetKy).
+    public bool IsUltimateSkillBook() => T.Id == 1044 || T.Id == 1211 || T.Id == 1212;
 
-    // Java isSachTuyetKy2(). (Java: isSachTuyetKy2()).
-    public bool IsSachTuyetKy2() => T.Id >= 1278 && T.Id <= 1280;
+    // Kiểm tra biến thể 2 của sách tuyệt kỹ (Java: isSachTuyetKy2).
+    public bool IsUltimateSkillBookVariant2() => T.Id >= 1278 && T.Id <= 1280;
 
     // Kiểm tra can nang cap with ndc; giữ nguyên điều kiện, thứ tự và số học của Java (Java: canNangCapWithNDC).
     public bool CanNangCapWithNDC(Item daNangCap)
@@ -208,20 +209,20 @@ public class Item
         return t.Type == 4 && stone.Id == 220;
     }
 
-    // Java isDaPhaLeEpSao(). (Java: isDaPhaLeEpSao()).
-    public bool IsDaPhaLeEpSao() => Template != null && (Template.Type == 30 || (Template.Id >= 14 && Template.Id <= 20));
+    // Kiểm tra đá pha lê ép sao (Java: isDaPhaLeEpSao).
+    public bool IsCrystalStarUpgradeStone() => Template != null && (Template.Type == 30 || (Template.Id >= 14 && Template.Id <= 20));
 
-    // Java isDaPhaLeC1(). (Java: isDaPhaLeC1()).
-    public bool IsDaPhaLeC1() => Template != null && Template.Id >= 411 && Template.Id <= 447;
+    // Kiểm tra đá pha lê cấp 1 (Java: isDaPhaLeC1).
+    public bool IsCrystalTier1() => Template != null && Template.Id >= 411 && Template.Id <= 447;
 
     // Kiểm tra đá pha lê cấp 2; giữ nguyên ưu tiên toán tử Java nên vật phẩm thiếu Template vẫn truy cập T ở vế sau và ném lỗi (Java: isDaPhaLeC2).
-    public bool IsDaPhaLeC2() => (Template != null && Template.Id >= 1416 && Template.Id <= 1422) || T.Id == 964 || T.Id == 965;
+    public bool IsCrystalTier2() => (Template != null && Template.Id >= 1416 && Template.Id <= 1422) || T.Id == 964 || T.Id == 965;
 
     // Kiểm tra đá pha lê mới; giữ nguyên ưu tiên toán tử Java nên vật phẩm thiếu Template vẫn truy cập T ở các vế sau và ném lỗi (Java: isDaPhaLeMoi).
-    public bool IsDaPhaLeMoi() => (Template != null && Template.Id >= 1416 && Template.Id <= 1422) || T.Id == 964 || T.Id == 965 || (T.Id >= 1426 && T.Id <= 1434);
+    public bool IsCrystalTierNew() => (Template != null && Template.Id >= 1416 && Template.Id <= 1422) || T.Id == 964 || T.Id == 965 || (T.Id >= 1426 && T.Id <= 1434);
 
-    // Java isDaPhaLeCu(). (Java: isDaPhaLeCu()).
-    public bool IsDaPhaLeCu() => Template != null && Template.Id >= 441 && Template.Id <= 447;
+    // Kiểm tra đá pha lê cũ (Java: isDaPhaLeCu).
+    public bool IsCrystalTierOld() => Template != null && Template.Id >= 441 && Template.Id <= 447;
 
     // Kiểm tra loại trang bị trên người; giữ nguyên ưu tiên Java nên vật phẩm thiếu Template vẫn có thể truy cập T ở vế sau và ném lỗi (Java: isTypeBody).
     public bool IsTypeBody() => (Template != null && 0 <= Template.Type && Template.Type < 6) || T.Type == 32 || T.Type == 35 || T.Type == 11 || T.Type == 23;
@@ -364,7 +365,7 @@ public class Item
     }
 
     // Lấy tùy chọn do đá pha lê tạo; đá không rõ trả chính đối tượng tùy chọn đầu của vật phẩm, không phải bản sao, và danh sách rỗng ném ArgumentOutOfRangeException như IndexOutOfBoundsException Java (Java: getOptionDaPhaLe).
-    public ItemOption GetOptionDaPhaLe()
+    public ItemOption GetCrystalOption()
     {
         (int optionId, int param)? pair = T.Id switch
         {
@@ -415,7 +416,7 @@ public class Item
         bool haveOption = false;
         var optionInfo = new List<string>();
         Item itC = CloneItem();
-        ItemOption iodpl = item.GetOptionDaPhaLe();
+        ItemOption iodpl = item.GetCrystalOption();
         foreach (ItemOption io in itC.ItemOptions)
         {
             if (!haveOption && io.OptionTemplate.Id == iodpl.OptionTemplate.Id)
@@ -445,7 +446,7 @@ public class Item
         ArgumentNullException.ThrowIfNull(item);
         var optionInfo = new List<string>();
         Item itC = CloneItem();
-        ItemOption iodpl = item.GetOptionDaPhaLe();
+        ItemOption iodpl = item.GetCrystalOption();
         foreach (ItemOption io in itC.ItemOptions)
         {
             if (io.OptionTemplate.Id != 72 && io.OptionTemplate.Id != 73 && io.OptionTemplate.Id != 102 && io.OptionTemplate.Id != 107 && io.OptionTemplate.Id != 218)
@@ -533,11 +534,11 @@ public class Item
     }
 
     // Kiểm tra have set kich hoat; giữ nguyên điều kiện, thứ tự và số học của Java (Java: haveSetKichHoat).
-    public bool HaveSetKichHoat()
+    public bool HasActivationSet()
     {
         if (IsNotNullItem())
         {
-            return ItemOptions.Any(op => op != null && KichHoatIds.Contains(op.OptionTemplate.Id));
+            return ItemOptions.Any(op => op != null && ActivationSetIds.Contains(op.OptionTemplate.Id));
         }
 
         return false;

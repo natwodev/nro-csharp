@@ -16,9 +16,14 @@ public partial class NPoint : IDisposable
 
     public const sbyte MAX_LIMIT = 13;
 
-    private long lastTimeHoiPhuc;
-    private long lastTimeHoiPhuc10s;
-    private long lastTimeHoiStamina;
+    // Mốc hồi HP/KI chu kỳ 30 giây (Java: lastTimeHoiPhuc).
+    private long lastRegenTime;
+
+    // Mốc hồi HP chu kỳ 10 giây (Java: lastTimeHoiPhuc10s).
+    private long lastRegen10sTime;
+
+    // Mốc hồi thể lực chu kỳ 60 giây (Java: lastTimeHoiStamina).
+    private long lastStaminaRegenTime;
 
     // Chỉ GetDamageAttack làm mới intrinsic; SetOptions và ApplyIntrinsicGoldPercent dùng nội tại lần đánh trước, null trước lần đầu như Java.
     private NPointIntrinsic? intrinsic;
@@ -404,13 +409,13 @@ public partial class NPoint : IDisposable
 
     public int PetPowerPotentialPercent { get; set; }
 
-    // Lưu trạng thái ChargedBlastLevel (Java: xChuong).
+    // Lưu trạng thái BlastDamageMultiplier (Java: xChuong).
 
-    public int ChargedBlastLevel { get; set; }
+    public int BlastDamageMultiplier { get; set; }
 
-    // Thực hiện TinhSealSetCount (Java: setTinhAn).
+    // Thực hiện StarSealSetCount (Java: setTinhAn; nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public int TinhSealSetCount { get; set; }
+    public int StarSealSetCount { get; set; }
 
     // Thực hiện NhatSealSetCount (Java: setNhatAn).
 
@@ -440,9 +445,9 @@ public partial class NPoint : IDisposable
 
     public int MpReductionPercent { get; set; }
 
-    // Lưu trạng thái ChargedBlastNullification (Java: voHieuChuong).
+    // Lưu trạng thái BlastNullification (Java: voHieuChuong).
 
-    public int ChargedBlastNullification { get; set; }
+    public int BlastNullification { get; set; }
 
     // Lưu trạng thái giáp tập luyện. (Java: trainArmor)
 
@@ -464,9 +469,9 @@ public partial class NPoint : IDisposable
 
     public bool IsFounder { get; set; }
 
-    // Lưu trạng thái HasTinhSeal (Java: isTinhAn).
+    // Lưu trạng thái HasStarSeal (Java: isTinhAn; nghĩa chưa chắc, cần chủ dự án duyệt).
 
-    public bool HasTinhSeal { get; set; }
+    public bool HasStarSeal { get; set; }
 
     // Lưu trạng thái HasNhatSeal (Java: isNhatAn).
 
@@ -484,9 +489,9 @@ public partial class NPoint : IDisposable
 
     public bool IsPetrified { get; set; }
 
-    // Lưu trạng thái IsSPLCostume (Java: isDoSPL).
+    // Lưu trạng thái HasCrystalStarEquipment (Java: isDoSPL).
 
-    public bool IsSPLCostume { get; set; }
+    public bool HasCrystalStarEquipment { get; set; }
 
     // Lưu trạng thái IsRabbitBulma (Java: isThoBulma).
 
@@ -746,16 +751,16 @@ public partial class NPoint : IDisposable
 
     // Trừ phòng thủ nhưng sát thương tối thiểu là 1 (Java: subDameInjureWithDeff).
 
-    public double ReduceDamageByDefense(double dame)
+    public double ReduceDamageByDefense(double damage)
     {
         long def = Defense;
-        dame -= def;
-        if (dame < 0)
+        damage -= def;
+        if (damage < 0)
         {
-            dame = 1;
+            damage = 1;
         }
 
-        return dame;
+        return damage;
     }
 
     // Thực hiện GetGoldPercent (Java: getTlGold).

@@ -159,8 +159,8 @@ public class PlayerRepositoryTests : IClassFixture<PlayerRepositoryFixture>
         player.Gender = 2;
         player.HaveTennisSpaceShip = true;
         player.LastTimeDropTail = 2_000_000_001;
-        player.Lasttimekhisukien = 2_000_000_002;
-        player.Isbienhinh = 91;
+        player.LastEventGasTime = 2_000_000_002;
+        player.TransformationState = 91;
         player.Notify = "mutated notify";
         player.LastPkCommesonTime = 2_000_000_003;
         player.LastTimeShenronAppeared_Christmas = 2_000_000_004;
@@ -211,8 +211,8 @@ public class PlayerRepositoryTests : IClassFixture<PlayerRepositoryFixture>
 public sealed class PlayerRepositoryFixture : TestDatabase
 {
     private static readonly HashSet<string> IntegerColumns =
-    ["account_id", "head", "gender", "clan_id", "point_pvp", "thachdauwhis", "isbienhinh", "rank", "event_point", "event_point_boss", "event_point_nhs", "event_point_quai", "diem_huy_diet", "diem_chien_truong_namek", "diem_su_kien_tet", "diem_su_kien_giangsinh", "diem_su_kien_halloween", "diem_su_kien_8_3", "diem_su_kien_trungthu", "diem_su_kien_hung_vuong", "diem_su_kien_black_friday", "diem_su_kien_20_10", "hp_point_fusion", "mp_point_fusion", "dame_point_fusion"];
-    private static readonly HashSet<string> BigintColumns = ["last_time_drop_tail", "last_time_khi_su_kien", "doanhtrai", "lasttimepkcommeson", "dragon_christmas", "dragon_halloween", "last_time_update_task"];
+    ["account_id", "head", "gender", "clan_id", "point_pvp", "whis_sparring", "isbienhinh", "rank", "event_point", "event_point_boss", "event_point_nhs", "event_point_quai", "diem_huy_diet", "diem_chien_truong_namek", "diem_su_kien_tet", "diem_su_kien_giangsinh", "diem_su_kien_halloween", "diem_su_kien_8_3", "diem_su_kien_trungthu", "diem_su_kien_hung_vuong", "diem_su_kien_black_friday", "diem_su_kien_20_10", "hp_point_fusion", "mp_point_fusion", "point_fusion_damage"];
+    private static readonly HashSet<string> BigintColumns = ["last_time_drop_tail", "last_time_khi_su_kien", "barracks_state", "lasttimepkcommeson", "dragon_christmas", "dragon_halloween", "last_time_update_task"];
     private static readonly HashSet<string> TimestampColumns = ["create_time", "lastimelogin", "first_time_login", "last_time_login_game"];
 
     protected override async Task SeedAsync()

@@ -125,11 +125,11 @@ public class Zone
     // Người chơi phe Cadic trong Tranh Ngọc.
     public SnapshotList<Player> PlayersCadic { get; } = new();
 
-    // Thời điểm bắt đầu Tranh Ngọc.
-    public long LastTimeStartTranhNgoc { get; set; }
+    // Thời điểm bắt đầu Tranh Ngọc (Java: lastTimeStartTranhNgoc).
+    public long LastNamekWarStartTime { get; set; }
 
-    // Đánh dấu Tranh Ngọc của zone đã bắt đầu.
-    public bool StartZoneTranhNgoc { get; set; }
+    // Đánh dấu Tranh Ngọc của zone đã bắt đầu (Java: startZoneTranhNgoc).
+    public bool IsNamekWarZoneStarted { get; set; }
 
     // Thời điểm rơi ngọc Tranh Ngọc gần nhất.
     public long LastTimeDropBall { get; set; }
@@ -138,7 +138,7 @@ public class Zone
     public Player? Npc { get; set; }
 
     // Hình nhân thử sát thương của map 169-171 (Java: TestDame).
-    public Player? TestDame { get; set; }
+    public Player? DamageTestPlayer { get; set; }
 
     // Trạng thái Trung úy Trắng còn sống.
     public bool IsTrungUyTrangAlive { get; set; }
@@ -216,10 +216,10 @@ public class Zone
         RunPhase(UpdateItem, "items");
         RunPhase(UpdateNonInteractiveNPC, "non interactive npcs");
         RunPhase(UpdatePlayer, "players");
-        RunPhase(UpdateZoneTranhNgoc, "tranh ngoc");
+        RunPhase(UpdateNamekWarZone, "namek war");
         if (Map.MapId == 169 || Map.MapId == 170 || Map.MapId == 171)
         {
-            RunPhase(UpdateTestDame, "test dame");
+            RunPhase(UpdateDamageTest, "damage test");
         }
     }
 
@@ -335,27 +335,27 @@ public class Zone
         }
     }
 
-    private void UpdateTestDame()
+    private void UpdateDamageTest()
     {
-        if (TestDame != null)
+        if (DamageTestPlayer != null)
         {
             try
             {
-                Runtime.Players.UpdatePlayer(TestDame);
+                Runtime.Players.UpdatePlayer(DamageTestPlayer);
             }
             catch (Exception e)
             {
-                Logger.LogException(typeof(Zone), e, "Lỗi update TestDame");
+                Logger.LogException(typeof(Zone), e, "Lỗi update DamageTestPlayer");
             }
         }
     }
 
-    private void UpdateZoneTranhNgoc()
+    private void UpdateNamekWarZone()
     {
         IMapWorld world = Runtime.World;
-        if (!world.IsTranhNgocWarTime() && StartZoneTranhNgoc)
+        if (!world.IsNamekWarTime() && IsNamekWarZoneStarted)
         {
-            StartZoneTranhNgoc = false;
+            IsNamekWarZoneStarted = false;
             PlayersCadic.Clear();
             PlayersFide.Clear();
             PointCadic = 0;
@@ -363,53 +363,53 @@ public class Zone
             return;
         }
 
-        if (!StartZoneTranhNgoc)
+        if (!IsNamekWarZoneStarted)
         {
             return;
         }
 
-        if (Runtime.CanDoWithTime(LastTimeStartTranhNgoc, ConstNamekWar.TIME))
+        if (Runtime.CanDoWithTime(LastNamekWarStartTime, ConstNamekWar.TIME))
         {
-            StartZoneTranhNgoc = false;
+            IsNamekWarZoneStarted = false;
             if (PointCadic > PointFide)
             {
-                world.SendTranhNgocEnd(this, ConstNamekWar.WIN, false);
-                world.SendTranhNgocEnd(this, ConstNamekWar.LOSE, true);
-                world.GiveTranhNgocPrize(PlayersCadic, ConstNamekWar.WIN, PointCadic);
-                world.GiveTranhNgocPrize(PlayersFide, ConstNamekWar.LOSE, PointFide);
+                world.SendNamekWarEnd(this, ConstNamekWar.WIN, false);
+                world.SendNamekWarEnd(this, ConstNamekWar.LOSE, true);
+                world.GiveNamekWarPrize(PlayersCadic, ConstNamekWar.WIN, PointCadic);
+                world.GiveNamekWarPrize(PlayersFide, ConstNamekWar.LOSE, PointFide);
             }
             else if (PointFide > PointCadic)
             {
-                world.SendTranhNgocEnd(this, ConstNamekWar.WIN, true);
-                world.SendTranhNgocEnd(this, ConstNamekWar.LOSE, false);
-                world.GiveTranhNgocPrize(PlayersFide, ConstNamekWar.WIN, PointFide);
-                world.GiveTranhNgocPrize(PlayersCadic, ConstNamekWar.LOSE, PointCadic);
+                world.SendNamekWarEnd(this, ConstNamekWar.WIN, true);
+                world.SendNamekWarEnd(this, ConstNamekWar.LOSE, false);
+                world.GiveNamekWarPrize(PlayersFide, ConstNamekWar.WIN, PointFide);
+                world.GiveNamekWarPrize(PlayersCadic, ConstNamekWar.LOSE, PointCadic);
             }
             else
             {
-                world.SendTranhNgocEnd(this, ConstNamekWar.DRAW, true);
-                world.SendTranhNgocEnd(this, ConstNamekWar.DRAW, false);
+                world.SendNamekWarEnd(this, ConstNamekWar.DRAW, true);
+                world.SendNamekWarEnd(this, ConstNamekWar.DRAW, false);
             }
 
-            ResetTranhNgoc();
+            ResetNamekWar();
         }
         else if (PointCadic == 7)
         {
-            StartZoneTranhNgoc = false;
-            world.SendTranhNgocEnd(this, ConstNamekWar.WIN, false);
-            world.SendTranhNgocEnd(this, ConstNamekWar.LOSE, true);
-            world.GiveTranhNgocPrize(PlayersCadic, ConstNamekWar.WIN, PointCadic);
-            world.GiveTranhNgocPrize(PlayersFide, ConstNamekWar.LOSE, PointFide);
-            ResetTranhNgoc();
+            IsNamekWarZoneStarted = false;
+            world.SendNamekWarEnd(this, ConstNamekWar.WIN, false);
+            world.SendNamekWarEnd(this, ConstNamekWar.LOSE, true);
+            world.GiveNamekWarPrize(PlayersCadic, ConstNamekWar.WIN, PointCadic);
+            world.GiveNamekWarPrize(PlayersFide, ConstNamekWar.LOSE, PointFide);
+            ResetNamekWar();
         }
         else if (PointFide == 7)
         {
-            StartZoneTranhNgoc = false;
-            world.SendTranhNgocEnd(this, ConstNamekWar.WIN, true);
-            world.SendTranhNgocEnd(this, ConstNamekWar.LOSE, false);
-            world.GiveTranhNgocPrize(PlayersFide, ConstNamekWar.WIN, PointFide);
-            world.GiveTranhNgocPrize(PlayersCadic, ConstNamekWar.LOSE, PointCadic);
-            ResetTranhNgoc();
+            IsNamekWarZoneStarted = false;
+            world.SendNamekWarEnd(this, ConstNamekWar.WIN, true);
+            world.SendNamekWarEnd(this, ConstNamekWar.LOSE, false);
+            world.GiveNamekWarPrize(PlayersFide, ConstNamekWar.WIN, PointFide);
+            world.GiveNamekWarPrize(PlayersCadic, ConstNamekWar.LOSE, PointCadic);
+            ResetNamekWar();
         }
 
         // Java giữ khối này trong nhánh "chiến tranh đang chạy" đã vào ở trên nên nó cũng chạy tại tick vừa kết thúc chiến tranh.
@@ -422,13 +422,13 @@ public class Zone
                 LastTimeDropBall = Runtime.Now;
                 int x = Runtime.NextInt(20, Map.MapWidth);
                 int y = Map.YPhysicInTop(x, Runtime.NextInt(20, Map.MapHeight - 200));
-                ItemMap itemMap = new(this, id, 1, x, y, -1) { IsNamecBallTranhDoat = true };
+                ItemMap itemMap = new(this, id, 1, x, y, -1) { IsContestedNamekBall = true };
                 Runtime.World.DropItemMap(this, itemMap);
             }
         }
     }
 
-    private void ResetTranhNgoc()
+    private void ResetNamekWar()
     {
         Items.Clear();
         PlayersCadic.Clear();
@@ -545,13 +545,13 @@ public class Zone
                 NonInteractiveNPCs.Add(player);
             }
 
-            if (!player.IsBoss && !NotBosses.Contains(player) && !player.IsPetFollow && !player.IsDuongTang && !isNonInteractiveNpc)
+            if (!player.IsBoss && !NotBosses.Contains(player) && !player.IsPetFollow && !player.IsTangMonk && !isNonInteractiveNpc)
             {
                 NotBosses.Add(player);
             }
 
-            if (!player.IsBoss && !player.IsPetFollow && !player.IsDuongTang && !player.IsDeTu && !player.IsBo && !player.IsMe && !player.IsNguoiYeu
-                && !player.IsConOne && !player.IsConTwo && !player.IsConThree && !Players.Contains(player) && !isNonInteractiveNpc)
+            if (!player.IsBoss && !player.IsPetFollow && !player.IsTangMonk && !player.IsPet && !player.IsFather && !player.IsMother && !player.IsLover
+                && !player.IsChildOne && !player.IsChildTwo && !player.IsChildThree && !Players.Contains(player) && !isNonInteractiveNpc)
             {
                 Players.Add(player);
             }
@@ -561,8 +561,8 @@ public class Zone
                 Bosses.Add(player);
             }
 
-            if (player.IsDeTu || player.IsBo || player.IsMe || player.IsPetFollow || player.IsDuongTang || player.IsNguoiYeu || player.IsConOne || player.IsConTwo
-                || player.IsConThree)
+            if (player.IsPet || player.IsFather || player.IsMother || player.IsPetFollow || player.IsTangMonk || player.IsLover || player.IsChildOne || player.IsChildTwo
+                || player.IsChildThree)
             {
                 _pets.Add(player);
             }
@@ -630,7 +630,7 @@ public class Zone
     {
         foreach (Player pl in Players)
         {
-            if (pl != null && pl.IsHoldNamecBallTranhDoat && pl.TempIdNamecBallHoldTranhDoat == id)
+            if (pl != null && pl.IsHoldingContestedNamekBall && pl.ContestedNamekBallTemplateId == id)
             {
                 return true;
             }
@@ -801,9 +801,9 @@ public class Zone
                 return;
             }
 
-            if (itemMap.IsNamecBallTranhDoat)
+            if (itemMap.IsContestedNamekBall)
             {
-                world.PickTranhNgocBall(player, itemMap);
+                world.PickNamekWarBall(player, itemMap);
                 return;
             }
 
@@ -987,7 +987,7 @@ public class Zone
                 for (int i = humanoids.Length - 1; i >= 0; i--)
                 {
                     Player pl = humanoids[i];
-                    if (pl != null && (gateway.IsNonInteractiveNpc(pl) || gateway.IsTrainingBossOf(pl, player) || gateway.IsTestDame(pl)))
+                    if (pl != null && (gateway.IsNonInteractiveNpc(pl) || gateway.IsTrainingBossOf(pl, player) || gateway.IsDamageTestPlayer(pl)))
                     {
                         gateway.SendPlayerInfo(player, pl);
                     }
@@ -1033,8 +1033,8 @@ public class Zone
             {
                 foreach (Player pl in Bosses)
                 {
-                    if (!ReferenceEquals(boss, pl) && !gateway.IsPl(pl) && !pl.IsDeTu && !pl.IsBo && !pl.IsMe && !pl.IsPetFollow && !pl.IsDuongTang && !pl.IsPhanThan
-                        && !pl.IsSaibamen && !pl.IsNguoiYeu && !pl.IsConOne && !pl.IsConTwo && !pl.IsConThree)
+                    if (!ReferenceEquals(boss, pl) && !gateway.IsPl(pl) && !pl.IsPet && !pl.IsFather && !pl.IsMother && !pl.IsPetFollow && !pl.IsTangMonk && !pl.IsBodyClone
+                        && !pl.IsSaibamen && !pl.IsLover && !pl.IsChildOne && !pl.IsChildTwo && !pl.IsChildThree)
                     {
                         gateway.SendPlayerInfo(boss, pl);
                         gateway.SendPlayerInfo(pl, boss);

@@ -419,11 +419,11 @@ public sealed class EffectSkillService : IEffectSkillService
     }
 
     // Cài đặt SetDamageBuff theo hợp đồng dịch vụ hiệu ứng (Java: setDameBuff).
-    public void SetDamageBuff(Player player, int time, int tiLe)
+    public void SetDamageBuff(Player player, int time, int percent)
     {
         player.EffectSkill.IsDamageBuff = true;
         player.EffectSkill.TimeDamageBuff = time;
-        player.EffectSkill.DamageBuffPercent = tiLe;
+        player.EffectSkill.DamageBuffPercent = percent;
         player.EffectSkill.LastTimeDamageBuff = Now();
     }
 
@@ -476,8 +476,8 @@ public sealed class EffectSkillService : IEffectSkillService
         }
     }
 
-    // Cài đặt SetMiniature theo hợp đồng dịch vụ hiệu ứng (Java: setChibi).
-    public void SetMiniature(Player player, int time)
+    // Cài đặt SetChibiBird theo hợp đồng dịch vụ hiệu ứng (Java: setChibi).
+    public void SetChibiBird(Player player, int time)
     {
         player.EffectSkill.IsChibi = true;
         player.EffectSkill.TimeChibi = time;
@@ -496,8 +496,8 @@ public sealed class EffectSkillService : IEffectSkillService
         notifier.SendHaveChibiFollowToAllMap(player);
     }
 
-    // Cài đặt RemoveMiniature theo hợp đồng dịch vụ hiệu ứng (Java: removeChibi).
-    public void RemoveMiniature(Player player)
+    // Cài đặt RemoveChibiBird theo hợp đồng dịch vụ hiệu ứng (Java: removeChibi).
+    public void RemoveChibiBird(Player player)
     {
         player.EffectSkill.IsChibi = false;
         player.TypeChibi = -1;
@@ -712,7 +712,7 @@ public sealed class EffectSkillService : IEffectSkillService
         player.EffectSkill.LevelMonkey = unchecked((sbyte)selected.Point);
         players.SetHp(player, CrisGH(unchecked(players.GetNPoint(player).Hp * 2)));
         notifier.SendCostume(player);
-        if (!player.IsDeTu && !player.IsBo && !player.IsMe && !player.IsNguoiYeu && !player.IsConOne && !player.IsConTwo && !player.IsConThree)
+        if (!player.IsPet && !player.IsFather && !player.IsMother && !player.IsLover && !player.IsChildOne && !player.IsChildTwo && !player.IsChildThree)
         {
             notifier.SendInfoHpMp(player);
         }
@@ -792,9 +792,9 @@ public sealed class EffectSkillService : IEffectSkillService
         effectSkill.BoundMob = null;
         effectSkill.BoundPlayer = null;
         SendEffectPlayer(player, player, TURN_OFF_EFFECT, HOLD_EFFECT);
-        if (player.PhanThan is { } phanThan && phanThan.EffectSkill.IsBinding)
+        if (player.BodyClone is { } bodyClone && bodyClone.EffectSkill.IsBinding)
         {
-            RemoveBinding(phanThan);
+            RemoveBinding(bodyClone);
         }
     }
 
@@ -887,9 +887,9 @@ public sealed class EffectSkillService : IEffectSkillService
     }
 
     // Cài đặt StartWhistle theo hợp đồng dịch vụ hiệu ứng (Java: setStartHuytSao).
-    public void StartWhistle(Player player, int tiLeHP)
+    public void StartWhistle(Player player, int hpPercent)
     {
-        player.EffectSkill.HpWhistlePercent = tiLeHP;
+        player.EffectSkill.HpWhistlePercent = hpPercent;
         player.EffectSkill.LastTimeWhistle = Now();
     }
 
@@ -1058,8 +1058,8 @@ public sealed class EffectSkillService : IEffectSkillService
     public void SetTransformation(Player player)
     {
         int timeTranformation = rules.GetTimeTranformation();
-        player.Isbienhinh = 0;
-        players.SaveIsBienHinh(player);
+        player.TransformationState = 0;
+        players.SaveTransformationState(player);
         player.EffectSkill.IsTransformation = true;
         player.EffectSkill.TimeTransformation = timeTranformation;
         player.EffectSkill.TransformationLevel = unchecked((sbyte)Require(players.GetSelectedSkill(player), "selected skill").Point);
@@ -1084,8 +1084,8 @@ public sealed class EffectSkillService : IEffectSkillService
     // Cài đặt RemoveTransformation theo hợp đồng dịch vụ hiệu ứng (Java: TranformationDown).
     public void RemoveTransformation(Player player)
     {
-        player.Isbienhinh = 0;
-        players.SaveIsBienHinh(player);
+        player.TransformationState = 0;
+        players.SaveTransformationState(player);
         player.EffectSkill.IsTransformation = false;
         player.EffectSkill.TransformationLevel = 0;
         EffectNPointState state = players.GetNPoint(player);
@@ -1106,8 +1106,8 @@ public sealed class EffectSkillService : IEffectSkillService
     // Cài đặt RemoveEvolution theo hợp đồng dịch vụ hiệu ứng (Java: EvolutionDown).
     public void RemoveEvolution(Player player)
     {
-        player.Isbienhinh = 0;
-        players.SaveIsBienHinh(player);
+        player.TransformationState = 0;
+        players.SaveTransformationState(player);
         player.EffectSkill.IsEvolution = false;
         EffectNPointState state = players.GetNPoint(player);
         if (state.Hp > state.HpMax)
@@ -1129,7 +1129,7 @@ public sealed class EffectSkillService : IEffectSkillService
     {
         player.EffectSkill.IsPowerBurst = true;
         player.EffectSkill.LastTimePowerBurst = Now();
-        player.EffectSkill.TimePowerBurst = rules.GetTimeSucManhBocPha(Require(players.GetSelectedSkill(player), "selected skill").Point);
+        player.EffectSkill.TimePowerBurst = rules.GetPowerBurstDuration(Require(players.GetSelectedSkill(player), "selected skill").Point);
     }
 
     // Cài đặt RemovePowerBurst theo hợp đồng dịch vụ hiệu ứng (Java: removeSucManhBocPha).

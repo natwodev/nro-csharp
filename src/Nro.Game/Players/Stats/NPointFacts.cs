@@ -306,7 +306,7 @@ public sealed class NPointEffectSkillFacts
     public int DamageBuffPercent { get; set; }
 }
 
-// Tập trường EffectSkin NPoint đọc hoặc ghi; host ghi trả IsChargedBlast, IsDamageBoosted và LastTimeChargedBlast sau một lần tấn công.
+// Tập trường EffectSkin NPoint đọc hoặc ghi; host ghi trả IsBlastDamageMultiplierReady, IsBlastDamageMultiplierApplied và LastTimeBlastDamageMultiplier sau một lần tấn công.
 public sealed class NPointEffectSkinFacts
 {
 
@@ -322,14 +322,14 @@ public sealed class NPointEffectSkinFacts
     // Dữ liệu DamageMultiplier dùng trong bản chụp phục vụ công thức chỉ số (Java: xDame).
     public int DamageMultiplier { get; set; } = 1;
 
-    // Dữ liệu IsChargedBlast dùng trong bản chụp phục vụ công thức chỉ số (Java: isXChuong).
-    public bool IsChargedBlast { get; set; }
+    // Dữ liệu IsBlastDamageMultiplierReady dùng trong bản chụp phục vụ công thức chỉ số (Java: isXChuong).
+    public bool IsBlastDamageMultiplierReady { get; set; }
 
-    // Dữ liệu IsDamageBoosted dùng trong bản chụp phục vụ công thức chỉ số (Java: isXDame).
-    public bool IsDamageBoosted { get; set; }
+    // Dữ liệu IsBlastDamageMultiplierApplied dùng trong bản chụp phục vụ công thức chỉ số (Java: isXDame).
+    public bool IsBlastDamageMultiplierApplied { get; set; }
 
-    // Dữ liệu LastTimeChargedBlast dùng trong bản chụp phục vụ công thức chỉ số (Java: lastTimeXChuong).
-    public long LastTimeChargedBlast { get; set; }
+    // Dữ liệu LastTimeBlastDamageMultiplier dùng trong bản chụp phục vụ công thức chỉ số (Java: lastTimeXChuong).
+    public long LastTimeBlastDamageMultiplier { get; set; }
 }
 
 // Tập trường SetClothes NPoint đọc; Worldcup còn được NPoint đếm lại số áo World Cup rồi host ghi trả.
@@ -419,29 +419,29 @@ public sealed class NPointCharmsFacts
     // Dữ liệu TdTriTue20 dùng trong bản chụp phục vụ công thức chỉ số.
     public long TdTriTue20 { get; set; }
 
-    // Dữ liệu TdDeTu dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu { get; set; }
+    // Dữ liệu PetTraining dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining { get; set; }
 
-    // Dữ liệu TdDeTu2 dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu2 { get; set; }
+    // Dữ liệu PetTraining2 dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu2; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining2 { get; set; }
 
-    // Dữ liệu TdDeTu3 dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu3 { get; set; }
+    // Dữ liệu PetTraining3 dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu3; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining3 { get; set; }
 
-    // Dữ liệu TdDeTu4 dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu4 { get; set; }
+    // Dữ liệu PetTraining4 dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu4; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining4 { get; set; }
 
-    // Dữ liệu TdDeTu5 dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu5 { get; set; }
+    // Dữ liệu PetTraining5 dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu5; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining5 { get; set; }
 
-    // Dữ liệu TdDeTu7 dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu7 { get; set; }
+    // Dữ liệu PetTraining7 dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu7; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining7 { get; set; }
 
-    // Dữ liệu TdDeTu10 dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu10 { get; set; }
+    // Dữ liệu PetTraining10 dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu10; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining10 { get; set; }
 
-    // Dữ liệu TdDeTu20 dùng trong bản chụp phục vụ công thức chỉ số.
-    public long TdDeTu20 { get; set; }
+    // Dữ liệu PetTraining20 dùng trong bản chụp phục vụ công thức chỉ số (Java: tdDeTu20; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long PetTraining20 { get; set; }
 }
 
 // Chứa dữ liệu Player mà NPoint đọc; host vận hành nạp từ Player shell.
@@ -469,50 +469,50 @@ public sealed class NPointPlayerFacts
     // Dữ liệu IsBoss dùng trong bản chụp phục vụ công thức chỉ số.
     public bool IsBoss { get; set; }
 
-    // Dữ liệu IsDeTu dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsDeTu { get; set; }
+    // Dữ liệu IsPet dùng trong bản chụp phục vụ công thức chỉ số (Java: isDeTu).
+    public bool IsPet { get; set; }
 
-    // Dữ liệu IsBo dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsBo { get; set; }
+    // Dữ liệu IsFather dùng trong bản chụp phục vụ công thức chỉ số.
+    public bool IsFather { get; set; }
 
-    // Dữ liệu IsMe dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsMe { get; set; }
+    // Dữ liệu IsMother dùng trong bản chụp phục vụ công thức chỉ số.
+    public bool IsMother { get; set; }
 
-    // Dữ liệu IsPhanThan dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsPhanThan { get; set; }
+    // Dữ liệu IsBodyClone dùng trong bản chụp phục vụ công thức chỉ số (Java: isPhanThan).
+    public bool IsBodyClone { get; set; }
 
-    // Dữ liệu IsPhuHoMapMabu dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsPhuHoMapMabu { get; set; }
+    // Dữ liệu IsMabuMapProtected dùng trong bản chụp phục vụ công thức chỉ số.
+    public bool IsMabuMapProtected { get; set; }
 
-    // Trạng thái Detu khi người chơi là đệ tử; DetuFusionStatus là giá trị đang hợp thể.
-    public sbyte DetuStatus { get; set; }
+    // Trạng thái Pet khi người chơi là đệ tử (Java: detuStatus); PetFusionStatus là giá trị đang hợp thể.
+    public sbyte PetStatus { get; set; }
 
     // Loại đệ tử: 0 thường, 1 Ma Bu, 2-4 Sơn Tinh/Thủy Tinh, 5 Bu Nhí/Xên Nhí/Fide Đại Ca.
-    public sbyte DetuTypeDeTu { get; set; }
+    public sbyte PetType { get; set; }
 
-    // Dữ liệu THE_TUAN dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_TUAN { get; set; }
+    // Dữ liệu WeeklyCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int WeeklyCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_TUAN dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_TUAN { get; set; }
+    // Dữ liệu LastWeeklyCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastWeeklyCardTime { get; set; }
 
-    // Dữ liệu THE_THANG dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_THANG { get; set; }
+    // Dữ liệu MonthlyCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int MonthlyCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_THANG dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_THANG { get; set; }
+    // Dữ liệu LastMonthlyCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastMonthlyCardTime { get; set; }
 
-    // Dữ liệu THE_NAM dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_NAM { get; set; }
+    // Dữ liệu YearlyCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int YearlyCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_NAM dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_NAM { get; set; }
+    // Dữ liệu LastYearlyCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastYearlyCardTime { get; set; }
 
-    // Dữ liệu THE_CHI_TON dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_CHI_TON { get; set; }
+    // Dữ liệu SupremeCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int SupremeCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_CHI_TON dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_CHI_TON { get; set; }
+    // Dữ liệu LastSupremeCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastSupremeCardTime { get; set; }
 
     // Dữ liệu ClanHpBonusPercent dùng trong bản chụp phục vụ công thức chỉ số (Java: tlHpClanAdd).
     public int ClanHpBonusPercent { get; set; }
@@ -523,14 +523,14 @@ public sealed class NPointPlayerFacts
     // Dữ liệu ClanDamageBonusPercent dùng trong bản chụp phục vụ công thức chỉ số (Java: tlDameClanAdd).
     public int ClanDamageBonusPercent { get; set; }
 
-    // Dữ liệu IsUseDanhHieu_ThienTu dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsUseDanhHieu_ThienTu { get; set; }
+    // Dữ liệu UsesEmperorTitle dùng trong bản chụp phục vụ công thức chỉ số.
+    public bool UsesEmperorTitle { get; set; }
 
-    // Dữ liệu LastTimeDanhHieu_ThienTu dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LastTimeDanhHieu_ThienTu { get; set; }
+    // Dữ liệu LastEmperorTitleTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastEmperorTitleTime { get; set; }
 
-    // Dữ liệu Isbienhinh dùng trong bản chụp phục vụ công thức chỉ số.
-    public int Isbienhinh { get; set; }
+    // Dữ liệu TransformationState dùng trong bản chụp phục vụ công thức chỉ số.
+    public int TransformationState { get; set; }
 
     // Dữ liệu Trbne dùng trong bản chụp phục vụ công thức chỉ số.
     public sbyte Trbne { get; set; }
@@ -544,8 +544,8 @@ public sealed class NPointPlayerFacts
     // Dữ liệu Buff dùng trong bản chụp phục vụ công thức chỉ số.
     public Buff Buff { get; set; } = Buff.NONE;
 
-    // Dữ liệu Baovetaikhoan dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool Baovetaikhoan { get; set; }
+    // Dữ liệu IsAccountProtected dùng trong bản chụp phục vụ công thức chỉ số.
+    public bool IsAccountProtected { get; set; }
 
     // Cho biết phiên tồn tại và có Vip_Point dương.
     public bool HasVipPoint { get; set; }
@@ -588,14 +588,14 @@ public sealed class NPointZoneFacts
     // Dữ liệu IsMapKVTH dùng trong bản chụp phục vụ công thức chỉ số.
     public bool IsMapKVTH { get; set; }
 
-    // Dữ liệu IsMapBanDoKhoBau dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsMapBanDoKhoBau { get; set; }
+    // Dữ liệu IsTreasureUnderSeaMap dùng trong bản chụp phục vụ công thức chỉ số (Java: isMapBanDoKhoBau).
+    public bool IsTreasureUnderSeaMap { get; set; }
 
-    // Dữ liệu IsMapDoanhTrai dùng trong bản chụp phục vụ công thức chỉ số.
-    public bool IsMapDoanhTrai { get; set; }
+    // Dữ liệu IsBarracksMap dùng trong bản chụp phục vụ công thức chỉ số (Java: isMapDoanhTrai).
+    public bool IsBarracksMap { get; set; }
 
-    // Gộp các vị từ bản đồ Bình hút năng lượng, Địa ngục, Hirudegarn, Potara, Thánh địa và Hành tinh thực vật.
-    public bool IsTnsmDividedMap { get; set; }
+    // Gộp các vị từ bản đồ Bình hút năng lượng, Địa ngục, Hirudegarn, Potara, Thánh địa và Hành tinh thực vật (Java: isTnsmDividedMap).
+    public bool IsPowerPotentialDividedMap { get; set; }
 }
 
 // Chứa trường Clan mà công thức tiềm năng cần đọc.
@@ -608,22 +608,22 @@ public sealed class NPointClanFacts
     // Dữ liệu TimeStarBuffExp dùng trong bản chụp phục vụ công thức chỉ số.
     public long TimeStarBuffExp { get; set; }
 
-    // Dữ liệu AddPotentialSucManhToanBangHoi dùng trong bản chụp phục vụ công thức chỉ số.
-    public int AddPotentialSucManhToanBangHoi { get; set; }
+    // Dữ liệu ClanPowerPotentialBonus dùng trong bản chụp phục vụ công thức chỉ số (Java: congTiemNangSucManhToanBangHoi).
+    public int ClanPowerPotentialBonus { get; set; }
 
-    // Dữ liệu BuaTriTue dùng trong bản chụp phục vụ công thức chỉ số.
-    public long BuaTriTue { get; set; }
+    // Dữ liệu WisdomCharmExpiry dùng trong bản chụp phục vụ công thức chỉ số (Java: buaTriTue).
+    public long WisdomCharmExpiry { get; set; }
 
     // Dữ liệu Level dùng trong bản chụp phục vụ công thức chỉ số.
     public int Level { get; set; }
 }
 
-// Chứa đệ tử hợp thể hoặc đi theo; null khi không có. NPoint chỉ đọc chỉ số sau khi đệ tử đã tính lại.
-public sealed class NPointDetuFacts
+// Chứa đệ tử hợp thể hoặc đi theo; null khi không có. NPoint chỉ đọc chỉ số sau khi đệ tử đã tính lại (Java: NPointDetuFacts).
+public sealed class NPointPetFacts
 {
 
-    // Dữ liệu TypeDeTu dùng trong bản chụp phục vụ công thức chỉ số.
-    public sbyte TypeDeTu { get; set; }
+    // Dữ liệu PetType dùng trong bản chụp phục vụ công thức chỉ số (Java: typeDeTu).
+    public sbyte PetType { get; set; }
 
     // Dữ liệu HpMax dùng trong bản chụp phục vụ công thức chỉ số.
     public long HpMax { get; set; }
@@ -666,29 +666,29 @@ public sealed class NPointMasterFacts
     // Dữ liệu ItemTimeIsBoneDragon dùng trong bản chụp phục vụ công thức chỉ số.
     public bool ItemTimeIsBoneDragon { get; set; }
 
-    // Dữ liệu THE_TUAN dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_TUAN { get; set; }
+    // Dữ liệu WeeklyCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int WeeklyCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_TUAN dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_TUAN { get; set; }
+    // Dữ liệu LastWeeklyCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastWeeklyCardTime { get; set; }
 
-    // Dữ liệu THE_THANG dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_THANG { get; set; }
+    // Dữ liệu MonthlyCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int MonthlyCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_THANG dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_THANG { get; set; }
+    // Dữ liệu LastMonthlyCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastMonthlyCardTime { get; set; }
 
-    // Dữ liệu THE_NAM dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_NAM { get; set; }
+    // Dữ liệu YearlyCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int YearlyCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_NAM dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_NAM { get; set; }
+    // Dữ liệu LastYearlyCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastYearlyCardTime { get; set; }
 
-    // Dữ liệu THE_CHI_TON dùng trong bản chụp phục vụ công thức chỉ số.
-    public int THE_CHI_TON { get; set; }
+    // Dữ liệu SupremeCard dùng trong bản chụp phục vụ công thức chỉ số.
+    public int SupremeCard { get; set; }
 
-    // Dữ liệu LASTTIME_THE_CHI_TON dùng trong bản chụp phục vụ công thức chỉ số.
-    public long LASTTIME_THE_CHI_TON { get; set; }
+    // Dữ liệu LastSupremeCardTime dùng trong bản chụp phục vụ công thức chỉ số.
+    public long LastSupremeCardTime { get; set; }
 
     // Dữ liệu Charms dùng trong bản chụp phục vụ công thức chỉ số.
     public NPointCharmsFacts Charms { get; } = new();
@@ -787,8 +787,8 @@ public sealed class NPointInventoryFacts
 // Gom toàn bộ dữ liệu NPoint đọc trong một lần tính; INPointHost.Capture xây dựng bản chụp này.
 public sealed class NPointFacts
 {
-    // Hằng trạng thái hợp thể Detu.FUSION.
-    public const sbyte DetuFusionStatus = 4;
+    // Hằng trạng thái hợp thể Pet (Java: Detu.FUSION).
+    public const sbyte PetFusionStatus = 4;
 
     // Dữ liệu Player dùng trong bản chụp phục vụ công thức chỉ số.
     public NPointPlayerFacts Player { get; } = new();
@@ -820,8 +820,8 @@ public sealed class NPointFacts
     // Bang hội của người chơi; null khi chưa có.
     public NPointClanFacts? Clan { get; set; }
 
-    // Đệ tử của người chơi; null khi chưa có.
-    public NPointDetuFacts? Detu { get; set; }
+    // Pet của người chơi; null khi chưa có (Java: detu).
+    public NPointPetFacts? Pet { get; set; }
 
     // Chủ của người chơi khi là đệ tử hoặc phân thân; null trong trường hợp khác.
     public NPointMasterFacts? Master { get; set; }
@@ -829,8 +829,8 @@ public sealed class NPointFacts
     // Kiểu hợp thể của người chơi.
     public sbyte TypeFusion { get; set; }
 
-    // Sát thương cộng từ PointFusion.
-    public int DameFusion { get; set; }
+    // Sát thương cộng từ PointFusion (Java: dameFusion).
+    public int FusionDamage { get; set; }
 
     // Thời hạn quà Ngọc Rồng; có bảy phần tử tương ứng sao 1 đến 7.
     public long[] BlackBallTimeOut { get; set; } = new long[7];
@@ -867,11 +867,11 @@ public sealed class NPointAttackFacts
     // Dữ liệu EffectSkin dùng trong bản chụp phục vụ công thức chỉ số.
     public NPointEffectSkinFacts EffectSkin { get; } = new();
 
-    // Cho biết người chơi là đệ tử.
-    public bool IsDeTu { get; set; }
+    // Cho biết người chơi là Pet (Java: isDeTu).
+    public bool IsPet { get; set; }
 
-    // Thời hạn bùa đệ tử của chủ; bằng 0 khi người chơi không phải đệ tử.
-    public long MasterCharmsTdDeTu { get; set; }
+    // Thời hạn bùa đệ tử của chủ; bằng 0 khi người chơi không phải đệ tử (Java: master.charms.tdDeTu; nghĩa chưa chắc, cần chủ dự án duyệt).
+    public long MasterPetCharmTraining { get; set; }
 
     // Cờ Manager.readInt dùng cùng ý nghĩa với NPointServerFacts.ReadInt.
     public bool ReadInt { get; set; } = true;

@@ -53,7 +53,7 @@ public sealed record EffectNPointState
     public bool WearingMabu { get; init; }
 
     // Giá trị X Chưởng (Java: xChuong).
-    public int ChargedBlastLevel { get; init; }
+    public int BlastDamageMultiplier { get; init; }
 
     // Cho biết đang mặc giáp vô hình (Java: wearingVoHinh).
     public bool WearingInvisibilityArmor { get; init; }

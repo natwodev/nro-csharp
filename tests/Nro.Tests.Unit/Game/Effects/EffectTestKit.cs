@@ -143,7 +143,7 @@ internal sealed class FakeWorld : IEffectPlayerAccess, IEffectInventoryAccess, I
     /// <summary>Called at the start of every <see cref="Chat"/>; a test uses it to change the zone while an effect is iterating it.</summary>
     public Action<Player, string>? OnChat { get; set; }
 
-    /// <summary>Players whose <see cref="IEffectPlayerAccess.SaveIsBienHinh"/> was called, with the value of <c>Isbienhinh</c> at that moment.</summary>
+    /// <summary>Players whose <see cref="IEffectPlayerAccess.SaveTransformationState"/> was called, with the value of <c>TransformationState</c> at that moment.</summary>
     public List<(long Player, int Value)> SavedBienHinh { get; } = [];
 
     /// <summary>Every <see cref="IEffectPlayerAccess.Injure"/> call: victim id and the damage exactly as passed.</summary>
@@ -174,7 +174,7 @@ internal sealed class FakeWorld : IEffectPlayerAccess, IEffectInventoryAccess, I
         return player;
     }
 
-    /// <summary>Registers a player created by the test (for example a <c>PhanThan</c> clone) with the world.</summary>
+    /// <summary>Registers a player created by the test (for example a <c>BodyClone</c>) with the world.</summary>
     public Player Adopt(EffectEnvironment env, Player player, Action<Sim>? configure = null)
     {
         var sim = new Sim();
@@ -286,7 +286,7 @@ internal sealed class FakeWorld : IEffectPlayerAccess, IEffectInventoryAccess, I
         sims[player].DuoiKhi = false;
     }
 
-    public void SaveIsBienHinh(Player player) => SavedBienHinh.Add((player.Id, player.Isbienhinh));
+    public void SaveTransformationState(Player player) => SavedBienHinh.Add((player.Id, player.TransformationState));
 
     public void Injure(Player victim, Player? attacker, double damage, bool piercing, bool isMobAttack)
     {
@@ -337,7 +337,7 @@ internal sealed class FakeWorld : IEffectPlayerAccess, IEffectInventoryAccess, I
 
     public int GetTimett() => 300000;
 
-    public int GetTimeSucManhBocPha(int level) => (level + 5) * 5000;
+    public int GetPowerBurstDuration(int level) => (level + 5) * 5000;
 
     // ---- IEffectClientNotifier -----------------------------------------------------------------------------------------------------------------------------------
 

@@ -19,8 +19,8 @@ public class Inventory
     // Java LIMIT_GOLD: 2,000,000,000,000.
     public const long LIMIT_GOLD = 2_000_000_000_000L;
 
-    // Giới hạn vàng thứ hai: 2,000,000,000; Java không dùng, giữ cho bảng hằng. (Java: LIMIT_GOLD2)
-    public const long LIMIT_GOLD_2 = 2_000_000_000L;
+    // Mức vàng tối đa khi Shenron cộng vàng theo điều ước (Java: LIMIT_GOLD2).
+    public const long DRAGON_WISH_GOLD_CAP = 2_000_000_000L;
 
     // Java LIMIT_RUBY.
     public const int LIMIT_RUBY = 2_000_000_000;

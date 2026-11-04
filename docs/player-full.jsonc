@@ -696,8 +696,8 @@
     "lastHHTime": null, // data_item_event[3] lần reset hoa hồng (ms) | C#: ItemEvent.LastHHTime (chưa nạp) [dùng]
     "remainingBNCount": null, // data_item_event[4] lượt còn: bình nước | C#: ItemEvent.RemainingBNCount (chưa nạp) [dùng]
     "lastBNTime": null, // data_item_event[5] lần reset bình nước (ms) | C#: ItemEvent.LastBNTime (chưa nạp) [dùng]
-    "remainingKeoGiangSinhCount": null, // data_item_event[6] lượt còn: kẹo Giáng Sinh | C#: ItemEvent.RemainingKeoGiangSinhCount (chưa nạp) [dùng]
-    "lastKeoGiangSinhTime": null // data_item_event[7] lần reset kẹo GS (ms) | C#: ItemEvent.LastKeoGiangSinhTime (chưa nạp) [dùng]
+    "remainingKeoGiangSinhCount": null, // data_item_event[6] lượt còn: kẹo Giáng Sinh | C#: ItemEvent.RemainingChristmasCandyCount (chưa nạp) [dùng]
+    "lastKeoGiangSinhTime": null // data_item_event[7] lần reset kẹo GS (ms) | C#: ItemEvent.LastChristmasCandyTime (chưa nạp) [dùng]
   },
   // thẻ tuần/tháng/năm/chí tôn; DEFAULT '[0,0,0,0,0,0,0,0]' [dùng]
   "data_the_card": {

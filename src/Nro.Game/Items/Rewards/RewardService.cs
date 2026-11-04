@@ -112,10 +112,11 @@ public class RewardService
         InitStarOption(item.ItemOptions, ratioStars);
     }
 
+    // Khởi tạo tùy chọn cơ bản của Sao Pha Lê (Java: initBaseOptionSaoPhaLe).
     // Java initBaseOptionSaoPhaLe(itemReward): adds the option of a socket stone (441 to 447: options 95 to 101 with 5, 5, 5, 3, 3, 5, 5; 220 to 225: options 71, 70, 69, 68, 67, 73 with 0).
     // Java bug kept: for any other template id the code adds new ItemOption(-1, 5), which asks the option table for position -1 and throws IndexOutOfBoundsException. The C# version throws
     // ArgumentOutOfRangeException in the same case, after the other options were left untouched.
-    public void InitBaseOptionSaoPhaLe(Item itemReward)
+    public void InitializeCrystalStarBaseOption(Item itemReward)
     {
         ArgumentNullException.ThrowIfNull(itemReward);
         int optionId = -1;
@@ -202,6 +203,7 @@ public class RewardService
 
     private void NoRoom(Player player) => host.SendNotification(player, "Cần 1 ô hành trang trống");
 
+    // Phát phần thưởng Tuần Lộc, giữ nguyên hậu tố tên riêng (nghĩa chưa chắc, cần chủ dự án duyệt). (Java: rewardTuanLoc)
     // Java rewardTuanLoc(player): gives one of 13 reward items (equal chance) with its own option rolls and, for the first nine, a 99 percent chance of a 7, 15 or 30 day expiry option 93. Needs one free
     // bag slot; sets canReward_TuanLoc = false and haveReward_TuanLoc = true only when there is room.
     public void RewardTuanLoc(Player player)
@@ -210,7 +212,7 @@ public class RewardService
         if (host.GetCountEmptyBag(player) > 0)
         {
             player.CanReward_TuanLoc = false;
-            player.HaveReward_TuanLoc = true;
+            player.HasReward_TuanLoc = true;
             short[] expiryDays = [7, 15, 30];
             short[] listItem = [1654, 1748, 1829, 1841, 1467, 822, 823, 388, 391, 394, 925, 926, 927];
             Item itemReceived = items.CreateNewItem(listItem[random.NextInt(0, listItem.Length - 1)]);
@@ -337,8 +339,8 @@ public class RewardService
             player,
             p =>
             {
-                p.CanReward_PeNa = false;
-                p.HaveReward_PeNa = true;
+                p.CanReceiveEventReward_PeNa = false;
+                p.HasEventReward_PeNa = true;
             },
             758,
             1,
@@ -353,8 +355,8 @@ public class RewardService
             player,
             p =>
             {
-                p.CanReward_PiLong = false;
-                p.HaveReward_PiLong = true;
+                p.CanReceiveEventReward_PiLong = false;
+                p.HasEventReward_PiLong = true;
             },
             1187,
             1,
@@ -369,8 +371,8 @@ public class RewardService
             player,
             p =>
             {
-                p.CanReward_MeoDen = false;
-                p.HaveReward_MeoDen = true;
+                p.CanReceiveEventReward_MeoDen = false;
+                p.HasEventReward_MeoDen = true;
             },
             1187,
             1,
@@ -385,8 +387,8 @@ public class RewardService
             player,
             p =>
             {
-                p.CanReward = false;
-                p.HaveReward = true;
+                p.CanReceiveEventReward = false;
+                p.HasEventReward = true;
             },
             758,
             1,

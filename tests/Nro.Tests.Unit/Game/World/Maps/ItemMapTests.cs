@@ -125,7 +125,7 @@ public class ItemMapTests
     {
         FakeGame g = new();
         g.SetMapSet("NamecBall", 355);
-        g.SetMapSet("DoanhTrai", 90);
+        g.SetMapSet("Barracks", 90);
         Zone z = MapTestKit.BuildZone(g, 1);
         ItemMap namec = new(z, 355, 1, 0, 0, -1);
         ItemMap id78 = new(z, 78, 1, 0, 0, -1);
@@ -151,7 +151,7 @@ public class ItemMapTests
         Assert.DoesNotContain("removeItem:20", g2.Calls);
 
         FakeGame g3 = new();
-        g3.SetMapSet("DoanhTrai", 90);
+        g3.SetMapSet("Barracks", 90);
         Zone dt = MapTestKit.BuildZone(g3, 90);
         ItemMap ball = new(dt, 15, 1, 0, 0, -1);
         g3.Time.Advance(TimeSpan.FromMilliseconds(60_000));

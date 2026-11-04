@@ -19,10 +19,10 @@ public interface IMapRules
     bool IsMapHungVuongEvent(int mapId);
 
     // Kiểm tra map khí gas hủy diệt (Java: isMapKhiGasHuyDiet).
-    bool IsMapKhiGasHuyDiet(int mapId);
+    bool IsDestronGasMap(int mapId);
 
     // Kiểm tra map phó bản (Java: isMapPhoBan).
-    bool IsMapPhoBan(int mapId);
+    bool IsDungeonMap(int mapId);
 
     // Kiểm tra map không rơi vật phẩm (Java: isMapNotDropItems).
     bool IsMapNotDropItems(int mapId);
@@ -46,7 +46,7 @@ public interface IMapRules
     bool IsMapBang(int mapId);
 
     // Kiểm tra map bản đồ kho báu (Java: isMapBanDoKhoBau).
-    bool IsMapBanDoKhoBau(int mapId);
+    bool IsTreasureUnderSeaMap(int mapId);
 
     // Kiểm tra map làng (Java: isMapLang).
     bool IsMapLang(int mapId);
@@ -70,7 +70,7 @@ public interface IMapRules
     bool IsMapPotara(int mapId);
 
     // Kiểm tra map doanh trại (Java: isMapDoanhTrai).
-    bool IsMapDoanhTrai(int mapId);
+    bool IsBarracksMap(int mapId);
 
     // Kiểm tra map ngoại tuyến (Java: isMapOffline).
     bool IsMapOffline(int mapId);

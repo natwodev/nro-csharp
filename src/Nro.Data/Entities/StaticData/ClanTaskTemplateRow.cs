@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class ClanTaskTemplateRow
     // Khóa chính của bảng ClanTaskTemplate
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Column("id")]
     public int ClanTaskTemplateId { get; set; }
 
     // Tên nhiệm vụ (%1: số lượng)

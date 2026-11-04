@@ -10,7 +10,7 @@ namespace Nro.Game.World.Mobs;
 public sealed record DhdItem(int TemplateId, List<ItemMapOption> Options);
 
 // Chứa bảng vật phẩm rơi đặc biệt và các hàm thả thưởng theo vị trí.
-// Nguồn Java: nro/mob/MobDrop.java (các hàm static nhận MapRuntime thay Service.gI(), ItemService.gI() và new Random(); đồ Hủy Diệt trả DhdItem vì Item thật thuộc mô hình vật phẩm, tùy chọn có sẵn do IMobLootHost.CreateSetKichHoatOptions cung cấp).
+// Nguồn Java: nro/mob/MobDrop.java (các hàm static nhận MapRuntime thay Service.gI(), ItemService.gI() và new Random(); đồ Hủy Diệt trả DhdItem vì Item thật thuộc mô hình vật phẩm, tùy chọn có sẵn do IMobLootHost.CreateActivationSetOptions cung cấp).
 public static class MobDrop
 {
     // Các template thức ăn có thể rơi.
@@ -59,7 +59,7 @@ public static class MobDrop
     // Quay chỉ số món Hủy Diệt: áo 1800--2800, quần HP 85--100, găng 8500--10000, giày 80--90, nhẫn chí mạng 17--19; thêm tùy chọn cần 80 tỷ sức mạnh (21) và không giao dịch (30), chỉ số tăng 10% khi hợp giới tính. (Java: randomCS_DHD)
     public static DhdItem CreateRandomDestructionSetItem(MapRuntime rt, int itemId, int gender)
     {
-        List<ItemMapOption> options = rt.Loot.CreateSetKichHoatOptions(itemId);
+        List<ItemMapOption> options = rt.Loot.CreateActivationSetOptions(itemId);
         const int destructionRingId = 656;
         if (Array.IndexOf(Shirts, itemId) >= 0)
         {

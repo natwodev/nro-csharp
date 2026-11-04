@@ -27,32 +27,32 @@ public sealed record MobLootPlayerView
     // Phần trăm vàng cộng thêm. (Java: nPoint.tlGold)
     public double GoldPercent { get; init; }
 
-    // Cho biết đang mặc đồ Sức mạnh cấp lớn.
-    public bool IsSPLCostume { get; init; }
+    // Cho biết đang trang bị đồ Sao Pha Lê (Java: isDoSPL).
+    public bool HasCrystalStarEquipment { get; init; }
 
     // Cho biết phiên chơi đang hoạt động.
     public bool IsActive { get; init; }
 
     // Vé tháng còn hiệu lực. (Java: session.vethang == 1 && session.vethangExpire > now)
-    public bool VeThangActive { get; init; }
+    public bool MonthlyCardActive { get; init; }
 
     // Vé tuần còn hiệu lực. (Java: session.vetuan == 1 && session.vetuanExpire > now)
-    public bool VeTuanActive { get; init; }
+    public bool WeeklyCardActive { get; init; }
 
     // Cho biết đang dùng cỏ bốn lá.
     public bool UseCoBonLa { get; init; }
 
-    // Cho biết đang dùng máy dò thường.
-    public bool UseMayDo { get; init; }
+    // Cho biết đang dùng máy dò thường (Java: isUseMayDo).
+    public bool UseScanner { get; init; }
 
-    // Cho biết đang dùng máy dò siêu hóa.
-    public bool UseMayDoSieuHoa { get; init; }
+    // Cho biết đang dùng máy dò siêu hóa (Java: isUseMayDoSieuHoa).
+    public bool UseSuperTransformationScanner { get; init; }
 
-    // Cho biết đang dùng máy dò linh hồn.
-    public bool UseMayDoLinhHon { get; init; }
+    // Cho biết đang dùng máy dò linh hồn (Java: isUseMayDoLinhHon).
+    public bool UseSoulScanner { get; init; }
 
-    // Cho biết đang dùng máy dò ngọc bí.
-    public bool UseMayDoNgocBi { get; init; }
+    // Cho biết đang dùng máy dò ngọc bí (Java: isUseMayDoNgocBi).
+    public bool UseMysticOrbScanner { get; init; }
 
     // Bang có bản đồ kho báu cấp lớn hơn 0. (Java: player.clan != null && player.clan.BanDoKhoBau.level > 0)
     public bool HasTreasureMapClan { get; init; }
@@ -69,7 +69,7 @@ public interface IMobLootHost
     bool HasChristmasHat(Player player);
 
     // Kiểm tra còn được rơi kẹo Giáng Sinh và tăng bộ đếm nếu được. (Java: player.itemEvent.canDropKeoGiangSinh)
-    bool CanDropKeoGiangSinh(Player player, int limit);
+    bool CanDropChristmasCandy(Player player, int limit);
 
     // Kiểm tra còn được rơi tất vô Giáng Sinh. (Java: player.itemEvent.canDropTatVoGiangSinh)
     bool CanDropTatVoGiangSinh(Player player, int limit);
@@ -95,8 +95,8 @@ public interface IMobLootHost
     // Tăng tùy chọn 262 của vật phẩm tại index thêm 1, chặn 3000 và gửi túi. (Java: addOptionParam và sendItemBag)
     void IncreaseBinhHutNangLuong(Player player, int index);
 
-    // Tạo các tùy chọn có sẵn của ItemService.createItemSetKichHoat(itemId, 1), cùng template itemId.
-    List<ItemMapOption> CreateSetKichHoatOptions(int itemId);
+    // Tạo các tùy chọn có sẵn của ItemService.createItemSetKichHoat(itemId, 1), cùng template itemId (Java: createSetKichHoatOptions).
+    List<ItemMapOption> CreateActivationSetOptions(int itemId);
 
     // Lấy người quyết định bộ đếm rơi bình nước: chủ của đệ tử hoặc chính player. (Java: player.isDeTu ? ((Detu) player).master : player)
     Player GetBinhNuocOwner(Player player);

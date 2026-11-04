@@ -497,13 +497,13 @@ public class ItemModelGoldenTests
                 case "DoThienSu":
                     return DumpItem(e.Items.DoThienSu(int.Parse(a[0]), int.Parse(a[1])));
                 case "randTempItemKichHoat":
-                    return e.Items.RandTempItemKichHoat(int.Parse(c.Args)).ToString();
+                    return e.Items.RandomActivationSetTemplate(int.Parse(c.Args)).ToString();
                 case "randTempItemKichHoat_VIP":
-                    return e.Items.RandTempItemKichHoat_VIP(int.Parse(c.Args)).ToString();
+                    return e.Items.RandomActivationSetTemplate_Vip(int.Parse(c.Args)).ToString();
                 case "randOptionItemKichHoat":
-                    return "[" + string.Join(", ", e.Items.RandOptionItemKichHoat(int.Parse(c.Args))) + "]";
+                    return "[" + string.Join(", ", e.Items.RandomActivationSetOptions(int.Parse(c.Args))) + "]";
                 case "randOptionItemKichHoatNew":
-                    return "[" + string.Join(", ", e.Items.RandOptionItemKichHoatNew(int.Parse(c.Args))) + "]";
+                    return "[" + string.Join(", ", e.Items.RandomActivationSetOptionsNew(int.Parse(c.Args))) + "]";
                 case "createItemFromItemShop":
                 {
                     string[] parts = c.Args.Split(';');
@@ -570,13 +570,13 @@ public class ItemModelGoldenTests
                     return ItemOptionPredicates(e, c.Args);
                 case "stoneDefaultOption":
                 {
-                    ItemOption io = e.Item(300, Pairs(c.Args)).GetOptionDaPhaLe();
+                    ItemOption io = e.Item(300, Pairs(c.Args)).GetCrystalOption();
                     return io.OptionTemplate.Id + ":" + io.Param;
                 }
 
                 case "stoneOption":
                 {
-                    ItemOption io = e.Item(int.Parse(c.Args), 1, 1).GetOptionDaPhaLe();
+                    ItemOption io = e.Item(int.Parse(c.Args), 1, 1).GetCrystalOption();
                     return io.OptionTemplate.Id + ":" + io.Param;
                 }
 
@@ -620,7 +620,7 @@ public class ItemModelGoldenTests
                 case "initBaseOptionSaoPhaLe":
                 {
                     Item it = e.Item(int.Parse(c.Args), 47, 1);
-                    e.Rewards.InitBaseOptionSaoPhaLe(it);
+                    e.Rewards.InitializeCrystalStarBaseOption(it);
                     return Dump(it.ItemOptions);
                 }
 
@@ -675,8 +675,8 @@ public class ItemModelGoldenTests
                             break;
                     }
 
-                    return e.Host.TakeLog() + "|" + B(p.CanReward_TuanLoc) + B(p.HaveReward_TuanLoc) + B(p.CanReward_PeNa) + B(p.HaveReward_PeNa) + B(p.CanReward_PiLong) + B(p.HaveReward_PiLong)
-                        + B(p.CanReward_MeoDen) + B(p.HaveReward_MeoDen) + B(p.CanReward) + B(p.HaveReward);
+                    return e.Host.TakeLog() + "|" + B(p.CanReward_TuanLoc) + B(p.HasReward_TuanLoc) + B(p.CanReceiveEventReward_PeNa) + B(p.HasEventReward_PeNa) + B(p.CanReceiveEventReward_PiLong) + B(p.HasEventReward_PiLong)
+                        + B(p.CanReceiveEventReward_MeoDen) + B(p.HasEventReward_MeoDen) + B(p.CanReceiveEventReward) + B(p.HasEventReward);
                 }
 
                 case "rewardFirstTimeLoginPerDay":
@@ -881,9 +881,9 @@ public class ItemModelGoldenTests
             var sb = new StringBuilder();
             sb.Append(D(it.IsDTS())).Append(D(it.IsDTL())).Append(D(it.IsDHD())).Append(D(it.IsDHD1())).Append(D(it.IsDTLNew()))
                 .Append(D(it.IsManhThienSu())).Append(D(it.IsDaMayMan())).Append(D(it.IsDaNangCapTS())).Append(D(it.IsCongThuc()))
-                .Append(D(it.IsCongThucVip())).Append(D(it.IsDaNangCap())).Append(D(it.IsSachTuyetKy())).Append(D(it.IsSachTuyetKy2()))
-                .Append(D(it.IsDaPhaLeEpSao())).Append(D(it.IsDaPhaLeC1())).Append(D(it.IsDaPhaLeC2())).Append(D(it.IsDaPhaLeMoi()))
-                .Append(D(it.IsDaPhaLeCu())).Append(D(it.IsTypeBody())).Append(D(it.CanPhaLeHoa())).Append(D(it.IsDoKyGui()))
+                .Append(D(it.IsCongThucVip())).Append(D(it.IsDaNangCap())).Append(D(it.IsUltimateSkillBook())).Append(D(it.IsUltimateSkillBookVariant2()))
+                .Append(D(it.IsCrystalStarUpgradeStone())).Append(D(it.IsCrystalTier1())).Append(D(it.IsCrystalTier2())).Append(D(it.IsCrystalTierNew()))
+                .Append(D(it.IsCrystalTierOld())).Append(D(it.IsTypeBody())).Append(D(it.CanPhaLeHoa())).Append(D(it.IsDoKyGui()))
                 .Append(D(it.IsItemCollection())).Append(D(it.IsItemTemplateToPet())).Append(D(it.IsItemTemplateToPlayer()))
                 .Append(D(it.IsTrangBiPSH())).Append(D(it.IsTrangBiKhoaGd())).Append(D(it.IsTrangBiHacHoa()));
             sb.Append('|').Append(it.TypeName()).Append('|').Append(it.GetGenderName()).Append('|').Append(it.TypeManh());
@@ -901,7 +901,7 @@ public class ItemModelGoldenTests
             string[] parts = args.Split(';');
             Item it = e.Item(int.Parse(parts[0]), Pairs(parts[1]));
             var sb = new StringBuilder();
-            sb.Append(D(it.IsBUg())).Append(D(it.IsSKH())).Append(D(it.HaveSetKichHoat())).Append(D(it.IsTrangBiHSD()))
+            sb.Append(D(it.IsBUg())).Append(D(it.IsSKH())).Append(D(it.HasActivationSet())).Append(D(it.IsTrangBiHSD()))
                 .Append(D(it.IsHaveOption(47))).Append(D(it.HaveOption(30))).Append(D(it.IsDoKyGui()));
             sb.Append('|').Append(it.GetOptionParam(47)).Append('|').Append(it.GetInfo()).Append('|').Append(it.GetOptionInfo()).Append('|').Append(it.GetOptionInfoUpgrade())
                 .Append('|').Append(it.GetOptionInfoUpgradeFinal()).Append('|').Append(Dump(it.CloneItem().ItemOptions));

@@ -130,7 +130,7 @@ public class NPointCharacterizationTests
             CompareState(where, defaults, expected.GetProperty("state"), main.NPoint);
             if (expected.TryGetProperty("detuState", out JsonElement ds))
             {
-                CompareState(where + " (pet)", defaults, ds, main.Detu!.NPoint);
+                CompareState(where + " (pet)", defaults, ds, main.Pet!.NPoint);
             }
 
             CompareEffects(where, expected.GetProperty("effects"), host.StoreOf(main));
@@ -371,8 +371,8 @@ public class NPointCharacterizationTests
             Assert.True(f.Inventory.TrainingArmor is not null && f.Inventory.TrainingArmor.TemplateId == ta.GetInt32(), $"{where}: trainArmor Java {ta} / port {f.Inventory.TrainingArmor?.TemplateId}");
         }
 
-        Assert.Equal(expected.GetProperty("isXChuong").GetBoolean(), f.EffectSkin.IsChargedBlast);
-        Assert.Equal(expected.GetProperty("isXDame").GetBoolean(), f.EffectSkin.IsDamageBoosted);
+        Assert.Equal(expected.GetProperty("isXChuong").GetBoolean(), f.EffectSkin.IsBlastDamageMultiplierReady);
+        Assert.Equal(expected.GetProperty("isXDame").GetBoolean(), f.EffectSkin.IsBlastDamageMultiplierApplied);
         Assert.Equal(expected.GetProperty("isCharging").GetBoolean(), store.IsCharging);
         Assert.Equal(expected.GetProperty("countCharging").GetInt32(), store.CountCharging);
     }

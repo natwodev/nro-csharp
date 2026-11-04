@@ -14,7 +14,7 @@ public class InventoryMoneyTests
     public void Constants_are_the_java_values()
     {
         Assert.Equal(2_000_000_000_000L, Inventory.LIMIT_GOLD);
-        Assert.Equal(2_000_000_000L, Inventory.LIMIT_GOLD_2);
+        Assert.Equal(2_000_000_000L, Inventory.DRAGON_WISH_GOLD_CAP);
         Assert.Equal(2_000_000_000, Inventory.LIMIT_RUBY);
         Assert.Equal(2_000_000_000, Inventory.LIMIT_GEM);
         Assert.Equal(2_000_000_000, Inventory.LIMIT_VIP_EXPERIENCE);
@@ -193,7 +193,7 @@ public class InventoryMoneyTests
 
         JsonElement constants = doc.RootElement.GetProperty("constants");
         Assert.Equal(Inventory.LIMIT_GOLD, constants.GetProperty("LIMIT_GOLD").GetInt64());
-        Assert.Equal(Inventory.LIMIT_GOLD_2, constants.GetProperty("LIMIT_GOLD2").GetInt64());
+        Assert.Equal(Inventory.DRAGON_WISH_GOLD_CAP, constants.GetProperty("LIMIT_GOLD2").GetInt64());
         Assert.Equal(Inventory.LIMIT_GEM, constants.GetProperty("LIMIT_GEM").GetInt32());
         Assert.Equal(Inventory.LIMIT_RUBY, constants.GetProperty("LIMIT_RUBY").GetInt32());
         Assert.Equal(Inventory.LIMIT_VIP_EXPERIENCE, constants.GetProperty("LIMIT_EXP_VIP").GetInt32());

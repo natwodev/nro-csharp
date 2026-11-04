@@ -38,7 +38,7 @@ public sealed record MobPlayerView
     public Player? ThuHutOwner { get; init; }
 
     // Mốc hết hiệu lực bùa Đệ Tử của chủ; 0 nếu không phải đệ tử hoặc thiếu chủ. (Java: ((Detu) player).master.charms.tdDeTu)
-    public long MasterTdDeTu { get; init; }
+    public long MasterPetCharmTraining { get; init; }
 
     // Mốc bùa Đá Trâu của bang; 0 khi không có bang. (Java: player.clan != null && clan.BuaDaTrau)
     public long ClanBuaDaTrau { get; init; }

@@ -57,11 +57,11 @@ public class ItemService
         short[] quan = [556, 558, 560];
         short[] gang = [562, 564, 566];
         short[] giay = [563, 565, 567];
-        short[] nhan = [561];
+        short[] ringTemplateIds = [561];
         short[] options = [86, 87];
         if (random.IsTrueInt(10, 100))
         {
-            idTempTL = nhan[0];
+            idTempTL = ringTemplateIds[0];
         }
         else if (random.IsTrueInt(25, 100))
         {
@@ -80,121 +80,121 @@ public class ItemService
             idTempTL = giay[random.NextInt(3)];
         }
 
-        int tiLe = random.NextInt(100, 115);
+        int ratePercent = random.NextInt(100, 115);
         var itemoptions = new List<ItemOption>();
         int chiso;
         switch (idTempTL)
         {
             case 555:
-                itemoptions.Add(CreateOption(47, 800 * tiLe / 100));
-                if (tiLe > 100)
+                itemoptions.Add(CreateOption(47, 800 * ratePercent / 100));
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 557:
-                itemoptions.Add(CreateOption(47, 850 * tiLe / 100));
-                if (tiLe > 100)
+                itemoptions.Add(CreateOption(47, 850 * ratePercent / 100));
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 559:
-                itemoptions.Add(CreateOption(47, 900 * tiLe / 100));
-                if (tiLe > 100)
+                itemoptions.Add(CreateOption(47, 900 * ratePercent / 100));
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 556:
-                chiso = 52000 * tiLe / 100;
+                chiso = 52000 * ratePercent / 100;
                 itemoptions.Add(CreateOption(22, chiso / 1000));
                 itemoptions.Add(CreateOption(27, chiso / 20));
-                if (tiLe > 100)
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 558:
-                chiso = 50000 * tiLe / 100;
+                chiso = 50000 * ratePercent / 100;
                 itemoptions.Add(CreateOption(22, chiso / 1000));
                 itemoptions.Add(CreateOption(27, chiso / 20));
-                if (tiLe > 100)
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 560:
-                chiso = 48000 * tiLe / 100;
+                chiso = 48000 * ratePercent / 100;
                 itemoptions.Add(CreateOption(22, chiso / 1000));
                 itemoptions.Add(CreateOption(27, chiso / 20));
-                if (tiLe > 100)
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 562:
-                itemoptions.Add(CreateOption(0, 4400 * tiLe / 100));
-                if (tiLe > 100)
+                itemoptions.Add(CreateOption(0, 4400 * ratePercent / 100));
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 564:
-                itemoptions.Add(CreateOption(0, 4300 * tiLe / 100));
-                if (tiLe > 100)
+                itemoptions.Add(CreateOption(0, 4300 * ratePercent / 100));
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 566:
-                itemoptions.Add(CreateOption(0, 4500 * tiLe / 100));
-                if (tiLe > 100)
+                itemoptions.Add(CreateOption(0, 4500 * ratePercent / 100));
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 563:
-                chiso = 48000 * tiLe / 100;
+                chiso = 48000 * ratePercent / 100;
                 itemoptions.Add(CreateOption(23, chiso / 1000));
                 itemoptions.Add(CreateOption(28, chiso / 20));
-                if (tiLe > 100)
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 565:
-                chiso = 50000 * tiLe / 100;
+                chiso = 50000 * ratePercent / 100;
                 itemoptions.Add(CreateOption(23, chiso / 1000));
                 itemoptions.Add(CreateOption(28, chiso / 20));
-                if (tiLe > 100)
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 567:
-                chiso = 46000 * tiLe / 100;
+                chiso = 46000 * ratePercent / 100;
                 itemoptions.Add(CreateOption(23, chiso / 1000));
                 itemoptions.Add(CreateOption(28, chiso * 150 / 1000));
-                if (tiLe > 100)
+                if (ratePercent > 100)
                 {
-                    itemoptions.Add(CreateOption(207, tiLe - 100));
+                    itemoptions.Add(CreateOption(207, ratePercent - 100));
                 }
 
                 break;
             case 561:
-                itemoptions.Add(CreateOption(14, 14 * tiLe / 100));
+                itemoptions.Add(CreateOption(14, 14 * ratePercent / 100));
                 break;
             default:
                 break;
@@ -218,11 +218,11 @@ public class ItemService
         short[] quan = [556, 558, 560];
         short[] gang = [562, 564, 566];
         short[] giay = [563, 565, 567];
-        short[] nhan = [561];
+        short[] ringTemplateIds = [561];
         short[] options = [30, 34, 35, 36, 86, 87, 208];
         if (random.IsTrueInt(10, 100))
         {
-            idTempTL = nhan[0];
+            idTempTL = ringTemplateIds[0];
             type = 4;
         }
         else if (random.IsTrueInt(30, 100))
@@ -246,29 +246,29 @@ public class ItemService
             type = 3;
         }
 
-        int tiLe = random.NextInt(100, 115);
+        int ratePercent = random.NextInt(100, 115);
         var itemoptions = new List<ItemOption>();
         int chiso;
         switch (type)
         {
             case 0:
-                itemoptions.Add(CreateOption(47, random.NextInt(800, 900) * tiLe / 100));
+                itemoptions.Add(CreateOption(47, random.NextInt(800, 900) * ratePercent / 100));
                 break;
             case 1:
-                chiso = random.NextInt(46000, 49000) * tiLe / 100;
+                chiso = random.NextInt(46000, 49000) * ratePercent / 100;
                 itemoptions.Add(CreateOption(22, chiso / 1000));
                 itemoptions.Add(CreateOption(27, chiso * 125 / 1000));
                 break;
             case 2:
-                itemoptions.Add(CreateOption(0, random.NextInt(4300, 4500) * tiLe / 100));
+                itemoptions.Add(CreateOption(0, random.NextInt(4300, 4500) * ratePercent / 100));
                 break;
             case 3:
-                chiso = random.NextInt(46000, 49000) * tiLe / 100;
+                chiso = random.NextInt(46000, 49000) * ratePercent / 100;
                 itemoptions.Add(CreateOption(23, chiso / 1000));
                 itemoptions.Add(CreateOption(28, chiso * 125 / 1000));
                 break;
             case 4:
-                itemoptions.Add(CreateOption(14, random.NextInt(14, 17) * tiLe / 100));
+                itemoptions.Add(CreateOption(14, random.NextInt(14, 17) * ratePercent / 100));
                 break;
         }
 
@@ -285,60 +285,60 @@ public class ItemService
     public List<ItemOption> GetDefaultOptionTL(int itemId)
     {
         var options = new List<ItemOption>();
-        int tiLe = random.NextInt(100, 115);
+        int ratePercent = random.NextInt(100, 115);
         int cs;
         switch (itemId)
         {
             case 555:
-                options.Add(CreateOption(47, 800 * tiLe / 100));
+                options.Add(CreateOption(47, 800 * ratePercent / 100));
                 break;
             case 557:
-                options.Add(CreateOption(47, 850 * tiLe / 100));
+                options.Add(CreateOption(47, 850 * ratePercent / 100));
                 break;
             case 559:
-                options.Add(CreateOption(47, 900 * tiLe / 100));
+                options.Add(CreateOption(47, 900 * ratePercent / 100));
                 break;
             case 556:
-                cs = 52000 * tiLe / 100;
+                cs = 52000 * ratePercent / 100;
                 options.Add(CreateOption(22, cs / 1000));
                 options.Add(CreateOption(27, cs / 20));
                 break;
             case 558:
-                cs = 50000 * tiLe / 100;
+                cs = 50000 * ratePercent / 100;
                 options.Add(CreateOption(22, cs / 1000));
                 options.Add(CreateOption(27, cs / 20));
                 break;
             case 560:
-                cs = 48000 * tiLe / 100;
+                cs = 48000 * ratePercent / 100;
                 options.Add(CreateOption(22, cs / 1000));
                 options.Add(CreateOption(27, cs / 20));
                 break;
             case 562:
-                options.Add(CreateOption(0, 4400 * tiLe / 100));
+                options.Add(CreateOption(0, 4400 * ratePercent / 100));
                 break;
             case 564:
-                options.Add(CreateOption(0, 4300 * tiLe / 100));
+                options.Add(CreateOption(0, 4300 * ratePercent / 100));
                 break;
             case 566:
-                options.Add(CreateOption(0, 4500 * tiLe / 100));
+                options.Add(CreateOption(0, 4500 * ratePercent / 100));
                 break;
             case 563:
-                cs = 48000 * tiLe / 100;
+                cs = 48000 * ratePercent / 100;
                 options.Add(CreateOption(23, cs / 1000));
                 options.Add(CreateOption(28, cs / 20));
                 break;
             case 565:
-                cs = 50000 * tiLe / 100;
+                cs = 50000 * ratePercent / 100;
                 options.Add(CreateOption(23, cs / 1000));
                 options.Add(CreateOption(28, cs / 20));
                 break;
             case 567:
-                cs = 46000 * tiLe / 100;
+                cs = 46000 * ratePercent / 100;
                 options.Add(CreateOption(23, cs / 1000));
                 options.Add(CreateOption(28, cs * 150 / 1000));
                 break;
             case 561:
-                options.Add(CreateOption(14, 14 * tiLe / 100));
+                options.Add(CreateOption(14, 14 * ratePercent / 100));
                 break;
         }
 
@@ -696,7 +696,7 @@ public class ItemService
     }
 
     // Tạo create item set kich hoat; giữ nguyên điều kiện, thứ tự và số học của Java (Java: createItemSetKichHoat).
-    public Item CreateItemSetKichHoat(int tempId, int quantity)
+    public Item CreateActivationSetItem(int tempId, int quantity)
     {
         Item item = NewItem();
         item.Template = GetTemplate(tempId);
@@ -991,7 +991,7 @@ public class ItemService
     // Thực hiện item skh; giữ nguyên điều kiện, thứ tự và số học của Java (Java: itemSKH).
     public Item ItemSKH(int itemId, int skhId)
     {
-        Item item = CreateItemSetKichHoat(itemId, 1);
+        Item item = CreateActivationSetItem(itemId, 1);
         item.ItemOptions.AddRange(GetListOptionItemShop((short)itemId));
         item.ItemOptions.Add(CreateOption(skhId, 1));
         item.ItemOptions.Add(CreateOption(OptionIdSKH(skhId), 1));
@@ -1036,7 +1036,7 @@ public class ItemService
     // Thực hiện item dhd; giữ nguyên điều kiện, thứ tự và số học của Java (Java: itemDHD).
     public Item ItemDHD(int itemId, int dhdId)
     {
-        Item item = CreateItemSetKichHoat(itemId, 1);
+        Item item = CreateActivationSetItem(itemId, 1);
         item.ItemOptions.Add(CreateOption(dhdId, 1));
         item.ItemOptions.Add(CreateOption(OptionIdDHD(dhdId), 1));
         item.ItemOptions.Add(CreateOption(30, 1));
@@ -1080,7 +1080,7 @@ public class ItemService
     // Chọn ngẫu nhiên random cs_dhd; giữ nguyên điều kiện, thứ tự và số học của Java (Java: randomCS_DHD).
     public Item RandomCS_DHD(int itemId, int gender)
     {
-        Item it = CreateItemSetKichHoat(itemId, 1);
+        Item it = CreateActivationSetItem(itemId, 1);
         int[] ao = [650, 652, 654];
         int[] quan = [651, 653, 655];
         int[] gang = [657, 659, 661];
@@ -1169,12 +1169,12 @@ public class ItemService
     // Thực hiện do thien su; giữ nguyên điều kiện, thứ tự và số học của Java (Java: DoThienSu).
     public Item DoThienSu(int itemId, int gender)
     {
-        Item dots = CreateItemSetKichHoat(itemId, 1);
+        Item dots = CreateActivationSetItem(itemId, 1);
         int[] ao = [1048, 1049, 1050];
         int[] quan = [1051, 1052, 1053];
         int[] gang = [1054, 1055, 1056];
         int[] giay = [1057, 1058, 1059];
-        int[] nhan = [1060, 1061, 1062];
+        int[] ringTemplateIds = [1060, 1061, 1062];
         if (ao.Contains(itemId))
         {
             dots.AddOptionParam(47, Util.HighlightsItem(gender == 2, random.NextInt(1201) + 2800));
@@ -1225,7 +1225,7 @@ public class ItemService
             }
         }
 
-        if (nhan.Contains(itemId))
+        if (ringTemplateIds.Contains(itemId))
         {
             dots.AddOptionParam(14, Util.HighlightsItem(gender == 1, random.NextInt(3) + 18));
         }
@@ -1321,7 +1321,7 @@ public class ItemService
     // Chọn ngẫu nhiên trang bị kích hoạt
     // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-    private static readonly int[][][] KichHoatItems =
+    private static readonly int[][][] ActivationSetItems =
     [
         [[0, 0], [1, 1], [2, 2], [0, 33], [1, 41], [2, 49], [0, 3], [1, 4], [2, 5]],
         [[0, 6], [1, 7], [2, 8], [0, 35], [1, 43], [2, 51], [0, 9], [1, 10], [2, 11]],
@@ -1330,7 +1330,7 @@ public class ItemService
         [[3, 12], [3, 57], [3, 58], [3, 59]],
     ];
 
-    private static readonly int[][][] KichHoatItemsVip =
+    private static readonly int[][][] VipActivationSetItems =
     [
         [[0, 0], [1, 1], [2, 2], [0, 33], [1, 41], [2, 49], [0, 3], [1, 4], [2, 5], [0, 34], [0, 136], [0, 137], [0, 138], [0, 139], [0, 230], [0, 231], [0, 232], [0, 233], [1, 42], [1, 152], [1, 153], [1, 154], [1, 155], [1, 234], [1, 235], [1, 236], [1, 237], [2, 50], [2, 168], [2, 169], [2, 170], [2, 171], [2, 238], [2, 239], [2, 240], [2, 241]],
         [[0, 6], [1, 7], [2, 8], [0, 35], [1, 43], [2, 51], [0, 9], [1, 10], [2, 11], [0, 36], [0, 140], [0, 141], [0, 142], [0, 143], [0, 242], [0, 243], [0, 244], [0, 245], [1, 44], [1, 156], [1, 157], [1, 158], [1, 159], [1, 246], [1, 247], [1, 248], [1, 249], [2, 52], [2, 172], [2, 173], [2, 174], [2, 175], [2, 250], [2, 251], [2, 252], [2, 253]],
@@ -1339,7 +1339,7 @@ public class ItemService
         [[3, 12], [3, 57], [3, 58], [3, 59], [3, 184], [3, 185], [3, 186], [3, 187], [3, 278], [3, 279], [3, 280], [3, 281]],
     ];
 
-    private int PickKichHoat(int[][][] items, int gender)
+    private int PickActivationSetItem(int[][][] items, int gender)
     {
         for (int j = 0; j < 1; j++)
         {
@@ -1363,13 +1363,13 @@ public class ItemService
     }
 
     // Chọn ngẫu nhiên rand temp item kich hoat; giữ nguyên điều kiện, thứ tự và số học của Java (Java: randTempItemKichHoat).
-    public int RandTempItemKichHoat(int gender) => PickKichHoat(KichHoatItems, gender);
+    public int RandomActivationSetTemplate(int gender) => PickActivationSetItem(ActivationSetItems, gender);
 
     // Chọn ngẫu nhiên rand temp item kich hoat_vip; giữ nguyên điều kiện, thứ tự và số học của Java (Java: randTempItemKichHoat_VIP).
-    public int RandTempItemKichHoat_VIP(int gender) => PickKichHoat(KichHoatItemsVip, gender);
+    public int RandomActivationSetTemplate_Vip(int gender) => PickActivationSetItem(VipActivationSetItems, gender);
 
     // Chọn ngẫu nhiên rand option item kich hoat; giữ nguyên điều kiện, thứ tự và số học của Java (Java: randOptionItemKichHoat).
-    public int[] RandOptionItemKichHoat(int gender)
+    public int[] RandomActivationSetOptions(int gender)
     {
         int[][] options;
         switch (gender)
@@ -1419,7 +1419,7 @@ public class ItemService
     }
 
     // Chọn ngẫu nhiên rand option item kich hoat new; giữ nguyên điều kiện, thứ tự và số học của Java (Java: randOptionItemKichHoatNew).
-    public int[] RandOptionItemKichHoatNew(int gender)
+    public int[] RandomActivationSetOptionsNew(int gender)
     {
         int op1;
         int op2;

@@ -33,8 +33,8 @@ public class GuardRobot : BigBoss
         {
             if (player != null)
             {
-                double dameMob = Point.GetDamageAttack();
-                double dame = Rt.Players.Injured(player, null, dameMob, false, true);
+                double mobDamage = Point.GetDamageAttack();
+                double damage = Rt.Players.Injured(player, null, mobDamage, false, true);
                 Action = 0;
                 int dis = Distance(player);
                 if (dis <= 100)
@@ -51,7 +51,7 @@ public class GuardRobot : BigBoss
                 }
 
                 Location.X = unchecked((short)Rt.Players.GetX(player));
-                Rt.World.SendBigBoss(Zone!, Action, 1, unchecked((int)player.Id), Rt.CrisGH(dame));
+                Rt.World.SendBigBoss(Zone!, Action, 1, unchecked((int)player.Id), Rt.CrisGH(damage));
             }
 
             LastBigBossAttackTime = Rt.Now;

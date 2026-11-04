@@ -302,7 +302,7 @@ public class PlayerPersistenceMapperTests
         return int.Parse(expression, CultureInfo.InvariantCulture);
     }
 
-    private static bool IsBigintColumn(string column) => column is "last_time_drop_tail" or "last_time_khi_su_kien" or "doanhtrai" or "lasttimepkcommeson" or "dragon_christmas" or "dragon_halloween" or "last_time_update_task";
+    private static bool IsBigintColumn(string column) => column is "last_time_drop_tail" or "last_time_khi_su_kien" or "barracks_state" or "lasttimepkcommeson" or "dragon_christmas" or "dragon_halloween" or "last_time_update_task";
 
     private static string FindWorkspaceFile(params string[] parts)
     {

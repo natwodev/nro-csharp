@@ -36,6 +36,18 @@ internal static class JavaTypeMap
         [typeof(object)] = "object",
     };
 
+    // Tên field Java gốc -> định danh C# đã Anh hóa; golden vẫn lưu tên Java.
+    private static readonly IReadOnlyDictionary<string, string> RenamedFields = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["percentTiemNang"] = "PercentPotential",
+    };
+
+    // Tên lớp Java gốc -> tên lớp C# đã Anh hóa; golden vẫn lưu tên Java.
+    private static readonly IReadOnlyDictionary<string, string> RenamedClasses = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["BauCuaData"] = "GourdCrabData",
+    };
+
     /// <summary>Rule 3.5: capitalize only the first letter, do not split words (<c>iconID</c> becomes <c>IconID</c>).</summary>
     public static string ToClrName(string javaName)
     {
@@ -44,7 +56,7 @@ internal static class JavaTypeMap
             throw new MappingException("Java name is empty");
         }
 
-        return char.ToUpperInvariant(javaName[0]) + javaName[1..];
+        return RenamedFields.GetValueOrDefault(javaName) ?? char.ToUpperInvariant(javaName[0]) + javaName[1..];
     }
 
     /// <summary>The expected full name of the C# class (nested classes use a plus sign, as in .NET reflection).</summary>
@@ -55,8 +67,11 @@ internal static class JavaTypeMap
             throw new MappingException($"Java class outside the nro.template package: {javaBinaryName}");
         }
 
-        return ClrNamespace + "." + javaBinaryName[JavaPackagePrefix.Length..].Replace('$', '+');
+        string clrName = javaBinaryName[JavaPackagePrefix.Length..].Replace('$', '+');
+        return ClrNamespace + "." + string.Join("+", clrName.Split('+').Select(ToClrClassName));
     }
+
+    public static string ToClrClassName(string javaName) => RenamedClasses.GetValueOrDefault(javaName) ?? javaName;
 
     public static Type? FindClrClass(string javaBinaryName)
     {

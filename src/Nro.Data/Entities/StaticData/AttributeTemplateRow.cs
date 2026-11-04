@@ -1,8 +1,6 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nro.Data.Entities.Runtime;
 
 namespace Nro.Data.Entities.StaticData;
 
@@ -14,7 +12,6 @@ public class AttributeTemplateRow
     // Khóa chính của bảng AttributeTemplate (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
     public int AttributeTemplateId { get; set; }
 
     // Nội dung hiển thị buff (#value)

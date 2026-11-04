@@ -49,7 +49,7 @@ public class EffectSkinTests
         Assert.Equal(1, s.HpKiMultiplier);
         Assert.Equal(1, s.DamageMultiplier);
         Assert.False(s.IsNezuko || s.IsTanjiro || s.IsZenitsu || s.IsInosuke || s.IsInoHashi || s.IsChocolate || s.IsRabbitLeader || s.IsDraburaFrost || s.IsSlow);
-        Assert.False(s.IsInvisible || s.IsChargedBlast || s.IsDamageBoosted);
+        Assert.False(s.IsInvisible || s.IsBlastDamageMultiplierReady || s.IsBlastDamageMultiplierApplied);
     }
 
     [Fact]
@@ -626,19 +626,19 @@ public class EffectSkinTests
     [Fact]
     public void Palm_flag_is_raised_once_a_minute()
     {
-        (EffectRig rig, Player owner, _) = Pair(Stat(n => n with { ChargedBlastLevel = 3 }));
+        (EffectRig rig, Player owner, _) = Pair(Stat(n => n with { BlastDamageMultiplier = 3 }));
         owner.EffectSkin.Update();
-        Assert.True(owner.EffectSkin.IsChargedBlast);
-        Assert.Equal(rig.Now, owner.EffectSkin.LastTimeChargedBlast);
+        Assert.True(owner.EffectSkin.IsBlastDamageMultiplierReady);
+        Assert.Equal(rig.Now, owner.EffectSkin.LastTimeBlastDamageMultiplier);
 
-        owner.EffectSkin.IsChargedBlast = false;
+        owner.EffectSkin.IsBlastDamageMultiplierReady = false;
         rig.Advance(60_000);
         Quiet(rig, owner);
         owner.EffectSkin.Update();
-        Assert.False(owner.EffectSkin.IsChargedBlast);
+        Assert.False(owner.EffectSkin.IsBlastDamageMultiplierReady);
         rig.Advance(1);
         owner.EffectSkin.Update();
-        Assert.True(owner.EffectSkin.IsChargedBlast);
+        Assert.True(owner.EffectSkin.IsBlastDamageMultiplierReady);
     }
 
     [Fact]
@@ -660,11 +660,11 @@ public class EffectSkinTests
         Player ok = rig.Add(2, 10, 0);
         Player already = rig.Add(3, 10, 0);
         already.EffectSkill.IsHalloween = true;
-        Player pet = rig.Add(4, 10, 0, null, p => p.IsDeTu = true);
+        Player pet = rig.Add(4, 10, 0, null, p => p.IsPet = true);
         Player far = rig.Add(5, 201, 0);
         Player dead = rig.Add(6, 10, 0, Stat(n => n with { Hp = 0 }));
-        Player bot = rig.Add(7, 10, 0, null, p => p.IsBo = true);
-        Player me = rig.Add(8, 10, 0, null, p => p.IsMe = true);
+        Player bot = rig.Add(7, 10, 0, null, p => p.IsFather = true);
+        Player me = rig.Add(8, 10, 0, null, p => p.IsMother = true);
         Quiet(rig, owner);
         rig.Random.Enqueue(2);
 
@@ -1285,7 +1285,7 @@ public class EffectSkinTests
     [Theory]
     [InlineData("boss")]
     [InlineData("petfollow")]
-    [InlineData("duongtang")]
+    [InlineData("tangmonk")]
     [InlineData("nguoiyeu")]
     public void Training_armor_is_not_handled_for_bosses_pets_and_companions(string kind)
     {
@@ -1294,8 +1294,8 @@ public class EffectSkinTests
         {
             p.IsBoss = kind == "boss";
             p.IsPetFollow = kind == "petfollow";
-            p.IsDuongTang = kind == "duongtang";
-            p.IsNguoiYeu = kind == "nguoiyeu";
+            p.IsTangMonk = kind == "tangmonk";
+            p.IsLover = kind == "nguoiyeu";
         });
         owner.EffectSkin.Update();
         Assert.Empty(rig.World.Calls);

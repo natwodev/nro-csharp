@@ -1,6 +1,6 @@
 namespace Nro.Core.Util;
 
-// Các hàm ngẫu nhiên của game: nextInt, nextLong, nextDouble, nextfloat, sáu bản isTrue, getOne, getChanceFromLuck, Crisnext, GioiHannext, GioiHannextdame, shuffleArray
+// Các hàm ngẫu nhiên của game: nextInt, nextLong, nextDouble, nextfloat, sáu bản isTrue, getOne, getChanceFromLuck, Crisnext, NextWithinLimit, NextDamageWithinLimit, shuffleArray
 // Nguồn Java: nửa ngẫu nhiên của Utils/Util.java; biến tĩnh Random rand của Java thay bằng IRandomProvider được truyền vào. Giữ đúng phép tính, thứ tự các lần rút số
 // và các lỗi ném ra, nên một nguồn có seed sẽ cho lại đúng những gì Java làm.
 // CÁC BẢN isTrue KHÔNG THAY THẾ CHO NHAU ĐƯỢC: Java chọn bản theo kiểu tĩnh của tham số và mỗi bản chạy khác nhau, nên ở đây mỗi bản có tên riêng:
@@ -59,16 +59,16 @@ public sealed class RandomUtil
         return i;
     }
 
-    // isTrue(mum + tyLeMayMan * max / 300, max) bằng bản DOUBLE (IsTrueDouble); nếu isCoBonLa thì max được giảm trước còn max * 100 / 133
+    // isTrue(mum + luckPercent * max / 300, max) bằng bản DOUBLE (IsTrueDouble); nếu isCoBonLa thì max được giảm trước còn max * 100 / 133
     // (Java: getChanceFromLuck)
-    public bool GetChanceFromLuck(double tyLeMayMan, double mum, double max, bool isCoBonLa)
+    public bool GetChanceFromLuck(double luckPercent, double mum, double max, bool isCoBonLa)
     {
         if (isCoBonLa)
         {
             max = (max * 100) / 133;
         }
 
-        return IsTrueDouble(mum + ((tyLeMayMan * max) / 300), max);
+        return IsTrueDouble(mum + ((luckPercent * max) / 300), max);
     }
 
     // false khi typeRatio hoặc ratio không dương, true (không rút số) khi ratio >= typeRatio, còn lại là nextInt(typeRatio) < ratio.
@@ -135,11 +135,11 @@ public sealed class RandomUtil
     // Trả (long)rand.nextInt((int)max) (Java: Crisnext(double max))
     public long Crisnext(double max) => random.NextInt(JavaNumbers.ToInt(max));
 
-    // Giống hệt Crisnext(double, double) (Java: GioiHannext(double from, double to))
-    public long GioiHannext(double from, double to) => JavaNumbers.ToLong(from + random.NextInt(JavaNumbers.ToInt((to - from) + 1)));
+    // Giống hệt Crisnext(double, double) (Java: GioiHannext(double from, double to)).
+    public long NextWithinLimit(double from, double to) => JavaNumbers.ToLong(from + random.NextInt(JavaNumbers.ToInt((to - from) + 1)));
 
-    // Trả from + rand.nextInt((int)(to - from + 1)) dạng double (không ép sang long) (Java: GioiHannextdame(double from, double to))
-    public double GioiHannextdame(double from, double to) => from + random.NextInt(JavaNumbers.ToInt((to - from) + 1));
+    // Trả from + rand.nextInt((int)(to - from + 1)) dạng double (không ép sang long) (Java: GioiHannextdame(double from, double to)).
+    public double NextDamageWithinLimit(double from, double to) => from + random.NextInt(JavaNumbers.ToInt((to - from) + 1));
 
     // Xáo trộn mảng tại chỗ theo Fisher-Yates từ cuối về: j = nextInt(i + 1) với i = length - 1 .. 1 (Java: shuffleArray(int[]))
     public void ShuffleArray(int[] array)

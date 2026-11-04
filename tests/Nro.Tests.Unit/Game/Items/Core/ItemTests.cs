@@ -173,14 +173,14 @@ public class ItemTests
     [InlineData(1211, true)]
     [InlineData(1212, true)]
     [InlineData(1213, false)]
-    public void Skill_book_ids(short id, bool expected) => Assert.Equal(expected, Make(id).IsSachTuyetKy());
+    public void Skill_book_ids(short id, bool expected) => Assert.Equal(expected, Make(id).IsUltimateSkillBook());
 
     [Theory]
     [InlineData(1277, false)]
     [InlineData(1278, true)]
     [InlineData(1280, true)]
     [InlineData(1281, false)]
-    public void Second_skill_book_ids(short id, bool expected) => Assert.Equal(expected, Make(id).IsSachTuyetKy2());
+    public void Second_skill_book_ids(short id, bool expected) => Assert.Equal(expected, Make(id).IsUltimateSkillBookVariant2());
 
     [Theory]
     [InlineData(0, 223, true)]
@@ -207,14 +207,14 @@ public class ItemTests
     [InlineData(1, 13, false)]
     [InlineData(1, 21, false)]
     public void Socket_stones_are_type_30_or_template_14_to_20(sbyte type, short id, bool expected)
-        => Assert.Equal(expected, Make(id, Catalog(t => t.Type = type)).IsDaPhaLeEpSao());
+        => Assert.Equal(expected, Make(id, Catalog(t => t.Type = type)).IsCrystalStarUpgradeStone());
 
     [Theory]
     [InlineData(410, false)]
     [InlineData(411, true)]
     [InlineData(447, true)]
     [InlineData(448, false)]
-    public void First_class_socket_stones_are_411_to_447(short id, bool expected) => Assert.Equal(expected, Make(id).IsDaPhaLeC1());
+    public void First_class_socket_stones_are_411_to_447(short id, bool expected) => Assert.Equal(expected, Make(id).IsCrystalTier1());
 
     [Theory]
     [InlineData(1415, false)]
@@ -224,7 +224,7 @@ public class ItemTests
     [InlineData(964, true)]
     [InlineData(965, true)]
     [InlineData(966, false)]
-    public void Second_class_socket_stones(short id, bool expected) => Assert.Equal(expected, Make(id).IsDaPhaLeC2());
+    public void Second_class_socket_stones(short id, bool expected) => Assert.Equal(expected, Make(id).IsCrystalTier2());
 
     [Theory]
     [InlineData(1425, false)]
@@ -233,25 +233,25 @@ public class ItemTests
     [InlineData(1435, false)]
     [InlineData(1416, true)]
     [InlineData(964, true)]
-    public void New_socket_stones_add_1426_to_1434(short id, bool expected) => Assert.Equal(expected, Make(id).IsDaPhaLeMoi());
+    public void New_socket_stones_add_1426_to_1434(short id, bool expected) => Assert.Equal(expected, Make(id).IsCrystalTierNew());
 
     [Theory]
     [InlineData(440, false)]
     [InlineData(441, true)]
     [InlineData(447, true)]
     [InlineData(448, false)]
-    public void Old_socket_stones_are_441_to_447(short id, bool expected) => Assert.Equal(expected, Make(id).IsDaPhaLeCu());
+    public void Old_socket_stones_are_441_to_447(short id, bool expected) => Assert.Equal(expected, Make(id).IsCrystalTierOld());
 
     [Fact]
     public void Socket_predicates_on_an_empty_slot_are_false_except_the_java_precedence_cases_that_throw()
     {
         var empty = new Item(Catalog());
 
-        Assert.False(empty.IsDaPhaLeEpSao());
-        Assert.False(empty.IsDaPhaLeC1());
-        Assert.False(empty.IsDaPhaLeCu());
-        Assert.Throws<InvalidOperationException>(() => empty.IsDaPhaLeC2());
-        Assert.Throws<InvalidOperationException>(() => empty.IsDaPhaLeMoi());
+        Assert.False(empty.IsCrystalStarUpgradeStone());
+        Assert.False(empty.IsCrystalTier1());
+        Assert.False(empty.IsCrystalTierOld());
+        Assert.Throws<InvalidOperationException>(() => empty.IsCrystalTier2());
+        Assert.Throws<InvalidOperationException>(() => empty.IsCrystalTierNew());
         Assert.Throws<InvalidOperationException>(() => empty.IsTypeBody());
     }
 
@@ -384,7 +384,7 @@ public class ItemTests
         Item item = Make(5, null, (optionId, 1));
 
         Assert.Equal(expected, item.IsSKH());
-        Assert.Equal(expected, item.HaveSetKichHoat());
+        Assert.Equal(expected, item.HasActivationSet());
     }
 
     [Fact]
@@ -393,7 +393,7 @@ public class ItemTests
         var empty = new Item(Catalog());
         empty.ItemOptions.Add(ItemTestKit.Opt(Catalog(), 127, 1));
 
-        Assert.False(empty.HaveSetKichHoat());
+        Assert.False(empty.HasActivationSet());
         Assert.False(empty.HaveOption(127));
     }
 
@@ -535,7 +535,7 @@ public class ItemTests
     [InlineData(1434, 160, 5)]
     public void A_socket_stone_gives_its_option(short stone, int optionId, int param)
     {
-        ItemOption io = Make(stone, null, (1, 1)).GetOptionDaPhaLe();
+        ItemOption io = Make(stone, null, (1, 1)).GetCrystalOption();
 
         Assert.Equal(optionId, io.OptionTemplate.Id);
         Assert.Equal(param, io.Param);
@@ -546,8 +546,8 @@ public class ItemTests
     {
         Item odd = Make(300, null, (47, 8), (21, 9));
 
-        Assert.Same(odd.ItemOptions[0], odd.GetOptionDaPhaLe());
-        Assert.Throws<ArgumentOutOfRangeException>(() => Make(300).GetOptionDaPhaLe());
+        Assert.Same(odd.ItemOptions[0], odd.GetCrystalOption());
+        Assert.Throws<ArgumentOutOfRangeException>(() => Make(300).GetCrystalOption());
     }
 
     [Fact]

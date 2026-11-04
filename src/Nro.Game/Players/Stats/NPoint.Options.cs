@@ -13,8 +13,8 @@ public partial class NPoint
     // Tính lại đệ tử trước để chỉ số của nó cấp cho HP/KI/sát thương hợp thể của chủ, rồi mới tính người chơi này.
     public void CalPoint()
     {
-        Player? detu = Player.Detu;
-        detu?.NPoint.SetPointWhenWearClothes();
+        Player? pet = Player.Pet;
+        pet?.NPoint.SetPointWhenWearClothes();
         SetPointWhenWearClothes();
     }
 
@@ -145,7 +145,7 @@ public partial class NPoint
                     MpBonus += io.Param * 1000;
                     break;
                 case 3: // palm immunity
-                    ChargedBlastNullification += io.Param;
+                    BlastNullification += io.Param;
                     break;
                 case 5: //+#% critical damage
                     CriticalDamagePercents.Add(io.Param);
@@ -200,7 +200,7 @@ public partial class NPoint
                     Teleport = true;
                     break;
                 case 34:
-                    TinhSealSetCount += 1;
+                    StarSealSetCount += 1;
                     break;
                 case 35:
                     NguyetSealSetCount += 1;
@@ -357,7 +357,7 @@ public partial class NPoint
                     MpBonus += io.Param * 1000;
                     break;
                 case 3: // palm immunity
-                    ChargedBlastNullification += io.Param;
+                    BlastNullification += io.Param;
                     break;
                 case 5: //+#% critical damage
                     CriticalDamagePercents.Add(io.Param);
@@ -421,7 +421,7 @@ public partial class NPoint
                     Teleport = true;
                     break;
                 case 34:
-                    TinhSealSetCount += 1;
+                    StarSealSetCount += 1;
                     break;
                 case 35:
                     NguyetSealSetCount += 1;
@@ -516,7 +516,7 @@ public partial class NPoint
                     PercentDirtyHpLoss += io.Param;
                     break;
                 case 110: //spl outfit
-                    IsSPLCostume = true;
+                    HasCrystalStarEquipment = true;
                     break;
                 case 111: //distraction
                     IsXinbato = true;
@@ -554,7 +554,7 @@ public partial class NPoint
                     CuteMpRegen += io.Param;
                     break;
                 case 159: // palm multiplier
-                    ChargedBlastLevel = io.Param;
+                    BlastDamageMultiplier = io.Param;
                     break;
                 case 160: // pet potential
                     PetPowerPotentialPercent += io.Param;
@@ -654,14 +654,14 @@ public partial class NPoint
     private void SetOutfitFusion(NPointFacts facts)
     {
         List<NPointItem> body = facts.Inventory.ItemsBody;
-        NPointDetuFacts? detu = facts.Detu;
-        if (body.Count < 6 || detu is null || detu.BodyItemCount < 6)
+        NPointPetFacts? pet = facts.Pet;
+        if (body.Count < 6 || pet is null || pet.BodyItemCount < 6)
         {
             return;
         }
 
         NPointItem skin = body[5];
-        NPointItem? pskin = detu.BodySkin;
+        NPointItem? pskin = pet.BodySkin;
         if (skin.IsNotNullItem && pskin is not null && pskin.IsNotNullItem)
         {
             IsGogeta = (skin.TemplateId == 1693 && pskin.TemplateId == 1553) || (skin.TemplateId == 1553 && pskin.TemplateId == 1693);
@@ -749,7 +749,7 @@ public partial class NPoint
         SetDamage(facts);
         SetDef(facts);
         SetCrit(facts);
-        SetCritDame(facts);
+        SetCriticalDamage(facts);
         SetHpRegen(facts);
         SetMpRegen(facts);
         SetHpAbsorption(facts);
@@ -786,12 +786,13 @@ public partial class NPoint
     // Hoàn tất bộ ấn Tinh Nhật Nguyệt khi mặc đủ năm món.
     private void SetSealSets()
     {
-        HasTinhSeal = TinhSealSetCount >= 5;
+        HasStarSeal = StarSealSetCount >= 5;
         HasNhatSeal = NhatSealSetCount >= 5;
         HasNguyetSeal = NguyetSealSetCount >= 5;
     }
 
-    private bool HasFull5TinhAn() => TinhSealSetCount >= 5;
+    // Kiểm tra đủ năm ấn sao (Java: hasFull5TinhAn; nghĩa chưa chắc, cần chủ dự án duyệt).
+    private bool HasFullFiveStarSeal() => StarSealSetCount >= 5;
 
     private bool HasFull5NguyetAn() => NguyetSealSetCount >= 5;
 
@@ -820,7 +821,7 @@ public partial class NPoint
     // Đặt lại chỉ số tạm; cố ý không đặt lại WearingTrainArmor, EarringLevel, HP, MP và chỉ số cơ sở như Java.
     private void ResetPoint()
     {
-        ChargedBlastNullification = 0;
+        BlastNullification = 0;
         HpBonus = 0;
         MpBonus = 0;
         DamageBonus = 0;
@@ -873,9 +874,9 @@ public partial class NPoint
         LowMpDamageReductionPercent = 0;
         StackingDamagePercent = 0;
         PetPowerPotentialPercent = 0;
-        ChargedBlastLevel = 0;
+        BlastDamageMultiplier = 0;
         IsFounder = false;
-        TinhSealSetCount = 0;
+        StarSealSetCount = 0;
         NhatSealSetCount = 0;
         NguyetSealSetCount = 0;
         SexyDamagePercent = 0;
@@ -898,7 +899,7 @@ public partial class NPoint
         IsPetrified = false;
         WearingBuiBui = false;
         WearingMabu = false;
-        IsSPLCostume = false;
+        HasCrystalStarEquipment = false;
         IsXinbato = false;
         IsRabbitLeader = false;
         IsRabbitBulma = false;

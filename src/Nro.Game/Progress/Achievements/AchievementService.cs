@@ -72,7 +72,7 @@ public sealed class AchievementService : IAchievementService
     public void ConfirmAchievement(Player player, sbyte select)
     {
         ArgumentNullException.ThrowIfNull(player);
-        if (player.Baovetaikhoan)
+        if (player.IsAccountProtected)
         {
             host.SendNotification(player, "Chức năng bảo vệ đã được bật. Bạn vui lòng kiểm tra lại");
             return;

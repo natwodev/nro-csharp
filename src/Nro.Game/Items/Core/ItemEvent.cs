@@ -28,11 +28,11 @@ public class ItemEvent
     // Java remainingTVGSCount. (Java: remainingTVGSCount).
     public int RemainingTVGSCount { get; set; }
 
-    // Java lastKeoGiangSinhTime. (Java: lastKeoGiangSinhTime).
-    public long LastKeoGiangSinhTime { get; set; }
+    // Thời điểm rơi kẹo Giáng sinh gần nhất (Java: lastKeoGiangSinhTime).
+    public long LastChristmasCandyTime { get; set; }
 
-    // Java remainingKeoGiangSinhCount. (Java: remainingKeoGiangSinhCount).
-    public int RemainingKeoGiangSinhCount { get; set; }
+    // Số lượt rơi kẹo Giáng sinh còn lại (Java: remainingKeoGiangSinhCount).
+    public int RemainingChristmasCandyCount { get; set; }
 
     // Java lastHHTime. (Java: lastHHTime).
     public long LastHHTime { get; set; }
@@ -66,20 +66,20 @@ public class ItemEvent
         return false;
     }
 
-    // Java canDropKeoGiangSinh(maxCount). (Java: canDropKeoGiangSinh(maxCount)).
-    public bool CanDropKeoGiangSinh(int maxCount)
+    // Kiểm tra và ghi nhận lượt rơi kẹo Giáng sinh (Java: canDropKeoGiangSinh).
+    public bool CanDropChristmasCandy(int maxCount)
     {
         long now = Clock.CurrentTimeMillis();
-        if (Util.IsAfterDay(now, LastKeoGiangSinhTime))
+        if (Util.IsAfterDay(now, LastChristmasCandyTime))
         {
-            RemainingKeoGiangSinhCount = maxCount;
-            LastKeoGiangSinhTime = Clock.CurrentTimeMillis();
+            RemainingChristmasCandyCount = maxCount;
+            LastChristmasCandyTime = Clock.CurrentTimeMillis();
             return true;
         }
 
-        if (RemainingKeoGiangSinhCount > 0)
+        if (RemainingChristmasCandyCount > 0)
         {
-            RemainingKeoGiangSinhCount--;
+            RemainingChristmasCandyCount--;
             return true;
         }
 

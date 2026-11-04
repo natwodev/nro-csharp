@@ -194,10 +194,10 @@ public class ItemServiceTests
     {
         var rig = new Rig();
 
-        Assert.Empty(rig.Service.CreateItemSetKichHoat(5, 2).ItemOptions);
+        Assert.Empty(rig.Service.CreateActivationSetItem(5, 2).ItemOptions);
         Assert.Empty(rig.Service.CreateItemDoHuyDiet(5, 2).ItemOptions);
         Assert.False(rig.Service.CreateItemNull().IsNotNullItem());
-        Assert.Equal(2, rig.Service.CreateItemSetKichHoat(5, 2).Quantity);
+        Assert.Equal(2, rig.Service.CreateActivationSetItem(5, 2).Quantity);
     }
 
     // ----- shop item --------------------------------------------------------------------------------------------------------------------------------
@@ -1005,7 +1005,7 @@ public class ItemServiceTests
         // the draw order is the group, then the candidate among the group pairs that suit the race (race 3 pairs suit every race)
         var rig = new Rig(null, group, candidate);
 
-        int id = rig.Service.RandTempItemKichHoat(gender);
+        int id = rig.Service.RandomActivationSetTemplate(gender);
 
         Assert.Equal(expected, id);
         Assert.Equal(2, rig.Random.Calls.Count);
@@ -1014,8 +1014,8 @@ public class ItemServiceTests
     [Fact]
     public void Basic_activation_ring_group_is_open_to_every_race()
     {
-        Assert.Equal(59, new Rig(null, 4, 3).Service.RandTempItemKichHoat(1));
-        Assert.Equal(12, new Rig(null, 4, 0).Service.RandTempItemKichHoat(2));
+        Assert.Equal(59, new Rig(null, 4, 3).Service.RandomActivationSetTemplate(1));
+        Assert.Equal(12, new Rig(null, 4, 0).Service.RandomActivationSetTemplate(2));
     }
 
     [Fact]
@@ -1023,7 +1023,7 @@ public class ItemServiceTests
     {
         var rig = new Rig(null, 0);
 
-        Assert.Equal(0, rig.Service.RandTempItemKichHoat(5));
+        Assert.Equal(0, rig.Service.RandomActivationSetTemplate(5));
         Assert.Single(rig.Random.Calls);
     }
 
@@ -1035,7 +1035,7 @@ public class ItemServiceTests
     {
         var rig = new Rig(null, 0, candidate);
 
-        Assert.Equal(expected, rig.Service.RandTempItemKichHoat_VIP(gender));
+        Assert.Equal(expected, rig.Service.RandomActivationSetTemplate_Vip(gender));
     }
 
     [Fact]
@@ -1043,7 +1043,7 @@ public class ItemServiceTests
     {
         var rig = new Rig(null, 4, 11);
 
-        Assert.Equal(281, rig.Service.RandTempItemKichHoat_VIP(0));
+        Assert.Equal(281, rig.Service.RandomActivationSetTemplate_Vip(0));
     }
 
     [Theory]
@@ -1060,7 +1060,7 @@ public class ItemServiceTests
     {
         var rig = new Rig(null, draw);
 
-        Assert.Equal(new[] { first, second }, rig.Service.RandOptionItemKichHoat(gender));
+        Assert.Equal(new[] { first, second }, rig.Service.RandomActivationSetOptions(gender));
         Assert.Equal(8, (int)rig.Random.Calls.Single().Bound!);
     }
 
@@ -1074,7 +1074,7 @@ public class ItemServiceTests
     {
         var rig = new Rig();
 
-        int[] options = rig.Service.RandOptionItemKichHoatNew(gender);
+        int[] options = rig.Service.RandomActivationSetOptionsNew(gender);
 
         Assert.Equal(new[] { first, first + 1, first + 2, last }, options);
         Assert.Empty(rig.Random.Calls);

@@ -169,8 +169,11 @@ public class ItemTime
     public bool HasMonkeyTail { get; set; }
     public long PowerBurstStartTime { get; set; }
     public bool IsPowerBurst { get; set; }
-    public bool IsUseComboSkill { get; set; }
-    public long LastTimeUseComboSkill { get; set; }
+    // Đang có hiệu lực giải trừ phép thuật ở map Mabư (Java: isUseGTPT).
+    public bool HasMagicDispel { get; set; }
+
+    // Mốc bắt đầu hiệu lực giải trừ phép thuật (Java: lastTimeUseGTPT).
+    public long MagicDispelStartTime { get; set; }
     public bool IsUseElectricRiceCooker { get; set; }
     public long LastTimeUseElectricRiceCooker { get; set; }
     public bool IsUseCylindricalRiceCake { get; set; }
@@ -221,8 +224,11 @@ public class ItemTime
     public long LastTimeUseDurian { get; set; }
     public bool IsUseSoulScanner { get; set; }
     public long LastTimeUseSoulScanner { get; set; }
-    public bool IsUseSuperDigestiveScanner { get; set; }
-    public long LastTimeUseSuperDigestiveScanner { get; set; }
+    // Đang dùng máy dò đá siêu hóa (Java: isUseMayDoSieuHoa).
+    public bool IsUsingSuperTransformationStoneDetector { get; set; }
+
+    // Mốc bắt đầu dùng máy dò đá siêu hóa (Java: lastTimeUseMayDoSieuHoa).
+    public long SuperTransformationStoneDetectorStartTime { get; set; }
     public bool IsUseMysticOrbScanner { get; set; }
     public long LastTimeUseMysticOrbScanner { get; set; }
     public bool IsBoneDragon { get; set; }
@@ -351,9 +357,9 @@ public class ItemTime
             Host.SendPoint(Player);
         }
 
-        if (IsUseSuperDigestiveScanner && CanDoWithTime(LastTimeUseSuperDigestiveScanner, TIME_ITEM_60M))
+        if (IsUsingSuperTransformationStoneDetector && CanDoWithTime(SuperTransformationStoneDetectorStartTime, TIME_ITEM_60M))
         {
-            IsUseSuperDigestiveScanner = false;
+            IsUsingSuperTransformationStoneDetector = false;
             Host.SendPoint(Player);
         }
 
@@ -544,9 +550,9 @@ public class ItemTime
             Host.SendPoint(Player);
         }
 
-        if (IsUseComboSkill && CanDoWithTime(LastTimeUseComboSkill, TIME_ITEM_10M))
+        if (HasMagicDispel && CanDoWithTime(MagicDispelStartTime, TIME_ITEM_10M))
         {
-            IsUseComboSkill = false;
+            HasMagicDispel = false;
         }
 
         if (IsFaceMask && CanDoWithTime(LastFaceMask, TIME_ITEM_30M))

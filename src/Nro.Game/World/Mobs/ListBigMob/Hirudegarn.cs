@@ -156,9 +156,9 @@ public class Hirudegarn : BigBoss
                     {
                         case 1:
                             msg.Writer().WriteByte(1);
-                            double dame = Rt.Players.Injured(player, null, Point.GetDamageAttack(), false, true);
+                            double damage = Rt.Players.Injured(player, null, Point.GetDamageAttack(), false, true);
                             msg.Writer().WriteInt(unchecked((int)player.Id));
-                            msg.WriteCris(Rt.CrisGH(dame), Rt.ReadInt);
+                            msg.WriteCris(Rt.CrisGH(damage), Rt.ReadInt);
                             break;
                         case 3:
                             Location.X = unchecked((short)Rt.Players.GetX(player));

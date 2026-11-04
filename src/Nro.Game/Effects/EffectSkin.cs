@@ -231,14 +231,14 @@ public class EffectSkin
     // Giá trị trạng thái LastTimeBuiBui của hiệu ứng trang phục.
     public long LastTimeBuiBui { get; set; }
 
-    // Mốc đòn chưởng tích lực của hiệu ứng trang phục (Java: lastTimeXChuong).
-    public long LastTimeChargedBlast { get; set; }
+    // Mốc kích hoạt hệ số nhân sát thương đòn chưởng (Java: lastTimeXChuong).
+    public long LastTimeBlastDamageMultiplier { get; set; }
 
-    // Cờ đòn chưởng tích lực của hiệu ứng trang phục (Java: isXChuong).
-    public bool IsChargedBlast { get; set; }
+    // Cờ sẵn sàng áp hệ số nhân sát thương đòn chưởng (Java: isXChuong).
+    public bool IsBlastDamageMultiplierReady { get; set; }
 
-    // Cờ sát thương đã được tăng của hiệu ứng trang phục (Java: isXDame).
-    public bool IsDamageBoosted { get; set; }
+    // Cờ đã áp hệ số nhân sát thương đòn chưởng (Java: isXDame).
+    public bool IsBlastDamageMultiplierApplied { get; set; }
 
     // Người chơi sở hữu hiệu ứng, không null; setter công khai giữ @Setter của Lombok và Dispose không gán null (Java: player).
     // Giá trị trạng thái Player của hiệu ứng trang phục.
@@ -307,7 +307,7 @@ public class EffectSkin
             UpdatePetrification();
             UpdateChocolateTransformation();
             UpdateSlow();
-            UpdateChargedBlast();
+            UpdateBlastDamageMultiplier();
             UpdateHalloween();
             UpdateBulmaHairColor();
             UpdateBeachParty();
@@ -326,7 +326,7 @@ public class EffectSkin
             UpdateCuteDamage();
         }
 
-        if (!Player.IsBoss && !Player.IsPetFollow && !Player.IsDuongTang && !Player.IsNguoiYeu)
+        if (!Player.IsBoss && !Player.IsPetFollow && !Player.IsTangMonk && !Player.IsLover)
         {
             UpdateTrainArmor();
         }
@@ -1269,15 +1269,15 @@ public class EffectSkin
         }
     }
 
-    private void UpdateChargedBlast()
+    private void UpdateBlastDamageMultiplier()
     {
         EffectEnvironment env = Env;
         try
         {
-            if (env.Players.GetNPoint(Player).ChargedBlastLevel != 0 && Due(LastTimeChargedBlast, 60000))
+            if (env.Players.GetNPoint(Player).BlastDamageMultiplier != 0 && Due(LastTimeBlastDamageMultiplier, 60000))
             {
-                IsChargedBlast = true;
-                LastTimeChargedBlast = Now();
+                IsBlastDamageMultiplierReady = true;
+                LastTimeBlastDamageMultiplier = Now();
             }
         }
         catch (Exception e)
@@ -1327,7 +1327,7 @@ public class EffectSkin
                 for (int i = playersMap.Count - 1; i >= 0; i--)
                 {
                     Player pl = playersMap[i];
-                    if (!ReferenceEquals(Player, pl) && !pl.EffectSkill.IsHalloween && !pl.IsDeTu && !pl.IsBo && !pl.IsMe && !env.Players.IsDie(pl)
+                    if (!ReferenceEquals(Player, pl) && !pl.EffectSkill.IsHalloween && !pl.IsPet && !pl.IsFather && !pl.IsMother && !env.Players.IsDie(pl)
                         && Distance(Player, pl) <= 200)
                     {
                         env.Skills.SetIsHalloween(pl, -1, 1800000);

@@ -639,7 +639,7 @@ public class EffectSkill
 
         if (IsChibi && Due(LastTimeChibi, TimeChibi))
         {
-            service.RemoveMiniature(Player);
+            service.RemoveChibiBird(Player);
         }
 
         if (IsCumber && Due(LastTimeCumber, TimeCumber))

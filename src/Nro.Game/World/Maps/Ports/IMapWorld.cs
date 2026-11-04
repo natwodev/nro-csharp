@@ -28,7 +28,7 @@ public interface IMapWorld
     void DropItemMap(Zone zone, ItemMap itemMap);
 
     // Gửi cập nhật đại boss cho zone (Java: Service.sendBigBoss).
-    void SendBigBoss(Zone zone, int action, int type, int playerId, long dame);
+    void SendBigBoss(Zone zone, int action, int type, int playerId, long damage);
 
     // Gửi cập nhật đại boss theo quái cho zone (Java: Service.sendBigBoss2).
     void SendBigBoss2(Zone zone, int action, Mob mob);
@@ -70,7 +70,7 @@ public interface IMapWorld
     void AddSMTN(Player player, sbyte type, long amount, bool isOri);
 
     // Cộng tiềm năng luyện tập (Java: TrainningService.tangTnsmLuyenTap).
-    void TangTnsmLuyenTap(Player player, long tiemNang);
+    void AddTrainingPowerPotential(Player player, long potential);
 
     // Lấy cấp hiện tại của người chơi (Java: Service.getCurrLevel).
     int GetCurrLevel(Player player);
@@ -82,16 +82,16 @@ public interface IMapWorld
     double? GetActiveGoldAttributeValue();
 
     // Kiểm tra đang trong thời gian chiến tranh ngọc (Java: TranhNgoc.gI().isTimeStartWar).
-    bool IsTranhNgocWarTime();
+    bool IsNamekWarTime();
 
     // Gửi kết thúc phó bản Tranh Ngọc (Java: TranhNgocService.sendEndPhoBan).
-    void SendTranhNgocEnd(Zone zone, int result, bool flag);
+    void SendNamekWarEnd(Zone zone, int result, bool flag);
 
     // Trao thưởng Tranh Ngọc cho danh sách người chơi (Java: TranhNgocService.givePrice).
-    void GiveTranhNgocPrize(IReadOnlyList<Player> players, int result, int point);
+    void GiveNamekWarPrize(IReadOnlyList<Player> players, int result, int point);
 
     // Xử lý nhặt ngọc Tranh Ngọc (Java: TranhNgocService.pickBall).
-    void PickTranhNgocBall(Player player, ItemMap itemMap);
+    void PickNamekWarBall(Player player, ItemMap itemMap);
 
     // Đặt tọa độ người chơi (Java: Service.setPos).
     void SetPos(Player player, int x, int y);

@@ -8,9 +8,12 @@ namespace Nro.Data.Repositories.Top;
 public sealed class TopRepository : ITopRepository
 {
     // SQL Java nối player với account và chỉ giữ account.ban = 0, trừ TOP_THOI_VANG, TOP_NAP và TOP_DUA_NAP.
-    private const string MayDamTraiDatSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 0";
-    private const string MayDamNamecSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 1";
-    private const string MayDamXaydaSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 2";
+    // SQL bảng xếp hạng máy đấm Trái Đất (Java: mayDamTraiDatSql).
+    private const string PunchingMachineEarthlingSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 0";
+    // SQL bảng xếp hạng máy đấm Namếc (Java: mayDamNamecSql).
+    private const string PunchingMachineNamekianSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 1";
+    // SQL bảng xếp hạng máy đấm Xayda (Java: mayDamXaydaSql).
+    private const string PunchingMachineSaiyanSql = "select p.id as pid, p.data_may_dam as k from player p join account a on a.id = p.account_id where a.ban = 0 and p.gender = 2";
     private const string DataPointSql = "select p.id as pid, p.data_point as k from player p join account a on a.id = p.account_id where a.ban = 0";
     private const string PetSql = "select p.id as pid, p.pet as k from player p join account a on a.id = p.account_id where a.ban = 0";
     private const string VndSql = "select p.id as pid, a.vnd as k from player p join account a on a.id = p.account_id where a.ban = 0";
@@ -23,7 +26,8 @@ public sealed class TopRepository : ITopRepository
     private const string VuLanSql = "select p.id as pid, p.data_event_vulan as k from player p join account a on a.id = p.account_id where a.ban = 0";
     private const string HalloweenSql = "select p.id as pid, p.data_event_halloween as k from player p join account a on a.id = p.account_id where a.ban = 0";
     private const string Event83Sql = "select p.id as pid, p.data_event_8_3 as k from player p join account a on a.id = p.account_id where a.ban = 0";
-    private const string TrungThuSql = "select p.id as pid, p.data_event_trung_thu as k from player p join account a on a.id = p.account_id where a.ban = 0";
+    // SQL bảng xếp hạng Trung Thu (Java: trungThuSql).
+    private const string MoonFestivalSql = "select p.id as pid, p.data_event_trung_thu as k from player p join account a on a.id = p.account_id where a.ban = 0";
     private const string HungVuongSql = "select p.id as pid, p.data_event_hung_vuong as k from player p join account a on a.id = p.account_id where a.ban = 0";
     private const string BlackFridaySql = "select p.id as pid, p.data_event_black_friday as k from player p join account a on a.id = p.account_id where a.ban = 0";
     private const string PvpSql = "select p.id as pid, p.point_pvp as k from player p join account a on a.id = p.account_id where a.ban = 0";
@@ -35,7 +39,8 @@ public sealed class TopRepository : ITopRepository
     private const string VdstSql = "select p.id as pid, p.vodaisinhtu as k from player p join account a on a.id = p.account_id where a.ban = 0";
 
     // strpos tương đương LIKE '%"[457,%' nhưng không có ký tự đại diện.
-    private const string ThoiVangSql = "select p.id as pid, p.items_bag as bag, p.items_box as box from player p join account a on a.id = p.account_id where strpos(p.items_box, '\"[457,') > 0 or strpos(p.items_bag, '\"[457,') > 0";
+    // SQL bảng xếp hạng thỏi vàng (Java: thoiVangSql).
+    private const string GoldBarSql = "select p.id as pid, p.items_bag as bag, p.items_box as box from player p join account a on a.id = p.account_id where strpos(p.items_box, '\"[457,') > 0 or strpos(p.items_bag, '\"[457,') > 0";
 
     private const string DetailSql =
         "select p.id as pid, p.account_id as aid, p.name as pname, p.gender as gender, p.items_body as body, p.last_time_login_game as login from player p where p.id = any(?)";
@@ -44,9 +49,9 @@ public sealed class TopRepository : ITopRepository
 
     private static readonly Dictionary<TopRanking, RankingSpec> Specs = new()
     {
-        [TopRanking.PunchingMachineEarthling] = new(MayDamTraiDatSql, KeyKind.JsonIndexUnquoted, 0, DefaultLimit),
-        [TopRanking.PunchingMachineNamekian] = new(MayDamNamecSql, KeyKind.JsonIndexUnquoted, 1, DefaultLimit),
-        [TopRanking.PunchingMachineSaiyan] = new(MayDamXaydaSql, KeyKind.JsonIndexUnquoted, 2, DefaultLimit),
+        [TopRanking.PunchingMachineEarthling] = new(PunchingMachineEarthlingSql, KeyKind.JsonIndexUnquoted, 0, DefaultLimit),
+        [TopRanking.PunchingMachineNamekian] = new(PunchingMachineNamekianSql, KeyKind.JsonIndexUnquoted, 1, DefaultLimit),
+        [TopRanking.PunchingMachineSaiyan] = new(PunchingMachineSaiyanSql, KeyKind.JsonIndexUnquoted, 2, DefaultLimit),
         [TopRanking.Power] = new(DataPointSql, KeyKind.JsonIndex, 1, DefaultLimit),
         [TopRanking.Hp] = new(DataPointSql, KeyKind.JsonIndex, 14, DefaultLimit),
         [TopRanking.Ki] = new(DataPointSql, KeyKind.JsonIndex, 15, DefaultLimit),
@@ -75,8 +80,8 @@ public sealed class TopRepository : ITopRepository
         [TopRanking.HalloweenCard] = new(HalloweenSql, KeyKind.JsonIndexUnquoted, 1, DefaultLimit),
         [TopRanking.OpenWomensDayCard] = new(Event83Sql, KeyKind.JsonIndexUnquoted, 0, DefaultLimit),
         [TopRanking.GiveRoses] = new(Event83Sql, KeyKind.JsonIndexUnquoted, 1, DefaultLimit),
-        [TopRanking.MakeMoonCake] = new(TrungThuSql, KeyKind.JsonIndexUnquoted, 0, DefaultLimit),
-        [TopRanking.OpenSpecialMoonCake] = new(TrungThuSql, KeyKind.JsonIndexUnquoted, 1, DefaultLimit),
+        [TopRanking.MakeMoonCake] = new(MoonFestivalSql, KeyKind.JsonIndexUnquoted, 0, DefaultLimit),
+        [TopRanking.OpenSpecialMoonCake] = new(MoonFestivalSql, KeyKind.JsonIndexUnquoted, 1, DefaultLimit),
         [TopRanking.OpenGoldenEgg] = new(HungVuongSql, KeyKind.JsonIndexUnquoted, 0, DefaultLimit),
         [TopRanking.OpenHungKingGiftBox] = new(HungVuongSql, KeyKind.JsonIndexUnquoted, 3, DefaultLimit),
         [TopRanking.OfferCakes] = new(HungVuongSql, KeyKind.JsonIndexUnquoted, 4, DefaultLimit),
@@ -286,14 +291,14 @@ public sealed class TopRepository : ITopRepository
         return _database.InTransactionAsync<IReadOnlyList<TopGoldBarEntry>>(
             async transaction =>
             {
-                var candidates = new List<ThoiVangCandidate>();
-                using (var rows = await transaction.ExecuteQueryAsync(ThoiVangSql, cancellationToken))
+                var candidates = new List<GoldBarCandidate>();
+                using (var rows = await transaction.ExecuteQueryAsync(GoldBarSql, cancellationToken))
                 {
                     while (rows.Next())
                     {
                         var bag = MariaDbCompat.GoldBarQuantity(rows.GetObject("bag") as string ?? string.Empty);
                         var box = MariaDbCompat.GoldBarQuantity(rows.GetObject("box") as string ?? string.Empty);
-                        candidates.Add(new ThoiVangCandidate(ReadInt(rows.GetObject("pid")), bag, box));
+                        candidates.Add(new GoldBarCandidate(ReadInt(rows.GetObject("pid")), bag, box));
                     }
                 }
 
@@ -410,7 +415,8 @@ public sealed class TopRepository : ITopRepository
 
     private sealed record VdstCandidate(int PlayerId, ulong Time, ulong? Field2);
 
-    private sealed record ThoiVangCandidate(int PlayerId, ulong Bag, ulong Box)
+    // Ứng viên bảng xếp hạng thỏi vàng (Java: ThoiVangCandidate).
+    private sealed record GoldBarCandidate(int PlayerId, ulong Bag, ulong Box)
     {
         // Tổng thỏi vàng dùng UInt128 để tránh tràn trước khi bão hòa khi trả kết quả.
         public UInt128 Sum => (UInt128)Bag + Box;

@@ -1,9 +1,5 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities.Logs;
-using Nro.Data.Entities;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nro.Data.Entities.Logs;
 
 namespace Nro.Data.Entities.Runtime;
 

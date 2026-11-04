@@ -1,6 +1,3 @@
-using Nro.Data.Entities.StaticData;
-using Nro.Data.Entities.Runtime;
-using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,7 +11,6 @@ public class ItemShopOptionRow
     // Khóa chính của bảng ItemShopOption (tự tăng)
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
     public int ItemShopOptionId { get; set; }
 
     // Khóa ngoại liên kết với ItemShop (mục cửa hàng sở hữu)

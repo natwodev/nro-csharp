@@ -25,7 +25,7 @@ public sealed class PlayerPersistenceMapper
             Id = GetInt(row, "id"), Account_id = GetInt(row, "account_id"), Name = GetString(row, "name"),
             Head = checked((short)GetInt(row, "head")), Gender = checked((sbyte)GetInt(row, "gender")),
             HaveTennisSpaceShip = GetBool(row, "have_tennis_space_ship"), LastTimeDropTail = GetLong(row, "last_time_drop_tail"),
-            Lasttimekhisukien = GetLong(row, "last_time_khi_su_kien"), Isbienhinh = GetInt(row, "isbienhinh"),
+            LastEventGasTime = GetLong(row, "last_time_khi_su_kien"), TransformationState = GetInt(row, "isbienhinh"),
             Notify = row["notify"] as string, LastPkCommesonTime = GetLong(row, "lasttimepkcommeson"),
             LastTimeShenronAppeared_Christmas = GetLong(row, "dragon_christmas"),
             LastTimeShenronAppeared_Halloween = GetLong(row, "dragon_halloween"),
@@ -55,8 +55,8 @@ public sealed class PlayerPersistenceMapper
         saved = ReplaceWhenChanged(saved, original, "gender", (int)player.Gender, IntMatches);
         saved = ReplaceWhenChanged(saved, original, "have_tennis_space_ship", player.HaveTennisSpaceShip, BoolMatches);
         saved = ReplaceWhenChanged(saved, original, "last_time_drop_tail", player.LastTimeDropTail, LongMatches);
-        saved = ReplaceWhenChanged(saved, original, "last_time_khi_su_kien", player.Lasttimekhisukien, LongMatches);
-        saved = ReplaceWhenChanged(saved, original, "isbienhinh", player.Isbienhinh, IntMatches);
+        saved = ReplaceWhenChanged(saved, original, "last_time_khi_su_kien", player.LastEventGasTime, LongMatches);
+        saved = ReplaceWhenChanged(saved, original, "isbienhinh", player.TransformationState, IntMatches);
         saved = ReplaceWhenChanged(saved, original, "notify", player.Notify, StringMatches);
         saved = ReplaceWhenChanged(saved, original, "lasttimepkcommeson", player.LastPkCommesonTime, LongMatches);
         saved = ReplaceWhenChanged(saved, original, "dragon_christmas", player.LastTimeShenronAppeared_Christmas, LongMatches);
@@ -104,7 +104,7 @@ public sealed class PlayerPersistenceMapper
         values["create_time"] = utc; values["first_time_login"] = utc;
         values["lastimelogin"] = DateTime.SpecifyKind(utc, DateTimeKind.Unspecified); values["last_time_login_game"] = utc;
         values["master_does_not_attack"] = "false"; values["master_does_not_attack_bo"] = "false"; values["master_does_not_attack_me"] = "false";
-        values["notify"] = null; values["nguoi_yeu_does_not_attack"] = "false"; values["conone_does_not_attack"] = "false"; values["contwo_does_not_attack"] = "false"; values["conthree_does_not_attack"] = "false";
+        values["notify"] = null; values["lover_does_not_attack"] = "false"; values["conone_does_not_attack"] = "false"; values["contwo_does_not_attack"] = "false"; values["conthree_does_not_attack"] = "false";
         values["thanh_tich_bang"] = ""; values["thanh_tich_bang2"] = ""; values["thanh_tich_bang3"] = "";
         values["data_badges"] = "[]"; values["data_task_badges"] = "[]"; values["daily_gift"] = "[]";
         return new PlayerPersistenceRecord(values);
@@ -126,15 +126,15 @@ public sealed class PlayerPersistenceMapper
             ["create_time"] = utc,
             ["point_pvp"] = 0,
             ["data_card"] = "[]",
-            ["thoigianduhanh"] = "[0,0]",
-            ["thachdauwhis"] = 0,
+            ["time_travel_duration"] = "[0,0]",
+            ["whis_sparring"] = 0,
             ["isbienhinh"] = 0,
             ["check_band_account"] = "[0,0,0]",
             ["master_does_not_attack"] = "false",
             ["master_does_not_attack_bo"] = "false",
             ["master_does_not_attack_me"] = "false",
             ["bandokhobau"] = "[]",
-            ["doanhtrai"] = 0L,
+            ["barracks_state"] = 0L,
             ["conduongrandoc"] = "[]",
             ["data_clan_task"] = "[]",
             ["data_achievement"] = "[]",
@@ -153,7 +153,7 @@ public sealed class PlayerPersistenceMapper
             ["data_the_card"] = "[0,0,0,0,0,0,0,0]",
             ["data_diem_danh"] = "[0,0,0,0,0,0,0,0,0,0]",
             ["data_may_dam"] = "[0,0,0]",
-            ["nguoi_yeu_does_not_attack"] = "false",
+            ["lover_does_not_attack"] = "false",
             ["conone_does_not_attack"] = "false",
             ["contwo_does_not_attack"] = "false",
             ["conthree_does_not_attack"] = "false",
@@ -182,9 +182,9 @@ public sealed class PlayerPersistenceMapper
             ["data_models"] = "[0,0,0,0,0,0,0,0,0,0]",
             ["hp_point_fusion"] = 0,
             ["mp_point_fusion"] = 0,
-            ["dame_point_fusion"] = 0,
+            ["point_fusion_damage"] = 0,
             ["last_time_update_task"] = 1L,
-            ["danh_hieu"] = "[0,0,0,0,0,0,0,0]",
+            ["title"] = "[0,0,0,0,0,0,0,0]",
         };
 
         foreach ((string column, object? value) in defaults)

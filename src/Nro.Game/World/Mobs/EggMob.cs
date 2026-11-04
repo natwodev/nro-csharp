@@ -67,16 +67,16 @@ public sealed class EggMob : Mob
         {
             if (pl != null)
             {
-                long dame = !miss ? Point.Damage : 0;
+                long damage = !miss ? Point.Damage : 0;
                 MobPlayerView before = Rt.Players.GetMobPlayerView(pl);
-                if ((before.Hp > dame && before.Hp > before.HpMax * 0.05) || _fullPikkoroSet)
+                if ((before.Hp > damage && before.Hp > before.HpMax * 0.05) || _fullPikkoroSet)
                 {
-                    double dameHit = Rt.Players.Injured(pl, _player, dame, true, true);
+                    double damageHit = Rt.Players.Injured(pl, _player, damage, true, true);
                     Message msg = new(-95);
                     msg.Writer().WriteByte(2);
                     msg.Writer().WriteInt(Id);
                     msg.Writer().WriteInt(unchecked((int)pl.Id));
-                    msg.WriteCris(Rt.CrisGH(dameHit), Rt.ReadInt);
+                    msg.WriteCris(Rt.CrisGH(damageHit), Rt.ReadInt);
                     msg.WriteCris(Rt.CrisGH(Rt.Players.GetMobPlayerView(pl).Hp), Rt.ReadInt);
                     Rt.World.SendMessAllPlayerInMap(_player, msg);
                 }

@@ -201,7 +201,7 @@ public class MobTests
         Mob mob = MapTestKit.NewMob(z);
         Player master = MapTestKit.NewPlayerIn(g, z, 1);
         Player disciple = MapTestKit.NewPlayerIn(g, z, 2);
-        disciple.IsDeTu = true;
+        disciple.IsPet = true;
         mob.Point.Hp = 900;
         mob.Injured(master, 100, false);
         Assert.Equal(900, mob.Point.Hp);
@@ -229,15 +229,15 @@ public class MobTests
     {
         (FakeGame g, _, Mob mob, Player p) = Arena(tempId: ConstMob.POWER_METER, hp: 2_000_000_000);
         mob.Injured(p, 1234, false);
-        Assert.Equal(1234, p.TotalDameMayDam);
-        Assert.Equal(g.Runtime.Now, p.LastTimeDameMayDam);
+        Assert.Equal(1234, p.PunchingMachineTotalDamage);
+        Assert.Equal(g.Runtime.Now, p.LastPunchingMachineDamageTime);
     }
 
     [Fact]
     public void Injured_KhiGasMapLimitsBasicSkillsWhileTheMachineLives()
     {
         FakeGame g = new();
-        g.SetMapSet("KhiGas", 1);
+        g.SetMapSet("DestronGas", 1);
         Zone z = MapTestKit.BuildZone(g);
         Mob machine = MapTestKit.NewMob(z, 5, ConstMob.DESTRUCTION_MACHINE, 100_000);
         Mob mob = MapTestKit.NewMob(z, 6, 25, 100_000);
@@ -288,8 +288,8 @@ public class MobTests
         g.State(p).X = 350;
         mob.AddTemporaryEnemies(p);
         mob.Attack();
-        long dame = long.Parse(g.Calls.Single(c => c.StartsWith("injured:1:", StringComparison.Ordinal))[10..]);
-        Assert.InRange(dame, 30, 70);
+        long damage = long.Parse(g.Calls.Single(c => c.StartsWith("injured:1:", StringComparison.Ordinal))[10..]);
+        Assert.InRange(damage, 30, 70);
         Assert.Single(g.PacketsOf(-11));
         Assert.Single(g.PacketsOf(-10));
 
@@ -668,7 +668,7 @@ public class MobTests
     [Theory]
     [InlineData(ConstMob.POWER_METER)]
     [InlineData(ConstMob.HIRUDEGARN)]
-    public void GetTiemNangForPlayer_SpecialMobsAlwaysGiveOne(int tempId)
+    public void GetPotentialForPlayer_SpecialMobsAlwaysGiveOne(int tempId)
     {
         (_, _, Mob mob, Player p) = Arena(tempId: tempId, hp: 1000);
         Assert.Equal(1, mob.GetPotentialForPlayer(p, 1000));
@@ -748,7 +748,7 @@ public class MobTests
     public void GetItemMobReward_TreasureMapGoldIsDroppedInChunksNextToTheMob()
     {
         (FakeGame g, _, Mob mob, Player p) = Arena(seed: 5, hp: 8000);
-        g.SetMapSet("BanDoKhoBau", 1);
+        g.SetMapSet("TreasureUnderSea", 1);
         g.State(p).Loot = new MobLootPlayerView { HasTreasureMapClan = true };
         mob.GetItemMobReward(p, 100, 144);
         List<string> drops = g.Calls.Where(c => c.StartsWith("drop:190x", StringComparison.Ordinal)).ToList();
@@ -757,7 +757,7 @@ public class MobTests
         Assert.EndsWith("@130,144", drops[7], StringComparison.Ordinal);
 
         FakeGame g2 = new(5);
-        g2.SetMapSet("BanDoKhoBau", 1);
+        g2.SetMapSet("TreasureUnderSea", 1);
         Zone z2 = MapTestKit.BuildZone(g2);
         Mob big = MapTestKit.NewMob(z2, 0, 25, 40_000_000_000);
         Player p2 = MapTestKit.NewPlayerIn(g2, z2, 1);
@@ -768,7 +768,7 @@ public class MobTests
         Assert.All(chunks, c => Assert.InRange(int.Parse(c["drop:190x".Length..c.IndexOf('@', StringComparison.Ordinal)]), 1, 100_000_000));
 
         FakeGame g3 = new(5);
-        g3.SetMapSet("BanDoKhoBau", 1);
+        g3.SetMapSet("TreasureUnderSea", 1);
         Zone z3 = MapTestKit.BuildZone(g3);
         Mob m3 = MapTestKit.NewMob(z3, 0, 25, 8000);
         Player p3 = MapTestKit.NewPlayerIn(g3, z3, 1);

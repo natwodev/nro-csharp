@@ -88,9 +88,9 @@ public class VegetaM : BigBoss
                         int dir = 0;
                         foreach (Player pl in players)
                         {
-                            double dame = Rt.Players.Injured(pl, null, Point.GetDamageAttack(), false, true);
+                            double damage = Rt.Players.Injured(pl, null, Point.GetDamageAttack(), false, true);
                             msg.Writer().WriteInt(unchecked((int)pl.Id));
-                            msg.WriteCris(Rt.CrisGH(dame), Rt.ReadInt);
+                            msg.WriteCris(Rt.CrisGH(damage), Rt.ReadInt);
                             dir = Rt.Players.GetX(pl) < Location.X ? -1 : 1;
                         }
 

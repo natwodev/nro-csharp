@@ -29,7 +29,7 @@ public class MobTemplate
     public sbyte PercentDame { get; set; }
 
     // Phần trăm tiềm năng (Java: percentTiemNang)
-    public sbyte PercentTiemNang { get; set; }
+    public sbyte PercentPotential { get; set; }
 
     // Phần trăm vàng nhận được (Java: percent_gold)
     public sbyte Percent_gold { get; set; }

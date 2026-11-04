@@ -54,6 +54,16 @@ public class EntitiesTests
         return System.Text.RegularExpressions.Regex.Replace(s, "_+", "_").ToLowerInvariant();
     }
 
+    /// <summary>Maps the conventional single primary key <c>&lt;Entity&gt;Id</c> to <c>id</c>; other properties use snake_case.</summary>
+    private static string ColumnName(PropertyInfo property)
+    {
+        Type entity = property.DeclaringType ?? throw new InvalidOperationException($"{property.Name} has no declaring type");
+        string entityName = entity.Name.EndsWith("Row", StringComparison.Ordinal) ? entity.Name[..^3] : entity.Name;
+        return property.GetCustomAttribute<KeyAttribute>() is not null && property.Name == entityName + "Id"
+            ? "id"
+            : Snake(property.Name);
+    }
+
     /// <summary>A scalar property maps to a column; navigation properties and collections do not.</summary>
     private static bool IsScalar(PropertyInfo p) =>
         !p.PropertyType.Namespace!.StartsWith("Nro.Data.Entities", StringComparison.Ordinal) && !(p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>));
@@ -133,7 +143,7 @@ public class EntitiesTests
             ColumnAttribute? col = p.GetCustomAttribute<ColumnAttribute>();
 
             Assert.True(c.ExplicitName == (col?.Name is not null), $"{where}: [Column(name)] presence differs");
-            Assert.True(c.Column == (col?.Name ?? Snake(p.Name)), $"{where}: column name differs");
+            Assert.True(c.Column == (col?.Name ?? ColumnName(p)), $"{where}: column name differs");
             Assert.True(c.Column == c.Column.ToLowerInvariant() && !c.Column.Contains("__"), $"{where}: column is not lower-case snake_case");
             Assert.True(c.CsharpType == CSharpName(p.PropertyType, nullability.Create(p)), $"{where}: type differs");
             Assert.True(c.SqlTypeName == col?.TypeName, $"{where}: SQL type name differs");
@@ -156,7 +166,7 @@ public class EntitiesTests
         Assert.Equal(
             e.PrimaryKey.Order(StringComparer.Ordinal),
             props.Where(p => p.GetCustomAttribute<KeyAttribute>() is not null)
-                 .Select(p => p.GetCustomAttribute<ColumnAttribute>()?.Name ?? Snake(p.Name)).Order(StringComparer.Ordinal));
+                 .Select(p => p.GetCustomAttribute<ColumnAttribute>()?.Name ?? ColumnName(p)).Order(StringComparer.Ordinal));
 
         if (e.PrimaryKey.Length > 1)
         {
@@ -220,6 +230,6 @@ public class EntitiesTests
 
         PropertyInfo[] keys = TypeOf(skill).GetProperties().Where(p => p.GetCustomAttribute<KeyAttribute>() is not null)
             .OrderBy(p => p.GetCustomAttribute<ColumnAttribute>()!.Order).ToArray();
-        Assert.Equal(["nclass_id", "id"], keys.Select(p => p.GetCustomAttribute<ColumnAttribute>()?.Name ?? Snake(p.Name)));
+        Assert.Equal(["nclass_id", "id"], keys.Select(p => p.GetCustomAttribute<ColumnAttribute>()?.Name ?? ColumnName(p)));
     }
 }

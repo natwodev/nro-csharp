@@ -73,7 +73,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public double? GoldAttribute { get; set; }
 
-    public bool TranhNgocWar { get; set; }
+    public bool NamekWar { get; set; }
 
     public int TaskIdDefault { get; set; }
 
@@ -90,7 +90,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool InternationalWomansDay { get; set; }
 
-    public bool TrungThu { get; set; }
+    public bool MoonFestival { get; set; }
 
     public bool HungVuong { get; set; }
 
@@ -129,7 +129,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public void DropItemMap(Zone zone, ItemMap itemMap) => Calls.Add("drop:" + itemMap.ItemTemplate?.Id + "x" + itemMap.Quantity + "@" + itemMap.X + "," + itemMap.Y);
 
-    public void SendBigBoss(Zone zone, int action, int type, int playerId, long dame) => Calls.Add($"bigboss:{action}:{type}:{playerId}:{dame}");
+    public void SendBigBoss(Zone zone, int action, int type, int playerId, long damage) => Calls.Add($"bigboss:{action}:{type}:{playerId}:{damage}");
 
     public void SendBigBoss2(Zone zone, int action, Mob mob) => Calls.Add($"bigboss2:{action}:{mob.LvMob}");
 
@@ -162,7 +162,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public void AddSMTN(Player player, sbyte type, long amount, bool isOri) => Calls.Add($"smtn:{player.Id}:{type}:{amount}");
 
-    public void TangTnsmLuyenTap(Player player, long tiemNang) => Calls.Add($"train:{player.Id}:{tiemNang}");
+    public void AddTrainingPowerPotential(Player player, long potential) => Calls.Add($"train:{player.Id}:{potential}");
 
     public int CurrLevel { get; set; } = 10;
 
@@ -172,13 +172,13 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public double? GetActiveGoldAttributeValue() => GoldAttribute;
 
-    public bool IsTranhNgocWarTime() => TranhNgocFailure != null ? throw TranhNgocFailure : TranhNgocWar;
+    public bool IsNamekWarTime() => NamekWarFailure != null ? throw NamekWarFailure : NamekWar;
 
-    public void SendTranhNgocEnd(Zone zone, int result, bool flag) => Calls.Add($"tnEnd:{result}:{flag}");
+    public void SendNamekWarEnd(Zone zone, int result, bool flag) => Calls.Add($"namekWarEnd:{result}:{flag}");
 
-    public void GiveTranhNgocPrize(IReadOnlyList<Player> players, int result, int point) => Calls.Add($"tnPrize:{result}:{players.Count}:{point}");
+    public void GiveNamekWarPrize(IReadOnlyList<Player> players, int result, int point) => Calls.Add($"namekWarPrize:{result}:{players.Count}:{point}");
 
-    public void PickTranhNgocBall(Player player, ItemMap itemMap) => Calls.Add("tnPick:" + player.Id);
+    public void PickNamekWarBall(Player player, ItemMap itemMap) => Calls.Add("namekWarPick:" + player.Id);
 
     public void SetPos(Player player, int x, int y)
     {
@@ -203,9 +203,9 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool IsMapHungVuongEvent(int mapId) => In("HungVuongEvent", mapId);
 
-    public bool IsMapKhiGasHuyDiet(int mapId) => In("KhiGas", mapId);
+    public bool IsDestronGasMap(int mapId) => In("DestronGas", mapId);
 
-    public bool IsMapPhoBan(int mapId) => In("PhoBan", mapId);
+    public bool IsDungeonMap(int mapId) => In("Dungeon", mapId);
 
     public bool IsMapNotDropItems(int mapId) => In("NotDrop", mapId);
 
@@ -221,7 +221,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool IsMapBang(int mapId) => In("Bang", mapId);
 
-    public bool IsMapBanDoKhoBau(int mapId) => In("BanDoKhoBau", mapId);
+    public bool IsTreasureUnderSeaMap(int mapId) => In("TreasureUnderSea", mapId);
 
     public bool IsMapLang(int mapId) => In("Lang", mapId);
 
@@ -237,7 +237,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool IsMapPotara(int mapId) => In("Potara", mapId);
 
-    public bool IsMapDoanhTrai(int mapId) => In("DoanhTrai", mapId);
+    public bool IsBarracksMap(int mapId) => In("Barracks", mapId);
 
     public bool IsMapOffline(int mapId) => In("Offline", mapId);
 
@@ -262,7 +262,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool RecordPlayerUpdates { get; set; } = true;
 
-    public Exception? TranhNgocFailure { get; set; }
+    public Exception? NamekWarFailure { get; set; }
 
     public void UpdatePlayer(Player player)
     {
@@ -293,7 +293,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool IsNonInteractiveNpc(Player player) => _players.TryGetValue(player, out FakePlayerState? s) && s.NonInteractiveNpc;
 
-    public bool IsTestDame(Player player) => false;
+    public bool IsDamageTestPlayer(Player player) => false;
 
     public bool IsTrainingBossOf(Player candidate, Player owner) => false;
 
@@ -310,7 +310,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool HasSatellite(Player player) => true;
 
-    public double CalculatePowerPotential(Player player, long tiemNang) => tiemNang;
+    public double CalculatePowerPotential(Player player, long potential) => potential;
 
     public MafubaInfo? GetMafubaInfo(Player player) => new(10, _players[player].HpMax, 0, 1);
 
@@ -321,7 +321,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public bool HasChristmasHat(Player player) => true;
 
-    public bool CanDropKeoGiangSinh(Player player, int limit) => true;
+    public bool CanDropChristmasCandy(Player player, int limit) => true;
 
     public bool CanDropTatVoGiangSinh(Player player, int limit) => true;
 
@@ -339,7 +339,7 @@ internal sealed class FakeGame : IMapWorld, IMapRules, IMapPlayerGateway, IMobLo
 
     public void IncreaseBinhHutNangLuong(Player player, int index) => Calls.Add("binhhut:" + index);
 
-    public List<ItemMapOption> CreateSetKichHoatOptions(int itemId) => [new ItemMapOption(1, 1)];
+    public List<ItemMapOption> CreateActivationSetOptions(int itemId) => [new ItemMapOption(1, 1)];
 
     public Player GetBinhNuocOwner(Player player) => player;
 

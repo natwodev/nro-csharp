@@ -34,8 +34,8 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         /// <summary>The collaborator values of this player (what the host reports in <see cref="NPointFacts"/>); the groups are copied into each snapshot.</summary>
         public NPointFacts Facts { get; } = new();
 
-        public sbyte DetuStatus { get; set; }
-        public sbyte DetuTypeDeTu { get; set; }
+        public sbyte PetStatus { get; set; }
+        public sbyte PetType { get; set; }
         public int LocX { get; set; }
         public int LocY { get; set; }
         public bool IsCharging { get; set; }
@@ -70,13 +70,13 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         if (kind == "detu")
         {
             Player master = masterOverride ?? (spec.TryGetProperty("master", out JsonElement m) && m.ValueKind == JsonValueKind.Object ? Build(m, null, makeNPoint) : NewBare(makeNPoint));
-            player = new Detu();
+            player = new Pet();
             masters[player] = master;
         }
         else if (kind == "phanthan")
         {
             Player master = spec.TryGetProperty("master", out JsonElement m) && m.ValueKind == JsonValueKind.Object ? Build(m, null, makeNPoint) : NewBare(makeNPoint);
-            player = new PhanThan();
+            player = new BodyClone();
             masters[player] = master;
         }
         else
@@ -147,9 +147,9 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
             store.Humans.Add((h[0].GetInt64(), h[1].GetInt32(), h[2].GetInt32(), hp, h[4].GetBoolean()));
         }
 
-        if (spec.TryGetProperty("detu", out JsonElement detu) && detu.ValueKind == JsonValueKind.Object)
+        if (spec.TryGetProperty("detu", out JsonElement petSpec) && petSpec.ValueKind == JsonValueKind.Object)
         {
-            player.Detu = (Detu)Build(detu, player, makeNPoint);
+            player.Pet = (Pet)Build(petSpec, player, makeNPoint);
         }
 
         return player;
@@ -290,7 +290,7 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
                 f.TypeFusion = (sbyte)v.GetInt32();
                 break;
             case "pf":
-                f.DameFusion = v.GetInt32();
+                f.FusionDamage = v.GetInt32();
                 break;
             case "bb":
                 f.BlackBallTimeOut[int.Parse(field, System.Globalization.CultureInfo.InvariantCulture)] = v.GetInt64();
@@ -316,11 +316,11 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
             case "dt":
                 if (field == "typeDeTu")
                 {
-                    store.DetuTypeDeTu = (sbyte)v.GetInt32();
+                    store.PetType = (sbyte)v.GetInt32();
                 }
                 else if (field == "status")
                 {
-                    store.DetuStatus = (sbyte)v.GetInt32();
+                    store.PetStatus = (sbyte)v.GetInt32();
                 }
                 else
                 {
@@ -419,7 +419,7 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
             "TlDameClanAdd" => "ClanDamageBonusPercent",
             "TlHpClanAdd" => "ClanHpBonusPercent",
             "TlMpClanAdd" => "ClanMpBonusPercent",
-            "CongTiemNangSucManhToanBangHoi" => "AddPotentialSucManhToanBangHoi",
+            "CongTiemNangSucManhToanBangHoi" => "ClanPowerPotentialBonus",
             "TlDameBoss" => "BossDamagePercent",
             "TlDameMobRun" => "RunningMobDamagePercent",
             "TlDameMobMonkey" => "MonkeyMobDamagePercent",
@@ -428,7 +428,7 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
             "IsThoDaiKa" => "IsRabbitLeader",
             "XHPKI" => "HpKiMultiplier",
             "XDame" => "DamageMultiplier",
-            "IsXChuong" => "IsChargedBlast",
+            "IsXChuong" => "IsBlastDamageMultiplierReady",
             "TiLeHPHuytSao" => "HpWhistlePercent",
             "IsDameBuff" => "IsDamageBuff",
             "TileDameBuff" => "DamageBuffPercent",
@@ -438,8 +438,8 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
             "IsSUcManhBocPha" => "IsPowerBurst",
             "IsBongTuyet" => "IsSnowflake",
             "TlTNSMPet" => "PetPowerPotentialPercent",
-            "XChuong" => "ChargedBlastLevel",
-            "SetTinhAn" => "TinhSealSetCount",
+            "XChuong" => "BlastDamageMultiplier",
+            "SetTinhAn" => "StarSealSetCount",
             "SetNhatAn" => "NhatSealSetCount",
             "SetNguyetAn" => "NguyetSealSetCount",
             "TlSexyDame" => "SexyDamagePercent",
@@ -447,13 +447,13 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
             "TlSubSD" => "DamageReductionPercent",
             "TlSubHP" => "HpReductionPercent",
             "TlSubMP" => "MpReductionPercent",
-            "VoHieuChuong" => "ChargedBlastNullification",
+            "VoHieuChuong" => "BlastNullification",
             "IsKhongLanh" => "IsColdImmune",
-            "IsTinhAn" => "HasTinhSeal",
+            "IsTinhAn" => "HasStarSeal",
             "IsNhatAn" => "HasNhatSeal",
             "IsNguyetAn" => "HasNguyetSeal",
             "IsHoaDa" => "IsPetrified",
-            "IsDoSPL" => "IsSPLCostume",
+            "IsDoSPL" => "HasCrystalStarEquipment",
             "IsThoBulma" => "IsRabbitBulma",
             "IsBunmaTocMau" => "IsBulmaColoredHair",
             "IsTiecBaiBien" => "IsBeachParty",
@@ -466,12 +466,74 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
             "IsUseCuongNo2" => "IsUseRage2",
             "LastTimeCuongNo" => "LastTimeRage",
             "LastTimeCuongNo2" => "LastTimeRage2",
+            "TdDeTu" => "PetTraining",
+            "TdDeTu2" => "PetTraining2",
+            "TdDeTu3" => "PetTraining3",
+            "TdDeTu4" => "PetTraining4",
+            "TdDeTu5" => "PetTraining5",
+            "TdDeTu7" => "PetTraining7",
+            "TdDeTu10" => "PetTraining10",
+            "TdDeTu20" => "PetTraining20",
+            "BuaTriTue" => "WisdomCharmExpiry",
+            "IsMapBanDoKhoBau" => "IsTreasureUnderSeaMap",
+            "IsMapDoanhTrai" => "IsBarracksMap",
+            "IsTnsmDividedMap" => "IsPowerPotentialDividedMap",
             _ => pascalName,
         };
     }
 
-    // Player vẫn dùng tên Java được Pascal-case; PlayerNPointHost chuyển các clan bonus sang snapshot Clan*BonusPercent.
-    private static string CSharpPlayerPropertyName(string javaName) => char.ToUpperInvariant(javaName[0]) + javaName[1..];
+    // Player dùng property C# đã đổi tên; corpus scenario vẫn giữ chính tả Java.
+    private static string CSharpPlayerPropertyName(string javaName)
+    {
+        if (javaName.StartsWith("nhanKeoHayBiGheoNpc_", StringComparison.Ordinal)
+            && int.TryParse(javaName.AsSpan("nhanKeoHayBiGheoNpc_".Length), out int candyIndex) && candyIndex is >= 1 and <= 15)
+            return $"HalloweenNpcCandyOutcome_{candyIndex}";
+        if (javaName.StartsWith("nhanLiXiForNPC_", StringComparison.Ordinal)
+            && int.TryParse(javaName.AsSpan("nhanLiXiForNPC_".Length), out int luckyMoneyIndex) && luckyMoneyIndex is >= 1 and <= 25)
+            return $"LuckyMoneyReceivedFromNpc_{luckyMoneyIndex}";
+
+        string pascalName = char.ToUpperInvariant(javaName[0]) + javaName[1..];
+        return pascalName switch
+        {
+            "HienThiHopThe" => "FusionDisplayState", "Resetdame" => "ResetDamage", "LastTimeDame" => "LastDamageTime", "Dametong" => "TotalDamage",
+            "LastTimeDameMayDam" => "LastPunchingMachineDamageTime", "TotalDameMayDam" => "PunchingMachineTotalDamage",
+            "TlDameAdd" => "DamageBonusPercent", "TlDameClanAdd" => "ClanDamageBonusPercent", "TlHpClanAdd" => "ClanHpBonusPercent", "TlMpClanAdd" => "ClanMpBonusPercent",
+            "TrangThaiLichSuGd" => "TransactionHistoryStatus", "TopMayDamTraiDat" => "EarthlingPunchingMachineRank", "TopMayDamNamec" => "NamekianPunchingMachineRank", "TopMayDamXayda" => "SaiyanPunchingMachineRank",
+            "DiemDanhBangHoi" => "ClanCheckInCount", "VeTangNgoc_SoLuongNgoc" => "GiftGemVoucherCount", "Player_NhanNgoc" => "GemRecipient", "VeTangHongNgoc_SoLuongHongNgoc" => "GiftRubyVoucherCount", "Player_NhanHongNgoc" => "RubyRecipient",
+            "RestartNauBanh" => "RestartCakeCooking", "Khisukien" => "IsEventGasActive", "Lasttimekhisukien" => "LastEventGasTime", "LastTimeCallKhi" => "LastGasCallTime", "PartDanhHieu" => "TitlePart",
+            "IsDeTu" => "IsPet", "IsDuongTang" => "IsTangMonk", "IsPhanThan" => "IsBodyClone", "IsNguoiYeu" => "IsLover", "IsConOne" => "IsChildOne", "IsConTwo" => "IsChildTwo", "IsConThree" => "IsChildThree",
+            "NhapNgocRongTimes" => "DragonBallInsertCount", "CheckTrongNgay" => "DailyCheckTimestamp",
+            "DuaTopTangLiXi" => "GiveLuckyMoneyRankingScore", "DuaTopMoLiXi" => "OpenLuckyMoneyRankingScore", "DuaTopBanPhaoHoa" => "LaunchFireworksRankingScore", "DuaTopBanPhaoHoaVIP" => "LaunchVipFireworksRankingScore",
+            "DuaTopTrangTriCayNoel" => "DecorateChristmasTreeRankingScore", "DuaTopCheTaoNguoiTuyet" => "CraftSnowmanRankingScore", "DuaTopCheTaoNguoiTuyetBangGia" => "CraftFrozenSnowmanRankingScore", "DuaTopDotDiem" => "BurnMatchesRankingScore",
+            "DuaTopPhaoHoaVuLan" => "LaunchVuLanFirecrackersRankingScore", "DuaTopHoaDang" => "FlowerLanternRankingScore", "DuaTopHoaDangCoLoiChuc" => "WishLanternRankingScore",
+            "DuaTopMoHopMaQuy" => "OpenGhostGiftBoxRankingScore", "DuaTopThiepHalloween" => "HalloweenCardRankingScore", "DuaTopMoThiep83" => "OpenWomensDayCardRankingScore", "DuaTopTangBongHoaHong" => "GiveRosesRankingScore",
+            "DuaTopLamBanhTrungThu" => "MakeMoonCakeRankingScore", "DuaTopMoHopTrungThuDacBiet" => "OpenSpecialMoonCakeRankingScore", "UocMienPhi" => "FreeWishCount",
+            "NhanQuaHungVuongFree" => "ReceivedHungKingFreeGift", "LastTimeNauBanhHungVuong" => "LastHungKingCakeCookingTime", "TypeBanhDangNau" => "CookingCakeType",
+            "DuaTopMoHopQuaGioTo" => "OpenHungKingGiftBoxRankingScore", "DuaTopDangBanhHungVuong" => "OfferHungKingCakesRankingScore", "DuaTopMoTrungRongVang" => "OpenGoldenDragonEggRankingScore", "DuaTopDoiDuaHau" => "ExchangeWatermelonRankingScore",
+            "DuaTopMoHopBlackFriday" => "OpenBlackFridayBoxRankingScore", "DuaTopMuaSamBlackFriday" => "BlackFridayShoppingRankingScore", "DuaTopMoHop20_10" => "OpenWomensDayGiftBoxRankingScore", "DuaTopMoThiepChuc" => "OpenGreetingCardRankingScore", "DuaTopTangThiepChuc" => "GiveGreetingCardRankingScore",
+            "HoTongDuongTang" => "IsEscortingTangMonk", "MapHoTong" => "TangMonkEscortMapId", "LastTimeDuongTang" => "LastTangMonkTime",
+            "IsHoldNamecBallTranhDoat" => "IsHoldingContestedNamekBall", "TempIdNamecBallHoldTranhDoat" => "ContestedNamekBallTemplateId",
+            "ThongBaoChangeMap" => "ShowMapChangeNotification", "TextThongBaoChangeMap" => "MapChangeNotificationText", "ThongBaoThua" => "ShowLossNotification", "TextThongBaoThua" => "LossNotificationText",
+            "ThoiVangVoDaiSinhTu" => "DeathmatchGoldTime", "BinhChonHatMit" => "JackfruitVote", "BinhChonPlayer" => "PlayerVote", "ZoneBinhChon" => "VotingZone",
+            "IsBo" => "IsFather", "IsMe" => "IsMother", "IsPhuHoMapMabu" => "IsMabuMapProtected",
+            "DoesNotAttackBo" => "FatherDoesNotAttack", "LastTimePlayerNotAttackBo" => "LastFatherAttackBlockPlayerTime", "TimeNotAttackBo" => "FatherAttackBlockDuration", "TemporaryEnemiesBo" => "FatherTemporaryEnemies", "JustRevivedBo" => "FatherJustRevived", "LastTimeRevivedBo" => "LastFatherRevivedTime",
+            "DoesNotAttackMe" => "MotherDoesNotAttack", "LastTimePlayerNotAttackMe" => "LastMotherAttackBlockPlayerTime", "TimeNotAttackMe" => "MotherAttackBlockDuration", "TemporaryEnemiesMe" => "MotherTemporaryEnemies", "JustRevivedMe" => "MotherJustRevived", "LastTimeRevivedMe" => "LastMotherRevivedTime",
+            "DoesNotAttackNguoiYeu" => "LoverDoesNotAttack", "LastTimePlayerNotAttackNguoiYeu" => "LastLoverAttackBlockPlayerTime", "TimeNotAttackNguoiYeu" => "LoverAttackBlockDuration", "TemporaryEnemiesNguoiYeu" => "LoverTemporaryEnemies", "JustRevivedNguoiYeu" => "LoverJustRevived", "LastTimeRevivedNguoiYeu" => "LastLoverRevivedTime",
+            "DoesNotAttackConone" => "ChildOneDoesNotAttack", "LastTimePlayerNotAttackConone" => "LastChildOneAttackBlockPlayerTime", "TimeNotAttackConone" => "ChildOneAttackBlockDuration", "TemporaryEnemiesConone" => "ChildOneTemporaryEnemies", "JustRevivedConone" => "ChildOneJustRevived", "LastTimeRevivedConone" => "LastChildOneRevivedTime",
+            "DoesNotAttackContwo" => "ChildTwoDoesNotAttack", "LastTimePlayerNotAttackContwo" => "LastChildTwoAttackBlockPlayerTime", "TimeNotAttackContwo" => "ChildTwoAttackBlockDuration", "TemporaryEnemiesContwo" => "ChildTwoTemporaryEnemies", "JustRevivedContwo" => "ChildTwoJustRevived", "LastTimeRevivedContwo" => "LastChildTwoRevivedTime",
+            "DoesNotAttackConthree" => "ChildThreeDoesNotAttack", "LastTimePlayerNotAttackConthree" => "LastChildThreeAttackBlockPlayerTime", "TimeNotAttackConthree" => "ChildThreeAttackBlockDuration", "TemporaryEnemiesConthree" => "ChildThreeTemporaryEnemies", "JustRevivedConthree" => "ChildThreeJustRevived", "LastTimeRevivedConthree" => "LastChildThreeRevivedTime",
+            "THE_TUAN" => "WeeklyCard", "LASTTIME_THE_TUAN" => "LastWeeklyCardTime",
+            "THE_THANG" => "MonthlyCard", "LASTTIME_THE_THANG" => "LastMonthlyCardTime",
+            "THE_NAM" => "YearlyCard", "LASTTIME_THE_NAM" => "LastYearlyCardTime",
+            "THE_CHI_TON" => "SupremeCard", "LASTTIME_THE_CHI_TON" => "LastSupremeCardTime",
+            "IsUseDanhHieu_ThienTu" => "UsesEmperorTitle", "LastTimeDanhHieu_ThienTu" => "LastEmperorTitleTime",
+            "IsUseDanhHieu_2" => "UsesTitle_2", "LastTimeDanhHieu_2" => "LastTitleTime_2",
+            "IsUseDanhHieu_3" => "UsesTitle_3", "LastTimeDanhHieu_3" => "LastTitleTime_3",
+            "IsUseDanhHieu_4" => "UsesTitle_4", "LastTimeDanhHieu_4" => "LastTitleTime_4",
+            "Isbienhinh" => "TransformationState", "Baovetaikhoan" => "IsAccountProtected",
+            _ => pascalName,
+        };
+    }
 
     // Khóa corpus giữ nguyên tên Java; chỉ ánh xạ khi đặt vào các property SetClothes đã đổi tên.
     private static string CSharpSetClothesPropertyName(string javaName) => javaName switch
@@ -546,7 +608,7 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         facts.Zone = s.Zone;
         facts.Clan = s.Clan;
         facts.TypeFusion = s.TypeFusion;
-        facts.DameFusion = s.DameFusion;
+        facts.FusionDamage = s.FusionDamage;
         facts.BlackBallTimeOut = s.BlackBallTimeOut;
         facts.Cards = s.Cards;
         facts.BadgeOptions = s.BadgeOptions;
@@ -555,8 +617,8 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         facts.Player.SatelliteIsIntelligent = s.Player.SatelliteIsIntelligent;
         facts.Player.UseFishSkewer = s.Player.UseFishSkewer;
         facts.Player.HasVipPoint = s.Player.HasVipPoint;
-        facts.Player.DetuStatus = store.DetuStatus;
-        facts.Player.DetuTypeDeTu = store.DetuTypeDeTu;
+        facts.Player.PetStatus = store.PetStatus;
+        facts.Player.PetType = store.PetType;
 
         NPointServerFacts server = facts.Server;
         server.ReadInt = ReadInt;
@@ -572,13 +634,13 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         server.WhisPlayerIds = [.. Whis];
 
         // the pet of this player: the numbers were read from its NPoint by the production host, the rest comes from the pet's scenario
-        if (player.Detu is not null && facts.Detu is not null)
+        if (player.Pet is not null && facts.Pet is not null)
         {
-            Store detuStore = stores[player.Detu];
-            facts.Detu.TypeDeTu = detuStore.DetuTypeDeTu;
-            List<NPointItem> detuBody = detuStore.Facts.Inventory.ItemsBody;
-            facts.Detu.BodyItemCount = detuBody.Count;
-            facts.Detu.BodySkin = detuBody.Count > 5 ? detuBody[5] : null;
+            Store petStore = stores[player.Pet];
+            facts.Pet.PetType = petStore.PetType;
+            List<NPointItem> petBody = petStore.Facts.Inventory.ItemsBody;
+            facts.Pet.BodyItemCount = petBody.Count;
+            facts.Pet.BodySkin = petBody.Count > 5 ? petBody[5] : null;
         }
 
         // this player is a pet or a clone: the data of its master
@@ -594,14 +656,14 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
                 ItemTimeIsEatMeal = ms.Facts.ItemTime.IsEatMeal,
                 ItemTimeIsUsePetPowerPotentialCharm = ms.Facts.ItemTime.IsUsePetPowerPotentialCharm,
                 ItemTimeIsBoneDragon = ms.Facts.ItemTime.IsBoneDragon,
-                THE_TUAN = master.THE_TUAN,
-                LASTTIME_THE_TUAN = master.LASTTIME_THE_TUAN,
-                THE_THANG = master.THE_THANG,
-                LASTTIME_THE_THANG = master.LASTTIME_THE_THANG,
-                THE_NAM = master.THE_NAM,
-                LASTTIME_THE_NAM = master.LASTTIME_THE_NAM,
-                THE_CHI_TON = master.THE_CHI_TON,
-                LASTTIME_THE_CHI_TON = master.LASTTIME_THE_CHI_TON,
+                WeeklyCard = master.WeeklyCard,
+                LastWeeklyCardTime = master.LastWeeklyCardTime,
+                MonthlyCard = master.MonthlyCard,
+                LastMonthlyCardTime = master.LastMonthlyCardTime,
+                YearlyCard = master.YearlyCard,
+                LastYearlyCardTime = master.LastYearlyCardTime,
+                SupremeCard = master.SupremeCard,
+                LastSupremeCardTime = master.LastSupremeCardTime,
             };
             CopyProperties(ms.Facts.Charms, mf.Charms);
             facts.Master = mf;
@@ -629,7 +691,7 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         Player player = npoint.Player;
         Store store = stores[player];
         NPointFacts s = store.Facts;
-        NPointAttackFacts af = new() { ReadInt = ReadInt, IsDeTu = player.IsDeTu };
+        NPointAttackFacts af = new() { ReadInt = ReadInt, IsPet = player.IsPet };
         if (s.SkillSelect is null)
         {
             throw new NullReferenceException("player.playerSkill.skillSelect is null");
@@ -640,9 +702,9 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         CopyProperties(s.SetClothes, af.SetClothes);
         CopyProperties(s.EffectSkill, af.EffectSkill);
         CopyProperties(s.EffectSkin, af.EffectSkin);
-        if (player.IsDeTu && masters.TryGetValue(player, out Player? master))
+        if (player.IsPet && masters.TryGetValue(player, out Player? master))
         {
-            af.MasterCharmsTdDeTu = stores[master].Facts.Charms.TdDeTu;
+            af.MasterPetCharmTraining = stores[master].Facts.Charms.PetTraining;
         }
 
         if (s.SkillSelect.TemplateId == Skill.QUA_CAU_KENH_KHI)
@@ -676,9 +738,9 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
     public override void CommitAttack(NPoint npoint, NPointAttackFacts facts)
     {
         NPointEffectSkinFacts es = stores[npoint.Player].Facts.EffectSkin;
-        es.IsChargedBlast = facts.EffectSkin.IsChargedBlast;
-        es.IsDamageBoosted = facts.EffectSkin.IsDamageBoosted;
-        es.LastTimeChargedBlast = facts.EffectSkin.LastTimeChargedBlast;
+        es.IsBlastDamageMultiplierReady = facts.EffectSkin.IsBlastDamageMultiplierReady;
+        es.IsBlastDamageMultiplierApplied = facts.EffectSkin.IsBlastDamageMultiplierApplied;
+        es.LastTimeBlastDamageMultiplier = facts.EffectSkin.LastTimeBlastDamageMultiplier;
     }
 
     public override NPointUpdateFacts CaptureUpdate(NPoint npoint)

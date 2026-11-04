@@ -26,5 +26,5 @@ public interface IEffectRules
     int GetTimett();
 
     // Trả thời lượng sức mạnh bộc phá: (cấp + 5) * 5000 mili giây (Java: SkillUtil.getTimeSucManhBocPha).
-    int GetTimeSucManhBocPha(int level);
+    int GetPowerBurstDuration(int level);
 }

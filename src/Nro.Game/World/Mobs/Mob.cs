@@ -153,7 +153,7 @@ public class Mob
 
         IMapRules rules = Rt.Rules;
         IMapPlayerGateway gateway = Rt.Players;
-        if (plAtt != null && plAtt.Zone != null && plAtt.Zone.Map.MapId == 179 && !plAtt.IsDeTu)
+        if (plAtt != null && plAtt.Zone != null && plAtt.Zone.Map.MapId == 179 && !plAtt.IsPet)
         {
             damage = 0;
         }
@@ -231,8 +231,8 @@ public class Mob
         {
             if (TempId == ConstMob.POWER_METER)
             {
-                plAtt.TotalDameMayDam = JavaNumbers.ToLong(plAtt.TotalDameMayDam + damage);
-                plAtt.LastTimeDameMayDam = Rt.Now;
+                plAtt.PunchingMachineTotalDamage = JavaNumbers.ToLong(plAtt.PunchingMachineTotalDamage + damage);
+                plAtt.LastPunchingMachineDamageTime = Rt.Now;
             }
 
             int tlDameFly = attackerView.FlyingMobDamagePercent;
@@ -254,7 +254,7 @@ public class Mob
             }
         }
 
-        if (rules.IsMapKhiGasHuyDiet(Z.Map.MapId))
+        if (rules.IsDestronGasMap(Z.Map.MapId))
         {
             bool mob76Die = true;
             foreach (Mob mob in Z.Mobs)
@@ -276,7 +276,7 @@ public class Mob
             }
         }
 
-        if (!dieWhenHpFull && !IsBigBoss() && !rules.IsMapPhoBan(Z.Map.MapId) && LvMob > 0 && plAtt != null && attackerView != null
+        if (!dieWhenHpFull && !IsBigBoss() && !rules.IsDungeonMap(Z.Map.MapId) && LvMob > 0 && plAtt != null && attackerView != null
             && attackerView.TdOaiHung < Rt.Now)
         {
             damage = (Point.MaxHp <= 20000000 ? Point.MaxHp * 10 : 2000000000) * (10.0 / 100);
@@ -318,7 +318,7 @@ public class Mob
             SendMobStillAliveAffterAttacked(damage, plAtt != null && attackerView != null && attackerView.IsCritical);
         }
 
-        if (plAtt != null && plAtt.IsNguoiYeu)
+        if (plAtt != null && plAtt.IsLover)
         {
             Rt.World.AddSMTN(plAtt, 2, GetPotentialForPlayer(plAtt, damage), true);
         }
@@ -330,12 +330,12 @@ public class Mob
                 gateway.ClearSatelliteDefend(plAtt);
             }
 
-            long tiemNang = GetPotentialForPlayer(plAtt, damage);
-            Rt.World.AddSMTN(plAtt, 2, tiemNang, true);
-            Rt.World.TangTnsmLuyenTap(plAtt, tiemNang);
+            long potential = GetPotentialForPlayer(plAtt, damage);
+            Rt.World.AddSMTN(plAtt, 2, potential, true);
+            Rt.World.AddTrainingPowerPotential(plAtt, potential);
 
             // Java gọi tangTnsmLuyenTap thêm lần nữa ngay sau lần đầu; giữ nguyên để gấp đôi tiềm năng luyện tập.
-            Rt.World.TangTnsmLuyenTap(plAtt, tiemNang);
+            Rt.World.AddTrainingPowerPotential(plAtt, potential);
         }
     }
 
@@ -344,60 +344,60 @@ public class Mob
     {
         int levelPlayer = Rt.World.GetCurrLevel(pl);
         int n = levelPlayer - Level;
-        long pDameHit;
+        long playerDamageHit;
         if (Point.GetHpFull() >= 100000000)
         {
-            pDameHit = Rt.CrisGH(damage) * 500 / Point.GetHpFull();
+            playerDamageHit = Rt.CrisGH(damage) * 500 / Point.GetHpFull();
         }
         else
         {
-            pDameHit = Rt.CrisGH(damage) * 100 / Point.GetHpFull();
+            playerDamageHit = Rt.CrisGH(damage) * 100 / Point.GetHpFull();
         }
 
-        long tiemNang = pDameHit * _maxPotential / 100;
+        long potential = playerDamageHit * _maxPotential / 100;
         if (n >= 0)
         {
             for (int j = 0; j < n; j++)
             {
-                long sub = tiemNang * 10 / 100;
-                if (sub <= 0)
+                long reduction = potential * 10 / 100;
+                if (reduction <= 0)
                 {
-                    sub = 1;
+                    reduction = 1;
                 }
 
-                tiemNang -= sub;
+                potential -= reduction;
             }
         }
         else
         {
             for (int j = 0; j < -n; j++)
             {
-                long add = tiemNang * 10 / 100;
+                long add = potential * 10 / 100;
                 if (add <= 0)
                 {
                     add = 1;
                 }
 
-                tiemNang += add;
+                potential += add;
             }
         }
 
-        if (tiemNang <= 0)
+        if (potential <= 0)
         {
-            tiemNang = 1;
+            potential = 1;
         }
 
         if (TempId == ConstMob.POWER_METER)
         {
-            tiemNang = 1;
+            potential = 1;
         }
 
         if (TempId == ConstMob.HIRUDEGARN)
         {
-            tiemNang = 1;
+            potential = 1;
         }
 
-        return Rt.CrisGH(Rt.Players.CalculatePowerPotential(pl, tiemNang));
+        return Rt.CrisGH(Rt.Players.CalculatePowerPotential(pl, potential));
     }
 
     // Cập nhật theo tick.
@@ -515,7 +515,7 @@ public class Mob
         Player? player = GetPlayerCanAttack();
         if (!IsDie() && !EffectSkill.IsHaveEffectSkill() && TempId != ConstMob.TRAINING_DUMMY && TempId != ConstMob.POWER_METER
             && TempId != ConstMob.HAUNTED_SCARECROW && TempId != ConstMob.DESTRUCTION_MACHINE && !IsBigBoss()
-            && (LvMob < 1 || Rt.Rules.IsMapPhoBan(Z.Map.MapId))
+            && (LvMob < 1 || Rt.Rules.IsDungeonMap(Z.Map.MapId))
             && Rt.CanDoWithTime(_lastTimeAttackPlayer, _timeAttack))
         {
             if (player != null)
@@ -553,7 +553,7 @@ public class Mob
                 }
 
                 MobPlayerView view = Rt.Players.GetMobPlayerView(pl);
-                bool canAttack = !view.IsDie && !pl.IsBoss && !pl.IsPetFollow && !pl.IsDuongTang && !view.SatelliteDefend && !view.IsInvisible
+                bool canAttack = !view.IsDie && !pl.IsBoss && !pl.IsPetFollow && !pl.IsTangMonk && !view.SatelliteDefend && !view.IsInvisible
                     && (TempId > 18 || (TempId > 9 && Type == 4) || IsBigBoss());
                 if (canAttack)
                 {
@@ -616,15 +616,15 @@ public class Mob
     private void MobAttackPlayer(Player player)
     {
         MobPlayerView view = Rt.Players.GetMobPlayerView(player);
-        double dameMob = Rt.CrisGH(Point.GetDamageAttack());
-        if (dameMob > 2_000_000_000)
+        double mobDamage = Rt.CrisGH(Point.GetDamageAttack());
+        if (mobDamage > 2_000_000_000)
         {
-            dameMob = 2_000_000_000;
+            mobDamage = 2_000_000_000;
         }
 
         if (view.TdDaTrau > Rt.Now)
         {
-            dameMob /= 2;
+            mobDamage /= 2;
         }
 
         if (view.ClanBuaDaTrau > Rt.Now)
@@ -636,55 +636,55 @@ public class Mob
                 bonusPercent = 200;
             }
 
-            dameMob -= dameMob * bonusPercent / 100;
+            mobDamage -= mobDamage * bonusPercent / 100;
         }
 
-        if (player.IsDeTu && view.MasterTdDeTu > Rt.Now)
+        if (player.IsPet && view.MasterPetCharmTraining > Rt.Now)
         {
-            dameMob /= 2;
+            mobDamage /= 2;
         }
 
-        if (LvMob > 0 && !Rt.Rules.IsMapPhoBan(Z.Map.MapId))
+        if (LvMob > 0 && !Rt.Rules.IsDungeonMap(Z.Map.MapId))
         {
-            dameMob = view.HpMax * (10.0 / 100);
+            mobDamage = view.HpMax * (10.0 / 100);
         }
 
         if (view.SatelliteDefend)
         {
-            dameMob -= dameMob / 5;
+            mobDamage -= mobDamage / 5;
         }
 
         if (view.IsCommenson)
         {
-            dameMob = JavaNumbers.Round(dameMob * 0.1);
+            mobDamage = JavaNumbers.Round(mobDamage * 0.1);
         }
 
         if (LvMob > 0 && view.TdOaiHung > Rt.Now)
         {
-            dameMob = 0;
+            mobDamage = 0;
         }
 
         if (Rt.Rules.IsMapNguHanhSon(MapIdOf(player)))
         {
-            dameMob = view.HpMax / 10;
+            mobDamage = view.HpMax / 10;
         }
 
-        double dame = Rt.Players.Injured(player, null, Rt.CrisGH(dameMob), false, true);
-        SendMobAttackMe(player, dame);
+        double damage = Rt.Players.Injured(player, null, Rt.CrisGH(mobDamage), false, true);
+        SendMobAttackMe(player, damage);
         SendMobAttackPlayer(player);
-        ReflectDamage(player, dame);
+        ReflectDamage(player, damage);
     }
 
-    private void SendMobAttackMe(Player player, double dame)
+    private void SendMobAttackMe(Player player, double damage)
     {
-        if (!player.IsDeTu && !player.IsBo && !player.IsMe && !player.IsPetFollow && !player.IsDuongTang && !player.IsBot && !player.IsBot_Event
-            && !player.IsBot_New && !player.IsBot_Valentine && !player.IsNguoiYeu && !player.IsConOne && !player.IsConTwo && !player.IsConThree)
+        if (!player.IsPet && !player.IsFather && !player.IsMother && !player.IsPetFollow && !player.IsTangMonk && !player.IsBot && !player.IsBot_Event
+            && !player.IsBot_New && !player.IsBot_Valentine && !player.IsLover && !player.IsChildOne && !player.IsChildTwo && !player.IsChildThree)
         {
             try
             {
                 Message msg = new(-11);
                 msg.Writer().WriteByte(Id);
-                msg.WriteCris(Rt.CrisGH(dame), Rt.ReadInt);
+                msg.WriteCris(Rt.CrisGH(damage), Rt.ReadInt);
                 Rt.Players.SendMessage(player, msg);
             }
             catch (Exception e)
@@ -811,13 +811,13 @@ public class Mob
         }
     }
 
-    private void SendMobDieAffterAttacked(Player plKill, double dameHit)
+    private void SendMobDieAffterAttacked(Player plKill, double damageHit)
     {
         try
         {
             Message msg = new(-12);
             msg.Writer().WriteByte(Id);
-            msg.WriteCris(Rt.CrisGH(dameHit), Rt.ReadInt);
+            msg.WriteCris(Rt.CrisGH(damageHit), Rt.ReadInt);
             msg.Writer().WriteBoolean(Rt.Players.GetMobPlayerView(plKill).IsCritical);
             List<ItemMap>? items = null;
             if (Rt.Players.IsPl(plKill))
@@ -859,14 +859,14 @@ public class Mob
         LastTimeDie = Rt.Now;
     }
 
-    private void SendMobStillAliveAffterAttacked(double dameHit, bool crit)
+    private void SendMobStillAliveAffterAttacked(double damageHit, bool crit)
     {
         try
         {
             Message msg = new(-9);
             msg.Writer().WriteByte(Id);
             msg.WriteCris(Rt.CrisGH(Point.Gethp()), Rt.ReadInt);
-            msg.WriteCris(Rt.CrisGH(dameHit), Rt.ReadInt);
+            msg.WriteCris(Rt.CrisGH(damageHit), Rt.ReadInt);
             msg.Writer().WriteBoolean(crit);
             msg.Writer().WriteInt(-1);
             SendAll(msg);
@@ -958,12 +958,12 @@ public class Mob
         }
     }
 
-    private void ReflectDamage(Player plTarget, double dame)
+    private void ReflectDamage(Player plTarget, double damage)
     {
         int percentPST = Rt.Players.GetMobPlayerView(plTarget).ReflectDamagePercent;
         if (percentPST != 0)
         {
-            double damePST = Rt.CrisGH(dame * percentPST / 100L);
+            double damePST = Rt.CrisGH(damage * percentPST / 100L);
             try
             {
                 Message msg = new(-9);
@@ -1027,13 +1027,13 @@ public class Mob
         }
 
         MobLootPlayerView lv = Rt.Loot.GetLootView(player);
-        double tyLeMayMan = lv.LuckPercent;
+        double luckPercent = lv.LuckPercent;
         bool coBonLa = lv.UseCoBonLa;
         int mapId = MapIdOf(player);
         IMapRules rules = Rt.Rules;
         IGameFlags flags = Rt.Flags;
         IMobLootHost loot = Rt.Loot;
-        bool Luck(double mum, double max) => Rt.Random.GetChanceFromLuck(tyLeMayMan, mum, max, coBonLa);
+        bool Luck(double mum, double max) => Rt.Random.GetChanceFromLuck(luckPercent, mum, max, coBonLa);
         int Next(int a, int b) => Rt.NextInt(a, b);
 
         // Sự kiện Tết.
@@ -1072,7 +1072,7 @@ public class Mob
         {
             if (loot.HasChristmasHat(player))
             {
-                if (Luck(1, 100) && loot.CanDropKeoGiangSinh(player, 99))
+                if (Luck(1, 100) && loot.CanDropChristmasCandy(player, 99))
                 {
                     list.Add(CreateItemMap(player, 533, x, yEnd, Opt(30, 0)));
                 }
@@ -1115,8 +1115,8 @@ public class Mob
         // Sự kiện Vu Lan.
         if (flags.VuLanFestival && rules.IsMapDiaNguc(mapId) && !rules.IsMapNotDropItems(mapId))
         {
-            bool useMayDo = lv.UseMayDoLinhHon;
-            if (Luck(1, useMayDo ? 5 : 10))
+            bool useScanner = lv.UseSoulScanner;
+            if (Luck(1, useScanner ? 5 : 10))
             {
                 list.Add(CreateItemMap(player, 1258, x, yEnd, Opt(30, 0)));
             }
@@ -1139,7 +1139,7 @@ public class Mob
             double hpFactor = Math.Floor(hp / 1000.0);
             double max = 30.0 - (hpFactor * 0.02);
             max = Math.Max(10.0, Math.Min(30.0, max));
-            if (lv.UseMayDoNgocBi && Luck(1, max))
+            if (lv.UseMysticOrbScanner && Luck(1, max))
             {
                 list.Add(CreateItemMap(player, Next(705, 708), x, yEnd, Opt(87, 0), Opt(30, 0), Opt(93, 35)));
             }
@@ -1175,7 +1175,7 @@ public class Mob
         }
 
         // Sự kiện Trung Thu.
-        if (flags.TrungThu && !rules.IsMapNotDropItems(mapId))
+        if (flags.MoonFestival && !rules.IsMapNotDropItems(mapId))
         {
             if (Luck(1, 50))
             {
@@ -1430,10 +1430,10 @@ public class Mob
         list.AddRange(GetItemEventMobReward(player, x, yEnd));
 
         MobLootPlayerView lv = loot.GetLootView(player);
-        double tyLeMayMan = lv.LuckPercent;
+        double luckPercent = lv.LuckPercent;
         bool coBonLa = lv.UseCoBonLa;
         int mapid = MapIdOf(player);
-        bool Luck(double mum, double max) => Rt.Random.GetChanceFromLuck(tyLeMayMan, mum, max, coBonLa);
+        bool Luck(double mum, double max) => Rt.Random.GetChanceFromLuck(luckPercent, mum, max, coBonLa);
         int Next(int a, int b) => Rt.NextInt(a, b);
 
         // Điểm Ngũ Hành Sơn.
@@ -1461,13 +1461,13 @@ public class Mob
         }
 
         // Vàng thường.
-        if (!rules.IsMapBanDoKhoBau(mapid) && !rules.IsMapLang(mapid) && Rt.IsTrue(2, 10))
+        if (!rules.IsTreasureUnderSeaMap(mapid) && !rules.IsMapLang(mapid) && Rt.IsTrue(2, 10))
         {
             DropGold(player, lv, this, list, Z, x, yEnd);
         }
 
         // Vàng bản đồ kho báu.
-        if (rules.IsMapBanDoKhoBau(mapid))
+        if (rules.IsTreasureUnderSeaMap(mapid))
         {
             DropGoldForTreasureUnderSea(player, lv, yEnd);
         }
@@ -1475,7 +1475,7 @@ public class Mob
         // Danh hiệu Thiên Tử.
         if (rules.IsMapHanhTinhNgucTu(mapid))
         {
-            if (player.LastTimeDanhHieu_ThienTu > 0 && player.IsUseDanhHieu_ThienTu)
+            if (player.LastEmperorTitleTime > 0 && player.UsesEmperorTitle)
             {
                 if (Luck(1, 10))
                 {
@@ -1489,13 +1489,13 @@ public class Mob
         }
 
         // Viên nang.
-        if (lv.UseMayDo && rules.IsMapTuongLai(mapid) && Rt.IsTrue(1, 30))
+        if (lv.UseScanner && rules.IsMapTuongLai(mapid) && Rt.IsTrue(1, 30))
         {
             list.Add(new ItemMap(Z, 380, 1, x, yEnd, player.Id));
         }
 
         // Đá siêu cấp.
-        if (lv.UseMayDoSieuHoa && rules.IsMapCold(mapid) && Rt.IsTrue(1, 70))
+        if (lv.UseSuperTransformationScanner && rules.IsMapCold(mapid) && Rt.IsTrue(1, 70))
         {
             list.Add(new ItemMap(Z, 1979, 1, x, yEnd, player.Id));
         }
@@ -1517,11 +1517,11 @@ public class Mob
         if (lv.IsActive)
         {
             int tile = 200;
-            if (lv.VeThangActive)
+            if (lv.MonthlyCardActive)
             {
                 tile = 50;
             }
-            else if (lv.VeTuanActive)
+            else if (lv.WeeklyCardActive)
             {
                 tile = 150;
             }
@@ -1537,7 +1537,7 @@ public class Mob
             list.Add(new ItemMap(Z, 19, 1, x + Next(-10, 10), yEnd, player.Id));
         }
 
-        if (lv.IsSPLCostume && Rt.IsTrue(1, 10))
+        if (lv.HasCrystalStarEquipment && Rt.IsTrue(1, 10))
         {
             int rand = Next(0, 6);
             ItemMap it = new(Z, rand + 441, 1, x + Next(-10, 10), yEnd, player.Id);
@@ -1546,7 +1546,7 @@ public class Mob
         }
 
         // Vàng thường, lượt quay thứ hai như Java.
-        if (!rules.IsMapBanDoKhoBau(mapid) && !rules.IsMapLang(mapid) && Rt.IsTrue(2, 10))
+        if (!rules.IsTreasureUnderSeaMap(mapid) && !rules.IsMapLang(mapid) && Rt.IsTrue(2, 10))
         {
             DropGold(player, lv, this, list, Z, x, yEnd);
         }

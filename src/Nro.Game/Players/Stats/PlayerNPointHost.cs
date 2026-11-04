@@ -22,14 +22,14 @@ public class PlayerNPointHost : INPointHost
         Player player = npoint.Player;
         NPointFacts facts = new();
         CapturePlayer(player, facts.Player);
-        NPoint? detuPoint = player.Detu?.NPoint;
-        if (detuPoint is not null)
+        NPoint? petPoint = player.Pet?.NPoint;
+        if (petPoint is not null)
         {
-            facts.Detu = new NPointDetuFacts
+            facts.Pet = new NPointPetFacts
             {
-                HpMax = detuPoint.HpMax,
-                MpMax = detuPoint.MpMax,
-                Damage = detuPoint.Damage,
+                HpMax = petPoint.HpMax,
+                MpMax = petPoint.MpMax,
+                Damage = petPoint.Damage,
             };
         }
 
@@ -48,30 +48,30 @@ public class PlayerNPointHost : INPointHost
         p.IsPlMan = IsPlMan(player);
         p.IsBotAny = player.IsBot || player.IsBot_New || player.IsBot_Event || player.IsBot_Valentine;
         p.IsBoss = player.IsBoss;
-        p.IsDeTu = player.IsDeTu;
-        p.IsBo = player.IsBo;
-        p.IsMe = player.IsMe;
-        p.IsPhanThan = player.IsPhanThan;
-        p.IsPhuHoMapMabu = player.IsPhuHoMapMabu;
-        p.THE_TUAN = player.THE_TUAN;
-        p.LASTTIME_THE_TUAN = player.LASTTIME_THE_TUAN;
-        p.THE_THANG = player.THE_THANG;
-        p.LASTTIME_THE_THANG = player.LASTTIME_THE_THANG;
-        p.THE_NAM = player.THE_NAM;
-        p.LASTTIME_THE_NAM = player.LASTTIME_THE_NAM;
-        p.THE_CHI_TON = player.THE_CHI_TON;
-        p.LASTTIME_THE_CHI_TON = player.LASTTIME_THE_CHI_TON;
-        p.ClanHpBonusPercent = player.TlHpClanAdd;
-        p.ClanMpBonusPercent = player.TlMpClanAdd;
-        p.ClanDamageBonusPercent = player.TlDameClanAdd;
-        p.IsUseDanhHieu_ThienTu = player.IsUseDanhHieu_ThienTu;
-        p.LastTimeDanhHieu_ThienTu = player.LastTimeDanhHieu_ThienTu;
-        p.Isbienhinh = player.Isbienhinh;
+        p.IsPet = player.IsPet;
+        p.IsFather = player.IsFather;
+        p.IsMother = player.IsMother;
+        p.IsBodyClone = player.IsBodyClone;
+        p.IsMabuMapProtected = player.IsMabuMapProtected;
+        p.WeeklyCard = player.WeeklyCard;
+        p.LastWeeklyCardTime = player.LastWeeklyCardTime;
+        p.MonthlyCard = player.MonthlyCard;
+        p.LastMonthlyCardTime = player.LastMonthlyCardTime;
+        p.YearlyCard = player.YearlyCard;
+        p.LastYearlyCardTime = player.LastYearlyCardTime;
+        p.SupremeCard = player.SupremeCard;
+        p.LastSupremeCardTime = player.LastSupremeCardTime;
+        p.ClanHpBonusPercent = player.ClanHpBonusPercent;
+        p.ClanMpBonusPercent = player.ClanMpBonusPercent;
+        p.ClanDamageBonusPercent = player.ClanDamageBonusPercent;
+        p.UsesEmperorTitle = player.UsesEmperorTitle;
+        p.LastEmperorTitleTime = player.LastEmperorTitleTime;
+        p.TransformationState = player.TransformationState;
         p.Trbne = player.Trbne;
         p.CFlag = player.CFlag;
         p.TypeChibi = player.TypeChibi;
         p.Buff = player.Buff;
-        p.Baovetaikhoan = player.Baovetaikhoan;
+        p.IsAccountProtected = player.IsAccountProtected;
     }
 
     // Chụp component người chơi sở hữu; component null của new Player() trần được hiểu là không có hiệu ứng. Cờ được chép theo tên thuộc tính theo quy ước Player shell; kiểm thử sẽ lỗi nếu facts không có đối ứng.
@@ -206,16 +206,16 @@ public class PlayerNPointHost : INPointHost
     // Xác định người chơi thực, không phải đệ tử, họ hàng, boss, phân thân, bot, Saibamen hay thú đi theo.
     public static bool IsPl(Player player)
     {
-        return player.IsPlayer && !player.IsDeTu && !player.IsBo && !player.IsMe && !player.IsBoss && !player.IsPetFollow && !player.IsDuongTang && !player.IsPhanThan
-            && !player.IsBot_Valentine && !player.IsBot && !player.IsBot_Event && !player.IsBot_New && !player.IsSaibamen && !player.IsNguoiYeu && !player.IsConOne
-            && !player.IsConTwo && !player.IsConThree;
+        return player.IsPlayer && !player.IsPet && !player.IsFather && !player.IsMother && !player.IsBoss && !player.IsPetFollow && !player.IsTangMonk && !player.IsBodyClone
+            && !player.IsBot_Valentine && !player.IsBot && !player.IsBot_Event && !player.IsBot_New && !player.IsSaibamen && !player.IsLover && !player.IsChildOne
+            && !player.IsChildTwo && !player.IsChildThree;
     }
 
     // Xác định nhóm người/chủ theo Player.isPlMan() của Java.
     public static bool IsPlMan(Player player)
     {
-        return (player.IsPlayer || player.IsDeTu || player.IsBo || player.IsMe || player.IsNguoiYeu || player.IsConOne || player.IsConTwo || player.IsConThree || player.IsPhanThan)
-            && !player.IsBoss && !player.IsPetFollow && !player.IsDuongTang && !player.IsBot && !player.IsBot_Event && !player.IsBot_New && !player.IsBot_Valentine && !player.IsSaibamen;
+        return (player.IsPlayer || player.IsPet || player.IsFather || player.IsMother || player.IsLover || player.IsChildOne || player.IsChildTwo || player.IsChildThree || player.IsBodyClone)
+            && !player.IsBoss && !player.IsPetFollow && !player.IsTangMonk && !player.IsBot && !player.IsBot_Event && !player.IsBot_New && !player.IsBot_Valentine && !player.IsSaibamen;
     }
 
     // Hook bổ sung facts từ dịch vụ hoặc lớp chưa chuyển; mặc định giữ trạng thái không có hiệu ứng.
@@ -245,7 +245,7 @@ public class PlayerNPointHost : INPointHost
     {
         Player player = npoint.Player;
         Skill skill = player.PlayerSkill?.SkillSelect ?? throw new NullReferenceException("player.playerSkill.skillSelect is null");
-        NPointAttackFacts af = new() { SkillSelect = ToFact(skill)!, IsDeTu = player.IsDeTu };
+        NPointAttackFacts af = new() { SkillSelect = ToFact(skill)!, IsPet = player.IsPet };
         Intrinsic? intrinsic = player.PlayerIntrinsic?.Intrinsic;
         if (intrinsic is not null)
         {
@@ -277,9 +277,9 @@ public class PlayerNPointHost : INPointHost
         EffectSkin? skin = npoint.Player.EffectSkin;
         if (skin is not null)
         {
-            skin.IsChargedBlast = facts.EffectSkin.IsChargedBlast;
-            skin.IsDamageBoosted = facts.EffectSkin.IsDamageBoosted;
-            skin.LastTimeChargedBlast = facts.EffectSkin.LastTimeChargedBlast;
+            skin.IsBlastDamageMultiplierReady = facts.EffectSkin.IsBlastDamageMultiplierReady;
+            skin.IsBlastDamageMultiplierApplied = facts.EffectSkin.IsBlastDamageMultiplierApplied;
+            skin.LastTimeBlastDamageMultiplier = facts.EffectSkin.LastTimeBlastDamageMultiplier;
         }
     }
 

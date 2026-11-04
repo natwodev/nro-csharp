@@ -39,7 +39,7 @@ public class ZoneTests
         Player boss = g.NewPlayer(2);
         boss.IsBoss = true;
         Player disciple = g.NewPlayer(3);
-        disciple.IsDeTu = true;
+        disciple.IsPet = true;
         Player follow = g.NewPlayer(4);
         follow.IsPetFollow = true;
         Player npc = g.NewPlayer(5);
@@ -296,14 +296,14 @@ public class ZoneTests
     }
 
     [Fact]
-    public void PickItem_TranhNgocBallGoesToTheWarService()
+    public void PickItem_NamekWarBallGoesToTheWarService()
     {
         FakeGame g = new();
         Zone z = MapTestKit.BuildZone(g);
         Player p = MapTestKit.NewPlayerIn(g, z, 5);
-        ItemMap ball = new(z, 353, 1, 0, 0, -1) { IsNamecBallTranhDoat = true };
+        ItemMap ball = new(z, 353, 1, 0, 0, -1) { IsContestedNamekBall = true };
         z.PickItem(p, ball.ItemMapId);
-        Assert.Contains("tnPick:5", g.Calls);
+        Assert.Contains("namekWarPick:5", g.Calls);
         Assert.Contains(ball, z.Items);
     }
 
@@ -457,78 +457,78 @@ public class ZoneTests
     // ---- Namek war -------------------------------------------------------------------------------------------------------------------------------------------
 
     [Fact]
-    public void TranhNgoc_WarEndedByTheServer_ResetsTheZone()
+    public void NamekWar_WarEndedByTheServer_ResetsTheZone()
     {
-        FakeGame g = new() { TranhNgocWar = false };
+        FakeGame g = new() { NamekWar = false };
         Zone z = MapTestKit.BuildZone(g);
-        z.StartZoneTranhNgoc = true;
+        z.IsNamekWarZoneStarted = true;
         z.PointCadic = 3;
         z.PointFide = 2;
         z.AddPlayersCadic(g.NewPlayer(1));
         z.Update();
-        Assert.False(z.StartZoneTranhNgoc);
+        Assert.False(z.IsNamekWarZoneStarted);
         Assert.Equal(0, z.PointCadic);
         Assert.Equal(0, z.PointFide);
         Assert.Empty(z.PlayersCadic);
     }
 
     [Fact]
-    public void TranhNgoc_SevenPointsWinImmediately_AndTheTimeoutPicksTheHigherScore()
+    public void NamekWar_SevenPointsWinImmediately_AndTheTimeoutPicksTheHigherScore()
     {
-        FakeGame g = new() { TranhNgocWar = true };
+        FakeGame g = new() { NamekWar = true };
         Zone z = MapTestKit.BuildZone(g);
-        z.StartZoneTranhNgoc = true;
-        z.LastTimeStartTranhNgoc = g.Runtime.Now;
+        z.IsNamekWarZoneStarted = true;
+        z.LastNamekWarStartTime = g.Runtime.Now;
         z.LastTimeDropBall = g.Runtime.Now;
         z.PointFide = 7;
         z.PointCadic = 1;
         z.AddPlayersCadic(g.NewPlayer(1));
         z.AddplayersFide(g.NewPlayer(2));
         z.Update();
-        Assert.False(z.StartZoneTranhNgoc);
-        Assert.Equal(["tnEnd:1:True", "tnEnd:0:False", "tnPrize:1:1:7", "tnPrize:0:1:1"], g.Calls.Where(c => c.StartsWith("tn", StringComparison.Ordinal)).ToArray());
+        Assert.False(z.IsNamekWarZoneStarted);
+        Assert.Equal(["namekWarEnd:1:True", "namekWarEnd:0:False", "namekWarPrize:1:1:7", "namekWarPrize:0:1:1"], g.Calls.Where(c => c.StartsWith("namekWar", StringComparison.Ordinal)).ToArray());
 
         g.Calls.Clear();
-        z.StartZoneTranhNgoc = true;
-        z.LastTimeStartTranhNgoc = g.Runtime.Now;
+        z.IsNamekWarZoneStarted = true;
+        z.LastNamekWarStartTime = g.Runtime.Now;
         z.PointCadic = 4;
         z.PointFide = 2;
         g.Time.Advance(TimeSpan.FromMilliseconds(ConstNamekWar.TIME + 1));
         z.Update();
-        Assert.Contains("tnEnd:1:False", g.Calls);
-        Assert.Contains("tnEnd:0:True", g.Calls);
+        Assert.Contains("namekWarEnd:1:False", g.Calls);
+        Assert.Contains("namekWarEnd:0:True", g.Calls);
         Assert.Equal(0, z.PointCadic);
 
         g.Calls.Clear();
-        z.StartZoneTranhNgoc = true;
-        z.LastTimeStartTranhNgoc = g.Runtime.Now;
+        z.IsNamekWarZoneStarted = true;
+        z.LastNamekWarStartTime = g.Runtime.Now;
         z.PointCadic = 2;
         z.PointFide = 2;
         g.Time.Advance(TimeSpan.FromMilliseconds(ConstNamekWar.TIME + 1));
         z.Update();
-        Assert.Equal(["tnEnd:2:True", "tnEnd:2:False"], g.Calls.Where(c => c.StartsWith("tn", StringComparison.Ordinal)).ToArray());
+        Assert.Equal(["namekWarEnd:2:True", "namekWarEnd:2:False"], g.Calls.Where(c => c.StartsWith("namekWar", StringComparison.Ordinal)).ToArray());
     }
 
     [Fact]
-    public void TranhNgoc_DropsABallAfterTheDelay_WhenNobodyHasIt()
+    public void NamekWar_DropsABallAfterTheDelay_WhenNobodyHasIt()
     {
-        FakeGame g = new() { TranhNgocWar = true };
+        FakeGame g = new() { NamekWar = true };
         Zone z = MapTestKit.BuildZone(g);
-        z.StartZoneTranhNgoc = true;
-        z.LastTimeStartTranhNgoc = g.Runtime.Now;
+        z.IsNamekWarZoneStarted = true;
+        z.LastNamekWarStartTime = g.Runtime.Now;
         z.LastTimeDropBall = g.Runtime.Now;
         z.Update();
         Assert.Empty(z.Items);
         g.Time.Advance(TimeSpan.FromMilliseconds(ConstNamekWar.LAST_TIME_DROP_BALL + 1));
         z.Update();
         ItemMap ball = Assert.Single(z.Items);
-        Assert.True(ball.IsNamecBallTranhDoat);
+        Assert.True(ball.IsContestedNamekBall);
         Assert.InRange((int)ball.ItemTemplate!.Id, 353, 359);
         Assert.Equal(g.Runtime.Now, z.LastTimeDropBall);
     }
 
     [Fact]
-    public void TranhNgoc_PlayersAreNotAddedTwice()
+    public void NamekWar_PlayersAreNotAddedTwice()
     {
         FakeGame g = new();
         Zone z = MapTestKit.BuildZone(g);
