@@ -1,0 +1,15 @@
+package nro.badges;
+
+import java.util.ArrayList;
+import java.util.List;
+import models.Item.ItemOption;
+import nro.player.Player;
+
+public class BagesTemplate {
+
+    public static List<ItemOption> badgeOptions = new ArrayList<>();
+
+    public static List<ItemOption> sendListItemOption(Player player) {
+        return badgeOptions;
+    }
+}

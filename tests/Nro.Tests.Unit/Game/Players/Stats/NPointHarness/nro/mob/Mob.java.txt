@@ -1,0 +1,14 @@
+package nro.mob;
+
+import nro.player.Location;
+
+public class Mob {
+
+    public MobPoint point = new MobPoint();
+    public Location location = new Location();
+    public boolean die;
+
+    public boolean isDie() {
+        return die;
+    }
+}

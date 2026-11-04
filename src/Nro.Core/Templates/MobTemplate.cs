@@ -1,29 +1,36 @@
 namespace Nro.Core.Templates;
 
-/// <summary>
-/// Port of <c>nro/template/MobTemplate.java</c> (a mob template, loaded from the mob_template table). Java's <c>byte</c> fields
-/// are signed, so they are <see cref="sbyte"/>. <c>percent_gold</c> becomes <c>Percent_gold</c> (only the first letter is capitalized).
-/// <c>name</c> is null in Java until the loader assigns it; C# uses an empty string (see the null decision in <see cref="FlagBag"/>).
-/// </summary>
+// Mẫu quái, được nạp từ bảng mob_template; các byte có dấu của Java được giữ bằng sbyte.
+// Nguồn Java: nro/template/MobTemplate.java (tên mặc định chuỗi rỗng thay cho null của Java và chỉ viết hoa ký tự đầu của percent_gold).
 public class MobTemplate
 {
+    // Mã mẫu quái (Java: id)
     public int Id { get; set; }
 
+    // Kiểu quái (Java: type)
     public sbyte Type { get; set; }
 
+    // Tên quái, mặc định chuỗi rỗng thay cho null của Java (Java: name)
     public string Name { get; set; } = "";
 
+    // Máu cơ bản của quái (Java: hp)
     public int Hp { get; set; }
 
+    // Phạm vi di chuyển (Java: rangeMove)
     public sbyte RangeMove { get; set; }
 
+    // Tốc độ di chuyển (Java: speed)
     public sbyte Speed { get; set; }
 
+    // Kiểu phi tiêu/tấn công xa (Java: dartType)
     public sbyte DartType { get; set; }
 
+    // Phần trăm sát thương (Java: percentDame)
     public sbyte PercentDame { get; set; }
 
+    // Phần trăm tiềm năng (Java: percentTiemNang)
     public sbyte PercentTiemNang { get; set; }
 
+    // Phần trăm vàng nhận được (Java: percent_gold)
     public sbyte Percent_gold { get; set; }
 }

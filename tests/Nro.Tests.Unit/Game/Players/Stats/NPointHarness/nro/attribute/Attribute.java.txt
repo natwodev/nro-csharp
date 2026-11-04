@@ -1,0 +1,15 @@
+package nro.attribute;
+
+public class Attribute {
+
+    public boolean expired;
+    public int value;
+
+    public boolean isExpired() {
+        return expired;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}

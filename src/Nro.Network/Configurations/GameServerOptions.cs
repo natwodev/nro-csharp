@@ -3,27 +3,27 @@ using Nro.Network.Sessions;
 
 namespace Nro.Network.Configurations;
 
-/// <summary>Settings of the TCP listener (<see cref="Services.GameServer"/>).</summary>
+// Tập cấu hình bộ lắng nghe TCP của máy chủ game.
+// Nguồn Java: network/ServerManager.java (giữ cổng, giới hạn IP và buffer; C# tắt Nagle có chủ đích để tránh độ trễ delayed-ACK cho gói nhỏ).
+
 public sealed class GameServerOptions
 {
-    /// <summary>Java <c>ServerManager.PORT</c>. 0 lets the operating system pick a free port (used by the tests).</summary>
+
+    // Cổng TCP lắng nghe; 0 để hệ điều hành chọn cổng trống (Java: ServerManager.PORT).
     public int Port { get; init; } = 14445;
 
-    /// <summary>The local address to listen on. <c>null</c> means every interface (IPv4 and IPv6 when the machine supports it), like Java's wildcard bind.</summary>
+    // Địa chỉ cục bộ lắng nghe; null là mọi giao diện IPv4/IPv6 như wildcard Java.
     public IPAddress? BindAddress { get; init; }
 
-    /// <summary>Java <c>Manager.MAX_PER_IP</c>: simultaneous connections allowed from one IP address.</summary>
+    // Số kết nối đồng thời tối đa từ một IP (Java: Manager.MAX_PER_IP).
     public int MaxConnectionsPerIp { get; init; } = 3;
 
-    /// <summary>Java <c>setSendBufferSize/setReceiveBufferSize(0x100000)</c>.</summary>
+    // Kích thước buffer gửi và nhận của socket theo giá trị Java 0x100000.
     public int SocketBufferBytes { get; init; } = 0x100000;
 
-    /// <summary>
-    /// Turns Nagle's algorithm off. Java left it on; every packet here is written with a single call, so keeping it on only adds
-    /// up to a delayed-ACK interval of latency to small packets.
-    /// </summary>
+    // Bật TCP NoDelay để gói nhỏ không chờ Nagle/delayed-ACK; khác Java có chủ đích.
     public bool NoDelay { get; init; } = true;
 
-    /// <summary>Limits applied to each session.</summary>
+    // Giới hạn áp dụng cho từng phiên.
     public SessionOptions Session { get; init; } = new();
 }

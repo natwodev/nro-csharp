@@ -1,0 +1,7 @@
+package nro.server;
+
+public class Manager {
+
+    public static boolean readInt = true;
+    public static int RATE_EXP_SERVER = 10;
+}

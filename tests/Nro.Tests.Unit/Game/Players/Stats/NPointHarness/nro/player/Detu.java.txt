@@ -1,0 +1,13 @@
+package nro.player;
+
+public class Detu extends Player {
+
+    public static final byte FUSION = 4;
+    public Player master;
+    public byte status = 0;
+    public byte typeDeTu;
+
+    public Detu(Player master) {
+        this.master = master;
+    }
+}

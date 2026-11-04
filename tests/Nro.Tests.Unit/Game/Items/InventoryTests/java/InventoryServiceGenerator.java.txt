@@ -1,0 +1,1112 @@
+// Generates tests/Nro.Tests/Inventory/inventory-service.json: what the REAL code of nro/inventory/InventoryService.java does, for the methods that do not need the rest of the server.
+//
+// How it is made (nothing here is a re-implementation):
+//   * the method bodies inside "static class InvLogic" below were extracted verbatim from InventoryService.java (sha256 e8620afdb0c78eb95c81b98bdf8e9789ee824c4829910dbdba94b7d648ff9d4a) by build_service_harness.py, from these line ranges:
+//   boolean addItemList\(                                        lines 1591-1705
+//   boolean hasOptionTemplateId\(                                lines 1831-1841
+//   int\[\] isItemIncrementalOption\(                            lines 1853-1863
+//   void sortItems\(                                             lines 464-488
+//   void sortItemv2\(                                            lines 490-501
+//   void removeItem\(List<Item> items, int index\)               lines 375-378
+//   void removeItem\(List<Item> items, Item item\)               lines 380-392
+//   void subQuantityItem\(                                       lines 446-458
+//   byte getCountEmptyListItem\(                                 lines 1951-1959
+//   void updateSet\(                                             lines 2337-2360
+//   void resetSet\(                                              lines 2362-2405
+//   void updateSetNew\(                                          lines 2407-2440
+//   void resetSetNew\(                                           lines 2442-2497
+//   int HpItemsInBoxCollection\(                                 lines 2513-2541
+//   int MpItemsInBoxCollection\(                                 lines 2543-2573
+//   int DamageItemsInBoxCollection\(                             lines 2575-2601
+//   int CritItemsInBoxCollection\(                               lines 2603-2625
+//   void removeAndAddOptionTemplate\(                            lines 1865-1920
+//   void removeAndAddOptionTemplateHSD\(                         lines 1922-1937
+//   void sendItemBag\(                                           lines 1221-1250
+//   void sendItemBody\(                                          lines 1252-1291
+//   void sendItemBox\(                                           lines 1293-1318
+//   void openBox\(                                               lines 1320-1330
+//   * the ONLY edits are two lines in removeAndAddOptionTemplate / removeAndAddOptionTemplateHSD, marked "EDIT": the JDK's private random sources (Collections.shuffle(list) and new Random())
+//     are replaced by Util.rand, so one java.util.Random(seed) drives every draw. The C# code draws from one IRandomProvider (SeededRandomProvider is bit-exact with java.util.Random).
+//   * the small classes after the line "// FILE:" are stubs for what InventoryService touches (Item, ItemOption, ItemService, Service, Player, Message, Util, Logger, ...);
+//     their method bodies that matter (Item.haveOption/getOptionParam/getInfo/getContent/dispose, ItemOption.getOptionString, ItemService.copyItem/createItemNull, Util.isTrue/nextInt/replace)
+//     were copied from the original files.
+//
+// HOW TO RUN (JDK 17+; python 3): python split_harness.py InventoryServiceGenerator.java.txt <tmp> ; javac -encoding UTF-8 -d <tmp>/out <tmp>/*.java ; java -cp <tmp>/out InventoryServiceGenerator <output.json> e8620afdb0c78eb95c81b98bdf8e9789ee824c4829910dbdba94b7d648ff9d4a
+// All scenarios come from java.util.Random with fixed seeds, so the output is the same on every run.
+// Item notation in the JSON: 0 = empty slot, null = a Java null element, [templateId, quantity, [[optionId, param], ...]] = a real item.
+
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class InventoryServiceGenerator {
+
+    // ---------------------------------------------------------------- the verbatim code
+    static class InvLogic {
+        static Player player = null; // Java: "import static nro.server.Manager.player" - a static field nobody assigns
+
+    public boolean addItemList(List<Item> items, Item itemAdd) {
+        // --- Nếu item không có option, thêm option rỗng để tránh lỗi
+        if (itemAdd.itemOptions.isEmpty()) {
+            itemAdd.itemOptions.add(new ItemOption(73, 0));
+        }
+
+        // --- Item cộng thêm chỉ số param: tự động luyện tập - bí kiếp
+        int[] idParam = isItemIncrementalOption(itemAdd);
+        if (idParam[0] != -1) {
+            for (Item it : items) {
+                if (it.isNotNullItem() && it.template.id == itemAdd.template.id) {
+                    for (ItemOption io : it.itemOptions) {
+                        if (io.optionTemplate.id == idParam[0]) {
+                            io.param += idParam[1];
+                        }
+                    }
+                    itemAdd.quantity = 0;
+                    return true;
+                }
+            }
+        }
+
+        // ✅ Xử lý riêng cho Thỏi vàng (ID 457)
+        if (itemAdd.template.id == 457) {
+            final int MAX_STACK_TV = 100000; // Giới hạn mỗi ô: 30.000
+            boolean isLocked = hasOptionTemplateId(itemAdd, 30);
+
+            // --- Gộp vào slot cùng loại và cùng trạng thái khóa
+            for (Item it : items) {
+                if (it != null && it.isNotNullItem() && it.template.id == 457) {
+                    boolean otherLocked = hasOptionTemplateId(it, 30);
+                    if (isLocked == otherLocked) {
+                        int space = MAX_STACK_TV - it.quantity;
+                        if (space > 0) {
+                            int add = Math.min(space, itemAdd.quantity);
+                            it.quantity += add;
+                            itemAdd.quantity -= add;
+                            if (itemAdd.quantity <= 0) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // --- Nếu còn dư, tìm ô trống để set trực tiếp (không add slot mới)
+            if (itemAdd.quantity > 0) {
+                for (int i = 0; i < items.size(); i++) {
+                    Item slot = items.get(i);
+                    if (slot == null || !slot.isNotNullItem()) {
+                        Item newItem = ItemService.gI().copyItem(itemAdd);
+                        newItem.quantity = Math.min(itemAdd.quantity, MAX_STACK_TV);
+
+                        // Nếu là thỏi vàng khóa, thêm option 30 nếu chưa có
+                        if (isLocked && !hasOptionTemplateId(newItem, 30)) {
+                            newItem.itemOptions.add(new ItemOption(30, 0));
+                        }
+
+                        items.set(i, newItem);
+                        itemAdd.quantity -= newItem.quantity;
+                        if (itemAdd.quantity <= 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // --- Túi đầy
+            Service.gI().sendThongBao(player, "Hành trang đã đầy, không thể nhận thêm Thỏi vàng");
+            return false;
+        }
+
+        // --- Item cộng dồn thông thường
+        if (itemAdd.template.isUpToUp) {
+            for (Item it : items) {
+                if (!it.isNotNullItem() || it.template.id != itemAdd.template.id || it.quantity >= 100_000_000) {
+                    continue;
+                }
+
+                if (itemAdd.template.id == 1705) { // Không giới hạn số lượng
+                    it.quantity += itemAdd.quantity;
+                    itemAdd.quantity = 0;
+                    return true;
+                }
+
+                // Giới hạn 9999
+                if (it.quantity < 9999) {
+                    int add = 9999 - it.quantity;
+                    if (itemAdd.quantity <= add) {
+                        it.quantity += itemAdd.quantity;
+                        itemAdd.quantity = 0;
+                        return true;
+                    } else {
+                        it.quantity = 9999;
+                        itemAdd.quantity -= add;
+                    }
+                }
+            }
+        }
+
+        // --- Nếu còn dư, tìm ô trống để đặt vào
+        if (itemAdd.quantity > 0) {
+            for (int i = 0; i < items.size(); i++) {
+                Item slot = items.get(i);
+                if (slot == null || !slot.isNotNullItem()) {
+                    items.set(i, ItemService.gI().copyItem(itemAdd));
+                    itemAdd.quantity = 0;
+                    return true;
+                }
+            }
+        }
+
+        // --- Túi đầy
+        return false;
+    }
+
+    private boolean hasOptionTemplateId(Item item, int optionTemplateId) {
+        if (item == null || item.itemOptions == null) {
+            return false;
+        }
+        for (ItemOption io : item.itemOptions) {
+            if (io.optionTemplate.id == optionTemplateId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int[] isItemIncrementalOption(Item item) {
+        for (ItemOption io : item.itemOptions) {
+            switch (io.optionTemplate.id) {
+                case 1:
+                    return new int[]{io.optionTemplate.id, io.param};
+                case 31:
+                    return new int[]{io.optionTemplate.id, io.param};
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
+    public void sortItems(List<Item> list) {
+        int first = -1;
+        int last = -1;
+        Item tempFirst = null;
+        Item tempLast = null;
+        for (int i = 0; i < list.size(); i++) {
+            if (!list.get(i).isNotNullItem()) {
+                first = i;
+                tempFirst = list.get(i);
+                break;
+            }
+        }
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (list.get(i).isNotNullItem()) {
+                last = i;
+                tempLast = list.get(i);
+                break;
+            }
+        }
+        if (first != -1 && last != -1 && first < last) {
+            list.set(first, tempLast);
+            list.set(last, tempFirst);
+            sortItems(list);
+        }
+    }
+
+    public void sortItemv2(List<Item> items) {
+        int index = 0;
+        for (Item item : items) {
+            if (item != null && item.quantity > 0) {
+                items.set(index, item);
+                index++;
+            }
+        }
+        for (int i = index; i < items.size(); i++) {
+            items.set(i, null);
+        }
+    }
+
+    public void removeItem(List<Item> items, int index) {
+        Item item = ItemService.gI().createItemNull();
+        items.set(index, item);
+    }
+
+    public void removeItem(List<Item> items, Item item) {
+        if (item == null) {
+            return;
+        }
+        Item it = ItemService.gI().createItemNull();
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).equals(item)) {
+                items.set(i, it);
+                item.dispose();
+                break;
+            }
+        }
+    }
+
+    public void subQuantityItem(List<Item> items, Item item, int quantity) {
+        if (item != null) {
+            for (Item it : items) {
+                if (item.equals(it)) {
+                    it.quantity -= quantity;
+                    if (it.quantity <= 0) {
+                        this.removeItem(items, item);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public byte getCountEmptyListItem(List<Item> list) {
+        byte count = 0;
+        for (Item item : list) {
+            if (!item.isNotNullItem()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void updateSet(Player player, int setOptionId, int applyId) {
+        int count = 0;
+        for (Item item : player.inventory.itemsBody) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            for (ItemOption io : item.itemOptions) {
+                if (io.optionTemplate.id == setOptionId) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        for (Item item : player.inventory.itemsBody) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            if (count == 5) {
+                item.getOptionParam(applyId, 1);
+            } else {
+                item.getOptionParam(applyId, 0);
+            }
+        }
+    }
+
+    public void resetSet(Player player, Player pl, Player plbox, int setOptionId, int applyId) {
+        int count = 0;
+        for (Item item : player.inventory.itemsBody) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            for (ItemOption io : item.itemOptions) {
+                if (io.optionTemplate.id == setOptionId) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        for (Item item : player.inventory.itemsBody) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            if (count < 5) {
+                item.getOptionParam(applyId, 0);
+            }
+        }
+        for (Item item : player.inventory.itemsBag) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            item.getOptionParam(applyId, 0);
+        }
+        if (pl != null) {
+            for (Item item : pl.inventory.itemsBag) {
+                if (item == null || !item.isNotNullItem()) {
+                    continue;
+                }
+                item.getOptionParam(applyId, 0);
+            }
+        }
+        if (plbox != null) {
+            for (Item item : plbox.inventory.itemsBox) {
+                if (item == null || !item.isNotNullItem()) {
+                    continue;
+                }
+                item.getOptionParam(applyId, 0);
+            }
+        }
+    }
+
+    public void updateSetNew(Player player, int startId, int endId, int[] applyIds) {
+        int count = 0;
+        for (Item items : player.inventory.itemsBody) {
+            if (items == null || !items.isNotNullItem()) {
+                continue;
+            }
+            for (ItemOption io : items.itemOptions) {
+                if (io.optionTemplate.id >= startId && io.optionTemplate.id <= endId) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        for (Item item : player.inventory.itemsBody) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            if (count >= 2) {
+                item.getOptionParam(applyIds[0], 1);
+            } else {
+                item.getOptionParam(applyIds[0], 0);
+            }
+            if (count >= 4) {
+                item.getOptionParam(applyIds[1], 1);
+            } else {
+                item.getOptionParam(applyIds[1], 0);
+            }
+            if (count >= 5) {
+                item.getOptionParam(applyIds[2], 1);
+            } else {
+                item.getOptionParam(applyIds[2], 0);
+            }
+        }
+    }
+
+    public void resetSetNew(Player player, Player pl, Player plbox, int startId, int endId, int[] applyIds) {
+        int count = 0;
+        for (Item items : player.inventory.itemsBody) {
+            if (items == null || !items.isNotNullItem()) {
+                continue;
+            }
+            for (ItemOption io : items.itemOptions) {
+                if (io.optionTemplate.id >= startId && io.optionTemplate.id <= endId) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        for (Item item : player.inventory.itemsBody) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            if (count < 2) {
+                item.getOptionParam(applyIds[0], 0);
+            }
+            if (count < 4) {
+                item.getOptionParam(applyIds[1], 0);
+            }
+            if (count < 5) {
+                item.getOptionParam(applyIds[2], 0);
+            }
+        }
+        for (Item item : player.inventory.itemsBag) {
+            if (item == null || !item.isNotNullItem()) {
+                continue;
+            }
+            for (int id : applyIds) {
+                item.getOptionParam(id, 0);
+            }
+        }
+        if (pl != null) {
+            for (Item item : pl.inventory.itemsBag) {
+                if (item == null || !item.isNotNullItem()) {
+                    continue;
+                }
+                for (int id : applyIds) {
+                    item.getOptionParam(id, 0);
+                }
+            }
+        }
+        if (plbox != null) {
+            for (Item item : plbox.inventory.itemsBox) {
+                if (item == null || !item.isNotNullItem()) {
+                    continue;
+                }
+                for (int id : applyIds) {
+                    item.getOptionParam(id, 0);
+                }
+            }
+        }
+    }
+
+    public int HpItemsInBoxCollection(Player player) {
+        if (player == null || player.inventory == null || player.inventory.itemsBoxCollection == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Item item : player.inventory.itemsBoxCollection) {
+            if (item != null && item.isNotNullItem()) {
+                count++;
+            }
+        }
+        if (count >= 120) {
+            return 30;
+        } else if (count >= 100) {
+            return 20;
+        } else if (count >= 80) {
+            return 15;
+        } else if (count >= 60) {
+            return 10;
+        } else if (count >= 40) {
+            return 5;
+        } else if (count >= 30) {
+            return 4;
+        } else if (count >= 20) {
+            return 2;
+        } else if (count >= 10) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public int MpItemsInBoxCollection(Player player) {
+        if (player == null || player.inventory == null || player.inventory.itemsBoxCollection == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Item item : player.inventory.itemsBoxCollection) {
+            if (item != null && item.isNotNullItem()) {
+                count++;
+            }
+        }
+        if (count >= 120) {
+            return 35;
+        } else if (count >= 100) {
+            return 30;
+        } else if (count >= 80) {
+            return 24;
+        } else if (count >= 60) {
+            return 18;
+        } else if (count >= 50) {
+            return 12;
+        } else if (count >= 35) {
+            return 7;
+        } else if (count >= 20) {
+            return 4;
+        } else if (count >= 10) {
+            return 2;
+        } else if (count >= 5) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public int DamageItemsInBoxCollection(Player player) {
+        if (player == null || player.inventory == null || player.inventory.itemsBoxCollection == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Item item : player.inventory.itemsBoxCollection) {
+            if (item != null && item.isNotNullItem()) {
+                count++;
+            }
+        }
+        if (count >= 120) {
+            return 25;
+        } else if (count >= 100) {
+            return 18;
+        } else if (count >= 90) {
+            return 15;
+        } else if (count >= 70) {
+            return 7;
+        } else if (count >= 50) {
+            return 5;
+        } else if (count >= 30) {
+            return 2;
+        } else if (count >= 15) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public int CritItemsInBoxCollection(Player player) {
+        if (player == null || player.inventory == null || player.inventory.itemsBoxCollection == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Item item : player.inventory.itemsBoxCollection) {
+            if (item != null && item.isNotNullItem()) {
+                count++;
+            }
+        }
+        if (count >= 120) {
+            return 5;
+        } else if (count >= 100) {
+            return 4;
+        } else if (count >= 70) {
+            return 3;
+        } else if (count >= 40) {
+            return 2;
+        } else if (count >= 20) {
+            return 1;
+        }
+        return 0;
+    }
+
+    private void removeAndAddOptionTemplate(Item item) {
+        int[] randomIds = {50, 77, 103, 14, 5, 94, 97, 108, 95, 96, 101, 204, 80, 81, 45, 46, 197}; // Danh sách ID có thể thay thế
+        int count = 1;
+        ItemOption option210 = item.itemOptions.stream()
+                .filter(option -> option.optionTemplate.id == 210)
+                .findFirst()
+                .orElse(null);
+        if (option210 != null) {
+            count = option210.param;
+            item.itemOptions.remove(option210);
+        }
+        List<Integer> availableIds = new ArrayList<>();
+        for (int id : randomIds) {
+            availableIds.add(id);
+        }
+        Collections.shuffle(availableIds, Util.rand);   // EDIT: was Collections.shuffle(availableIds)
+
+        Random rand = Util.rand;   // EDIT: was new Random()
+        for (int i = 0; i < count; i++) {
+            int newId;
+            if (i < availableIds.size()) {
+                newId = availableIds.get(i);
+            } else {
+                newId = randomIds[rand.nextInt(randomIds.length)];
+            }
+            int newParam;
+            switch (newId) {
+                case 50:
+                case 77:
+                case 103:
+                case 108:
+                case 45:
+                case 46:
+                case 197:
+                    newParam = Util.nextInt(5, 10);
+                    break;
+                case 94:
+                case 97:
+                case 204:
+                case 14:
+                    newParam = Util.nextInt(7, 18);
+                    break;
+                case 5:
+                case 80:
+                case 81:
+                case 95:
+                case 96:
+                    newParam = Util.nextInt(10, 20);
+                    break;
+                default:
+                    newParam = Util.nextInt(15, 30);
+                    break;
+            }
+            item.itemOptions.add(new ItemOption(newId, newParam));
+        }
+    }
+
+    private void removeAndAddOptionTemplateHSD(Item item) {
+        int[] randomIds = {1, 3, 5, 7, 14, 30};
+        ItemOption option231 = item.itemOptions.stream()
+                .filter(option -> option.optionTemplate.id == 231)
+                .findFirst()
+                .orElse(null);
+        if (option231 != null) {
+            item.itemOptions.remove(option231);
+        }
+        if (Util.isTrue(90, 100)) {
+            Random rand = Util.rand;   // EDIT: was new Random()
+            int newId = 93;
+            int newParam = randomIds[rand.nextInt(randomIds.length)];
+            item.itemOptions.add(new ItemOption(newId, newParam));
+        }
+    }
+
+    public void sendItemBag(Player player) {
+        sortItems(player.inventory.itemsBag);
+        Message msg;
+        try {
+            msg = new Message(-36);
+            msg.writer().writeByte(0);
+            msg.writer().writeByte(player.inventory.itemsBag.size());
+            for (int i = 0; i < player.inventory.itemsBag.size(); i++) {
+                Item item = player.inventory.itemsBag.get(i);
+                if (!item.isNotNullItem()) {
+                    msg.writer().writeShort(-1);
+                    continue;
+                }
+                msg.writer().writeShort(item.template.id);
+                msg.writer().writeInt(item.quantity);
+                msg.writer().writeUTF(item.getInfo());
+                msg.writer().writeUTF(item.getContent());
+                msg.writer().writeByte(item.itemOptions.size());
+                for (int j = 0; j < item.itemOptions.size(); j++) {
+                    msg.writer().writeInt(item.itemOptions.get(j).optionTemplate.id);
+                    msg.writer().writeInt(item.itemOptions.get(j).param);
+                }
+            }
+
+            player.sendMessage(msg);
+            msg.cleanup();
+        } catch (Exception e) {
+            Logger.logException(InventoryService.class, e);
+        }
+    }
+
+    public void sendItemBody(Player player) {
+        try {
+            Message msg = new Message(-37);
+            msg.writer().writeByte(0);
+            msg.writer().writeShort(player.getHead());
+            msg.writer().writeByte(player.inventory.itemsBody.size());
+
+            for (Item item : player.inventory.itemsBody) {
+                if (!item.isNotNullItem()) {
+                    msg.writer().writeShort(-1);
+                } else {
+                    msg.writer().writeShort(item.template.id);
+                    msg.writer().writeInt(item.quantity);
+                    msg.writer().writeUTF(item.getInfo());
+                    msg.writer().writeUTF(item.getContent());
+                    List<ItemOption> itemOptions = item.itemOptions;
+                    msg.writer().writeByte(itemOptions.size());
+                    for (ItemOption io : itemOptions) {
+                        msg.writer().writeInt(io.optionTemplate.id);
+                        msg.writer().writeInt(io.param);
+                    }
+                }
+            }
+            player.sendMessage(msg);
+            msg.cleanup();
+        } catch (Exception e) {
+            Logger.logException(InventoryService.class, e);
+        }
+
+        // ✅ Gửi hiệu ứng đặc biệt ngay khi login
+        Item chanMenh = player.inventory.itemsBody.get(11);
+        if (chanMenh != null && chanMenh.isNotNullItem()
+                && chanMenh.template.type == 39) {
+            Service.gI().sendChanMenh(player, chanMenh.template.id);
+        }
+
+        // Sau đó mới gửi trang phục và cờ
+        Service.gI().Send_Caitrang(player);
+        Service.gI().sendFlagBag(player);
+    }
+
+    public void sendItemBox(Player player) {
+        Message msg;
+        try {
+            msg = new Message(-35);
+            msg.writer().writeByte(0);
+            msg.writer().writeByte(player.inventory.itemsBox.size());
+            for (Item it : player.inventory.itemsBox) {
+                msg.writer().writeShort(it.isNotNullItem() ? it.template.id : -1);
+                if (it.isNotNullItem()) {
+                    msg.writer().writeInt(it.quantity);
+                    msg.writer().writeUTF(it.getInfo());
+                    msg.writer().writeUTF(it.getContent());
+                    msg.writer().writeByte(it.itemOptions.size());
+                    for (ItemOption io : it.itemOptions) {
+                        msg.writer().writeInt(io.optionTemplate.id);
+                        msg.writer().writeInt(io.param);
+                    }
+                }
+            }
+            player.sendMessage(msg);
+            msg.cleanup();
+        } catch (Exception e) {
+            Logger.logException(InventoryService.class, e);
+        }
+        this.openBox(player);
+    }
+
+    public void openBox(Player player) {
+        Message msg;
+        try {
+            msg = new Message(-35);
+            msg.writer().writeByte(1);
+            player.sendMessage(msg);
+            msg.cleanup();
+        } catch (Exception e) {
+            Logger.logException(InventoryService.class, e);
+        }
+    }
+    }
+
+    // ---------------------------------------------------------------- scenario helpers
+    static final int[] UNIVERSE = {1, 2, 3, 4, 5, 6, 7, 8, 457, 1705};
+    static final int[] QUANTITIES = {1, 2, 5, 9990, 9998, 9999, 10000, 50000, 99_990, 99_999_999, 100_000, 100_000_000, 2_000_000_000};
+    static final int[] OPTION_IDS = {1, 4, 30, 31, 73, 93, 127, 128, 139, 140, 241, 242, 243, 244};
+    static final int[] PARAMS = {0, 1, 5, 100, 29_999, 30_000, -3};
+
+    static Random rnd;
+
+    static ItemTemplate template(int id) {
+        ItemTemplate t = new ItemTemplate();
+        t.id = (short) id;
+        t.type = 99;
+        t.name = "item" + id;
+        t.strRequire = id * 10;
+        t.isUpToUp = (id >= 1 && id <= 4) || id == 1705;
+        return t;
+    }
+
+    static Item item(int id, int quantity, int[][] options) {
+        Item it = new Item();
+        it.template = template(id);
+        it.quantity = quantity;
+        for (int[] o : options) it.itemOptions.add(new ItemOption(o[0], o[1]));
+        return it;
+    }
+
+    static Item randomItem(boolean allowEmpty) {
+        if (allowEmpty && rnd.nextInt(3) == 0) return new Item();
+        int id = UNIVERSE[rnd.nextInt(UNIVERSE.length)];
+        int q = QUANTITIES[rnd.nextInt(QUANTITIES.length)];
+        int n = rnd.nextInt(4) == 0 ? 0 : 1 + rnd.nextInt(2);
+        int[][] opts = new int[n][];
+        for (int i = 0; i < n; i++) opts[i] = new int[]{OPTION_IDS[rnd.nextInt(OPTION_IDS.length)], PARAMS[rnd.nextInt(PARAMS.length)]};
+        return item(id, q, opts);
+    }
+
+    static List<Item> randomList(int size, boolean allowEmpty) {
+        List<Item> l = new ArrayList<>();
+        for (int i = 0; i < size; i++) l.add(randomItem(allowEmpty));
+        return l;
+    }
+
+    static String js(Item it) {
+        if (it == null) return "null";
+        if (!it.isNotNullItem()) return "0";
+        StringBuilder sb = new StringBuilder("[").append(it.template.id).append(',').append(it.quantity).append(",[");
+        for (int i = 0; i < it.itemOptions.size(); i++) {
+            ItemOption o = it.itemOptions.get(i);
+            sb.append(i > 0 ? "," : "").append('[').append(o.optionTemplate.id).append(',').append(o.param).append(']');
+        }
+        return sb.append("]]").toString();
+    }
+
+    static String js(List<Item> l) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < l.size(); i++) sb.append(i > 0 ? "," : "").append(js(l.get(i)));
+        return sb.append("]").toString();
+    }
+
+    static String hex(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (byte x : b) sb.append(String.format("%02x", x));
+        return sb.toString();
+    }
+
+    static Player player(int body, int bag, int box) {
+        Player p = new Player();
+        p.inventory = new Inventory();
+        for (int i = 0; i < body; i++) p.inventory.itemsBody.add(new Item());
+        for (int i = 0; i < bag; i++) p.inventory.itemsBag.add(new Item());
+        for (int i = 0; i < box; i++) p.inventory.itemsBox.add(new Item());
+        return p;
+    }
+
+    static final int[] SET_MARKERS = {127, 128, 129, 130, 131, 132, 133, 134, 135, 233, 250, 251, 252, 263, 265, 267};
+    static final int[] SET_BONUS = {139, 140, 141, 142, 143, 144, 136, 137, 138, 234, 253, 254, 255, 264, 266, 268};
+
+    static Item setItem(int idx, int marker, int[] bonuses, int bonusParam) {
+        List<int[]> o = new ArrayList<>();
+        if (marker >= 0) o.add(new int[]{marker, 1});
+        for (int b : bonuses) o.add(new int[]{b, bonusParam});
+        return item(10 + idx, 1, o.toArray(new int[0][]));
+    }
+
+    public static void main(String[] args) throws Exception {
+        StringBuilder out = new StringBuilder();
+        out.append("{\n  \"source\": \"nro/inventory/InventoryService.java (method bodies extracted verbatim)\",\n  \"sha256\": \"").append(args.length > 1 ? args[1] : "").append("\",\n");
+
+        // ---- addItemList ----
+        out.append("  \"addItemList\": [\n");
+        rnd = new Random(20261103L);
+        int n = 900;
+        for (int i = 0; i < n; i++) {
+            List<Item> list = randomList(1 + rnd.nextInt(6), true);
+            Item add = randomItem(false);
+            if (rnd.nextInt(3) == 0 && !list.isEmpty()) { // same template as a slot, to exercise stacking
+                Item mate = list.get(rnd.nextInt(list.size()));
+                if (mate.isNotNullItem()) add = item(mate.template.id, QUANTITIES[rnd.nextInt(QUANTITIES.length)], new int[0][]);
+            }
+            String before = js(list), addBefore = js(add);
+            InvLogic.player = null;
+            Service.notices.clear();
+            boolean result = new InvLogic().addItemList(list, add);
+            out.append("    {\"before\":").append(before).append(",\"add\":").append(addBefore).append(",\"result\":").append(result)
+               .append(",\"after\":").append(js(list)).append(",\"addAfter\":").append(js(add)).append(",\"notices\":").append(Service.notices.size()).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- sortItems / sortItemv2 / getCountEmptyListItem ----
+        out.append("  \"sort\": [\n");
+        rnd = new Random(77L);
+        n = 300;
+        for (int i = 0; i < n; i++) {
+            int size = rnd.nextInt(14);
+            List<Item> list = new ArrayList<>();
+            for (int j = 0; j < size; j++) list.add(rnd.nextInt(2) == 0 ? new Item() : item(100 + j, 1 + rnd.nextInt(3) - (rnd.nextInt(5) == 0 ? 2 : 0), new int[0][]));
+            List<Item> copy = new ArrayList<>(list);
+            List<Item> v2 = new ArrayList<>(list);
+            String before = js(list);
+            new InvLogic().sortItems(list);
+            new InvLogic().sortItemv2(v2);
+            out.append("    {\"before\":").append(before).append(",\"sorted\":").append(js(list)).append(",\"v2\":").append(js(v2))
+               .append(",\"empties\":").append(new InvLogic().getCountEmptyListItem(copy)).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+        out.append("  \"emptyCounts\": [");
+        int[] sizes = {0, 1, 100, 127, 128, 129, 200, 255, 256, 257};
+        for (int i = 0; i < sizes.length; i++) {
+            List<Item> l = new ArrayList<>();
+            for (int j = 0; j < sizes[i]; j++) l.add(new Item());
+            out.append(i > 0 ? "," : "").append("[").append(sizes[i]).append(',').append(new InvLogic().getCountEmptyListItem(l)).append("]");
+        }
+        out.append("],\n");
+
+        // ---- removeItem(list, item) / subQuantityItem ----
+        out.append("  \"remove\": [\n");
+        rnd = new Random(99L);
+        n = 300;
+        for (int i = 0; i < n; i++) {
+            List<Item> list = randomList(1 + rnd.nextInt(6), true);
+            int pick = rnd.nextInt(list.size() + 2); // size = a lookalike that is not in the list, size+1 = null
+            Item target = pick < list.size() ? list.get(pick) : pick == list.size() ? item(1, 1, new int[0][]) : null;
+            int[] qs = {1, 2, 5, 100, -3, 2_000_000_000, Integer.MIN_VALUE};
+            int q = qs[rnd.nextInt(qs.length)];
+            boolean sub = rnd.nextBoolean();
+            String before = js(list);
+            if (sub) new InvLogic().subQuantityItem(list, target, q); else new InvLogic().removeItem(list, target);
+            out.append("    {\"op\":\"").append(sub ? "sub" : "remove").append("\",\"before\":").append(before).append(",\"pick\":").append(pick).append(",\"quantity\":").append(q)
+               .append(",\"after\":").append(js(list)).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- set bonuses ----
+        out.append("  \"sets\": [\n");
+        rnd = new Random(4242L);
+        n = 500;
+        for (int i = 0; i < n; i++) {
+            int kind = rnd.nextInt(4);
+            Player p = player(12, 6, 6);
+            Player other = player(12, 6, 6);
+            int setIdx = rnd.nextInt(SET_MARKERS.length);
+            int pieces = rnd.nextInt(8);
+            boolean isNew = kind >= 2;
+            int[] newGroup = {241, 244};
+            int[] applyIds = rnd.nextBoolean() ? new int[]{242, 243, 244} : new int[]{238, 239, 240};
+            for (int s = 0; s < pieces && s < 12; s++) {
+                int marker = isNew ? 241 + rnd.nextInt(4) : (rnd.nextInt(5) == 0 ? -1 : SET_MARKERS[setIdx]);
+                int[] bonuses = isNew ? applyIds : new int[]{SET_BONUS[setIdx]};
+                if (rnd.nextInt(4) == 0) marker = -1;
+                p.inventory.itemsBody.set(s, setItem(s, marker, bonuses, rnd.nextInt(2)));
+            }
+            for (int s = 0; s < 3; s++) {
+                int[] bonuses = isNew ? applyIds : new int[]{SET_BONUS[setIdx]};
+                p.inventory.itemsBag.set(s, setItem(20 + s, -1, bonuses, 1));
+                other.inventory.itemsBag.set(s, setItem(30 + s, -1, bonuses, 1));
+                other.inventory.itemsBox.set(s, setItem(40 + s, -1, bonuses, 1));
+                p.inventory.itemsBox.set(s, setItem(50 + s, -1, bonuses, 1));
+                other.inventory.itemsBody.set(s, setItem(60 + s, -1, bonuses, 1));
+            }
+            boolean usePl = rnd.nextBoolean(), usePlbox = rnd.nextBoolean();
+            String[] names = {"updateSet", "resetSet", "updateSetNew", "resetSetNew"};
+            String sb = js(p.inventory.itemsBody) + "," + js(p.inventory.itemsBag) + "," + js(p.inventory.itemsBox) + "," + js(other.inventory.itemsBody) + "," + js(other.inventory.itemsBag) + "," + js(other.inventory.itemsBox);
+            InvLogic l = new InvLogic();
+            switch (kind) {
+                case 0: l.updateSet(p, SET_MARKERS[setIdx], SET_BONUS[setIdx]); break;
+                case 1: l.resetSet(p, usePl ? other : null, usePlbox ? other : null, SET_MARKERS[setIdx], SET_BONUS[setIdx]); break;
+                case 2: l.updateSetNew(p, newGroup[0], newGroup[1], applyIds); break;
+                default: l.resetSetNew(p, usePl ? other : null, usePlbox ? other : null, newGroup[0], newGroup[1], applyIds); break;
+            }
+            out.append("    {\"op\":\"").append(names[kind]).append("\",\"setOptionId\":").append(SET_MARKERS[setIdx]).append(",\"applyId\":").append(SET_BONUS[setIdx])
+               .append(",\"applyIds\":[").append(applyIds[0]).append(',').append(applyIds[1]).append(',').append(applyIds[2]).append("],\"usePl\":").append(usePl).append(",\"usePlbox\":").append(usePlbox)
+               .append(",\"before\":[").append(sb).append("],\"after\":[")
+               .append(js(p.inventory.itemsBody)).append(',').append(js(p.inventory.itemsBag)).append(',').append(js(p.inventory.itemsBox)).append(',')
+               .append(js(other.inventory.itemsBody)).append(',').append(js(other.inventory.itemsBag)).append(',').append(js(other.inventory.itemsBox)).append("]}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- collection box tiers ----
+        out.append("  \"tiers\": [");
+        for (int c = 0; c <= 135; c++) {
+            Player p = player(0, 0, 0);
+            for (int j = 0; j < 140; j++) p.inventory.itemsBoxCollection.add(j < c ? item(100 + j, 1, new int[0][]) : new Item());
+            InvLogic l = new InvLogic();
+            out.append(c > 0 ? "," : "").append('[').append(c).append(',').append(l.HpItemsInBoxCollection(p)).append(',').append(l.MpItemsInBoxCollection(p))
+               .append(',').append(l.DamageItemsInBoxCollection(p)).append(',').append(l.CritItemsInBoxCollection(p)).append(']');
+        }
+        out.append("],\n");
+
+        // ---- random option rolls (items with option 210 / 231) ----
+        out.append("  \"rolls\": [\n");
+        n = 400;
+        for (int i = 0; i < n; i++) {
+            long seed = 1000 + i;
+            Util.rand = new Random(seed);
+            boolean hsd = i % 3 == 0;
+            int count = hsd ? 1 : 1 + (i % 25);
+            Item it = item(5, 1, hsd ? new int[][]{{231, 1}, {4, 9}} : new int[][]{{210, count}, {4, 9}, {30, 0}});
+            String before = js(it);
+            if (hsd) new InvLogic().removeAndAddOptionTemplateHSD(it); else new InvLogic().removeAndAddOptionTemplate(it);
+            out.append("    {\"seed\":").append(seed).append(",\"kind\":\"").append(hsd ? "231" : "210").append("\",\"before\":").append(before).append(",\"after\":").append(js(it))
+               .append(",\"next\":").append(Util.rand.nextInt()).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- packets ----
+        out.append("  \"packets\": [\n");
+        rnd = new Random(5150L);
+        n = 150;
+        for (int i = 0; i < n; i++) {
+            Player p = player(0, 0, 0);
+            int bagSize = rnd.nextInt(12);
+            for (int j = 0; j < bagSize; j++) p.inventory.itemsBag.add(rnd.nextInt(3) == 0 ? new Item() : randomItem(false));
+            for (int j = 0; j < 12; j++) p.inventory.itemsBody.add(rnd.nextInt(2) == 0 ? new Item() : randomItem(false));
+            int boxSize = rnd.nextInt(8);
+            for (int j = 0; j < boxSize; j++) p.inventory.itemsBox.add(rnd.nextInt(3) == 0 ? new Item() : randomItem(false));
+            String bagBefore = js(p.inventory.itemsBag), body = js(p.inventory.itemsBody), box = js(p.inventory.itemsBox);
+            InvLogic l = new InvLogic();
+            Player.sent.clear();
+            l.sendItemBag(p);
+            String bagHex = hex(Player.sent.get(0));
+            String bagAfter = js(p.inventory.itemsBag);
+            Player.sent.clear();
+            l.sendItemBody(p);
+            String bodyHex = hex(Player.sent.get(0));
+            Player.sent.clear();
+            l.sendItemBox(p);
+            out.append("    {\"bag\":").append(bagBefore).append(",\"body\":").append(body).append(",\"box\":").append(box)
+               .append(",\"bagAfter\":").append(bagAfter).append(",\"bagHex\":\"").append(bagHex).append("\",\"bodyHex\":\"").append(bodyHex)
+               .append("\",\"boxHex\":\"").append(hex(Player.sent.get(0))).append("\",\"openHex\":\"").append(hex(Player.sent.get(1))).append("\",\"head\":").append(Player.HEAD).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ]\n}\n");
+
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(args[0]), StandardCharsets.UTF_8)) { w.write(out.toString()); }
+    }
+}
+
+
+// FILE: Item.java
+// import java.util.*;
+// public class Item {
+//     public ItemTemplate template;
+//     public String info;
+//     public String content;
+//     public int quantity;
+//     public List<ItemOption> itemOptions = new ArrayList<>();
+//     public long createTime;
+//     public boolean isNotNullItem() { return this.template != null; }
+//     public String getInfo() { String strInfo = ""; for (ItemOption itemOption : itemOptions) { strInfo += itemOption.getOptionString(); } return strInfo; }   // Item.java getInfo
+//     public String getContent() { return "Yêu cầu sức mạnh " + this.template.strRequire + " trở lên"; }                                                       // Item.java getContent
+//     public void dispose() {                                                                                                                                // Item.java dispose
+//         this.template = null; this.info = null; this.content = null;
+//         if (this.itemOptions != null) { for (ItemOption io : this.itemOptions) { io.dispose(); } this.itemOptions.clear(); }
+//         this.itemOptions = null;
+//     }
+//     public void getOptionParam(int id, int param) {                                                                                                         // Item.java getOptionParam(id, param)
+//         for (int i = 0; i < this.itemOptions.size(); i++) {
+//             ItemOption itemOption = this.itemOptions.get(i);
+//             if (itemOption != null && itemOption.optionTemplate.id == id) { itemOption.param = param; return; }
+//         }
+//     }
+//     public boolean haveOption(int idOption) {                                                                                                               // Item.java haveOption
+//         if (this != null && this.isNotNullItem()) { return this.itemOptions.stream().anyMatch(op -> op != null && op.optionTemplate.id == idOption); }
+//         return false;
+//     }
+// }
+// FILE: ItemOption.java
+// public class ItemOption {
+//     public int param;
+//     public ItemOptionTemplate optionTemplate;
+//     public ItemOption(ItemOption io) { this.param = io.param; this.optionTemplate = io.optionTemplate; }
+//     public ItemOption(int tempId, int param) { this.optionTemplate = ItemService.gI().getItemOptionTemplate(tempId); this.param = param; }
+//     public String getOptionString() { return Util.replace(this.optionTemplate.name, "#", String.valueOf(this.param)); }
+//     public void dispose() { this.optionTemplate = null; }
+// }
+// FILE: ItemTemplate.java
+// public class ItemTemplate { public short id; public byte type; public String name; public int strRequire; public boolean isUpToUp; }
+// FILE: ItemOptionTemplate.java
+// public class ItemOptionTemplate { public int id; public String name; }
+// FILE: ItemService.java
+// public class ItemService {
+//     private static ItemService I;
+//     public static ItemService gI() { if (I == null) I = new ItemService(); return I; }
+//     public Item createItemNull() { Item item = new Item(); return item; }
+//     public ItemOptionTemplate getItemOptionTemplate(int id) { ItemOptionTemplate t = new ItemOptionTemplate(); t.id = id; t.name = "option" + id + " #"; return t; }
+//     public Item copyItem(Item item) {                                                                                                                       // ItemService.java copyItem
+//         Item it = new Item();
+//         it.itemOptions = new java.util.ArrayList<>();
+//         it.template = item.template;
+//         it.info = item.info;
+//         it.content = item.content;
+//         it.quantity = item.quantity;
+//         it.createTime = item.createTime;
+//         for (ItemOption io : item.itemOptions) { it.itemOptions.add(new ItemOption(io)); }
+//         return it;
+//     }
+// }
+// FILE: Service.java
+// import java.util.*;
+// public class Service {
+//     public static final List<String> notices = new ArrayList<>();
+//     private static Service I;
+//     public static Service gI() { if (I == null) I = new Service(); return I; }
+//     public void sendThongBao(Player pl, String text) { notices.add((pl == null ? "<null player>" : "player") + ":" + text); }
+//     public void sendChanMenh(Player player, int id) { }
+//     public void Send_Caitrang(Player player) { }
+//     public void sendFlagBag(Player pl) { }
+// }
+// FILE: Inventory.java
+// import java.util.*;
+// public class Inventory {
+//     public List<Item> itemsBody = new ArrayList<>();
+//     public List<Item> itemsBag = new ArrayList<>();
+//     public List<Item> itemsBox = new ArrayList<>();
+//     public List<Item> itemsBoxCollection = new ArrayList<>();
+// }
+// FILE: Player.java
+// import java.util.*;
+// public class Player {
+//     public static final short HEAD = 321;
+//     public static final List<byte[]> sent = new ArrayList<>();
+//     public Inventory inventory;
+//     public short getHead() { return HEAD; }
+//     public void sendMessage(Message msg) { sent.add(msg.data()); }
+// }
+// FILE: Message.java
+// import java.io.*;
+// public class Message {
+//     public byte command;
+//     private final ByteArrayOutputStream os = new ByteArrayOutputStream();
+//     private final DataOutputStream dos = new DataOutputStream(os);
+//     public Message(int command) { this.command = (byte) command; }
+//     public DataOutputStream writer() { return dos; }
+//     public void cleanup() { }
+//     public byte[] data() { return os.toByteArray(); }
+// }
+// FILE: Util.java
+// import java.util.Random;
+// public class Util {
+//     public static Random rand = new Random();
+//     public static int nextInt(int from, int to) { return from + rand.nextInt(to - from + 1); }                                                              // Util.java nextInt(from, to)
+//     public static int nextInt(int max) { return rand.nextInt(max); }
+//     public static boolean isTrue(int ratio, int typeRatio) {                                                                                                // Util.java isTrue(int, int)
+//         if (typeRatio <= 0 || ratio <= 0) { return false; }
+//         if (ratio >= typeRatio) { return true; }
+//         return Util.nextInt(typeRatio) < ratio;
+//     }
+//     public static String replace(String text, String regex, String replacement) { return text.replace(regex, replacement); }                                 // Util.java replace
+// }
+// FILE: Logger.java
+// public class Logger {
+//     public static void logException(Class<?> clazz, Exception e) { System.err.println("logException " + clazz.getSimpleName() + ": " + e); }
+// }
+// FILE: InventoryService.java
+// public class InventoryService { }   // only so that "InventoryService.class" in the logging calls compiles

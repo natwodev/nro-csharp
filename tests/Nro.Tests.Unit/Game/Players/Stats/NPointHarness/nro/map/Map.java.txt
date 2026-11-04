@@ -1,0 +1,9 @@
+package nro.map;
+
+/** Map flags that the MapService predicates answer from (the real predicates are map id tables owned by another track). */
+public class Map {
+
+    public int mapId;
+    public int type;
+    public boolean isMapBlackBallWar, isMapCold, isMapChristMasEvent, isMap5000NamTruoc, isMapCereal, isMapVohinh, isMapKVTH, isMapBanDoKhoBau, isMapDoanhTrai, isTnsmDividedMap;
+}

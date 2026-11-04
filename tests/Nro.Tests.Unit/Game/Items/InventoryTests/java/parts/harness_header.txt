@@ -1,0 +1,14 @@
+// Generates tests/Nro.Tests/Inventory/inventory-service.json: what the REAL code of nro/inventory/InventoryService.java does, for the methods that do not need the rest of the server.
+//
+// How it is made (nothing here is a re-implementation):
+//   * the method bodies inside "static class InvLogic" below were extracted verbatim from InventoryService.java (sha256 @SHA@) by build_service_harness.py, from these line ranges:
+@RANGES@
+//   * the ONLY edits are two lines in removeAndAddOptionTemplate / removeAndAddOptionTemplateHSD, marked "EDIT": the JDK's private random sources (Collections.shuffle(list) and new Random())
+//     are replaced by Util.rand, so one java.util.Random(seed) drives every draw. The C# code draws from one IRandomProvider (SeededRandomProvider is bit-exact with java.util.Random).
+//   * the small classes after the line "// FILE:" are stubs for what InventoryService touches (Item, ItemOption, ItemService, Service, Player, Message, Util, Logger, ...);
+//     their method bodies that matter (Item.haveOption/getOptionParam/getInfo/getContent/dispose, ItemOption.getOptionString, ItemService.copyItem/createItemNull, Util.isTrue/nextInt/replace)
+//     were copied from the original files.
+//
+// HOW TO RUN (JDK 17+; python 3): python split_harness.py InventoryServiceGenerator.java.txt <tmp> ; javac -encoding UTF-8 -d <tmp>/out <tmp>/*.java ; java -cp <tmp>/out InventoryServiceGenerator <output.json> @SHA@
+// All scenarios come from java.util.Random with fixed seeds, so the output is the same on every run.
+// Item notation in the JSON: 0 = empty slot, null = a Java null element, [templateId, quantity, [[optionId, param], ...]] = a real item.

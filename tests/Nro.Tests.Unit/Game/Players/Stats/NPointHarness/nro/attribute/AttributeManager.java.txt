@@ -1,0 +1,13 @@
+package nro.attribute;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class AttributeManager {
+
+    public final Map<Integer, Attribute> attributes = new HashMap<>();
+
+    public Attribute find(int templateId) {
+        return attributes.get(templateId);
+    }
+}

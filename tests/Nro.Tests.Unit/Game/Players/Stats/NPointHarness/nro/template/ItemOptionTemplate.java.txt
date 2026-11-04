@@ -1,0 +1,6 @@
+package nro.template;
+
+public class ItemOptionTemplate {
+
+    public int id;
+}

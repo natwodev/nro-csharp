@@ -1,0 +1,9 @@
+package models.Item;
+
+import nro.template.ItemOptionTemplate;
+
+public class ItemOption {
+
+    public int param;
+    public ItemOptionTemplate optionTemplate;
+}

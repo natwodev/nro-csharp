@@ -1,0 +1,9 @@
+package nro.effect;
+
+public class EffectSkin {
+
+    public boolean isSlow, isThoDaiKa, isXChuong, isXDame;
+    public int xHPKI = 1;
+    public int xDame = 1;
+    public long lastTimeXChuong;
+}

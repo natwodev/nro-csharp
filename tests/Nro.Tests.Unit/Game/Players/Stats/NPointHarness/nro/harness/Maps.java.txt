@@ -1,0 +1,13 @@
+package nro.harness;
+
+import java.util.HashMap;
+import nro.map.Map;
+
+public class Maps {
+
+    public static final HashMap<Integer, Map> registry = new HashMap<>();
+
+    public static Map get(int mapId) {
+        return registry.get(mapId);
+    }
+}

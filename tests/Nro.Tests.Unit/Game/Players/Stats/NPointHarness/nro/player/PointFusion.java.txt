@@ -1,0 +1,14 @@
+package nro.player;
+
+public class PointFusion {
+
+    private int DameFusion;
+
+    public int getDameFusion() {
+        return DameFusion;
+    }
+
+    public void setDameFusion(int DameFusion) {
+        this.DameFusion = DameFusion;
+    }
+}

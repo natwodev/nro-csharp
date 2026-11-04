@@ -1,32 +1,25 @@
-using Nro.Network.Consts;
+using Nro.Network.Configurations;
 
 namespace Nro.Network.Framing;
 
-/// <summary>
-/// Protocol constants shared by the frame encoder, the frame reader and the handshake
-/// (see <c>docs/PROTOCOL.md</c> section 1 and <c>network/io/MessageSendCollect.java</c>).
-/// </summary>
+// Hằng số giao thức dùng chung cho mã hóa/giải mã khung và bắt tay.
+// Nguồn Java: network/io/MessageSendCollect.java (lệnh -27 mở đầu kết nối để trao đổi khóa không mã hóa; đúng tám lệnh server gửi dùng trường kích thước 3 byte vì payload có thể vượt 64 KiB).
+
 public static class WireCommands
 {
-    /// <summary>
-    /// <c>-27</c>: the first packet of every connection. The client sends it with no payload to ask for the session key,
-    /// and the server answers with a packet of the same command carrying the key (not encrypted).
-    /// </summary>
+
+    // Lệnh -27 mở đầu kết nối: client xin khóa, server trả khóa ở dạng không mã hóa.
     public const sbyte GetSessionId = Cmd_message.GET_SESSION_ID;
 
-    /// <summary>
-    /// The eight commands whose server-to-client packets carry a 3-byte size field instead of a 2-byte one
-    /// (<c>MessageSendCollect.doSendMessage</c> lines 71-74). They exist because their payloads can exceed 64 KiB
-    /// (<c>-28</c> carries the whole item-template update).
-    /// </summary>
+    // Đúng tám lệnh server gửi dùng trường kích thước 3 byte thay cho 2 byte.
     public static readonly IReadOnlySet<sbyte> LargeSizeCommands = new HashSet<sbyte> { -32, -66, -74, 11, -67, -87, 66, -28 };
 
-    /// <summary>The largest payload a 2-byte size field can describe.</summary>
+    // Payload lớn nhất trường kích thước 2 byte biểu diễn được.
     public const int MaxTwoByteSize = 0xFFFF;
 
-    /// <summary>The largest payload a 3-byte size field can describe.</summary>
+    // Payload lớn nhất trường kích thước 3 byte biểu diễn được.
     public const int MaxThreeByteSize = 0xFFFFFF;
 
-    /// <summary>True when server-to-client packets of <paramref name="command"/> use the 3-byte size field.</summary>
+    // Cho biết lệnh server gửi có dùng trường kích thước 3 byte hay không.
     public static bool IsLargeSize(sbyte command) => LargeSizeCommands.Contains(command);
 }

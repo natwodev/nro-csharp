@@ -1,0 +1,15 @@
+package models.Item;
+
+import java.util.ArrayList;
+import java.util.List;
+import nro.template.ItemTemplate;
+
+public class Item {
+
+    public ItemTemplate template;
+    public List<ItemOption> itemOptions = new ArrayList<>();
+
+    public boolean isNotNullItem() {
+        return template != null;
+    }
+}

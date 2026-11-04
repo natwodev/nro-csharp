@@ -1,0 +1,80 @@
+// Generates tests/Nro.Tests/Inventory/inventory-money.json: what the REAL, UNMODIFIED nro/inventory/Inventory.java does with its money fields.
+//
+// HOW IT RUNS (JDK 17 or newer; bash or PowerShell, any temp directory):
+//   1. copy the original source file  <SRC>/nro/inventory/Inventory.java  unchanged to  <tmp>/nro/inventory/Inventory.java
+//   2. split the stub section below (it starts at the line "// FILE: " ... ) into the files named on those lines under <tmp>
+//      (they only give Inventory.java the three small classes it imports; none of them has logic that matters for the money fields)
+//   3. save the class InventoryMoneyGenerator (the part before the first "// FILE:" line) as <tmp>/InventoryMoneyGenerator.java
+//   4. javac -encoding UTF-8 -d <tmp>/out $(find <tmp> -name '*.java')   then   java -cp <tmp>/out InventoryMoneyGenerator <output.json> <sha256-of-Inventory.java>
+// The scenarios come from java.util.Random(20261103), so the file is the same on every run.
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import nro.inventory.Inventory;
+
+public class InventoryMoneyGenerator {
+    static final long[] GOLD = {0, 1, 5, 100, 2_147_483_646L, 2_147_483_647L, 2_147_483_648L, 4_294_967_296L, 1_999_999_999_999L, 2_000_000_000_000L, -1, -5_000_000_000L};
+    static final int[] INTS = {0, 1, -1, 5, 100, 1_000_000, 1_999_999_999, 2_000_000_000, 2_000_000_001, 2_147_483_646, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE + 1, -100, -2_000_000_000, -294_967_296};
+    static final String[] OPS = {"addGold", "addRuby", "addGem", "addExpVip", "subGem", "subGoldInt", "subGoldLong", "subRuby", "subExpVip", "subGemAndRuby"};
+
+    public static void main(String[] args) throws Exception {
+        Random r = new Random(20261103L);
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n  \"source\": \"nro/inventory/Inventory.java (unmodified)\",\n  \"sha256\": \"").append(args.length > 1 ? args[1] : "").append("\",\n  \"seed\": 20261103,\n  \"cases\": [\n");
+        int n = 700;
+        for (int i = 0; i < n; i++) {
+            Inventory inv = new Inventory();
+            inv.gold = GOLD[r.nextInt(GOLD.length)];
+            inv.gem = INTS[r.nextInt(INTS.length)];
+            inv.ruby = INTS[r.nextInt(INTS.length)];
+            inv.Exp_Vip = INTS[r.nextInt(INTS.length)];
+            String op = OPS[r.nextInt(OPS.length)];
+            int argInt = INTS[r.nextInt(INTS.length)];
+            long argLong = GOLD[r.nextInt(GOLD.length)];
+            long g0 = inv.gold; int m0 = inv.gem, r0 = inv.ruby, v0 = inv.Exp_Vip;
+            switch (op) {
+                case "addGold": inv.addGold(argInt); break;
+                case "addRuby": inv.addRuby(argInt); break;
+                case "addGem": inv.addGem(argInt); break;
+                case "addExpVip": inv.addExpVip(argInt); break;
+                case "subGem": inv.subGem(argInt); break;
+                case "subGoldInt": inv.subGold(argInt); break;
+                case "subGoldLong": inv.subGold(argLong); break;
+                case "subRuby": inv.subRuby(argInt); break;
+                case "subExpVip": inv.subExpVip(argInt); break;
+                case "subGemAndRuby": inv.subGemAndRuby(argInt); break;
+            }
+            boolean isLong = op.equals("subGoldLong");
+            sb.append("    {\"op\":\"").append(op).append("\",\"arg\":").append(isLong ? argLong : (long) argInt)
+              .append(",\"before\":[").append(g0).append(',').append(m0).append(',').append(r0).append(',').append(v0)
+              .append("],\"after\":[").append(inv.getGold()).append(',').append(inv.getGem()).append(',').append(inv.getRuby()).append(',').append(inv.getExpVip())
+              .append("],\"gemAndRuby\":").append(inv.getGemAndRuby()).append('}');
+            sb.append(i + 1 < n ? ",\n" : "\n");
+        }
+        sb.append("  ],\n  \"constants\": {\"LIMIT_GOLD\":").append(Inventory.LIMIT_GOLD).append(",\"LIMIT_GOLD2\":").append(Inventory.LIMIT_GOLD2)
+          .append(",\"LIMIT_RUBY\":").append(Inventory.LIMIT_RUBY).append(",\"LIMIT_GEM\":").append(Inventory.LIMIT_GEM)
+          .append(",\"LIMIT_EXP_VIP\":").append(Inventory.LIMIT_EXP_VIP).append(",\"MAX_ITEMS_BAG\":").append(Inventory.MAX_ITEMS_BAG)
+          .append(",\"MAX_ITEMS_BOX\":").append(Inventory.MAX_ITEMS_BOX).append(",\"goldLimit\":").append(new Inventory().getGoldLimit()).append("}\n}\n");
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(args[0]), StandardCharsets.UTF_8)) { w.write(sb.toString()); }
+    }
+}
+
+// FILE: models/Item/Item.java
+// package models.Item;
+// import java.util.*;
+// public class Item {
+//     public nro.template.ItemTemplate template;
+//     public List<ItemOption> itemOptions = new ArrayList<>();
+//     public boolean isNotNullItem() { return template != null; }
+//     public void dispose() { template = null; itemOptions.clear(); }
+// }
+// FILE: models/Item/ItemOption.java
+// package models.Item;
+// public class ItemOption { public int param; public nro.template.ItemOptionTemplate optionTemplate; }
+// FILE: nro/template/ItemOptionTemplate.java
+// package nro.template;
+// public class ItemOptionTemplate { public int id; }
+// FILE: nro/template/ItemTemplate.java
+// package nro.template;
+// public class ItemTemplate { public int id; }

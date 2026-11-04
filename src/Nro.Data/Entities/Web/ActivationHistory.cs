@@ -1,7 +1,10 @@
+using Nro.Data.Entities.StaticData;
+using Nro.Data.Entities.Runtime;
+using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nro.Data.Entities;
+namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho nhật ký kích hoạt thành viên trong hệ thống
 // Bảng cơ sở dữ liệu: history_active (sinh tự động, không sửa tay)

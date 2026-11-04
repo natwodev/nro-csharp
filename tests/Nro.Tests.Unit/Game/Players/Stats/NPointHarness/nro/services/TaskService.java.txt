@@ -1,0 +1,20 @@
+package nro.services;
+
+import nro.player.Player;
+
+public class TaskService {
+
+    private static final TaskService instance = new TaskService();
+
+    public static TaskService gI() {
+        return instance;
+    }
+
+    public void checkDoneTaskPower(Player player, long power) {
+        nro.harness.Log.add("checkDoneTaskPower(" + power + ")");
+    }
+
+    public void checkDoneTaskUseTiemNang(Player player) {
+        nro.harness.Log.add("checkDoneTaskUseTiemNang");
+    }
+}

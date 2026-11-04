@@ -1,0 +1,33 @@
+package nro.services;
+
+import nro.map.Map;
+
+/** Answers the predicates from the flags of the map registered under the id (see nro.harness.Maps). */
+public class MapService {
+
+    private static final MapService instance = new MapService();
+
+    public static MapService gI() {
+        return instance;
+    }
+
+    private Map of(int mapId) {
+        return nro.harness.Maps.get(mapId);
+    }
+
+    public boolean isMapBlackBallWar(int mapId) { return of(mapId).isMapBlackBallWar; }
+    public boolean isMapCold(Map map) { return map.isMapCold; }
+    public boolean isMapChristMasEvent(int mapId) { return of(mapId).isMapChristMasEvent; }
+    public boolean isMap5000NamTruoc(int mapId) { return of(mapId).isMap5000NamTruoc; }
+    public boolean isMapCereal(Map map) { return map.isMapCereal; }
+    public boolean isMapVohinh(Map map) { return map.isMapVohinh; }
+    public boolean isMapKVTH(int mapId) { return of(mapId).isMapKVTH; }
+    public boolean isMapBanDoKhoBau(int mapId) { return of(mapId).isMapBanDoKhoBau; }
+    public boolean isMapDoanhTrai(int mapId) { return of(mapId).isMapDoanhTrai; }
+    public boolean isMapBinhHutNangLuong(int mapId) { return of(mapId).isTnsmDividedMap; }
+    public boolean isMapDiaNguc(int mapId) { return false; }
+    public boolean isMapHirudegarn(int mapId) { return false; }
+    public boolean isMapPotara(int mapId) { return false; }
+    public boolean isMapThanhDia(int mapId) { return false; }
+    public boolean isMapHanhTinhThucVat(int mapId) { return false; }
+}

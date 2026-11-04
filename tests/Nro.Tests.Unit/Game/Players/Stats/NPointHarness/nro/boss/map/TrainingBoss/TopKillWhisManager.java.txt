@@ -1,0 +1,19 @@
+package nro.boss.map.TrainingBoss;
+
+import java.util.ArrayList;
+import java.util.List;
+import nro.player.Player;
+
+public class TopKillWhisManager {
+
+    private static final TopKillWhisManager instance = new TopKillWhisManager();
+    public final List<Player> list = new ArrayList<>();
+
+    public static TopKillWhisManager getInstance() {
+        return instance;
+    }
+
+    public List<Player> getList() {
+        return list;
+    }
+}

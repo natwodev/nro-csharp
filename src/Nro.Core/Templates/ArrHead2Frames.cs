@@ -1,10 +1,9 @@
 namespace Nro.Core.Templates;
 
-/// <summary>
-/// Port of <c>nro/template/ArrHead2Frames.java</c>. Java initializes <c>frames = new ArrayList()</c> right at the field declaration,
-/// so the list is never null after the object is created.
-/// </summary>
+// Danh sách các frame dùng cho đầu nhân vật.
+// Nguồn Java: nro/template/ArrHead2Frames.java (khởi tạo danh sách rỗng ngay tại khai báo như new ArrayList(), nên không null sau khi tạo đối tượng).
 public class ArrHead2Frames
 {
+    // Danh sách mã frame của đầu nhân vật (Java: frames)
     public List<int> Frames { get; set; } = new();
 }

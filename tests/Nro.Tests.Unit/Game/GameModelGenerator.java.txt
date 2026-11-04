@@ -1,0 +1,683 @@
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import nro.config.SkillDamageConfig;
+import nro.intrinsic.Intrinsic;
+import nro.skill.Skill;
+import nro.template.SkillTemplate;
+
+/**
+ * Generates tests/Nro.Tests/Game/game-model-differential.json: reference values for the "game model" classes of track D (skill, task, power, attribute, intrinsic, achievement, badges)
+ * produced by the REAL JDK. Two kinds of source are used, and the JSON says which one each section used:
+ * <ul>
+ * <li>REAL CLASSES, compiled from the original source files with no change: nro/skill/Skill.java, nro/template/SkillTemplate.java, nro/config/SkillDamageConfig.java,
+ *     nro/intrinsic/Intrinsic.java (sections "skillCopy", "skillDamage", "intrinsic").</li>
+ * <li>COPIED BODIES: the other classes depend on Player, Service, Manager, Lombok or the Util class (which pulls in half of the server), so the pure method bodies are copied
+ *     below with the original statements unchanged (names of fields become parameters). The comment above each copy names the original file and method.</li>
+ * </ul>
+ * Run (from this folder; ORIG is the original source root, e.g. .../AWN_Version/src):
+ *   javac -encoding UTF-8 -d out ORIG/nro/skill/Skill.java ORIG/nro/template/SkillTemplate.java ORIG/nro/config/SkillDamageConfig.java ORIG/nro/intrinsic/Intrinsic.java GameModelGenerator.java.txt
+ *   (copy this file to GameModelGenerator.java first) then
+ *   java -Dfile.encoding=UTF-8 -cp out GameModelGenerator game-model-differential.json
+ */
+public class GameModelGenerator {
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // tiny JSON writer (ASCII only output, so no file encoding problem when it is read back)
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    static String q(String s) {
+        if (s == null) {
+            return "null";
+        }
+        StringBuilder sb = new StringBuilder("\"");
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '"') {
+                sb.append("\\\"");
+            } else if (c == '\\') {
+                sb.append("\\\\");
+            } else if (c < 0x20 || c > 0x7e) {
+                sb.append(String.format("\\u%04x", (int) c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.append('"').toString();
+    }
+
+    /** A piece of JSON that is already formatted (an inner array), written as it is. */
+    static final class Raw {
+        final String json;
+
+        Raw(String json) {
+            this.json = json;
+        }
+
+        @Override
+        public String toString() {
+            return json;
+        }
+    }
+
+    static Raw j(String json) {
+        return new Raw(json);
+    }
+
+    static String arr(Object... items) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < items.length; i++) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            Object o = items[i];
+            if (o instanceof String) {
+                sb.append(q((String) o));
+            } else if (o == null) {
+                sb.append("null");
+            } else {
+                sb.append(o.toString());
+            }
+        }
+        return sb.append(']').toString();
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // copied from Utils/Util.java: removeAccent (tables and both methods, unchanged)
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    private static final char[] SOURCE_CHARACTERS = {'À', 'Á', 'Â', 'Ã', 'È', 'É',
+        'Ê', 'Ì', 'Í', 'Ò', 'Ó', 'Ô', 'Õ', 'Ù', 'Ú', 'Ý', 'à', 'á', 'â',
+        'ã', 'è', 'é', 'ê', 'ì', 'í', 'ò', 'ó', 'ô', 'õ', 'ù', 'ú', 'ý',
+        'Ă', 'ă', 'Đ', 'đ', 'Ĩ', 'ĩ', 'Ũ', 'ũ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ạ',
+        'ạ', 'Ả', 'ả', 'Ấ', 'ấ', 'Ầ', 'ầ', 'Ẩ', 'ẩ', 'Ẫ', 'ẫ', 'Ậ', 'ậ',
+        'Ắ', 'ắ', 'Ằ', 'ằ', 'Ẳ', 'ẳ', 'Ẵ', 'ẵ', 'Ặ', 'ặ', 'Ẹ', 'ẹ', 'Ẻ',
+        'ẻ', 'Ẽ', 'ẽ', 'Ế', 'ế', 'Ề', 'ề', 'Ể', 'ể', 'Ễ', 'ễ', 'Ệ', 'ệ',
+        'Ỉ', 'ỉ', 'Ị', 'ị', 'Ọ', 'ọ', 'Ỏ', 'ỏ', 'Ố', 'ố', 'Ồ', 'ồ', 'Ổ',
+        'ổ', 'Ỗ', 'ỗ', 'Ộ', 'ộ', 'Ớ', 'ớ', 'Ờ', 'ờ', 'Ở', 'ở', 'Ỡ', 'ỡ',
+        'Ợ', 'ợ', 'Ụ', 'ụ', 'Ủ', 'ủ', 'Ứ', 'ứ', 'Ừ', 'ừ', 'Ử', 'ử', 'Ữ',
+        'ữ', 'Ự', 'ự',};
+
+    private static final char[] DESTINATION_CHARACTERS = {'A', 'A', 'A', 'A', 'E',
+        'E', 'E', 'I', 'I', 'O', 'O', 'O', 'O', 'U', 'U', 'Y', 'a', 'a',
+        'a', 'a', 'e', 'e', 'e', 'i', 'i', 'o', 'o', 'o', 'o', 'u', 'u',
+        'y', 'A', 'a', 'D', 'd', 'I', 'i', 'U', 'u', 'O', 'o', 'U', 'u',
+        'A', 'a', 'A', 'a', 'A', 'a', 'A', 'a', 'A', 'a', 'A', 'a', 'A',
+        'a', 'A', 'a', 'A', 'a', 'A', 'a', 'A', 'a', 'A', 'a', 'E', 'e',
+        'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E',
+        'e', 'I', 'i', 'I', 'i', 'O', 'o', 'O', 'o', 'O', 'o', 'O', 'o',
+        'O', 'o', 'O', 'o', 'O', 'o', 'O', 'o', 'O', 'o', 'O', 'o', 'O',
+        'o', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u',
+        'U', 'u', 'U', 'u',};
+
+    public static char removeAccent(char ch) {
+        int index = Arrays.binarySearch(SOURCE_CHARACTERS, ch);
+        if (index >= 0) {
+            ch = DESTINATION_CHARACTERS[index];
+        }
+        return ch;
+    }
+
+    public static String removeAccent(String str) {
+        StringBuilder sb = new StringBuilder(str);
+        for (int i = 0; i < sb.length(); i++) {
+            sb.setCharAt(i, removeAccent(sb.charAt(i)));
+        }
+        return sb.toString();
+    }
+
+    // copied from Utils/TimeUtil.java: getTimeAgo (unchanged)
+    public static String getTimeAgo(int timeRemainS) {
+        int num = 0;
+        if (timeRemainS > 60) {
+            num = timeRemainS / 60;
+            timeRemainS %= 60;
+        }
+        int num2 = 0;
+        if (num > 60) {
+            num2 = num / 60;
+            num %= 60;
+        }
+        int num3 = 0;
+        if (num2 > 24) {
+            num3 = num2 / 24;
+            num2 %= 24;
+        }
+
+        String text = "";
+        if (num3 > 0) {
+            text += num3;
+            text += " ngày";
+            text = text + num2 + " giờ";
+        } else if (num2 > 0) {
+            text += num2;
+            text += " giờ";
+            text = text + num + " phút";
+        } else {
+            if (num == 0) {
+                num = 1;
+            }
+            text += num;
+            text += " phút";
+        }
+        return text;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // copies of the pure methods of the other classes
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // nro/skill/PlayerSkill.java getIndexSkillSelect(): the switch, with the template id as the parameter
+    static byte getIndexSkillSelect(byte templateId) {
+        switch (templateId) {
+            case Skill.DRAGON:
+            case Skill.DEMON:
+            case Skill.GALICK:
+            case Skill.KAIOKEN:
+            case Skill.LIEN_HOAN:
+                return 1;
+            case Skill.KAMEJOKO:
+            case Skill.ANTOMIC:
+            case Skill.MASENKO:
+                return 2;
+            case Skill.LIEN_HOAN_CHUONG:
+            case Skill.SUPER_KAME:
+            case Skill.MA_PHONG_BA:
+                return 4;
+            default:
+                return 3;
+        }
+    }
+
+    // nro/skill/NewSkill.java setSkillSpecial(): only the arithmetic on the target, fields become locals; returns {_xObjTaget, _yObjTaget}
+    static int[] newSkillTarget(byte dir, int point, byte templateId, short _xPlayer, short _yPlayer, short _xObjTaget, short _yObjTaget) {
+        short xObj;
+        short yObj;
+        int length = _xObjTaget - _xPlayer;
+        int dx = dir * (point * 100 + 100);
+        if (templateId != Skill.MA_PHONG_BA) {
+            if (Math.abs(dx) < Math.abs(length) || Math.abs(length) < 100) {
+                xObj = (short) dx;
+            } else {
+                xObj = (short) length;
+            }
+        } else {
+            xObj = 75;
+        }
+        xObj = (short) Math.abs(xObj);
+        yObj = (short) Math.abs(_yObjTaget);
+        return new int[]{xObj, yObj};
+    }
+
+    // nro/skill/NClass.java getSkillTemplateByName(): the match test, for one template name
+    static boolean nameMatches(String templateName, String name) {
+        return (removeAccent(templateName).toUpperCase()).contains((removeAccent(name)).toUpperCase());
+    }
+
+    // nro/task/SideTask.java and nro/task/EventTask.java (the two files have identical method bodies): getName, getLevel, getPercentProcess
+    static String taskGetName(String templateName, int maxCount) {
+        return templateName.replaceAll("%1", String.valueOf(maxCount));
+    }
+
+    static final int EASY = 0, NORMAL = 1, HARD = 2, VERY_HARD = 3, HELL = 4; // consts/ConstTask.java
+
+    static String taskGetLevel(int level) {
+        switch (level) {
+            case EASY:
+                return "dễ";
+            case NORMAL:
+                return "bình thường";
+            case HARD:
+                return "khó";
+            case VERY_HARD:
+                return "rất khó";
+            case HELL:
+                return "địa ngục";
+            default:
+                return "Anwin";
+        }
+    }
+
+    static int taskGetPercentProcess(int count, int maxCount) {
+        if (count >= maxCount) {
+            return 100;
+        }
+        return (int) ((long) count * 100 / maxCount);
+    }
+
+    // nro/task/KolTask.java getTaskInfo() (template present) and getPercentProcess() (template present)
+    static String kolGetTaskInfo(String info, int maxCount) {
+        return info.replaceAll("%1", String.valueOf(maxCount));
+    }
+
+    static int kolGetPercentProcess(int count, int maxCount) {
+        if (maxCount <= 0) {
+            return 0;
+        }
+
+        if (count >= maxCount) {
+            return 100;
+        }
+
+        return count * 100 / maxCount;
+    }
+
+    // nro/badges/BadgesTask.java getPercentProcess() and toString()
+    static int badgesTaskPercent(int count, int countMax) {
+        if (count >= countMax) {
+            return 100;
+        }
+        return (int) ((long) count * 100 / countMax);
+    }
+
+    static String badgesTaskToString(int id, int count, int countMax, int idBadgesReward) {
+        final String n = "\"";
+        return "{" + n + "id" + n + ":" + n + id + n + ","
+                + n + "count" + n + ":" + n + count + n + ","
+                + n + "countMax" + n + ":" + n + countMax + n + ","
+                + n + "idBadgesReward" + n + ":" + n + idBadgesReward + n + "}";
+    }
+
+    // nro/badges/BadgesData.java toString() and the expiry computation of BadgesData(Player, int, int)
+    static String badgesDataToString(int idBadGes, long timeofUseBadges, boolean isUse) {
+        final String n = "\"";
+        return "{"
+                + n + "idBadGes" + n + ":" + n + idBadGes + n + ","
+                + n + "timeofUseBadges" + n + ":" + n + timeofUseBadges + n + ","
+                + n + "isUse" + n + ":" + n + isUse + n
+                + "}";
+    }
+
+    static long badgesExpiry(long now, int days) {
+        return now + days * 24 * 60 * 60 * 1000L;
+    }
+
+    // nro/badges/BadgesTaskService.java sendDay(): the arithmetic
+    static int badgesSendDay(long timeofUseBadges, long now) {
+        long timeDifference = timeofUseBadges - now;
+        return (int) (timeDifference / (24 * 60 * 60 * 1000L));
+    }
+
+    // nro/attribute/Attribute.java toString(), template name and numbers as parameters
+    static String attributeToString(String templateName, int value, int time) {
+        String text = templateName.replaceAll("#value", String.valueOf(value));
+        if (time != -1) {
+            String strTimeAgo = getTimeAgo(time);
+            text += " trong vòng " + strTimeAgo;
+        }
+        return text;
+    }
+
+    // nro/power/CaptionManager.java getLevel(): the loop, with the powers as an array
+    static int captionLevel(long[] powers, long power) {
+        int size = powers.length;
+        int level = 0;
+        for (int i = size - 1; i >= 0; i--) {
+            long p = powers[i];
+            if (power >= p) {
+                level = i;
+                break;
+            }
+        }
+        return level;
+    }
+
+    // nro/achievement/Achievement.java getCompleted(), the HOAT_DONG_CHAM_CHI branch
+    static long hoursOf(long completed) {
+        return completed / (60 * 60 * 1000);
+    }
+
+    // nro/achievement/AchievementService.java regex() and numberToString() (the small branch; the big branch calls Util.formatNumber, covered by util-differential.json)
+    static String achievementRegex(int gen, String text) {
+        return text.replaceAll("%1", gen == 0 ? "Siêu nhân" : gen == 1 ? "Siêu Namếc" : "Siêu Xayda").replaceAll("%2", gen == 0 ? "Bunma" : gen == 1 ? "Dende" : "Appule");
+    }
+
+    static String achievementNumberSmall(long num) {
+        return num <= 10000 ? num + "" : null;
+    }
+
+    // nro/server/Manager.java: "String[] mc1 = rs.getString(..).split("-"); sideTask.count[0][0] = Integer.parseInt(mc1[0]); sideTask.count[0][1] = Integer.parseInt(mc1[1]);"
+    static String parseRange(String text) {
+        try {
+            String[] mc = text.split("-");
+            int a = Integer.parseInt(mc[0]);
+            int b = Integer.parseInt(mc[1]);
+            return arr("ok", a, b);
+        } catch (NumberFormatException e) {
+            return arr("error", "NumberFormatException", 0);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return arr("error", "ArrayIndexOutOfBoundsException", 0);
+        }
+    }
+
+    // nro/task/KolTask.java next(): "template = TaskService.gI().getKolTaskTemplateById(++template.id);" where getKolTaskTemplateById(id) is
+    // "if (id != -1) return Manager.KOL_TASKS_TEMPLATE.get(id);" ; the template objects are the shared ones of the server table. Only the id is modelled.
+    static class MiniKolTemplate {
+        int id;
+
+        MiniKolTemplate(int id) {
+            this.id = id;
+        }
+    }
+
+    static MiniKolTemplate miniNext(MiniKolTemplate template, List<MiniKolTemplate> table) {
+        if (template != null) {
+            int id = ++template.id;
+            return id != -1 ? table.get(id) : null;
+        }
+        return null;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    public static void main(String[] args) throws IOException {
+        StringBuilder out = new StringBuilder();
+        out.append("{\n\"meta\": {\"jdk\": ").append(q(System.getProperty("java.version"))).append(", \"note\": \"skillCopy, skillDamage and intrinsic use the real original classes; every other section runs copied method bodies (see GameModelGenerator.java.txt)\"},\n");
+
+        // ---- skillCopy: REAL nro.skill.Skill copy constructor --------------------------------------------------------------------------------------------------
+        out.append("\"skillCopy\": [\n");
+        long[][] skillInputs = {
+            // skillId, point, powRequire, coolDown, lastTimeUseThisSkill, dx, dy, maxFight, manaUse, damage, currLevel, lastTimeUseThisSkillbot, price
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {1, 3, 1000000L, 3000, 1700000000000L, 100, 50, 7, 120, 200, 500, 1700000000001L, 10},
+            {26, 7, 10000000000L, 11000, -1, -100, -50, 1, 3500, 1000, 1000, 5, 400},
+            {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+            {32767, 2147483647, Long.MAX_VALUE, 2147483647, Long.MAX_VALUE, 2147483647, 2147483647, 2147483647, 2147483647, 32767, 32767, Long.MAX_VALUE, 32767},
+            {-32768, -2147483648, Long.MIN_VALUE, -2147483648, Long.MIN_VALUE, -2147483648, -2147483648, -2147483648, -2147483648, -32768, -32768, Long.MIN_VALUE, -32768},
+            {40000, 5, 5, 5, 5, 5, 5, 5, 5, 40000, 40000, 5, 40000},
+        };
+        String[] moreInfo = {null, "", "info text", "null", "Giảm 20% sát thương"};
+        List<String> skillRows = new ArrayList<>();
+        for (int i = 0; i < skillInputs.length; i++) {
+            long[] v = skillInputs[i];
+            String info = moreInfo[i % moreInfo.length];
+            SkillTemplate template = new SkillTemplate();
+            template.id = (byte) (i * 7);
+            template.name = "T" + i;
+            Skill s = new Skill();
+            s.template = template;
+            s.skillId = (short) v[0];
+            s.point = (int) v[1];
+            s.powRequire = v[2];
+            s.coolDown = (int) v[3];
+            s.lastTimeUseThisSkill = v[4];
+            s.dx = (int) v[5];
+            s.dy = (int) v[6];
+            s.maxFight = (int) v[7];
+            s.manaUse = (int) v[8];
+            s.damage = (short) v[9];
+            s.currLevel = (short) v[10];
+            s.lastTimeUseThisSkillbot = v[11];
+            s.price = (short) v[12];
+            s.moreInfo = info;
+            Skill c = new Skill(s);
+            skillRows.add(arr(
+                    j(arr(s.skillId, s.point, s.powRequire, s.coolDown, s.lastTimeUseThisSkill, s.dx, s.dy, s.maxFight, s.manaUse, s.damage, s.currLevel, s.lastTimeUseThisSkillbot, s.price, s.moreInfo, s.template.id)),
+                    j(arr(c.skillId, c.point, c.powRequire, c.coolDown, c.lastTimeUseThisSkill, c.dx, c.dy, c.maxFight, c.manaUse, c.damage, c.currLevel, c.lastTimeUseThisSkillbot, c.price, c.moreInfo, c.template == s.template))));
+        }
+        out.append(String.join(",\n", skillRows)).append("\n],\n");
+
+        // ---- skillDamage: REAL nro.config.SkillDamageConfig ----------------------------------------------------------------------------------------------------
+        out.append("\"skillDamage\": {\n\"initial\": [");
+        for (int id = -128; id <= 127; id++) {
+            out.append(id == -128 ? "" : ",").append(Double.toString(SkillDamageConfig.getMultiplier((byte) id)));
+        }
+        SkillDamageConfig.setMultiplier((byte) 1, 5.5);
+        SkillDamageConfig.setMultiplier((byte) 100, 0.25);
+        SkillDamageConfig.setMultiplier((byte) -7, -2.0);
+        SkillDamageConfig.setMultiplier(Skill.DRAGON, 0.0);
+        out.append("],\n\"afterSet\": [");
+        for (int id = -128; id <= 127; id++) {
+            out.append(id == -128 ? "" : ",").append(Double.toString(SkillDamageConfig.getMultiplier((byte) id)));
+        }
+        out.append("]\n},\n");
+
+        // ---- skillIndex: PlayerSkill.getIndexSkillSelect --------------------------------------------------------------------------------------------------------
+        out.append("\"skillIndex\": [");
+        for (int id = -128; id <= 127; id++) {
+            out.append(id == -128 ? "" : ",").append(getIndexSkillSelect((byte) id));
+        }
+        out.append("],\n");
+
+        // ---- newSkillTarget: NewSkill.setSkillSpecial arithmetic ------------------------------------------------------------------------------------------------
+        out.append("\"newSkillTarget\": [\n");
+        List<String> rows = new ArrayList<>();
+        byte[] dirs = {-1, 1};
+        int[] points = {0, 1, 3, 7, 30, 100, 20000, 21474836};
+        byte[] templates = {Skill.SUPER_KAME, Skill.LIEN_HOAN_CHUONG, Skill.MA_PHONG_BA};
+        short[] xs = {0, 1, -1, 99, 100, 101, -99, -100, -101, 250, 400, 800, 32767, -32768, 12345};
+        short[] ys = {0, 1, -1, 300, -300, 32767, -32768};
+        for (byte dir : dirs) {
+            for (int point : points) {
+                for (byte t : templates) {
+                    for (short xp : new short[]{0, 500, -32768, 32767}) {
+                        for (short xo : xs) {
+                            short yo = ys[(Math.abs(xo) + point + t) % ys.length];
+                            int[] r = newSkillTarget(dir, point, t, xp, (short) 77, xo, yo);
+                            rows.add(arr(dir, point, t, xp, 77, xo, yo, r[0], r[1]));
+                        }
+                    }
+                }
+            }
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- nclassName: NClass.getSkillTemplateByName match ----------------------------------------------------------------------------------------------------
+        out.append("\"nclassName\": [\n");
+        rows = new ArrayList<>();
+        String[] templateNames = {"Chiêu đấm Dragon", "Kamejoko", "Đẻ trứng", "Quả cầu kênh khí", "Thôi miên", "ma phong ba", "Biến Khỉ", "Tái tạo năng lượng", "", "Cadic Liên hoàn"};
+        String[] queries = {"", "kame", "KAME", "dẻ", "de trung", "ĐẺ", "khi", "Khỉ", "nang luong", "NĂNG", "dragon", "Ma phong", "ba", "xyz", "Cadic", "lien"};
+        for (String tn : templateNames) {
+            for (String qy : queries) {
+                rows.add(arr(tn, qy, nameMatches(tn, qy)));
+            }
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- taskText: SideTask / EventTask getName, getLevel, getPercentProcess; KolTask getTaskInfo, getPercentProcess --------------------------------------------
+        out.append("\"taskText\": [\n");
+        rows = new ArrayList<>();
+        String[] taskNames = {"Hạ %1 quái", "Nhặt %1 vật phẩm %1 lần", "Không có chỗ thay", "%1", "", "100%1", "Giết %%1 con", "Đánh bại %1 boss $1 \\1"};
+        int[] counts = {0, 1, 5, 50, 99, 100, 101, 2147483647, -1, -5, 1000000, 21474837, 21474836};
+        int[] maxCounts = {1, 3, 10, 100, 101, 1000, 2147483647, 0, -1, 21474836};
+        for (String tn : taskNames) {
+            for (int mc : maxCounts) {
+                rows.add(arr("name", tn, mc, taskGetName(tn, mc)));
+            }
+        }
+        for (int level = -2; level <= 6; level++) {
+            rows.add(arr("level", level, taskGetLevel(level)));
+        }
+        for (int c : counts) {
+            for (int mc : maxCounts) {
+                String sideResult;
+                String kolResult;
+                try {
+                    sideResult = String.valueOf(taskGetPercentProcess(c, mc));
+                } catch (ArithmeticException e) {
+                    sideResult = "ArithmeticException";
+                }
+                try {
+                    kolResult = String.valueOf(kolGetPercentProcess(c, mc));
+                } catch (ArithmeticException e) {
+                    kolResult = "ArithmeticException";
+                }
+                rows.add(arr("percent", c, mc, sideResult, kolResult));
+            }
+        }
+        for (String tn : taskNames) {
+            for (int mc : new int[]{1, 25, 2147483647, -3}) {
+                rows.add(arr("kolInfo", tn, mc, kolGetTaskInfo(tn, mc)));
+            }
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- taskRange: Manager's "min-max" parsing ------------------------------------------------------------------------------------------------------------
+        out.append("\"taskRange\": [\n");
+        rows = new ArrayList<>();
+        String[] ranges = {"1-5", "10-20", "0-0", "5-", "-", "", "-1-5", "1-5-9", "1-", "-5", "a-b", " 1-2", "1 -2", "+3-4", "2147483647-2147483647", "2147483648-1", "1-2147483648", "007-08", "1--2", "１-２"};
+        for (String r : ranges) {
+            rows.add(arr(r, j(parseRange(r))));
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- intrinsic: REAL nro.intrinsic.Intrinsic -----------------------------------------------------------------------------------------------------------
+        out.append("\"intrinsic\": [\n");
+        rows = new ArrayList<>();
+        String[] intrinsicNames = {
+            "Không có Nội Tại",
+            "Tăng p0% đến p1 sức đánh",
+            "Tăng p0% đến p1% HP, p2% đến p3% KI",
+            "Hồi p0% đến p1 HP mỗi giây",
+            "p0 p1 p2 p3",
+            "p10 p11 p00",
+            "Chỉ số p0, p0, p0",
+            "p2% đến p3 và p0% đến p1",
+            "",
+            "xp0y p1z",
+        };
+        short[][] intrinsicParams = {
+            {0, 0, 0, 0, 0, 0, 0},
+            {1, 5, 10, 20, 8, 9, 3},
+            {-5, 5, -10, 10, 0, 0, 1},
+            {32767, -32768, 100, 200, 32767, -32768, 2},
+            {7, 7, 7, 7, 7, 7, 0},
+            {10, 11, 12, 13, 14, 15, 3},
+        };
+        int[] intrinsicIds = {0, 1, 2, 17, -3, 127};
+        for (String nm : intrinsicNames) {
+            for (short[] p : intrinsicParams) {
+                for (int id : intrinsicIds) {
+                    Intrinsic it = new Intrinsic();
+                    it.id = id;
+                    it.name = nm;
+                    it.paramFrom1 = p[0];
+                    it.paramTo1 = p[1];
+                    it.paramFrom2 = p[2];
+                    it.paramTo2 = p[3];
+                    it.param1 = p[4];
+                    it.param2 = p[5];
+                    it.icon = 1234;
+                    it.gender = (byte) p[6];
+                    Intrinsic copy = new Intrinsic(it);
+                    rows.add(arr(id, nm, p[0], p[1], p[2], p[3], p[4], p[5], it.getDescription(), it.getName(), copy.param1, copy.param2, copy.getName(), copy.icon, copy.gender));
+                }
+            }
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- attribute: Attribute.toString ---------------------------------------------------------------------------------------------------------------------
+        out.append("\"attribute\": [\n");
+        rows = new ArrayList<>();
+        String[] attrNames = {"Tăng #value% kinh nghiệm", "Vàng x#value", "#value #value", "Không có chỗ", ""};
+        int[] values = {0, 1, 50, -3, 2147483647, -2147483648};
+        int[] times = {-1, 0, 1, 59, 60, 61, 119, 120, 3599, 3600, 3601, 7200, 86399, 86400, 90000, 172800, 2147483647, -2, -3600};
+        for (String nm : attrNames) {
+            for (int v : values) {
+                for (int t : times) {
+                    rows.add(arr(nm, v, t, attributeToString(nm, v, t)));
+                }
+            }
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- captionLevel --------------------------------------------------------------------------------------------------------------------------------------
+        out.append("\"captionLevel\": [\n");
+        rows = new ArrayList<>();
+        long[][] captionSets = {
+            {},
+            {0},
+            {0, 1000, 5000, 20000, 100000},
+            {100, 200, 300},
+            {500, 100, 900, 50},
+            {10, 10, 10},
+            {0, 100, 100, 200},
+            {Long.MIN_VALUE, 0, Long.MAX_VALUE},
+        };
+        long[] powers = {-1, 0, 1, 99, 100, 101, 199, 200, 299, 300, 301, 999, 1000, 4999, 5000, 5001, 20000, 99999, 100000, 100001, Long.MAX_VALUE, Long.MIN_VALUE};
+        for (long[] set : captionSets) {
+            for (long pw : powers) {
+                StringBuilder sb = new StringBuilder("[");
+                for (int i = 0; i < set.length; i++) {
+                    sb.append(i > 0 ? "," : "").append(set[i]);
+                }
+                sb.append("]");
+                rows.add("[" + sb + "," + pw + "," + captionLevel(set, pw) + "]");
+            }
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- badges --------------------------------------------------------------------------------------------------------------------------------------------
+        out.append("\"badgesTask\": [\n");
+        rows = new ArrayList<>();
+        int[][] bt = {{1, 0, 5, 3}, {2, 5, 5, 4}, {3, 7, 5, 4}, {-1, -1, -1, -1}, {4, 1, 3, 9}, {5, 1, 1000000000, 1}, {6, 2147483647, 2147483647, 0}, {7, -5, 10, 2}, {8, 3, 7, 6}, {9, 2, 3, 6}, {10, 1, 3, 6}};
+        for (int[] b : bt) {
+            rows.add(arr(b[0], b[1], b[2], b[3], badgesTaskPercent(b[1], b[2]), badgesTaskToString(b[0], b[1], b[2], b[3])));
+        }
+        rows.add(arr(11, -1, 0, 0, "ArithmeticException", badgesTaskToString(11, -1, 0, 0)));
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        out.append("\"badgesData\": [\n");
+        rows = new ArrayList<>();
+        long[] nows = {0, 1700000000000L, 1893456000000L, Long.MAX_VALUE - 1};
+        int[] days = {0, 1, 30, 365, 24855, 24856, 30000, 100000, 2147483647, -1, -30, -2147483648};
+        for (long now : nows) {
+            for (int d : days) {
+                long expiry = badgesExpiry(now, d);
+                rows.add(arr("expiry", now, d, expiry, badgesDataToString(d, expiry, d % 2 == 0)));
+            }
+        }
+        long[] diffs = {0, 1, 86399999L, 86400000L, 86400001L, 172800000L, -1, -86399999L, -86400000L, -86400001L, 2592000000L, 9000000000000L, Long.MAX_VALUE, Long.MIN_VALUE};
+        for (long df : diffs) {
+            rows.add(arr("sendDay", df, 1000, badgesSendDay(df + 1000, 1000)));
+        }
+        rows.add(arr("default", badgesDataToString(-1, -1, false)));
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- achievement ---------------------------------------------------------------------------------------------------------------------------------------
+        out.append("\"achievement\": [\n");
+        rows = new ArrayList<>();
+        long[] completeds = {0, 1, 3599999L, 3600000L, 3600001L, 7199999L, 36000000L, -1, -3600000L, -3599999L, -3600001L, Long.MAX_VALUE, Long.MIN_VALUE};
+        for (long c : completeds) {
+            rows.add(arr("hours", c, hoursOf(c)));
+        }
+        String[] regexTexts = {"%1 mạnh nhất", "Gặp %2", "%1 và %2", "%1%2", "không có", "", "%3 %1"};
+        for (int gen = -1; gen <= 3; gen++) {
+            for (String tx : regexTexts) {
+                rows.add(arr("regex", gen, tx, achievementRegex(gen, tx)));
+            }
+        }
+        long[] nums = {0, 1, 9999, 10000, 10001, -1, Long.MIN_VALUE};
+        for (long num : nums) {
+            rows.add(arr("numberSmall", num, achievementNumberSmall(num)));
+        }
+        out.append(String.join(",\n", rows)).append("\n],\n");
+
+        // ---- kolNextQuirk: the shared-template mutation of KolTask.next() ---------------------------------------------------------------------------------------------
+        List<MiniKolTemplate> table = new ArrayList<>();
+        for (int t = 0; t < 3; t++) {
+            table.add(new MiniKolTemplate(t));
+        }
+        MiniKolTemplate playerA = table.get(0);
+        MiniKolTemplate playerB = table.get(0);
+        playerA = miniNext(playerA, table);
+        out.append("\"kolNextQuirk\": {\"tableIdsAfterOneNext\": ").append(arr(table.get(0).id, table.get(1).id, table.get(2).id))
+                .append(", \"playerAIsTableSecondEntry\": ").append(playerA == table.get(1))
+                .append(", \"playerBTemplateIdAfter\": ").append(playerB.id);
+        String third;
+        try {
+            playerA = miniNext(playerA, table);
+            playerA = miniNext(playerA, table);
+            third = "no exception";
+        } catch (IndexOutOfBoundsException e) {
+            third = "IndexOutOfBoundsException";
+        }
+        out.append(", \"afterLastTask\": ").append(q(third)).append("}\n}\n");
+
+        Files.write(Paths.get(args[0]), out.toString().getBytes(StandardCharsets.UTF_8));
+    }
+}

@@ -1,0 +1,6 @@
+package network.session;
+
+public class MySession {
+
+    public int Vip_Point;
+}

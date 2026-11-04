@@ -1,15 +1,21 @@
 namespace Nro.Core.Consts;
 
-/// <summary>
-/// Port of <c>consts/ConstAttribute.java</c>: class and constant names are preserved; values were machine-translated from Java
-/// (port-csharp/tools/consts/gen_consts_cs.py), not copied by hand.
-/// Automatically verified against the real values read from the compiled Java class: <c>ConstsParityTests</c> (tests/golden/consts.json).
-/// </summary>
+// Hằng số loại buff toàn máy chủ: id trong bảng attribute_template, giá trị buff tính theo phần trăm
+// Nguồn Java: consts/ConstAttribute.java (tên đổi sang tiếng Anh, tên Java gốc ghi cuối chú thích nếu khác; giá trị đối chiếu bằng ConstsParityTests)
 public static class ConstAttribute
 {
-    public const int TNSM = 1;
-    public const int VANG = 2;
+    // Tăng % tiềm năng sức mạnh (TNSM) nhận được (Java: TNSM)
+    public const int POWER_POTENTIAL = 1;
+
+    // Tăng % vàng rơi từ quái (Java: VANG)
+    public const int GOLD = 2;
+
+    // Tăng % HP tối đa
     public const int HP = 4;
+
+    // Tăng % KI tối đa
     public const int KI = 3;
-    public const int SUC_DANH = 5;
+
+    // Tăng % sức đánh (Java: SUC_DANH)
+    public const int DAMAGE = 5;
 }

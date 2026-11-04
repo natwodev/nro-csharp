@@ -1,0 +1,118 @@
+
+// FILE: Item.java
+// import java.util.*;
+// public class Item {
+//     public ItemTemplate template;
+//     public String info;
+//     public String content;
+//     public int quantity;
+//     public List<ItemOption> itemOptions = new ArrayList<>();
+//     public long createTime;
+//     public boolean isNotNullItem() { return this.template != null; }
+//     public String getInfo() { String strInfo = ""; for (ItemOption itemOption : itemOptions) { strInfo += itemOption.getOptionString(); } return strInfo; }   // Item.java getInfo
+//     public String getContent() { return "Yêu cầu sức mạnh " + this.template.strRequire + " trở lên"; }                                                       // Item.java getContent
+//     public void dispose() {                                                                                                                                // Item.java dispose
+//         this.template = null; this.info = null; this.content = null;
+//         if (this.itemOptions != null) { for (ItemOption io : this.itemOptions) { io.dispose(); } this.itemOptions.clear(); }
+//         this.itemOptions = null;
+//     }
+//     public void getOptionParam(int id, int param) {                                                                                                         // Item.java getOptionParam(id, param)
+//         for (int i = 0; i < this.itemOptions.size(); i++) {
+//             ItemOption itemOption = this.itemOptions.get(i);
+//             if (itemOption != null && itemOption.optionTemplate.id == id) { itemOption.param = param; return; }
+//         }
+//     }
+//     public boolean haveOption(int idOption) {                                                                                                               // Item.java haveOption
+//         if (this != null && this.isNotNullItem()) { return this.itemOptions.stream().anyMatch(op -> op != null && op.optionTemplate.id == idOption); }
+//         return false;
+//     }
+// }
+// FILE: ItemOption.java
+// public class ItemOption {
+//     public int param;
+//     public ItemOptionTemplate optionTemplate;
+//     public ItemOption(ItemOption io) { this.param = io.param; this.optionTemplate = io.optionTemplate; }
+//     public ItemOption(int tempId, int param) { this.optionTemplate = ItemService.gI().getItemOptionTemplate(tempId); this.param = param; }
+//     public String getOptionString() { return Util.replace(this.optionTemplate.name, "#", String.valueOf(this.param)); }
+//     public void dispose() { this.optionTemplate = null; }
+// }
+// FILE: ItemTemplate.java
+// public class ItemTemplate { public short id; public byte type; public String name; public int strRequire; public boolean isUpToUp; }
+// FILE: ItemOptionTemplate.java
+// public class ItemOptionTemplate { public int id; public String name; }
+// FILE: ItemService.java
+// public class ItemService {
+//     private static ItemService I;
+//     public static ItemService gI() { if (I == null) I = new ItemService(); return I; }
+//     public Item createItemNull() { Item item = new Item(); return item; }
+//     public ItemOptionTemplate getItemOptionTemplate(int id) { ItemOptionTemplate t = new ItemOptionTemplate(); t.id = id; t.name = "option" + id + " #"; return t; }
+//     public Item copyItem(Item item) {                                                                                                                       // ItemService.java copyItem
+//         Item it = new Item();
+//         it.itemOptions = new java.util.ArrayList<>();
+//         it.template = item.template;
+//         it.info = item.info;
+//         it.content = item.content;
+//         it.quantity = item.quantity;
+//         it.createTime = item.createTime;
+//         for (ItemOption io : item.itemOptions) { it.itemOptions.add(new ItemOption(io)); }
+//         return it;
+//     }
+// }
+// FILE: Service.java
+// import java.util.*;
+// public class Service {
+//     public static final List<String> notices = new ArrayList<>();
+//     private static Service I;
+//     public static Service gI() { if (I == null) I = new Service(); return I; }
+//     public void sendThongBao(Player pl, String text) { notices.add((pl == null ? "<null player>" : "player") + ":" + text); }
+//     public void sendChanMenh(Player player, int id) { }
+//     public void Send_Caitrang(Player player) { }
+//     public void sendFlagBag(Player pl) { }
+// }
+// FILE: Inventory.java
+// import java.util.*;
+// public class Inventory {
+//     public List<Item> itemsBody = new ArrayList<>();
+//     public List<Item> itemsBag = new ArrayList<>();
+//     public List<Item> itemsBox = new ArrayList<>();
+//     public List<Item> itemsBoxCollection = new ArrayList<>();
+// }
+// FILE: Player.java
+// import java.util.*;
+// public class Player {
+//     public static final short HEAD = 321;
+//     public static final List<byte[]> sent = new ArrayList<>();
+//     public Inventory inventory;
+//     public short getHead() { return HEAD; }
+//     public void sendMessage(Message msg) { sent.add(msg.data()); }
+// }
+// FILE: Message.java
+// import java.io.*;
+// public class Message {
+//     public byte command;
+//     private final ByteArrayOutputStream os = new ByteArrayOutputStream();
+//     private final DataOutputStream dos = new DataOutputStream(os);
+//     public Message(int command) { this.command = (byte) command; }
+//     public DataOutputStream writer() { return dos; }
+//     public void cleanup() { }
+//     public byte[] data() { return os.toByteArray(); }
+// }
+// FILE: Util.java
+// import java.util.Random;
+// public class Util {
+//     public static Random rand = new Random();
+//     public static int nextInt(int from, int to) { return from + rand.nextInt(to - from + 1); }                                                              // Util.java nextInt(from, to)
+//     public static int nextInt(int max) { return rand.nextInt(max); }
+//     public static boolean isTrue(int ratio, int typeRatio) {                                                                                                // Util.java isTrue(int, int)
+//         if (typeRatio <= 0 || ratio <= 0) { return false; }
+//         if (ratio >= typeRatio) { return true; }
+//         return Util.nextInt(typeRatio) < ratio;
+//     }
+//     public static String replace(String text, String regex, String replacement) { return text.replace(regex, replacement); }                                 // Util.java replace
+// }
+// FILE: Logger.java
+// public class Logger {
+//     public static void logException(Class<?> clazz, Exception e) { System.err.println("logException " + clazz.getSimpleName() + ": " + e); }
+// }
+// FILE: InventoryService.java
+// public class InventoryService { }   // only so that "InventoryService.class" in the logging calls compiles

@@ -1,0 +1,13 @@
+package nro.effect;
+
+public class EffectSkill {
+
+    public boolean isVirus, isBongTuyet, isMonkey, isChibi, isSUcManhBocPha, iscumber, iscumber2, iskefla, isDameBuff, isCharging;
+    public byte levelMonkey;
+    public int tiLeHPHuytSao, tileDameBuff, countCharging;
+    public boolean haveEffectSkill;
+
+    public boolean isHaveEffectSkill() {
+        return haveEffectSkill;
+    }
+}

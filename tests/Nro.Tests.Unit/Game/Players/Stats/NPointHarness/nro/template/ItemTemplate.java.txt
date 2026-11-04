@@ -1,0 +1,7 @@
+package nro.template;
+
+public class ItemTemplate {
+
+    public short id;
+    public byte type;
+}

@@ -1,0 +1,17 @@
+package nro.map;
+
+import java.util.ArrayList;
+import java.util.List;
+import nro.mob.Mob;
+import nro.player.Player;
+
+public class Zone {
+
+    public Map map = new Map();
+    public List<Mob> mobs = new ArrayList<>();
+    public List<Player> humanoids = new ArrayList<>();
+
+    public List<Player> getHumanoids() {
+        return humanoids;
+    }
+}

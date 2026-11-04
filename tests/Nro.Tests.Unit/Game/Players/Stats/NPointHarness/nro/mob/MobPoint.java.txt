@@ -1,0 +1,6 @@
+package nro.mob;
+
+public class MobPoint {
+
+    public long hp;
+}

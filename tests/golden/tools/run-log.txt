@@ -1,0 +1,20 @@
+Run date: 2026-11-04 (Asia/Saigon)
+JDK:
+openjdk version "17.0.19" 2026-04-21 LTS
+OpenJDK Runtime Environment Microsoft-13877129 (build 17.0.19+10-LTS)
+OpenJDK 64-Bit Server VM Microsoft-13877129 (build 17.0.19+10-LTS, mixed mode, sharing)
+
+Command:
+javac -encoding UTF-8 -cp D:\nam\ngocrong\java-run\runtime\AWN_Version.jar -d C:\Users\HQSOFT\AppData\Local\Temp\nro-task-g4fix-run-20261104 D:\nam\ngocrong\nro-csharp\tests\golden\tools\PlayerNewGolden.java
+java -cp C:\Users\HQSOFT\AppData\Local\Temp\nro-task-g4fix-run-20261104;D:\nam\ngocrong\java-run\runtime\AWN_Version.jar PlayerNewGolden C:\Users\HQSOFT\AppData\Local\Temp\nro-task-g4fix-run-20261104\out
+
+SHA-256 generated / existing golden:
+gender0  D77BBA8F24155E10AEFADFA125F45515EAABE84F797B9C1E60249505BBDD5010 / D77BBA8F24155E10AEFADFA125F45515EAABE84F797B9C1E60249505BBDD5010
+gender1  B65FE4F7400C51844E95913ED7C56262455C584BABDE2D9949DBD1F6FA04FC4A / B65FE4F7400C51844E95913ED7C56262455C584BABDE2D9949DBD1F6FA04FC4A
+gender2  8BC5793BE7424FDCE82D075D09A418F9138CDBD12298DD397859E03E15009A7C / 8BC5793BE7424FDCE82D075D09A418F9138CDBD12298DD397859E03E15009A7C
+
+Byte comparisons:
+gender0: MATCH bytes=16435
+gender1: MATCH bytes=16436
+gender2: MATCH bytes=16436
+matches=3

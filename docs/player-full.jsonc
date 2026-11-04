@@ -1,0 +1,918 @@
+// player-full.jsonc – Tham chiếu ĐẦY ĐỦ một dòng bảng `player` (Ngọc Rồng Online, port Java → C#).
+// Giá trị = mặc định của nhân vật MỚI hành tinh Trái Đất (gender 0): PlayerDAO.createNewPlayer + DEFAULT trong CREATE TABLE.
+// KHÔNG phải dữ liệu thật. Mọi mốc thời gian dùng giá trị giả 1730612345678 (ms). null = không có giá trị mặc định / cấu trúc chỉ để xem hình dạng.
+// Khóa cấp 1 = đúng tên cột trong CREATE TABLE `player` của bản dump MySQL, đúng thứ tự (114 cột). Tên PostgreSQL/C# (snake_case) ghi "PG:" khi khác.
+// Trong DB, cột JSON là MẢNG KHÔNG TÊN (nghĩa = vị trí). File này đổi từng vị trí thành khóa camelCase; nguồn ghi dạng cột[vị trí].
+// Mã hóa thật: ô đồ/skill/... là mảng các CHUỖI JSON; danh sách option của ô đồ lại là CHUỖI JSON chứa các chuỗi "[id,param]".
+// Ví dụ thật items_body của nhân vật TĐ mới:
+//   ["[0,1,\"[\\\"[47,2]\\\"]\",1730612345678]","[6,1,\"[\\\"[6,30]\\\"]\",1730612345678]","[-1,0,\"[]\",1730612345678]",...(thêm 9 ô trống)]
+//   = ô 0: item 0 "Áo vải 3 lỗ" x1, option 47 "Giáp+#" = 2; ô 1: item 6 "Quần vải đen" x1, option 6 "HP+#" = 30; còn lại ô trống [-1,0,"[]",ms].
+// Nguồn Java (chỉ đọc): tạo = jbcd/dao/PlayerDAO.createNewPlayer; lưu = PlayerDAO.updatePlayer; đọc = jbcd/data/GodGK.loadPlayer (từ login);
+//   ngoài ra TopDAO/TopServer/MyClanTop*/SuperRankDAO/TrainningDAO/Clan/ServerManager đọc/ghi trực tiếp một số cột (đã tính vào nhãn).
+// C#: Nro.Game/Players/Persistence/PlayerPersistenceMapper.cs + Nro.Data/Models/PlayerPersistenceRecord.cs (PlayerRepository chỉ kiểm tra cột JSON là mảng).
+// Nhãn trạng thái (theo code Java):
+//   [dùng]       Java đọc lại và dùng trong logic game (kể cả truy vấn bảng xếp hạng).
+//   [chỉ ghi]    Code game có đặt/đổi giá trị (trong RAM) và Java ghi xuống DB, nhưng không bao giờ nạp lại / không logic nào đọc (thường là LỖI loader hoặc tính năng bỏ dở).
+//   [không dùng] Đệm thuần / hằng số / không code game nào đặt hay đọc (chỉ load–lưu vòng tròn) → luôn bằng mặc định; bỏ được an toàn.
+//   ⚠ (trong chú thích) = code game CÓ đọc nhưng KHÔNG chỗ nào đặt giá trị → thực tế luôn mặc định trừ khi sửa DB (vẫn gắn [dùng]).
+//   [chưa rõ]    Chưa xác định được từ code.
+// "C#: X" = PlayerPersistenceMapper đã đọc/ghi vào X. "C#: X (chưa nạp)" = C# runtime có thuộc tính X nhưng mapper chưa nạp (cột được giữ nguyên chuỗi gốc, DEFERRED).
+// "C#: chưa có" = C# chưa có thuộc tính tương ứng (hoặc lớp C# còn rỗng/placeholder).
+// Danh sách (ô đồ, skill, bạn bè, ...) chỉ mở rộng 1 phần tử mẫu (items_body: ô 0 và 1 thật); dòng "// N phần tử" cho độ dài thật và dạng ô trống.
+// Đếm "vị trí" = số khóa lá (cột thường = 1; cột JSON = các lá của 1 phần tử mẫu; items_body chỉ tính ô 0). Khóa trung gian (options, pet.info...) không đếm.
+//
+// TỔNG KẾT: 114 cột (khớp CREATE TABLE và PlayerPersistenceColumns.All), 507 vị trí: 449 [dùng] (trong đó 27 có ⚠), 14 [chỉ ghi], 44 [không dùng], 0 [chưa rõ].
+// Từng cột: số vị trí / [không dùng] / [chỉ ghi]  (cột không ghi gì thêm = toàn [dùng]):
+//   id 1; account_id 1; name 1; head 1; gender 1; have_tennis_space_ship 1; clan_id 1; data_inventory 4; data_location 3; data_point 16/1/0; data_magic_tree 5;
+//   items_body 5; items_bag 5; items_box 5; items_box_Collection 5; items_box_lucky_round 5/0/1; items_daban 5; item_mails_box 5; friends 7; enemies 7;
+//   data_intrinsic 8; data_item_time 78/2/0; data_task 4/1/0; data_mabu_egg 2; data_charm 21; skills 4; skills_shortcut 10; data_luyentap 10/2/1; pet 26;
+//   myFather 1/1/0; myMother 1/1/0; lastTimeDropTail 1; lastTimeKhiSuKien 1; data_black_ball 3; data_side_task 6; data_kol_task 2; data_event_task 6/0/6;
+//   create_time 1/1/0; pointPvp 1/1/0; data_card 8; bill_data 2; data_trong_dua_hau 2; thoigianduhanh 2/1/0; thachdauwhis 1/1/0; isbienhinh 1/1/0;
+//   check_band_account 3; masterDoesNotAttack 1/0/1; masterDoesNotAttackBo 1/1/0; masterDoesNotAttackMe 1/1/0; notify 1; bandokhobau 2; doanhtrai 1;
+//   conduongrandoc 4/0/1; data_clan_task 6; data_achievement 2; data_vip 5/3/0; lasttimepkcommeson 1; sieuthanthuy 3; baovetaikhoan 3/1/0; lastimelogin 1/1/0;
+//   firstTimeLogin 1; LastTimeLoginGame 1; dataBadges 3; dataTaskBadges 4; ruonggo 5/2/0; vodaisinhtu 4; dragon_christmas 1; dragon_halloween 1; rank 1;
+//   data_super_rank 7; data_item_event 8; data_the_card 8; data_diem_danh 10/8/0; data_may_dam 3; data_nguoi_yeu 1/1/0; NguoiYeuDoesNotAttack 1/1/0;
+//   CononeDoesNotAttack 1/1/0; ContwoDoesNotAttack 1/1/0; ConthreeDoesNotAttack 1/1/0; thanhTichBang 4; thanhTichBang2 4; thanhTichBang3 4; dailyGift 2;
+//   BoughtSkill 1; LearnSkill 3; event_point 1/1/0; event_point_boss 1/0/1; event_point_nhs 1/0/1; event_point_quai 1/1/0; diem_huy_diet 1;
+//   diem_chien_truong_namek 1; diem_su_kien_tet 1; diem_su_kien_giangsinh 1; diem_su_kien_halloween 1; diem_su_kien_8_3 1; diem_su_kien_trungthu 1;
+//   diem_su_kien_hung_vuong 1; diem_su_kien_black_friday 1; diem_su_kien_20_10 1; data_event_new_year 4; data_event_christ_mas 4; data_event_vulan 3;
+//   data_event_halloween 2; data_event_8_3 2; data_event_trung_thu 2; data_event_hung_vuong 6; data_event_black_friday 2; data_event_models 45/3/0;
+//   data_models 10/3/0; hp_point_fusion 1/0/1; mp_point_fusion 1/0/1; dame_point_fusion 1; lastTimeUpdateTask 1/1/0; danh_hieu 8
+// Lỗi/khác biệt đáng chú ý: data_event_task không bao giờ được đọc (GodGK đọc data_side_task); 7 cột *DoesNotAttack đọc sai tên cột → luôn false;
+//   conduongrandoc[3] bị đọc từ [2]; KI MAX tạo mới TĐ = 200; data_item_time tạo 78 / lưu 76 (C# tạo 79); data_event_models tạo 45 / lưu 44 (C# tạo 44);
+//   data_models DEFAULT 10 / Java 9; isbienhinh: Java không đọc nhưng C# mapper đọc; TOP_HONG_NGOC đọc data_inventory[1] (ngọc xanh) làm hồng ngọc.
+{
+  "id": null, // PK AUTO_INCREMENT (null trước khi INSERT) | C#: Player.Id [dùng]
+  "account_id": null, // FK account.id (UNIQUE: 1 tài khoản 1 nhân vật); = userId khi tạo | C#: Player.Account_id [dùng]
+  "name": null, // tên nhân vật (người chơi nhập, varchar 20) | C#: Player.Name [dùng]
+  "head": null, // part đầu = kiểu tóc client gửi khi tạo (DEFAULT 102 không dùng vì INSERT luôn ghi); load: -1 → 64 (TĐ) | C#: Player.Head [dùng]
+  "gender": 0, // hành tinh 0 TĐ / 1 Namếc / 2 Xayda | C#: Player.Gender [dùng]
+  "have_tennis_space_ship": 0, // có tàu Tennis (tinyint 0/1) | C#: Player.HaveTennisSpaceShip [dùng]
+  "clan_id": -1, // id bang, -1 = chưa có; load tìm member trong clan | C#: Player.Clan (chưa nạp) [dùng]
+  // tiền tệ [gold,gem,ruby,expVip] | C#: PlayerPersistenceMapper.ReadInventory/WriteInventory [dùng]
+  "data_inventory": {
+    "gold": 2000, // data_inventory[0] vàng (lưu: kẹp ≤ Inventory.LIMIT_GOLD 2.000.000.000.000; C# WriteInventory chưa kẹp) | C#: Inventory.Gold [dùng]
+    "gem": 99999999, // data_inventory[1] ngọc xanh (TopDAO.TOP_HONG_NGOC đọc nhầm [1] làm hồng ngọc) | C#: Inventory.Gem [dùng]
+    "ruby": 99999999, // data_inventory[2] hồng ngọc | C#: Inventory.Ruby [dùng]
+    "expVip": 0 // data_inventory[3] điểm kinh nghiệm VIP (Java load: thiếu → 0; C# ReadInventory lại bắt buộc đủ 4 phần tử) | C#: Inventory.Exp_Vip [dùng]
+  },
+  // vị trí [mapId,x,y]; lưu: chết/phó bản/map không vào được → nhà (21+gender, 300, 336) | C#: chưa có (Location rỗng) [dùng]
+  "data_location": {
+    "mapId": 39, // data_location[0] map (39 = Vách núi Aru = 39+gender); load: 51/phó bản/NRSĐ/Karin/Mabư → nhà; 49 → 45 | C#: Player.MapIdBeforeLogout (chưa nạp) [dùng]
+    "x": 100, // data_location[1] tọa độ x | C#: chưa có [dùng]
+    "y": 384 // data_location[2] tọa độ y (load ép y cho map 112/113/129) | C#: chưa có [dùng]
+  },
+  // chỉ số [16] | C#: PlayerPersistenceMapper.ReadPoint/WritePoint [dùng]
+  "data_point": {
+    "limitPower": 0, // data_point[0] cấp giới hạn sức mạnh (chỉ số bảng power_limit) | C#: NPoint.LimitPower [dùng]
+    "power": 1200, // data_point[1] sức mạnh (TopDAO TOP_SM) | C#: NPoint.Power [dùng]
+    "tiemNang": 1200, // data_point[2] tiềm năng | C#: NPoint.TiemNang [dùng]
+    "stamina": 1000, // data_point[3] thể lực | C#: NPoint.Stamina [dùng]
+    "maxStamina": 1000, // data_point[4] thể lực tối đa | C#: NPoint.MaxStamina [dùng]
+    "hpg": 200, // data_point[5] HP gốc (TĐ 200, khác 100) | C#: NPoint.Hpg [dùng]
+    "mpg": 100, // data_point[6] KI gốc (Namếc 200, khác 100) | C#: NPoint.Mpg [dùng]
+    "dameg": 12, // data_point[7] sức đánh gốc (Xayda 15, khác 12) | C#: NPoint.Dameg [dùng]
+    "defg": 0, // data_point[8] giáp gốc | C#: NPoint.Defg [dùng]
+    "critg": 0, // data_point[9] chí mạng gốc | C#: NPoint.Critg [dùng]
+    "unused10": 0, // data_point[10] "năng động": Java luôn ghi 0, load chỉ get(10) rồi bỏ; C# ghi 0, bỏ qua | C#: chưa có [không dùng]
+    "hp": 200, // data_point[11] HP hiện tại (lưu khi chết = 1; MyClanTop* đọc nhầm [11] làm sức mạnh) | C#: NPoint.Hp [dùng]
+    "mp": 100, // data_point[12] KI hiện tại (lưu khi chết = 1) | C#: NPoint.Mp [dùng]
+    "dame": 12, // data_point[13] sức đánh hiện tại (TopDAO TOP_SD) | C#: NPoint.Dame [dùng]
+    "hpMax": 200, // data_point[14] HP tối đa (TopDAO TOP_HP) | C#: NPoint.HpMax [dùng]
+    "mpMax": 200 // data_point[15] KI tối đa (TopDAO TOP_KI); tạo mới dùng điều kiện gender==0 như HP nên TĐ = 200 dù KI gốc 100 (Java, C# giống) | C#: NPoint.MpMax [dùng]
+  },
+  // cây đậu thần [level,currPeas,isUpgrade,lastTimeHarvest,lastTimeUpgrade] | C#: chưa có (MagicTree rỗng) [dùng]
+  "data_magic_tree": {
+    "level": 1, // data_magic_tree[0] cấp cây | C#: chưa có [dùng]
+    "currPeas": 5, // data_magic_tree[1] số đậu đang có | C#: chưa có [dùng]
+    "isUpgrade": 0, // data_magic_tree[2] đang nâng cấp 0/1 | C#: chưa có [dùng]
+    "lastTimeHarvest": 1730612345678, // data_magic_tree[3] lần thu hoạch cuối (ms) | C#: chưa có [dùng]
+    "lastTimeUpgrade": 1730612345678 // data_magic_tree[4] lúc bắt đầu nâng cấp (ms) | C#: chưa có [dùng]
+  },
+  // đồ đang mặc, 12 ô cố định (ô: 0 áo, 1 quần, 2 găng, 3 giày, 4 rada, 5 cải trang (type 5), 6 giáp tập luyện (32), 7 thú cưng đi theo (21), 8 vật đeo lưng (11), 9 thú cưỡi (23/24), 10 sách tuyệt kỹ (35), 11 chân mệnh (39)) | C#: Inventory.ItemsBody (chưa nạp) [dùng]
+  "items_body": [
+    // items_body[0] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": 0, // items_body[0][0] id item_template; -1 = ô trống (Áo vải 3 lỗ) | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 1, // items_body[0][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // items_body[0][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // items_body[0][2][0] option 47 "Giáp+#" = 2 | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": 47, // items_body[0][2][0][0] id item_option_template (Giáp+#) | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": 2 // items_body[0][2][0][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+      ],
+      "createTime": 1730612345678 // items_body[0][3] thời điểm tạo item (ms); dùng tính hạn HSD | C#: Item.CreateTime (chưa nạp) [dùng]
+    },
+    // items_body[1] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": 6, // items_body[1][0] id item_template; -1 = ô trống (Quần vải đen) | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 1, // items_body[1][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // items_body[1][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // items_body[1][2][0] option 6 "HP+#" = 30 | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": 6, // items_body[1][2][0][0] id item_option_template (HP+#) | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": 30 // items_body[1][2][0][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+      ],
+      "createTime": 1730612345678 // items_body[1][3] thời điểm tạo item (ms); dùng tính hạn HSD | C#: Item.CreateTime (chưa nạp) [dùng]
+    }
+    // 12 phần tử (ConstPlayer.QTY_MAX_ITEM_BODY_PLAYER); ô 2..11 trống = "[-1,0,\"[]\",ms]"; load: thiếu ô → thêm đúng 1 ô trống; item 386-394/533/1464 bị thu hồi ngoài mùa Noel
+  ],
+  // hành trang | C#: Inventory.ItemsBag (chưa nạp) [dùng]
+  "items_bag": [
+    // items_bag[i] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": -1, // items_bag[i][0] id item_template; -1 = ô trống | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 0, // items_bag[i][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // items_bag[i][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // items_bag[i][2][j] 1 option = chuỗi "[optionId,param]" | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": null, // items_bag[i][2][j][0] id item_option_template | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": null // items_bag[i][2][j][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+        // 0..n option
+      ],
+      "createTime": 1730612345678 // items_bag[i][3] thời điểm tạo item (ms); dùng tính hạn HSD | C#: Item.CreateTime (chưa nạp) [dùng]
+    }
+    // 20 phần tử lúc tạo, tất cả trống = "[-1,0,\"[]\",ms]" (options thật = []; phần tử option ở trên chỉ để thấy cấu trúc); giữ cả ô trống
+  ],
+  // rương đồ | C#: Inventory.ItemsBox (chưa nạp) [dùng]
+  "items_box": [
+    // items_box[0] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": 12, // items_box[0][0] id item_template; -1 = ô trống (Rada cấp 1) | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 1, // items_box[0][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // items_box[0][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // items_box[0][2][0] option 14 "Chí mạng+#%" = 1 | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": 14, // items_box[0][2][0][0] id item_option_template (Chí mạng+#%) | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": 1 // items_box[0][2][0][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+      ],
+      "createTime": 1730612345678 // items_box[0][3] thời điểm tạo item (ms); dùng tính hạn HSD | C#: Item.CreateTime (chưa nạp) [dùng]
+    }
+    // 20 phần tử; ô 0 = Rada cấp 1 (id 12, option 14 = 1), ô 1..19 trống "[-1,0,\"[]\",ms]"
+  ],
+  // PG: items_box_collection | rương sưu tầm | C#: Inventory.ItemsBoxCollection (chưa nạp) [dùng]
+  "items_box_Collection": [
+    // items_box_Collection[i] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": -1, // items_box_Collection[i][0] id item_template; -1 = ô trống | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 0, // items_box_Collection[i][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // items_box_Collection[i][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // items_box_Collection[i][2][j] 1 option = chuỗi "[optionId,param]" | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": null, // items_box_Collection[i][2][j][0] id item_option_template | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": null // items_box_Collection[i][2][j][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+        // 0..n option
+      ],
+      "createTime": 1730612345678 // items_box_Collection[i][3] thời điểm tạo item (ms); dùng tính hạn HSD | C#: Item.CreateTime (chưa nạp) [dùng]
+    }
+    // 20 phần tử trống lúc tạo; giữ cả ô trống; không thu hồi đồ Noel
+  ],
+  // rương phần thưởng vòng quay (Java: itemsBoxCrackBall) | C#: Inventory.ItemsBoxCrackBall (chưa nạp) [dùng]
+  "items_box_lucky_round": [
+    // items_box_lucky_round[i] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": -1, // items_box_lucky_round[i][0] id item_template; -1 = ô trống | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 0, // items_box_lucky_round[i][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // items_box_lucky_round[i][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // items_box_lucky_round[i][2][j] 1 option = chuỗi "[optionId,param]" | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": null, // items_box_lucky_round[i][2][j][0] id item_option_template | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": null // items_box_lucky_round[i][2][j][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+        // 0..n option
+      ],
+      "createTime": 1730612345678 // items_box_lucky_round[i][3] thời điểm tạo item (ms); load KHÔNG đọc [3] → createTime = lúc load | C#: Item.CreateTime (chưa nạp) [chỉ ghi]
+    }
+    // 110 phần tử trống lúc tạo; load BỎ ô trống → sau lần lưu đầu chỉ còn các ô có đồ
+  ],
+  // đồ đã bán (mua lại) | C#: Inventory.ItemsDaBan (chưa nạp) [dùng]
+  "items_daban": [
+    // items_daban[i] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": -1, // items_daban[i][0] id item_template; -1 = ô trống | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 0, // items_daban[i][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // items_daban[i][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // items_daban[i][2][j] 1 option = chuỗi "[optionId,param]" | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": null, // items_daban[i][2][j][0] id item_option_template | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": null // items_daban[i][2][j][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+        // 0..n option
+      ],
+      "createTime": 1730612345678 // items_daban[i][3] thời điểm tạo item (ms); dùng tính hạn HSD | C#: Item.CreateTime (chưa nạp) [dùng]
+    }
+    // 20 phần tử trống lúc tạo; load chỉ đọc 20 ô đầu, BỎ ô trống và đồ hết hạn → lưu lại dạng gọn
+  ],
+  // hòm thư | C#: Inventory.ItemsMailBox (chưa nạp) [dùng]
+  "item_mails_box": [
+    // item_mails_box[i] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+    {
+      "itemId": -1, // item_mails_box[i][0] id item_template; -1 = ô trống | C#: Item.Template (chưa nạp) [dùng]
+      "quantity": 0, // item_mails_box[i][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+      // item_mails_box[i][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+      "options": [
+        // item_mails_box[i][2][j] 1 option = chuỗi "[optionId,param]" | C#: ItemOption (chưa nạp) [dùng]
+        {
+          "optionId": null, // item_mails_box[i][2][j][0] id item_option_template | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+          "param": null // item_mails_box[i][2][j][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+        }
+        // 0..n option
+      ],
+      "createTime": 1730612345678 // item_mails_box[i][3] thời điểm tạo item (ms); dùng tính hạn HSD; login không đọc [3], các hàm getAllPlayer/loadPlayerByName/ByID có đọc | C#: Item.CreateTime (chưa nạp) [dùng]
+    }
+    // 200 phần tử trống lúc tạo; login BỎ ô trống → lưu lại dạng gọn; GodGK.updateMailBox cũng ghi cột này
+  ],
+  // bạn bè; tạo mới = [] | C#: chưa có (Friend rỗng) [dùng]
+  "friends": [
+    // friends[i] 1 người = chuỗi JSON [id,name,head,body,leg,bag,power] | C#: chưa có [dùng]
+    {
+      "id": null, // friends[i][0] id player | C#: chưa có [dùng]
+      "name": null, // friends[i][1] tên | C#: chưa có [dùng]
+      "head": null, // friends[i][2] part đầu | C#: chưa có [dùng]
+      "body": null, // friends[i][3] part thân | C#: chưa có [dùng]
+      "leg": null, // friends[i][4] part chân | C#: chưa có [dùng]
+      "bag": null, // friends[i][5] id cờ/balo (flag bag) | C#: chưa có [dùng]
+      "power": null // friends[i][6] sức mạnh lúc lưu | C#: chưa có [dùng]
+    }
+    // 0..n phần tử
+  ],
+  // kẻ thù; tạo mới = [] | C#: chưa có (Enemy rỗng) [dùng]
+  "enemies": [
+    // enemies[i] 1 người = chuỗi JSON [id,name,head,body,leg,bag,power] | C#: chưa có [dùng]
+    {
+      "id": null, // enemies[i][0] id player | C#: chưa có [dùng]
+      "name": null, // enemies[i][1] tên | C#: chưa có [dùng]
+      "head": null, // enemies[i][2] part đầu | C#: chưa có [dùng]
+      "body": null, // enemies[i][3] part thân | C#: chưa có [dùng]
+      "leg": null, // enemies[i][4] part chân | C#: chưa có [dùng]
+      "bag": null, // enemies[i][5] id cờ/balo (flag bag) | C#: chưa có [dùng]
+      "power": null // enemies[i][6] sức mạnh lúc lưu | C#: chưa có [dùng]
+    }
+    // 0..n phần tử
+  ],
+  // nội tại [8] [dùng]
+  "data_intrinsic": {
+    "intrinsicId": 0, // data_intrinsic[0] id bảng intrinsic (0 = chưa kích hoạt) | C#: IntrinsicPlayer.Intrinsic (chưa nạp) [dùng]
+    "param1": 0, // data_intrinsic[1] chỉ số 1 của nội tại | C#: Intrinsic.Param1 (chưa nạp) [dùng]
+    "param2": 0, // data_intrinsic[2] chỉ số 2 của nội tại | C#: Intrinsic.Param2 (chưa nạp) [dùng]
+    "countOpen": 0, // data_intrinsic[3] số lần mở nội tại | C#: IntrinsicPlayer.CountOpen (chưa nạp) [dùng]
+    "isIntrinsic": 0, // data_intrinsic[4] effectSkill.isIntrinsic: tạo ghi 0, lưu ghi true/false (Boolean.parseBoolean) | C#: EffectSkill.IsIntrinsic (chưa nạp) [dùng]
+    "skillId": 0, // data_intrinsic[5] effectSkill.skillId (skill hồi chiêu do nội tại) | C#: EffectSkill.SkillId (chưa nạp) [dùng]
+    "cooldown": 0, // data_intrinsic[6] effectSkill.cooldown (ms) | C#: EffectSkill.Cooldown (chưa nạp) [dùng]
+    "lastTimeUseSkill": 0 // data_intrinsic[7] effectSkill.lastTimeUseSkill (ms) | C#: EffectSkill.LastTimeUseSkill (chưa nạp) [dùng]
+  },
+  // thời gian hiệu ứng vật phẩm còn lại (ms, trừ [8],[9]); load: !=0 → bật cờ và tính lastTime; [10..] đọc có kiểm tra độ dài [dùng]
+  "data_item_time": {
+    "boHuyet": 0, // data_item_time[0] ms còn lại của Bổ huyết (382), 10p | C#: ItemTime.IsUseBoHuyet (chưa nạp) [dùng]
+    "boKhi": 0, // data_item_time[1] ms còn lại của Bổ khí (383), 10p | C#: ItemTime.IsUseBoKhi (chưa nạp) [dùng]
+    "giapXen": 0, // data_item_time[2] ms còn lại của Giáp Xên bọ hung (384), 10p | C#: ItemTime.IsUseGiapXen (chưa nạp) [dùng]
+    "cuongNo": 0, // data_item_time[3] ms còn lại của Cuồng nộ (381), 10p | C#: ItemTime.IsUseRage (Java: isUseCuongNo; chưa nạp) [dùng]
+    "anDanh": 0, // data_item_time[4] ms còn lại của Ẩn danh (385), 10p | C#: ItemTime.IsUseAnDanh (chưa nạp) [dùng]
+    "openPower": 0, // data_item_time[5] ms còn lại của mở giới hạn sức mạnh, TIME_OPEN_POWER | C#: ItemTime.IsOpenPower (chưa nạp) [dùng]
+    "mayDo": 0, // data_item_time[6] ms còn lại của Máy dò Capsule kì bí (379), TIME_MAY_DO | C#: ItemTime.IsUseMayDo (chưa nạp) [dùng]
+    "meal": 0, // data_item_time[7] ms còn lại của thức ăn 663-667 (pudding, xúc xích, kem dâu, mì ly, sushi), TIME_EAT_MEAL | C#: ItemTime.IsEatMeal (chưa nạp) [dùng]
+    "iconMeal": 0, // data_item_time[8] icon thức ăn đang ăn (KHÔNG phải thời gian) | C#: ItemTime.IconMeal (chưa nạp) [dùng]
+    "tdlt": 0, // data_item_time[9] Tự động luyện tập: số PHÚT còn lại (không phải ms) | C#: ItemTime.IsUseTDLT (chưa nạp) [dùng]
+    "hongDao1": 0, // data_item_time[10] ⚠ ms còn lại của buff hongDao1 30s: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao1 (chưa nạp) [dùng]
+    "hongDao3": 0, // data_item_time[11] ⚠ ms còn lại của buff hongDao3 30s: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao3 (chưa nạp) [dùng]
+    "hongDao5": 0, // data_item_time[12] ⚠ ms còn lại của buff hongDao5 1p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao5 (chưa nạp) [dùng]
+    "hongDao10": 0, // data_item_time[13] ⚠ ms còn lại của buff hongDao10 1p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao10 (chưa nạp) [dùng]
+    "hongDao25": 0, // data_item_time[14] ⚠ ms còn lại của buff hongDao25 1p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao25 (chưa nạp) [dùng]
+    "hongDao50": 0, // data_item_time[15] ⚠ ms còn lại của buff hongDao50 10p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao50 (chưa nạp) [dùng]
+    "hongDao99": 0, // data_item_time[16] ⚠ ms còn lại của buff hongDao99 10p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao99 (chưa nạp) [dùng]
+    "hongDao999": 0, // data_item_time[17] ⚠ ms còn lại của buff hongDao999 10p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.IsUseHongDao999 (chưa nạp) [dùng]
+    "commeson": 0, // data_item_time[18] ms còn lại của Bình chứa Commeson (638), 50p | C#: ItemTime.Iscommenson (chưa nạp) [dùng]
+    "khauTrang": 0, // data_item_time[19] ms còn lại của Khẩu trang (764), 30p | C#: ItemTime.IsKhauTrang (chưa nạp) [dùng]
+    "keoMotMat": 0, // data_item_time[20] ms còn lại của Kẹo một mắt (899), 30p | C#: ItemTime.IsKeoMotMat (chưa nạp) [dùng]
+    "supBiHacAm": 0, // data_item_time[21] ms còn lại của Súp bí hắc ám (900), 30p | C#: ItemTime.IsSupbihacam (chưa nạp) [dùng]
+    "banhGatoNhen": 0, // data_item_time[22] ms còn lại của Bánh gato nhện (902), 30p | C#: ItemTime.Isbanhgatonhen (chưa nạp) [dùng]
+    "hamburgerSau": 0, // data_item_time[23] ms còn lại của Hamburger sâu (903), 30p | C#: ItemTime.Ishamburgersau (chưa nạp) [dùng]
+    "thuocMoThuong": 0, // data_item_time[24] ms còn lại của Thuốc mỡ Ipana (1016), 10p | C#: ItemTime.Isthuocmothuong (chưa nạp) [dùng]
+    "thuocMoDacBiet": 0, // data_item_time[25] ms còn lại của Thuốc mỡ Ipana đặc biệt (1017), 30p | C#: ItemTime.Isthuocmodacbiet (chưa nạp) [dùng]
+    "cuaRangMe": 0, // data_item_time[26] ms còn lại của Cua rang me (880), 10p | C#: ItemTime.Iscuarangme (chưa nạp) [dùng]
+    "bachTuocNuong": 0, // data_item_time[27] ms còn lại của Bạch tuộc nướng (881), 10p | C#: ItemTime.Isbachtuocnuong (chưa nạp) [dùng]
+    "tomTamBot": 0, // data_item_time[28] ms còn lại của Tôm tẩm bột chiên xù (882), 10p | C#: ItemTime.Istomtambot (chưa nạp) [dùng]
+    "bocPha": 0, // data_item_time[29] ms còn lại của bộc phá (item 1164), 10p | C#: ItemTime.IsBocPha (chưa nạp) [dùng]
+    "gtpt": 0, // data_item_time[30] ms còn lại của GTPT do NPC Babiday/Osin bật (map Mabư), 10p | C#: ItemTime.IsUseGTPT (chưa nạp) [dùng]
+    "duoiKhiTnsm": 0, // data_item_time[31] ms còn lại của Đuôi khỉ (1045) tăng TNSM, 30p | C#: ItemTime.IsUseDuoiKhiTNSM (chưa nạp) [dùng]
+    "trbSd": 0, // data_item_time[32] ⚠ ms còn lại của buff trbsd 60p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.Istrbsd (chưa nạp) [dùng]
+    "trbHp": 0, // data_item_time[33] ⚠ ms còn lại của buff trbhp 60p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.Istrbhp (chưa nạp) [dùng]
+    "trbKi": 0, // data_item_time[34] ⚠ ms còn lại của buff trbki 60p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.Istrbki (chưa nạp) [dùng]
+    "trbSdXd": 0, // data_item_time[35] ⚠ ms còn lại của buff trbsdxd 30p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.Istrbsdxd (chưa nạp) [dùng]
+    "trbHpXd": 0, // data_item_time[36] ⚠ ms còn lại của buff trbhpxd 30p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.Istrbhpxd (chưa nạp) [dùng]
+    "trbKiXd": 0, // data_item_time[37] ⚠ ms còn lại của buff trbkixd 30p: không code nào bật cờ (NPoint có đọc) – chỉ đổi khi sửa DB | C#: ItemTime.Istrbkixd (chưa nạp) [dùng]
+    "boHuyet2": 0, // data_item_time[38] ms còn lại của Bổ huyết 2 (1152), 10p | C#: ItemTime.IsUseBoHuyet2 (chưa nạp) [dùng]
+    "boKhi2": 0, // data_item_time[39] ms còn lại của Bổ khí 2 (1151), 10p | C#: ItemTime.IsUseBoKhi2 (chưa nạp) [dùng]
+    "giapXen2": 0, // data_item_time[40] ms còn lại của Giáp xên 2 (1153), 10p | C#: ItemTime.IsUseGiapXen2 (chưa nạp) [dùng]
+    "cuongNo2": 0, // data_item_time[41] ms còn lại của Cuồng nộ 2 (1150), 10p | C#: ItemTime.IsUseRage2 (Java: isUseCuongNo2; chưa nạp) [dùng]
+    "anDanh2": 0, // data_item_time[42] ms còn lại của Ẩn danh 2 (1154), 10p | C#: ItemTime.IsUseAnDanh2 (chưa nạp) [dùng]
+    "noiComDien": 0, // data_item_time[43] ms còn lại của Nồi cơm điện (1233), 30p | C#: ItemTime.IsUseNCD (chưa nạp) [dùng]
+    "banhTet": 0, // data_item_time[44] ms còn lại của Bánh tét (752), 60p | C#: ItemTime.IsUseBanhTet (chưa nạp) [dùng]
+    "banhChung": 0, // data_item_time[45] ms còn lại của Bánh chưng (753) – Java gọi BanhTrung, 60p | C#: ItemTime.IsUseBanhTrung (chưa nạp) [dùng]
+    "foodMeoDen1": 0, // data_item_time[46] ms còn lại của Xúc xích xông khói (1189), 3p | C#: ItemTime.IsUseFoodMeoDen1 (chưa nạp) [dùng]
+    "foodMeoDen2": 0, // data_item_time[47] ms còn lại của Dĩa thức ăn cho mèo (1190), 15p | C#: ItemTime.IsUseFoodMeoDen2 (chưa nạp) [dùng]
+    "chiMang2": 0, // data_item_time[48] ms còn lại của Chí mạng 2 (1404), 10p | C#: ItemTime.IsUseChiMang2 (chưa nạp) [dùng]
+    "chiMang3": 0, // data_item_time[49] ms còn lại của Chí mạng 3 (1405), 10p | C#: ItemTime.IsUseChiMang3 (chưa nạp) [dùng]
+    "neDon": 0, // data_item_time[50] ms còn lại của Né đòn (1406), 30s | C#: ItemTime.IsUseNedon (chưa nạp) [dùng]
+    "neDon2": 0, // data_item_time[51] ms còn lại của Né đòn 2 (1407), 30s | C#: ItemTime.IsUseNedon2 (chưa nạp) [dùng]
+    "phanSatThuong": 0, // data_item_time[52] ms còn lại của Phản sát thương (1409), 30s | C#: ItemTime.IsUsePhanSatThuong (chưa nạp) [dùng]
+    "phanSatThuong2": 0, // data_item_time[53] ms còn lại của Phản sát thương 2 (1410), 30s | C#: ItemTime.IsUsePhanSatThuong2 (chưa nạp) [dùng]
+    "phanSatThuong3": 0, // data_item_time[54] ms còn lại của Phản sát thương 3 (1411), 30s | C#: ItemTime.IsUsePhanSatThuong3 (chưa nạp) [dùng]
+    "kamejoko": 0, // data_item_time[55] ms còn lại của Kamejoko (1412), 30s | C#: ItemTime.IsUseKamejoko (chưa nạp) [dùng]
+    "kamejoko2": 0, // data_item_time[56] ms còn lại của Kamejoko 2 (1413), 30s | C#: ItemTime.IsUseKamejoko2 (chưa nạp) [dùng]
+    "rocket1h": 0, // data_item_time[57] ms còn lại của Rocket 1h (2062), 60p | C#: ItemTime.IsUseRocket1h (chưa nạp) [dùng]
+    "satThuongChuan": 0, // data_item_time[58] ms còn lại của Sát thương chuẩn (1517), 10p | C#: ItemTime.IsUseSatThuongChuan (chưa nạp) [dùng]
+    "satThuongChuan2": 0, // data_item_time[59] ms còn lại của Sát thương chuẩn 2 (1518), 10p | C#: ItemTime.IsUseSatThuongChuan2 (chưa nạp) [dùng]
+    "buaTnsmDeTu": 0, // data_item_time[60] ms còn lại của Bùa x2 tn,sm đệ tử (1628), 30p | C#: ItemTime.IsUseBuaTNSMDetu (chưa nạp) [dùng]
+    "coBonLa": 0, // data_item_time[61] ms còn lại của Cỏ bốn lá (1635), 30p | C#: ItemTime.IsUseCoBonLa (chưa nạp) [dùng]
+    "sauRieng": 0, // data_item_time[62] ms còn lại của Sầu riêng 6 múi (1672), 10p | C#: ItemTime.IsUseSauRieng (chưa nạp) [dùng]
+    "mayDoLinhHon": 0, // data_item_time[63] ms còn lại của Máy dò linh hồn (1264), 60p | C#: ItemTime.IsUseMayDoLinhHon (chưa nạp) [dùng]
+    "mayDoNgocBi": 0, // data_item_time[64] ms còn lại của Máy dò Ngọc rồng sự kiện (1115), 60p | C#: ItemTime.IsUseMayDoNgocBi (chưa nạp) [dùng]
+    "rongXuong": 0, // data_item_time[65] ms còn lại của điều ước Rồng xương Halloween 1, 30p | C#: ItemTime.IsRongXuong (chưa nạp) [dùng]
+    "rongXuong2": 0, // data_item_time[66] ms còn lại của điều ước Rồng xương Halloween 2, 30p | C#: ItemTime.IsRongXuong_2 (chưa nạp) [dùng]
+    "rongXuong3": 0, // data_item_time[67] ms còn lại của điều ước Rồng xương Halloween 3, 30p | C#: ItemTime.IsRongXuong_3 (chưa nạp) [dùng]
+    "banhDeoC1": 0, // data_item_time[68] ms còn lại của Bánh dẻo thỏ trắng (1306), 10p | C#: ItemTime.IsUseBanhDeoC1 (chưa nạp) [dùng]
+    "banhDeoC2": 0, // data_item_time[69] ms còn lại của Bánh dẻo thỏ xanh (1307), 10p | C#: ItemTime.IsUseBanhDeoC2 (chưa nạp) [dùng]
+    "banhDeoC3": 0, // data_item_time[70] ms còn lại của Bánh dẻo thỏ hồng (1308), 20p | C#: ItemTime.IsUseBanhDeoC3 (chưa nạp) [dùng]
+    "trungThu1Trung": 0, // data_item_time[71] ms còn lại của Bánh Trung Thu 1 trứng (465), 60p | C#: ItemTime.IsUseTrungThu1Trung (chưa nạp) [dùng]
+    "trungThu2Trung": 0, // data_item_time[72] ms còn lại của Bánh Trung Thu 2 trứng (466), 90p | C#: ItemTime.IsUseTrungThu2Trung (chưa nạp) [dùng]
+    "trungThuDacBiet": 0, // data_item_time[73] ms còn lại của Bánh Trung Thu Đặc Biệt (472), 120p | C#: ItemTime.IsUseTrungThuDB (chưa nạp) [dùng]
+    "hopBanhTrungThu": 0, // data_item_time[74] ms còn lại của Hộp bánh Trung Thu (473), 150p | C#: ItemTime.IsUseHBTrungThu (chưa nạp) [dùng]
+    "mayDoSieuHoa": 0, // data_item_time[75] ms còn lại của Máy dò đá siêu hóa (1986), 60p | C#: ItemTime.IsUseMayDoSieuHoa (chưa nạp) [dùng]
+    "unused76": 0, // data_item_time[76] đệm: createNewPlayer ghi 78 số 0, updatePlayer chỉ ghi 76 → mất sau lần lưu đầu | C#: chưa có [không dùng]
+    "unused77": 0 // data_item_time[77] đệm như [76] (C# CreateNew ghi 79 số 0 – lệch Java 78) | C#: chưa có [không dùng]
+  },
+  // nhiệm vụ chính; tạo mới 3 phần tử, lưu ghi 4 [dùng]
+  "data_task": {
+    "taskId": 0, // data_task[0] id task_main_template (0 = Nhiệm vụ đầu tiên); TopDAO TOP_NHIEM_VU | C#: TaskMain.Id (chưa nạp) [dùng]
+    "subIndex": 0, // data_task[1] index nhiệm vụ con | C#: TaskMain.Index (chưa nạp) [dùng]
+    "count": 0, // data_task[2] số lượng đã làm của nhiệm vụ con | C#: SubTaskMain.Count (chưa nạp) [dùng]
+    "lastTime": null // data_task[3] taskMain.lastTime: không có lúc tạo, load thiếu → now; không code game nào đặt/đọc | C#: TaskMain.LastTime (chưa nạp) [không dùng]
+  },
+  // trứng Mabư; tạo mới = [] (không có trứng) | C#: chưa có (MabuEgg rỗng) [dùng]
+  "data_mabu_egg": {
+    "lastTimeCreate": null, // data_mabu_egg[0] lúc bắt đầu ấp trứng Mabư (ms) | C#: chưa có [dùng]
+    "timeDone": null // data_mabu_egg[1] thời gian cần để ấp trứng Mabư xong (ms) | C#: chưa có [dùng]
+  },
+  // hạn dùng bùa (ms, mốc hết hạn); tạo mới = now cho cả 21 ô | C#: chưa có (Charms rỗng) [dùng]
+  "data_charm": {
+    "triTue": 1730612345678, // data_charm[0] hết hạn bùa trí tuệ (Java charms.tdTriTue) | C#: chưa có [dùng]
+    "manhMe": 1730612345678, // data_charm[1] hết hạn bùa mạnh mẽ (Java charms.tdManhMe) | C#: chưa có [dùng]
+    "daTrau": 1730612345678, // data_charm[2] hết hạn bùa da trâu (Java charms.tdDaTrau) | C#: chưa có [dùng]
+    "oaiHung": 1730612345678, // data_charm[3] hết hạn bùa oai hùng (Java charms.tdOaiHung) | C#: chưa có [dùng]
+    "batTu": 1730612345678, // data_charm[4] hết hạn bùa bất tử (Java charms.tdBatTu) | C#: chưa có [dùng]
+    "deoDai": 1730612345678, // data_charm[5] hết hạn bùa dẻo dai (Java charms.tdDeoDai) | C#: chưa có [dùng]
+    "thuHut": 1730612345678, // data_charm[6] hết hạn bùa thu hút (Java charms.tdThuHut) | C#: chưa có [dùng]
+    "deTu": 1730612345678, // data_charm[7] hết hạn bùa đệ tử (Java charms.tdDeTu) | C#: chưa có [dùng]
+    "triTue3": 1730612345678, // data_charm[8] hết hạn bùa trí tuệ x3 (Java charms.tdTriTue3) | C#: chưa có [dùng]
+    "triTue4": 1730612345678, // data_charm[9] hết hạn bùa trí tuệ x4 (Java charms.tdTriTue4) | C#: chưa có [dùng]
+    "deTu2": 1730612345678, // data_charm[10] hết hạn bùa đệ tử x2 (Java charms.tdDeTu2) | C#: chưa có [dùng]
+    "deTu3": 1730612345678, // data_charm[11] hết hạn bùa đệ tử x3 (Java charms.tdDeTu3) | C#: chưa có [dùng]
+    "deTu4": 1730612345678, // data_charm[12] hết hạn bùa đệ tử x4 (Java charms.tdDeTu4) | C#: chưa có [dùng]
+    "deTu5": 1730612345678, // data_charm[13] hết hạn bùa đệ tử x5 (Java charms.tdDeTu5) | C#: chưa có [dùng]
+    "deTu7": 1730612345678, // data_charm[14] hết hạn bùa đệ tử x7 (Java charms.tdDeTu7) | C#: chưa có [dùng]
+    "deTu10": 1730612345678, // data_charm[15] hết hạn bùa đệ tử x10 (Java charms.tdDeTu10) | C#: chưa có [dùng]
+    "deTu20": 1730612345678, // data_charm[16] hết hạn bùa đệ tử x20 (Java charms.tdDeTu20) | C#: chưa có [dùng]
+    "triTue5": 1730612345678, // data_charm[17] hết hạn bùa trí tuệ x5 (Java charms.tdTriTue5) | C#: chưa có [dùng]
+    "triTue7": 1730612345678, // data_charm[18] hết hạn bùa trí tuệ x7 (Java charms.tdTriTue7) | C#: chưa có [dùng]
+    "triTue10": 1730612345678, // data_charm[19] hết hạn bùa trí tuệ x10 (Java charms.tdTriTue10) | C#: chưa có [dùng]
+    "triTue20": 1730612345678 // data_charm[20] hết hạn bùa trí tuệ x20 (Java charms.tdTriTue20) | C#: chưa có [dùng]
+  },
+  // kỹ năng; mỗi phần tử = chuỗi JSON | C#: PlayerSkill.Skills (chưa nạp) [dùng]
+  "skills": [
+    // skills[0] skill 0 = Chiêu đấm Dragon cấp 1 | C#: Skill.Template (chưa nạp) [dùng]
+    {
+      "templateId": 0, // skills[i][0] id skill_template (0 Chiêu đấm Dragon) | C#: Skill.Template (chưa nạp) [dùng]
+      "point": 1, // skills[i][1] cấp skill; 0 = chưa học (createSkillLevel0) | C#: Skill.Point (chưa nạp) [dùng]
+      "lastTimeUse": 0, // skills[i][2] lần dùng cuối (ms) | C#: Skill.LastTimeUseThisSkill (chưa nạp) [dùng]
+      "currLevel": null // skills[i][3] skill.currLevel: tạo mới KHÔNG có (3 phần tử), lưu ghi thêm; load đọc nếu có | C#: Skill.CurrLevel (chưa nạp) [dùng]
+    }
+    // 9 phần tử TĐ: 0 Chiêu đấm Dragon (cấp 1), 1 Kamejoko, 6 Thái Dương Hạ San, 9 Kaioken, 10 Quả cầu kênh khi, 20 Dịch chuyển tức thời, 22 Thôi miên, 19 Khiên năng lượng, 24 Super Kamejoko (cấp 0) = "[id,0,0]"; load tự thêm skill thiếu theo ConstPlayer.SKILL_TD {0,1,6,20,10,24,19}
+  ],
+  // 10 ô phím tắt skill (id skill_template, -1 = trống); load chọn skill đánh đầu tiên | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+  "skills_shortcut": {
+    "slot0": 0, // skills_shortcut[0] id skill ở ô phím tắt 0 (TĐ = 0 Dragon) | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot1": -1, // skills_shortcut[1] id skill ở ô phím tắt 1 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot2": -1, // skills_shortcut[2] id skill ở ô phím tắt 2 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot3": -1, // skills_shortcut[3] id skill ở ô phím tắt 3 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot4": -1, // skills_shortcut[4] id skill ở ô phím tắt 4 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot5": -1, // skills_shortcut[5] id skill ở ô phím tắt 5 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot6": -1, // skills_shortcut[6] id skill ở ô phím tắt 6 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot7": -1, // skills_shortcut[7] id skill ở ô phím tắt 7 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot8": -1, // skills_shortcut[8] id skill ở ô phím tắt 8 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+    "slot9": -1 // skills_shortcut[9] id skill ở ô phím tắt 9 | C#: PlayerSkill.SkillShortCut (chưa nạp) [dùng]
+  },
+  // luyện tập/Whis; tạo mới = [] → load lỗi → mặc định (0,false,-1,0,now); lưu ghi 10 phần tử (cả TrainningDAO.updatePlayer) [dùng]
+  "data_luyentap": {
+    "levelLuyenTap": null, // data_luyentap[0] cấp luyện tập | C#: Player.LevelLuyenTap (chưa nạp) [dùng]
+    "dangKyTapTuDong": null, // data_luyentap[1] đăng ký tập tự động (bool) | C#: Player.DangKyTapTuDong (chưa nạp) [dùng]
+    "mapIdDangTapTuDong": null, // data_luyentap[2] map đang tập tự động (-1 = không) | C#: Player.MapIdDangTapTuDong (chưa nạp) [dùng]
+    "tnsmLuyenTap": null, // data_luyentap[3] TNSM nhận khi luyện tập | C#: Player.TnsmLuyenTap (chưa nạp) [dùng]
+    "lastTimeOffline": null, // data_luyentap[4] lúc offline (ms); đang online lưu now | C#: Player.LastTimeOffline (chưa nạp) [dùng]
+    "whisTop": null, // data_luyentap[5] traning.top: cấp Whis đã hạ (TopDAO TOP_WHIS, TopKillWhisManager) | C#: chưa có (Traning rỗng) [dùng]
+    "whisTime": null, // data_luyentap[6] traning.time: thời gian hạ Whis (TOP_WHIS sắp xếp) | C#: chưa có [dùng]
+    "whisLastTime": null, // data_luyentap[7] traning.lastTime: Whis đặt khi hạ, nhưng chỉ hằng TOP_3_WHIS (không được dùng) đọc | C#: chưa có [chỉ ghi]
+    "whisLastTop": null, // data_luyentap[8] traning.lastTop: không code nào set/đọc → luôn 0 | C#: chưa có [không dùng]
+    "whisLastRewardTime": null // data_luyentap[9] traning.lastRewardTime: không code nào set/đọc → luôn 0 | C#: chưa có [không dùng]
+  },
+  // đệ tử; tạo mới = [] (chưa có đệ); có đệ = mảng 4 CHUỖI JSON [info,point,body,skills]; lưu khi player.Detu != null, ngược lại ghi [] | C#: chưa có (Detu rỗng) [dùng]
+  "pet": {
+    // pet[0] chuỗi JSON [typeDeTu,gender,name,typeFusion,fusionTimeLeft,status] | C#: chưa có (Detu rỗng) [dùng]
+    "info": {
+      "typeDeTu": null, // pet[0][0] loại đệ: 0 thường, 1 Mabư, 2 Ubu, 3 Kid Jiren, 4 Kid Beer, 5 Black Goku | C#: chưa có [dùng]
+      "gender": null, // pet[0][1] hành tinh đệ | C#: chưa có [dùng]
+      "name": null, // pet[0][2] tên đệ (vd "$Đệ tử") | C#: chưa có [dùng]
+      "typeFusion": null, // pet[0][3] player.fusion.typeFusion (0 không hợp thể, 4 lưỡng long, 6..14 Porata…) | C#: chưa có (Fusion rỗng) [dùng]
+      "fusionTimeLeft": null, // pet[0][4] ms hợp thể còn lại (TIME_FUSION 600000 - đã qua, ≥0) | C#: chưa có [dùng]
+      "status": null // pet[0][5] trạng thái đệ: 0 đi theo, 1 bảo vệ, 2 tấn công, 3 về nhà, 4 hợp thể, 5 HTVV | C#: chưa có [dùng]
+    },
+    // pet[1] chuỗi JSON chỉ số đệ [13] (TopDAO đọc pet[1][1],[10],[11],[12]) | C#: chưa có [dùng]
+    "point": {
+      "limitPower": null, // pet[1][0] giới hạn sức mạnh | C#: chưa có [dùng]
+      "power": null, // pet[1][1] sức mạnh (TOP_SM_PET) | C#: chưa có [dùng]
+      "tiemNang": null, // pet[1][2] tiềm năng | C#: chưa có [dùng]
+      "stamina": null, // pet[1][3] thể lực | C#: chưa có [dùng]
+      "maxStamina": null, // pet[1][4] thể lực tối đa | C#: chưa có [dùng]
+      "hpg": null, // pet[1][5] HP gốc | C#: chưa có [dùng]
+      "mpg": null, // pet[1][6] KI gốc | C#: chưa có [dùng]
+      "dameg": null, // pet[1][7] sức đánh gốc | C#: chưa có [dùng]
+      "defg": null, // pet[1][8] giáp gốc | C#: chưa có [dùng]
+      "critg": null, // pet[1][9] chí mạng gốc | C#: chưa có [dùng]
+      "hp": null, // pet[1][10] HP hiện tại (TOP_HP_PET) | C#: chưa có [dùng]
+      "mp": null, // pet[1][11] KI hiện tại (TOP_KI_PET) | C#: chưa có [dùng]
+      "dame": null // pet[1][12] sức đánh (TOP_SD_PET) | C#: chưa có [dùng]
+    },
+    // pet[2] chuỗi JSON: đồ đệ mặc | C#: chưa có [dùng]
+    "body": [
+      // pet[2][i] 1 ô đồ = chuỗi JSON [itemId,quantity,options,createTime] | C#: Item (chưa nạp) [dùng]
+      {
+        "itemId": null, // pet[2][i][0] id item_template; -1 = ô trống | C#: Item.Template (chưa nạp) [dùng]
+        "quantity": null, // pet[2][i][1] số lượng (ô trống ghi 0, không đọc) | C#: Item.Quantity (chưa nạp) [dùng]
+        // pet[2][i][2] danh sách option: CHUỖI JSON chứa mảng chuỗi "[id,param]"; ô trống = "[]" | C#: Item.ItemOptions (chưa nạp) [dùng]
+        "options": [
+          // pet[2][i][2][j] 1 option = chuỗi "[optionId,param]" | C#: ItemOption (chưa nạp) [dùng]
+          {
+            "optionId": null, // pet[2][i][2][j][0] id item_option_template | C#: ItemOption.OptionTemplate (chưa nạp) [dùng]
+            "param": null // pet[2][i][2][j][1] giá trị # của option | C#: ItemOption.Param (chưa nạp) [dùng]
+          }
+          // 0..n option
+        ],
+        "createTime": null // pet[2][i][3] thời điểm tạo item (ms); dùng tính hạn HSD | C#: Item.CreateTime (chưa nạp) [dùng]
+      }
+      // 7 phần tử (ConstPlayer.QTY_MAX_ITEM_BODY_PET); ô trống = "[-1,0,\"[]\",ms]"; không thu hồi đồ Noel
+    ],
+    // pet[3] chuỗi JSON: skill đệ | C#: chưa có [dùng]
+    "skills": [
+      // pet[3][i] 1 skill đệ = chuỗi JSON [templateId,point] | C#: chưa có [dùng]
+      {
+        "templateId": null, // pet[3][i][0] id skill_template, -1 = ô trống | C#: chưa có [dùng]
+        "point": null // pet[3][i][1] cấp skill (ô trống 0); load đọc [2],[3] chỉ khi size>3 nhưng Java không bao giờ ghi | C#: chưa có [dùng]
+      }
+      // 4 phần tử (1 skill + QTY_MAX_SKILL_PET 3 ô trống "[-1,0]")
+    ]
+  },
+  // PG: my_father | "cha": chỉ INSERT "[]", không hàm nào đọc/ghi; updatePlayer có biến chết fatherInfo/Point/Body/Skill nhưng không đưa vào SQL | C#: chưa có [không dùng]
+  "myFather": [],
+  // PG: my_mother | "mẹ": chỉ INSERT "[]", không hàm nào đọc/ghi | C#: chưa có [không dùng]
+  "myMother": [],
+  "lastTimeDropTail": 0, // PG: last_time_drop_tail | lần rớt đuôi khỉ cuối (ms); Player ghi riêng bằng UPDATE theo name | C#: Player.LastTimeDropTail [dùng]
+  "lastTimeKhiSuKien": 0, // PG: last_time_khi_su_kien | lần hóa khỉ sự kiện cuối (ms); Service ghi riêng bằng UPDATE theo name | C#: Player.Lasttimekhisukien [dùng]
+  // thưởng Ngọc rồng sao đen | C#: RewardBlackBall.TimeOutOfDateReward (chưa nạp) [dùng]
+  "data_black_ball": [
+    // data_black_ball[i] phần tử i = ngọc sao đen (i+1) sao, chuỗi JSON [3] [dùng]
+    {
+      "timeOutOfDateReward": 0, // data_black_ball[i][0] hết hạn thưởng (ms) | C#: RewardBlackBall.TimeOutOfDateReward (chưa nạp) [dùng]
+      "lastTimeGetReward": 0, // data_black_ball[i][1] lần nhận thưởng cuối (ms) | C#: RewardBlackBall.LastTimeGetReward (chưa nạp) [dùng]
+      "quantity": 0 // data_black_ball[i][2] số lượng ngọc (lỗi parse → 1 nếu còn hạn) | C#: RewardBlackBall.QuantilyBlackBall (chưa nạp) [dùng]
+    }
+    // 7 phần tử "[0,0,0]" (1..7 sao)
+  ],
+  // nhiệm vụ hằng ngày (Bò Mộng) [dùng]
+  "data_side_task": {
+    "templateId": -1, // data_side_task[0] id side_task_template, -1 = chưa nhận | C#: SideTask.Template (chưa nạp) [dùng]
+    "receivedTime": 0, // data_side_task[1] lúc nhận (ms); load chỉ khôi phục nếu cùng ngày | C#: SideTask.ReceivedTime (chưa nạp) [dùng]
+    "count": 0, // data_side_task[2] đã làm | C#: SideTask.Count (chưa nạp) [dùng]
+    "maxCount": 0, // data_side_task[3] cần làm | C#: SideTask.MaxCount (chưa nạp) [dùng]
+    "leftTask": 20, // data_side_task[4] số nhiệm vụ còn nhận được trong ngày | C#: SideTask.LeftTask (chưa nạp) [dùng]
+    "level": 0 // data_side_task[5] mức độ (0..4) | C#: SideTask.Level (chưa nạp) [dùng]
+  },
+  // nhiệm vụ KOL [dùng]
+  "data_kol_task": {
+    "templateId": 0, // data_kol_task[0] id task_kol_template; tạo mới ghi 0 (= nhiệm vụ 0 "Thu thập cuốn chả giò") còn lưu ghi -1 khi null | C#: KolTask.Template (chưa nạp) [dùng]
+    "count": 0 // data_kol_task[1] đã làm | C#: KolTask.Count (chưa nạp) [dùng]
+  },
+  // nhiệm vụ sự kiện: updatePlayer ghi nhưng GodGK đọc nhầm data_side_task → cột này không bao giờ được đọc [chỉ ghi]
+  "data_event_task": {
+    "templateId": -1, // data_event_task[0] id task_event_template, -1 = chưa nhận; LỖI Java: load đọc data_side_task thay cột này | C#: EventTask.Template (chưa nạp) [chỉ ghi]
+    "receivedTime": 0, // data_event_task[1] lúc nhận (ms); load chỉ khôi phục nếu cùng ngày; LỖI Java: load đọc data_side_task thay cột này | C#: EventTask.ReceivedTime (chưa nạp) [chỉ ghi]
+    "count": 0, // data_event_task[2] đã làm; LỖI Java: load đọc data_side_task thay cột này | C#: EventTask.Count (chưa nạp) [chỉ ghi]
+    "maxCount": 0, // data_event_task[3] cần làm; LỖI Java: load đọc data_side_task thay cột này | C#: EventTask.MaxCount (chưa nạp) [chỉ ghi]
+    "leftTask": 20, // data_event_task[4] số nhiệm vụ còn nhận được trong ngày; LỖI Java: load đọc data_side_task thay cột này | C#: EventTask.LeftTask (chưa nạp) [chỉ ghi]
+    "level": 0 // data_event_task[5] mức độ (0..4); LỖI Java: load đọc data_side_task thay cột này | C#: EventTask.Level (chưa nạp) [chỉ ghi]
+  },
+  "create_time": null, // timestamp DEFAULT CURRENT_TIMESTAMP; Java không đọc/ghi (TOP_DUA_SM có tham chiếu nhưng đã comment) | C#: chưa có (entity Nro.Data có CreateTime) [không dùng]
+  "pointPvp": 0, // PG: point_pvp | điểm PvP: không ai ghi; chỉ hằng TopDAO.TOP_PVP đọc nhưng hằng này không được dùng | C#: chưa có [không dùng]
+  // thẻ rada đã thu (JSONValue.toJSONString(player.Cards)); DEFAULT '[]' | C#: chưa có [dùng]
+  "data_card": [
+    // data_card[i] 1 thẻ = object (Card.toString), mọi số lưu dạng CHUỖI | C#: chưa có (Card rỗng) [dùng]
+    {
+      "id": null, // data_card[i].id id thẻ rada (bảng radar) | C#: chưa có [dùng]
+      "amount": null, // data_card[i].amount số lượng đã thu | C#: chưa có [dùng]
+      "max": null, // data_card[i].max số lượng tối đa | C#: chưa có [dùng]
+      // data_card[i].option option thẻ (mảng object) | C#: chưa có [dùng]
+      "option": [
+        // data_card[i].option[k] 1 option thẻ | C#: chưa có [dùng]
+        {
+          "id": null, // data_card[i].option[k].id id item_option_template | C#: chưa có [dùng]
+          "active": null, // data_card[i].option[k].active cấp kích hoạt option | C#: chưa có [dùng]
+          "param": null // data_card[i].option[k].param giá trị | C#: chưa có [dùng]
+        }
+        // 0..n option
+      ],
+      "level": null, // data_card[i].level cấp thẻ (<0 → 1) | C#: chưa có [dùng]
+      "used": null // data_card[i].used đang dùng 0/1 | C#: chưa có [dùng]
+    }
+    // 0..n phần tử
+  ],
+  // trứng Bill; tạo mới = [] | C#: chưa có (BillEgg rỗng) [dùng]
+  "bill_data": {
+    "lastTimeCreate": null, // bill_data[0] lúc bắt đầu ấp trứng Bill (ms) | C#: chưa có [dùng]
+    "timeDone": null // bill_data[1] thời gian cần để ấp trứng Bill xong (ms) | C#: chưa có [dùng]
+  },
+  // trồng dưa hấu; tạo mới = [] | C#: chưa có (MelonPlant rỗng) [dùng]
+  "data_trong_dua_hau": {
+    "lastTimeCreate": null, // data_trong_dua_hau[0] lúc bắt đầu trồng dưa hấu (ms) | C#: chưa có [dùng]
+    "timeDone": null // data_trong_dua_hau[1] thời gian cần để trồng dưa hấu xong (ms) | C#: chưa có [dùng]
+  },
+  // thời gian du hành; DEFAULT '[0,0]' [dùng]
+  "thoigianduhanh": {
+    "isThoiGianDuHanh": 0, // thoigianduhanh[0] cờ isthoigianduhanh 0/1: chỉ load/lưu, không code game nào đặt/đọc | C#: Player.Isthoigianduhanh (chưa nạp) [không dùng]
+    "thoiGianDuHanh": 0 // thoigianduhanh[1] thời gian du hành còn lại (dùng ở NpcFactory/QuaKhu/UseItem) | C#: Player.Thoigianduhanh (chưa nạp) [dùng]
+  },
+  "thachdauwhis": 0, // Java không đọc/ghi | C#: chưa có [không dùng]
+  "isbienhinh": 0, // trạng thái biến hình: chỉ PlayerDAO.saveisBienHinh ghi, luôn ngay sau khi gán 0 → cột luôn 0; login KHÔNG đọc (C# mapper lại đọc/ghi – khác Java) | C#: Player.Isbienhinh [không dùng]
+  // đếm vi phạm chống gian lận; DEFAULT '[0,0,0]' [dùng]
+  "check_band_account": {
+    "errorMap": 0, // check_band_account[0] số lần vi phạm map (5 → xử lý) | C#: Player.ErrorMap (chưa nạp) [dùng]
+    "errorLocation": 0, // check_band_account[1] số lần vi phạm vị trí (/10) | C#: Player.ErrorLocation (chưa nạp) [dùng]
+    "errorPay": 0 // check_band_account[2] số lần vi phạm nạp (/3) | C#: Player.ErrorPay (chưa nạp) [dùng]
+  },
+  "masterDoesNotAttack": "false", // PG: master_does_not_attack | cờ sư phụ không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttack' không tồn tại → luôn false; trong RAM có dùng (Detu đặt và đọc) | C#: Player.DoesNotAttack (chưa nạp) [chỉ ghi]
+  "masterDoesNotAttackBo": "false", // PG: master_does_not_attack_bo | cờ bố không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttackBo' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackBo (chưa nạp) [không dùng]
+  "masterDoesNotAttackMe": "false", // PG: master_does_not_attack_me | cờ mẹ không tấn công (text 'true'/'false'); LỖI Java: login đọc cột 'masterDoesAttackMe' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackMe (chưa nạp) [không dùng]
+  "notify": null, // thông báo 1 lần khi vào game (MySession gửi rồi xóa) | C#: Player.Notify [dùng]
+  // Bản đồ kho báu; DEFAULT '[]' → load lỗi → (0, now) [dùng]
+  "bandokhobau": {
+    "timesPerDay": null, // bandokhobau[0] số lượt vào trong ngày | C#: Player.TimesPerDayBDKB (chưa nạp) [dùng]
+    "lastTimeJoin": null // bandokhobau[1] lần vào cuối (ms) | C#: Player.LastTimeJoinBDKB (chưa nạp) [dùng]
+  },
+  "doanhtrai": 0, // lần vào Doanh Trại cuối (ms) = player.lastTimeJoinDT | C#: Player.LastTimeJoinDT (chưa nạp) [dùng]
+  // Con Đường Rắn Độc; DEFAULT '[]'; load reset nếu clan chưa mở/khác lượt [dùng]
+  "conduongrandoc": {
+    "joinCDRD": null, // conduongrandoc[0] đã vào (bool) | C#: Player.JoinCDRD (chưa nạp) [dùng]
+    "lastTimeJoin": null, // conduongrandoc[1] lượt vào (ms, so với clan.lastTimeOpenConDuongRanDoc) | C#: Player.LastTimeJoinCDRD (chưa nạp) [dùng]
+    "talkToThuongDe": null, // conduongrandoc[2] đã nói chuyện Thượng Đế (bool) | C#: Player.TalkToThuongDe (chưa nạp) [dùng]
+    "talkToThanMeo": null // conduongrandoc[3] đã nói chuyện Thần Mèo (bool); LỖI Java: load đọc [2] thay [3] nên [3] không bao giờ được đọc | C#: Player.TalkToThanMeo (chưa nạp) [chỉ ghi]
+  },
+  // nhiệm vụ bang hằng ngày; DEFAULT '[]' (load lỗi → bỏ qua) [dùng]
+  "data_clan_task": {
+    "templateId": -1, // data_clan_task[0] id clan_task_template, -1 = chưa nhận | C#: chưa có [dùng]
+    "receivedTime": 0, // data_clan_task[1] lúc nhận (ms); load chỉ khôi phục nếu cùng ngày | C#: chưa có [dùng]
+    "count": 0, // data_clan_task[2] đã làm | C#: chưa có [dùng]
+    "maxCount": 0, // data_clan_task[3] cần làm | C#: chưa có [dùng]
+    "leftTask": 20, // data_clan_task[4] số nhiệm vụ còn nhận được trong ngày | C#: chưa có [dùng]
+    "level": 0 // data_clan_task[5] mức độ (0..4) | C#: chưa có [dùng]
+  },
+  // thành tựu; DEFAULT '[]' | C#: Player.Achievement (chưa nạp) [dùng]
+  "data_achievement": [
+    // data_achievement[i] chuỗi JSON [completed,isRecieve] của achievement_template thứ i [dùng]
+    {
+      "completed": null, // data_achievement[i][0] tiến độ đã đạt (long) | C#: AchievementQuest.Completed (chưa nạp) [dùng]
+      "isRecieve": null // data_achievement[i][1] đã nhận thưởng (bool) | C#: AchievementQuest.IsRecieve (chưa nạp) [dùng]
+    }
+    // = số dòng achievement_template (dump: 20); thiếu → (0,false)
+  ],
+  // đặc quyền VIP; DEFAULT '[]' [dùng]
+  "data_vip": {
+    "timesPerDayCuuSat": null, // data_vip[0] lượt cứu sát trong ngày | C#: Player.TimesPerDayCuuSat (chưa nạp) [dùng]
+    "lastTimeCuuSat": null, // data_vip[1] lần cứu sát cuối (ms) | C#: Player.LastTimeCuuSat (chưa nạp) [dùng]
+    "nhanDeTuNangVIP": null, // data_vip[2] đã nhận đệ tử nâng VIP (bool): chỉ load/lưu, không code game nào đặt/đọc | C#: Player.NhanDeTuNangVIP (chưa nạp) [không dùng]
+    "nhanVangNangVIP": null, // data_vip[3] đã nhận vàng nâng VIP (bool): chỉ load/lưu, không code game nào đặt/đọc | C#: Player.NhanVangNangVIP (chưa nạp) [không dùng]
+    "nhanSKHVIP": null // data_vip[4] đã nhận SKH VIP (bool): chỉ load/lưu, không code game nào đặt/đọc | C#: Player.NhanSKHVIP (chưa nạp) [không dùng]
+  },
+  "lasttimepkcommeson": 0, // lần PK Commeson cuối (ms) | C#: Player.LastPkCommesonTime [dùng]
+  // Siêu Thần Thủy; DEFAULT '[]' [dùng]
+  "sieuthanthuy": {
+    "winSTT": null, // sieuthanthuy[0] đã thắng (bool) | C#: Player.WinSTT (chưa nạp) [dùng]
+    "lastTimeWinSTT": null, // sieuthanthuy[1] lần thắng cuối (ms) | C#: Player.LastTimeWinSTT (chưa nạp) [dùng]
+    "callBossPocolo": null // sieuthanthuy[2] đã gọi boss Pocolo (bool) | C#: Player.CallBossPocolo (chưa nạp) [dùng]
+  },
+  // bảo vệ tài khoản; DEFAULT '[]' → load lỗi → (0,false,now) [dùng]
+  "baovetaikhoan": {
+    "mbv": null, // baovetaikhoan[0] mã bảo vệ | C#: Player.Mbv (chưa nạp) [dùng]
+    "isProtected": null, // baovetaikhoan[1] đang bật bảo vệ (bool) | C#: Player.Baovetaikhoan (chưa nạp) [dùng]
+    "mbvTime": null // baovetaikhoan[2] mbvtime (ms): chỉ load/lưu, không code game nào đặt/đọc | C#: Player.Mbvtime (chưa nạp) [không dùng]
+  },
+  "lastimelogin": null, // datetime = lúc tạo, không bao giờ cập nhật; chỉ MyClanTop* đọc vào Player.lastimelogin mà không ai dùng (C# mapper đọc/ghi) | C#: Player.Lastimelogin [không dùng]
+  "firstTimeLogin": null, // PG: first_time_login | timestamp lần đăng nhập đầu trong ngày; PlayerService.dailyLogin/RewardService so ngày → reset quà ngày, nhiệm vụ danh hiệu; lưu dạng chuỗi ngày | C#: Player.FirstTimeLogin [dùng]
+  "LastTimeLoginGame": null, // PG: last_time_login_game | timestamp hoạt động cuối (Player.update ghi mỗi 60 giây; TopDAO dùng lọc top) | C#: Player.LastTimeLoginGame [dùng]
+  // PG: data_badges | danh hiệu (badges) sở hữu; tạo mới = [] | C#: Player.DataBadges (chưa nạp) [dùng]
+  "dataBadges": [
+    // dataBadges[i] 1 danh hiệu = object (BadgesData.toString), số lưu dạng CHUỖI [dùng]
+    {
+      "idBadGes": null, // dataBadges[i].idBadGes id hiệu ứng danh hiệu (data_badges.idEffect) | C#: BadgesData.IdBadGes (chưa nạp) [dùng]
+      "timeofUseBadges": null, // dataBadges[i].timeofUseBadges hạn dùng (ms) | C#: BadgesData.TimeofUseBadges (chưa nạp) [dùng]
+      "isUse": null // dataBadges[i].isUse đang đeo ("true"/"false") | C#: BadgesData.IsUse (chưa nạp) [dùng]
+    }
+    // 0..n phần tử
+  ],
+  // PG: data_task_badges | nhiệm vụ danh hiệu; tạo mới = []; lỗi/reset ngày → tạo theo task_badges_template | C#: Player.DataTaskBadges (chưa nạp) [dùng]
+  "dataTaskBadges": [
+    // dataTaskBadges[i] 1 nhiệm vụ = object (BadgesTask.toString), số lưu dạng CHUỖI [dùng]
+    {
+      "id": null, // dataTaskBadges[i].id id task_badges_template | C#: BadgesTask.Id (chưa nạp) [dùng]
+      "count": null, // dataTaskBadges[i].count đã làm | C#: BadgesTask.Count (chưa nạp) [dùng]
+      "countMax": null, // dataTaskBadges[i].countMax cần làm | C#: BadgesTask.CountMax (chưa nạp) [dùng]
+      "idBadgesReward": null // dataTaskBadges[i].idBadgesReward id danh hiệu thưởng | C#: BadgesTask.IdBadgesReward (chưa nạp) [dùng]
+    }
+    // = số dòng task_badges_template (dump: 21)
+  ],
+  // rương gỗ Đại hội võ thuật 23; DEFAULT '[]' → load lỗi → (0, 50000000, 100, now, 0) [dùng]
+  "ruonggo": {
+    "levelWoodChest": null, // ruonggo[0] cấp rương gỗ | C#: Player.LevelWoodChest (chưa nạp) [dùng]
+    "goldChallenge": null, // ruonggo[1] vàng thách đấu: chỉ load/lưu, không code game nào đặt/đọc | C#: Player.GoldChallenge (chưa nạp) [không dùng]
+    "rubyChallenge": null, // ruonggo[2] hồng ngọc thách đấu: chỉ load/lưu, không code game nào đặt/đọc | C#: Player.RubyChallenge (chưa nạp) [không dùng]
+    "lastTimeRewardWoodChest": null, // ruonggo[3] lần nhận rương cuối (ms) | C#: Player.LastTimeRewardWoodChest (chưa nạp) [dùng]
+    "lastTimePKDHVT23": null // ruonggo[4] lần PK ĐHVT 23 cuối (ms) | C#: Player.LastTimePKDHVT23 (chưa nạp) [dùng]
+  },
+  // Võ đài sinh tử; DEFAULT '[]' [dùng]
+  "vodaisinhtu": {
+    "haveReward": null, // vodaisinhtu[0] có thưởng chưa nhận (bool) | C#: Player.HaveRewardVDST (chưa nạp) [dùng]
+    "thoiVang": null, // vodaisinhtu[1] thỏi vàng đặt cược | C#: Player.ThoiVangVoDaiSinhTu (chưa nạp) [dùng]
+    "lastTimePK": null, // vodaisinhtu[2] lần PK cuối (ms); TopDAO TOP_VDST | C#: Player.LastTimePKVoDaiSinhTu (chưa nạp) [dùng]
+    "timePK": null // vodaisinhtu[3] thời gian PK (TOP_VDST xếp hạng) | C#: Player.TimePKVDST (chưa nạp) [dùng]
+  },
+  "dragon_christmas": 0, // lần gọi rồng Giáng Sinh cuối (ms) | C#: Player.LastTimeShenronAppeared_Christmas [dùng]
+  "dragon_halloween": 0, // lần gọi rồng Halloween cuối (ms) | C#: Player.LastTimeShenronAppeared_Halloween [dùng]
+  "rank": 0, // hạng Siêu Hạng (superRank.rank); SuperRankDAO đọc/ghi riêng | C#: chưa có (SuperRank rỗng) [dùng]
+  // đấu trường Siêu Hạng; NULL lúc tạo (không DEFAULT) → load lỗi → bỏ qua; SuperRankDAO cũng ghi | C#: chưa có (SuperRank rỗng) [dùng]
+  "data_super_rank": {
+    "lastTimePK": null, // data_super_rank[0] lần PK cuối (ms); qua nửa đêm → +1 vé (tối đa 3) | C#: chưa có [dùng]
+    "lastTimeReward": null, // data_super_rank[1] lần nhận thưởng cuối (ms) | C#: chưa có [dùng]
+    "ticket": null, // data_super_rank[2] số vé | C#: chưa có [dùng]
+    "win": null, // data_super_rank[3] số trận thắng | C#: chưa có [dùng]
+    "lose": null, // data_super_rank[4] số trận thua | C#: chưa có [dùng]
+    // data_super_rank[5] CHUỖI JSON object (Gson) {history,lasttime} | C#: chưa có [dùng]
+    "historyJson": {
+      // data_super_rank[5].history nội dung lịch sử đấu | C#: chưa có [dùng]
+      "history": [
+        null // data_super_rank[5].history[k] 1 dòng lịch sử (string) | C#: chưa có [dùng]
+        // 0..n
+      ],
+      // data_super_rank[5].lasttime thời điểm từng dòng lịch sử (ms), cùng độ dài history | C#: chưa có [dùng]
+      "lasttime": [
+        null // data_super_rank[5].lasttime[k] ms | C#: chưa có [dùng]
+        // 0..n
+      ]
+    }
+  },
+  // giới hạn rơi đồ sự kiện; DEFAULT '[]' → load lỗi → tất cả 0 [dùng]
+  "data_item_event": {
+    "remainingTVGSCount": null, // data_item_event[0] lượt còn: tất vớ Giáng Sinh | C#: ItemEvent.RemainingTVGSCount (chưa nạp) [dùng]
+    "lastTVGSTime": null, // data_item_event[1] lần reset tất vớ GS (ms) | C#: ItemEvent.LastTVGSTime (chưa nạp) [dùng]
+    "remainingHHCount": null, // data_item_event[2] lượt còn: hoa hồng | C#: ItemEvent.RemainingHHCount (chưa nạp) [dùng]
+    "lastHHTime": null, // data_item_event[3] lần reset hoa hồng (ms) | C#: ItemEvent.LastHHTime (chưa nạp) [dùng]
+    "remainingBNCount": null, // data_item_event[4] lượt còn: bình nước | C#: ItemEvent.RemainingBNCount (chưa nạp) [dùng]
+    "lastBNTime": null, // data_item_event[5] lần reset bình nước (ms) | C#: ItemEvent.LastBNTime (chưa nạp) [dùng]
+    "remainingKeoGiangSinhCount": null, // data_item_event[6] lượt còn: kẹo Giáng Sinh | C#: ItemEvent.RemainingKeoGiangSinhCount (chưa nạp) [dùng]
+    "lastKeoGiangSinhTime": null // data_item_event[7] lần reset kẹo GS (ms) | C#: ItemEvent.LastKeoGiangSinhTime (chưa nạp) [dùng]
+  },
+  // thẻ tuần/tháng/năm/chí tôn; DEFAULT '[0,0,0,0,0,0,0,0]' [dùng]
+  "data_the_card": {
+    "theTuan": 0, // data_the_card[0] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – có thẻ tuần (NPoint đọc) | C#: Player.THE_TUAN (chưa nạp) [dùng]
+    "lastTimeTheTuan": 0, // data_the_card[1] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – hạn thẻ tuần (ms) (NPoint đọc) | C#: Player.LASTTIME_THE_TUAN (chưa nạp) [dùng]
+    "theThang": 0, // data_the_card[2] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – có thẻ tháng (NPoint đọc) | C#: Player.THE_THANG (chưa nạp) [dùng]
+    "lastTimeTheThang": 0, // data_the_card[3] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – hạn thẻ tháng (ms) (NPoint đọc) | C#: Player.LASTTIME_THE_THANG (chưa nạp) [dùng]
+    "theNam": 0, // data_the_card[4] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – có thẻ năm (NPoint đọc) | C#: Player.THE_NAM (chưa nạp) [dùng]
+    "lastTimeTheNam": 0, // data_the_card[5] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – hạn thẻ năm (ms) (NPoint đọc) | C#: Player.LASTTIME_THE_NAM (chưa nạp) [dùng]
+    "theChiTon": 0, // data_the_card[6] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – có thẻ chí tôn (NPoint đọc) | C#: Player.THE_CHI_TON (chưa nạp) [dùng]
+    "lastTimeTheChiTon": 0 // data_the_card[7] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – hạn thẻ chí tôn (ms) (NPoint đọc) | C#: Player.LASTTIME_THE_CHI_TON (chưa nạp) [dùng]
+  },
+  // điểm danh; DEFAULT '[0×10]'; load: qua ngày (DAY_OF_YEAR) → reset [dùng]
+  "data_diem_danh": {
+    "checkDayOne": 0, // data_diem_danh[0] ngày (DAY_OF_YEAR) điểm danh thường | C#: Player.CHECK_DAY_ON_ONE (chưa nạp) [dùng]
+    "diemDanh": 0, // data_diem_danh[1] đã điểm danh hôm nay (Ông Gohan) | C#: Player.DIEM_DANH (chưa nạp) [dùng]
+    "checkDayTuan": 0, // data_diem_danh[2] ngày điểm danh thẻ tuần: chỉ dùng để load reset [3], không code game nào đọc | C#: Player.CHECK_DAY_ON_TUAN (chưa nạp) [không dùng]
+    "diemDanhTuan": 0, // data_diem_danh[3] điểm danh thẻ tuần: chỉ được load reset về 0, không code game nào đặt/đọc | C#: Player.DIEM_DANH_TUAN (chưa nạp) [không dùng]
+    "checkDayThang": 0, // data_diem_danh[4] ngày điểm danh thẻ tháng: chỉ dùng để load reset [5], không code game nào đọc | C#: Player.CHECK_DAY_ON_THANG (chưa nạp) [không dùng]
+    "diemDanhThang": 0, // data_diem_danh[5] điểm danh thẻ tháng: chỉ được load reset về 0, không code game nào đặt/đọc | C#: Player.DIEM_DANH_THANG (chưa nạp) [không dùng]
+    "checkDayNam": 0, // data_diem_danh[6] ngày điểm danh thẻ năm: chỉ dùng để load reset [7], không code game nào đọc | C#: Player.CHECK_DAY_ON_NAM (chưa nạp) [không dùng]
+    "diemDanhNam": 0, // data_diem_danh[7] điểm danh thẻ năm: chỉ được load reset về 0, không code game nào đặt/đọc | C#: Player.DIEM_DANH_NAM (chưa nạp) [không dùng]
+    "checkDayChiTon": 0, // data_diem_danh[8] ngày điểm danh thẻ chí tôn: chỉ dùng để load reset [9], không code game nào đọc | C#: Player.CHECK_DAY_ON_CHI_TON (chưa nạp) [không dùng]
+    "diemDanhChiTon": 0 // data_diem_danh[9] điểm danh thẻ chí tôn: chỉ được load reset về 0, không code game nào đặt/đọc | C#: Player.DIEM_DANH_CHI_TON (chưa nạp) [không dùng]
+  },
+  // điểm cao máy đấm; DEFAULT '[0,0,0]'; updateBangXepHang cũng ghi [dùng]
+  "data_may_dam": {
+    "topTraiDat": 0, // data_may_dam[0] điểm máy đấm Trái Đất (TOP_MAY_DAM_TRAI_DAT) | C#: Player.TopMayDamTraiDat (chưa nạp) [dùng]
+    "topNamec": 0, // data_may_dam[1] điểm máy đấm Namếc | C#: Player.TopMayDamNamec (chưa nạp) [dùng]
+    "topXayda": 0 // data_may_dam[2] điểm máy đấm Xayda | C#: Player.TopMayDamXayda (chưa nạp) [dùng]
+  },
+  // "người yêu": tạo và mọi lần lưu đều ghi hằng "[]" (biến chết petNguoiyeuInfo/Point/Body/Skill), không ai đọc | C#: chưa có [không dùng]
+  "data_nguoi_yeu": [],
+  "NguoiYeuDoesNotAttack": "false", // PG: nguoi_yeu_does_not_attack | cờ người yêu không tấn công (text); login đọc 'NguoiYeuDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackNguoiYeu (chưa nạp) [không dùng]
+  "CononeDoesNotAttack": "false", // PG: conone_does_not_attack | cờ con thứ 1 không tấn công (text); login đọc 'CononeDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackConone (chưa nạp) [không dùng]
+  "ContwoDoesNotAttack": "false", // PG: contwo_does_not_attack | cờ con thứ 2 không tấn công (text); login đọc 'ContwoDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackContwo (chưa nạp) [không dùng]
+  "ConthreeDoesNotAttack": "false", // PG: conthree_does_not_attack | cờ con thứ 3 không tấn công (text); login đọc 'ConthreeDoesAttack' không tồn tại → luôn false; không code game nào đặt/đọc cờ này | C#: Player.DoesNotAttackConthree (chưa nạp) [không dùng]
+  // PG: thanh_tich_bang | thành tích bang Bản đồ kho báu (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopTreasureUnderSea cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
+  "thanhTichBang": {
+    "clanName": null, // thanhTichBang[0] tên bang (so1) | C#: chưa có [dùng]
+    "levelDone": null, // thanhTichBang[1] cấp đã hoàn thành (so2, lọc > 0) | C#: chưa có [dùng]
+    "timeDone": null, // thanhTichBang[2] thời gian hoàn thành (so3) | C#: chưa có [dùng]
+    "updatedAt": null // thanhTichBang[3] lúc ghi (ms) (so4) | C#: chưa có [dùng]
+  },
+  // PG: thanh_tich_bang2 | thành tích bang Khí gas hủy diệt (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopDestronGas cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
+  "thanhTichBang2": {
+    "clanName": null, // thanhTichBang2[0] tên bang (so1) | C#: chưa có [dùng]
+    "levelDone": null, // thanhTichBang2[1] cấp đã hoàn thành (so2, lọc > 0) | C#: chưa có [dùng]
+    "timeDone": null, // thanhTichBang2[2] thời gian hoàn thành (so3) | C#: chưa có [dùng]
+    "updatedAt": null // thanhTichBang2[3] lúc ghi (ms) (so4) | C#: chưa có [dùng]
+  },
+  // PG: thanh_tich_bang3 | thành tích bang Con đường rắn độc (ghi vào dòng của bang chủ bởi Clan.updatethanhTich*ForLeader); tạo mới = "" (chuỗi rỗng); dạng "[tênBang,cấp,thờiGian,ms]" KHÔNG phải JSON (tên không có ngoặc kép); MyClanTopSnakeWay cắt chuỗi bằng SUBSTRING_INDEX | C#: chưa có [dùng]
+  "thanhTichBang3": {
+    "clanName": null, // thanhTichBang3[0] tên bang (so1) | C#: chưa có [dùng]
+    "levelDone": null, // thanhTichBang3[1] cấp đã hoàn thành (so2, lọc > 0) | C#: chưa có [dùng]
+    "timeDone": null, // thanhTichBang3[2] thời gian hoàn thành (so3) | C#: chưa có [dùng]
+    "updatedAt": null // thanhTichBang3[3] lúc ghi (ms) (so4) | C#: chưa có [dùng]
+  },
+  // PG: daily_gift | quà hằng ngày; tạo mới = [] → load size<2 → addAndReset tạo 3 phần tử; dailyLogin reset mỗi ngày | C#: Player.DailyGiftData (chưa nạp) [dùng]
+  "dailyGift": [
+    // dailyGift[i] 1 quà = object (DailyGiftData.toString), số lưu dạng CHUỖI | C#: chưa có (DailyGiftData rỗng) [dùng]
+    {
+      "id": null, // dailyGift[i].id id mốc quà (0..2) | C#: chưa có [dùng]
+      "daNhan": null // dailyGift[i].daNhan đã nhận ("true"/"false") | C#: chưa có [dùng]
+    }
+    // 3 phần tử sau addAndReset
+  ],
+  // PG: bought_skill | id item_template sách kỹ năng đã học đủ (QuyLaoKame thêm; addBoughtSkillAttack thêm 66/79/87 = Sách đấm Dragon/Demon/Galick lv1) | C#: Player.BoughtSkill (chưa nạp) [dùng]
+  "BoughtSkill": [
+    0 // BoughtSkill[i] id item sách; tạo mới TĐ ghi 0 (= id skill Dragon, KHÔNG phải id sách 66 – có vẻ nhầm) | C#: Player.BoughtSkill (chưa nạp) [dùng]
+    // tạo mới TĐ = [0] (Namếc [2], Xayda [4])
+  ],
+  // PG: learn_skill | đang học sách kỹ năng; NULL lúc tạo → load lỗi → bỏ qua [dùng]
+  "LearnSkill": {
+    "time": null, // LearnSkill[0] lúc học xong (ms), -1 = không học | C#: PlayerSkill.Time (chưa nạp) [dùng]
+    "itemTemplateSkillId": null, // LearnSkill[1] id item sách đang học | C#: PlayerSkill.ItemTemplateSkillId (chưa nạp) [dùng]
+    "potential": null // LearnSkill[2] tiềm năng đã trả | C#: PlayerSkill.Potential (chưa nạp) [dùng]
+  },
+  "event_point": 0, // điểm sự kiện chung: không code game nào cộng/đọc (chỉ load/lưu); Java player.event.getEventPoint() | C#: chưa có (PlayerEvent rỗng) [không dùng]
+  "event_point_boss": 0, // điểm boss: Boss cộng dồn nhưng không nơi nào đọc; Java player.event.getEventPointBHM() | C#: chưa có (PlayerEvent rỗng) [chỉ ghi]
+  "event_point_nhs": 0, // điểm Ngũ Hành Sơn: Mob cộng dồn nhưng không nơi nào đọc; Java player.event.getEventPointNHS() | C#: chưa có (PlayerEvent rỗng) [chỉ ghi]
+  "event_point_quai": 0, // điểm săn quái: không code game nào cộng/đọc (chỉ load/lưu); Java player.event.getEventPointQuai() | C#: chưa có (PlayerEvent rỗng) [không dùng]
+  "diem_huy_diet": 0, // điểm Hủy Diệt (Whis cộng, ShopService trừ); Java player.event.getHakaiPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_chien_truong_namek": 0, // điểm chiến trường Namếc (TranhNgoc; TopDAO TOP_NAMEK_WAR); Java player.event.getNamekWarPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_tet": 0, // điểm sự kiện Tết (ServerManager reset); Java player.event.getLunaNewYearPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_giangsinh": 0, // điểm sự kiện Giáng Sinh; Java player.event.getChristMasPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_halloween": 0, // điểm sự kiện Halloween; Java player.event.getHalloweenPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_8_3": 0, // điểm sự kiện 8/3; Java player.event.getInternationalWomensDayPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_trungthu": 0, // điểm sự kiện Trung Thu; Java player.event.getTrungThuPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_hung_vuong": 0, // ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – điểm sự kiện Hùng Vương (HungVuong/ShopService đọc, addHungVuongPoint không được gọi); Java player.event.getHungVuongPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_black_friday": 0, // ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – điểm Black Friday (shop đọc, addBlackFridayPoint không được gọi); Java player.event.getBlackFridayPoint() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  "diem_su_kien_20_10": 0, // ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – điểm sự kiện 20/10 (shop đọc, add20_10Point không được gọi); Java player.event.get20_10Point() | C#: chưa có (PlayerEvent rỗng) [dùng]
+  // bộ đếm đua top sự kiện Tết; DEFAULT '[0,0,0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_new_year": {
+    "duaTopMoLiXi": 0, // data_event_new_year[0] đua top mở lì xì | C#: Player.DuaTopMoLiXi (chưa nạp) [dùng]
+    "duaTopTangLiXi": 0, // data_event_new_year[1] đua top tặng lì xì | C#: Player.DuaTopTangLiXi (chưa nạp) [dùng]
+    "duaTopBanPhaoHoa": 0, // data_event_new_year[2] đua top bắn pháo hoa | C#: Player.DuaTopBanPhaoHoa (chưa nạp) [dùng]
+    "duaTopBanPhaoHoaVip": 0 // data_event_new_year[3] đua top bắn pháo hoa VIP | C#: Player.DuaTopBanPhaoHoaVIP (chưa nạp) [dùng]
+  },
+  // bộ đếm đua top sự kiện Giáng Sinh; DEFAULT '[0,0,0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_christ_mas": {
+    "duaTopTrangTriCayNoel": 0, // data_event_christ_mas[0] đua top trang trí cây Noel | C#: Player.DuaTopTrangTriCayNoel (chưa nạp) [dùng]
+    "duaTopCheTaoNguoiTuyet": 0, // data_event_christ_mas[1] đua top chế tạo người tuyết | C#: Player.DuaTopCheTaoNguoiTuyet (chưa nạp) [dùng]
+    "duaTopCheTaoNguoiTuyetBangGia": 0, // data_event_christ_mas[2] đua top người tuyết băng giá | C#: Player.DuaTopCheTaoNguoiTuyetBangGia (chưa nạp) [dùng]
+    "duaTopDotDiem": 0 // data_event_christ_mas[3] đua top đốt diêm | C#: Player.DuaTopDotDiem (chưa nạp) [dùng]
+  },
+  // bộ đếm đua top sự kiện Vu Lan; DEFAULT '[0,0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_vulan": {
+    "duaTopPhaoHoaVuLan": 0, // data_event_vulan[0] đua top pháo hoa Vu Lan | C#: Player.DuaTopPhaoHoaVuLan (chưa nạp) [dùng]
+    "duaTopHoaDang": 0, // data_event_vulan[1] đua top hoa đăng | C#: Player.DuaTopHoaDang (chưa nạp) [dùng]
+    "duaTopHoaDangCoLoiChuc": 0 // data_event_vulan[2] đua top hoa đăng có lời chúc | C#: Player.DuaTopHoaDangCoLoiChuc (chưa nạp) [dùng]
+  },
+  // bộ đếm đua top sự kiện Halloween; DEFAULT '[0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_halloween": {
+    "duaTopMoHopMaQuy": 0, // data_event_halloween[0] đua top mở hộp ma quỷ | C#: Player.DuaTopMoHopMaQuy (chưa nạp) [dùng]
+    "duaTopThiepHalloween": 0 // data_event_halloween[1] đua top thiệp Halloween | C#: Player.DuaTopThiepHalloween (chưa nạp) [dùng]
+  },
+  // bộ đếm đua top sự kiện 8/3; DEFAULT '[0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_8_3": {
+    "duaTopMoThiep83": 0, // data_event_8_3[0] đua top mở thiệp 8/3 | C#: Player.DuaTopMoThiep83 (chưa nạp) [dùng]
+    "duaTopTangBongHoaHong": 0 // data_event_8_3[1] đua top tặng bông hoa hồng | C#: Player.DuaTopTangBongHoaHong (chưa nạp) [dùng]
+  },
+  // bộ đếm đua top sự kiện Trung Thu; DEFAULT '[0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_trung_thu": {
+    "duaTopLamBanhTrungThu": 0, // data_event_trung_thu[0] đua top làm bánh Trung Thu | C#: Player.DuaTopLamBanhTrungThu (chưa nạp) [dùng]
+    "duaTopMoHopTrungThuDacBiet": 0 // data_event_trung_thu[1] đua top mở hộp Trung Thu đặc biệt | C#: Player.DuaTopMoHopTrungThuDacBiet (chưa nạp) [dùng]
+  },
+  // bộ đếm đua top sự kiện Hùng Vương; DEFAULT '[0,0,0,0,0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_hung_vuong": {
+    "duaTopMoTrungRongVang": 0, // data_event_hung_vuong[0] đua top mở trứng rồng vàng | C#: Player.DuaTopMoTrungRongVang (chưa nạp) [dùng]
+    "typeBanhDangNau": 0, // data_event_hung_vuong[1] loại bánh đang nấu (NoiBanh) – không phải điểm top | C#: Player.TypeBanhDangNau (chưa nạp) [dùng]
+    "lastTimeNauBanh": 0, // data_event_hung_vuong[2] lúc bắt đầu nấu bánh (ms) – không phải điểm top | C#: Player.LastTimeNauBanhHungVuong (chưa nạp) [dùng]
+    "duaTopMoHopQuaGioTo": 0, // data_event_hung_vuong[3] đua top mở hộp quà Giỗ Tổ | C#: Player.DuaTopMoHopQuaGioTo (chưa nạp) [dùng]
+    "duaTopDangBanh": 0, // data_event_hung_vuong[4] đua top dâng bánh | C#: Player.DuaTopDangBanhHungVuong (chưa nạp) [dùng]
+    "duaTopDoiDuaHau": 0 // data_event_hung_vuong[5] đua top đổi dưa hấu | C#: Player.DuaTopDoiDuaHau (chưa nạp) [dùng]
+  },
+  // bộ đếm đua top sự kiện Black Friday; DEFAULT '[0,0]'; TopDAO đọc bằng JSON_EXTRACT; ServerManager reset; updateBangXepHang cũng ghi [dùng]
+  "data_event_black_friday": {
+    "duaTopMoHopBlackFriday": 0, // data_event_black_friday[0] đua top mở hộp Black Friday | C#: Player.DuaTopMoHopBlackFriday (chưa nạp) [dùng]
+    "duaTopMuaSam": 0 // data_event_black_friday[1] đua top mua sắm | C#: Player.DuaTopMuaSamBlackFriday (chưa nạp) [dùng]
+  },
+  // cờ quà/hoạt động theo ngày [dùng]
+  "data_event_models": {
+    "checkTrongNgay": 0, // data_event_models[0] ngày (DAY_OF_YEAR) lần reset cuối; qua ngày → reset [1..43] | C#: Player.CheckTrongNgay (chưa nạp) [dùng]
+    "nhanLiXiNpc1": 0, // data_event_models[1] đã nhận lì xì Tết từ NPC OngGohan hôm nay | C#: Player.NhanLiXiForNPC_1 (chưa nạp) [dùng]
+    "nhanLiXiNpc2": 0, // data_event_models[2] đã nhận lì xì Tết từ NPC Bulma hôm nay | C#: Player.NhanLiXiForNPC_2 (chưa nạp) [dùng]
+    "nhanLiXiNpc3": 0, // data_event_models[3] đã nhận lì xì Tết từ NPC DaiThienSu hôm nay | C#: Player.NhanLiXiForNPC_3 (chưa nạp) [dùng]
+    "nhanLiXiNpc4": 0, // data_event_models[4] đã nhận lì xì Tết từ NPC MrPoPo hôm nay | C#: Player.NhanLiXiForNPC_4 (chưa nạp) [dùng]
+    "nhanLiXiNpc5": 0, // data_event_models[5] đã nhận lì xì Tết từ NPC DuongTang hôm nay | C#: Player.NhanLiXiForNPC_5 (chưa nạp) [dùng]
+    "nhanLiXiNpc6": 0, // data_event_models[6] đã nhận lì xì Tết từ NPC BoMong hôm nay | C#: Player.NhanLiXiForNPC_6 (chưa nạp) [dùng]
+    "nhanLiXiNpc7": 0, // data_event_models[7] đã nhận lì xì Tết từ NPC ThanMeoKarin hôm nay | C#: Player.NhanLiXiForNPC_7 (chưa nạp) [dùng]
+    "nhanLiXiNpc8": 0, // data_event_models[8] đã nhận lì xì Tết từ NPC ThuongDe hôm nay | C#: Player.NhanLiXiForNPC_8 (chưa nạp) [dùng]
+    "nhanLiXiNpc9": 0, // data_event_models[9] đã nhận lì xì Tết từ NPC ThanVuTru hôm nay | C#: Player.NhanLiXiForNPC_9 (chưa nạp) [dùng]
+    "nhanLiXiNpc10": 0, // data_event_models[10] đã nhận lì xì Tết từ NPC Whis hôm nay | C#: Player.NhanLiXiForNPC_10 (chưa nạp) [dùng]
+    "nhanLiXiNpc11": 0, // data_event_models[11] đã nhận lì xì Tết từ NPC Bill hôm nay | C#: Player.NhanLiXiForNPC_11 (chưa nạp) [dùng]
+    "nhanLiXiNpc12": 0, // data_event_models[12] đã nhận lì xì Tết từ NPC ToSuKaio hôm nay | C#: Player.NhanLiXiForNPC_12 (chưa nạp) [dùng]
+    "nhanLiXiNpc13": 0, // data_event_models[13] đã nhận lì xì Tết từ NPC Santa hôm nay | C#: Player.NhanLiXiForNPC_13 (chưa nạp) [dùng]
+    "nhanLiXiNpc14": 0, // data_event_models[14] đã nhận lì xì Tết từ NPC BaHatMit hôm nay | C#: Player.NhanLiXiForNPC_14 (chưa nạp) [dùng]
+    "nhanLiXiNpc15": 0, // data_event_models[15] NhanLiXiForNPC_15: không NPC nào dùng (chỉ reset) | C#: Player.NhanLiXiForNPC_15 (chưa nạp) [không dùng]
+    "nhanLiXiNpc16": 0, // data_event_models[16] đã nhận lì xì Tết từ NPC QuyLaoKame hôm nay | C#: Player.NhanLiXiForNPC_16 (chưa nạp) [dùng]
+    "nhanLiXiNpc17": 0, // data_event_models[17] đã nhận lì xì Tết từ NPC TruongLaoGuru hôm nay | C#: Player.NhanLiXiForNPC_17 (chưa nạp) [dùng]
+    "nhanLiXiNpc18": 0, // data_event_models[18] đã nhận lì xì Tết từ NPC VuaVegeta hôm nay | C#: Player.NhanLiXiForNPC_18 (chưa nạp) [dùng]
+    "nhanLiXiNpc19": 0, // data_event_models[19] đã nhận lì xì Tết từ NPC Dende hôm nay | C#: Player.NhanLiXiForNPC_19 (chưa nạp) [dùng]
+    "nhanLiXiNpc20": 0, // data_event_models[20] đã nhận lì xì Tết từ NPC Appule hôm nay | C#: Player.NhanLiXiForNPC_20 (chưa nạp) [dùng]
+    "nhanLiXiNpc21": 0, // data_event_models[21] đã nhận lì xì Tết từ NPC Uron hôm nay | C#: Player.NhanLiXiForNPC_21 (chưa nạp) [dùng]
+    "nhanLiXiNpc22": 0, // data_event_models[22] đã nhận lì xì Tết từ NPC DrDrief hôm nay | C#: Player.NhanLiXiForNPC_22 (chưa nạp) [dùng]
+    "nhanLiXiNpc23": 0, // data_event_models[23] đã nhận lì xì Tết từ NPC Cargo hôm nay | C#: Player.NhanLiXiForNPC_23 (chưa nạp) [dùng]
+    "nhanLiXiNpc24": 0, // data_event_models[24] đã nhận lì xì Tết từ NPC Cui hôm nay | C#: Player.NhanLiXiForNPC_24 (chưa nạp) [dùng]
+    "nhanLiXiNpc25": 0, // data_event_models[25] đã nhận lì xì Tết từ NPC Jaco hôm nay | C#: Player.NhanLiXiForNPC_25 (chưa nạp) [dùng]
+    "nhanKeoNpc1": 0, // data_event_models[26] đã nhận kẹo/bị ghẹo (Halloween) ở NPC Appule hôm nay | C#: Player.NhanKeoHayBiGheoNpc_1 (chưa nạp) [dùng]
+    "nhanKeoNpc2": 0, // data_event_models[27] đã nhận kẹo/bị ghẹo (Halloween) ở NPC Bulma hôm nay | C#: Player.NhanKeoHayBiGheoNpc_2 (chưa nạp) [dùng]
+    "nhanKeoNpc3": 0, // data_event_models[28] đã nhận kẹo/bị ghẹo (Halloween) ở NPC Dende hôm nay | C#: Player.NhanKeoHayBiGheoNpc_3 (chưa nạp) [dùng]
+    "nhanKeoNpc4": 0, // data_event_models[29] đã nhận kẹo/bị ghẹo (Halloween) ở NPC DaiThienSu hôm nay | C#: Player.NhanKeoHayBiGheoNpc_4 (chưa nạp) [dùng]
+    "nhanKeoNpc5": 0, // data_event_models[30] đã nhận kẹo/bị ghẹo (Halloween) ở NPC MrPoPo hôm nay | C#: Player.NhanKeoHayBiGheoNpc_5 (chưa nạp) [dùng]
+    "nhanKeoNpc6": 0, // data_event_models[31] đã nhận kẹo/bị ghẹo (Halloween) ở NPC Uron hôm nay | C#: Player.NhanKeoHayBiGheoNpc_6 (chưa nạp) [dùng]
+    "nhanKeoNpc7": 0, // data_event_models[32] đã nhận kẹo/bị ghẹo (Halloween) ở NPC DrDrief hôm nay | C#: Player.NhanKeoHayBiGheoNpc_7 (chưa nạp) [dùng]
+    "nhanKeoNpc8": 0, // data_event_models[33] đã nhận kẹo/bị ghẹo (Halloween) ở NPC Cargo hôm nay | C#: Player.NhanKeoHayBiGheoNpc_8 (chưa nạp) [dùng]
+    "nhanKeoNpc9": 0, // data_event_models[34] đã nhận kẹo/bị ghẹo (Halloween) ở NPC Cui hôm nay | C#: Player.NhanKeoHayBiGheoNpc_9 (chưa nạp) [dùng]
+    "nhanKeoNpc10": 0, // data_event_models[35] đã nhận kẹo/bị ghẹo (Halloween) ở NPC Santa hôm nay | C#: Player.NhanKeoHayBiGheoNpc_10 (chưa nạp) [dùng]
+    "nhanKeoNpc11": 0, // data_event_models[36] đã nhận kẹo/bị ghẹo (Halloween) ở NPC TruongLaoGuru hôm nay | C#: Player.NhanKeoHayBiGheoNpc_11 (chưa nạp) [dùng]
+    "nhanKeoNpc12": 0, // data_event_models[37] đã nhận kẹo/bị ghẹo (Halloween) ở NPC VuaVegeta hôm nay | C#: Player.NhanKeoHayBiGheoNpc_12 (chưa nạp) [dùng]
+    "nhanKeoNpc13": 0, // data_event_models[38] đã nhận kẹo/bị ghẹo (Halloween) ở NPC QuyLaoKame hôm nay | C#: Player.NhanKeoHayBiGheoNpc_13 (chưa nạp) [dùng]
+    "nhanKeoNpc14": 0, // data_event_models[39] đã nhận kẹo/bị ghẹo (Halloween) ở NPC BaHatMit hôm nay | C#: Player.NhanKeoHayBiGheoNpc_14 (chưa nạp) [dùng]
+    "nhanKeoNpc15": 0, // data_event_models[40] NhanKeoHayBiGheoNpc_15: không NPC nào dùng (chỉ reset) | C#: Player.NhanKeoHayBiGheoNpc_15 (chưa nạp) [không dùng]
+    "uocMienPhi": 0, // data_event_models[41] đã ước miễn phí hôm nay (ThoDaiKa) | C#: Player.UocMienPhi (chưa nạp) [dùng]
+    "nhanQuaHungVuongFree": 0, // data_event_models[42] bitmask đã nhận quà Hùng Vương miễn phí (bit 1 = mốc 0, bit 2 = mốc 1) | C#: Player.NhanQuaHungVuongFree (chưa nạp) [dùng]
+    "diemDanhBangHoi": 0, // data_event_models[43] đã điểm danh bang hội (GiuMaDauBo) | C#: Player.DiemDanhBangHoi (chưa nạp) [dùng]
+    "unused44": 0 // data_event_models[44] đệm: createNewPlayer ghi 45 số 0, updatePlayer chỉ ghi 44 (C# CreateNew ghi 44 – lệch Java tạo mới) | C#: chưa có [không dùng]
+  },
+  // bộ đếm/cờ hằng ngày; không có trong INSERT → DEFAULT 10 số 0; load: qua ngày → reset [1],[2],[8], [3]+1 [dùng]
+  "data_models": {
+    "timeTrongNgay": 0, // data_models[0] ngày (DAY_OF_YEAR) lần reset cuối | C#: Player.TimeTrongNgay (chưa nạp) [dùng]
+    "soLanHoTong": 0, // data_models[1] solanhotong (số lần hộ tống trong ngày): chỉ được load reset về 0, không code game nào đặt/đọc | C#: Player.Solanhotong (chưa nạp) [không dùng]
+    "nhanThuocTrongNgay": 0, // data_models[2] đã nhận thuốc hôm nay (NpcFactory) | C#: Player.NhanThuocTrongNgay (chưa nạp) [dùng]
+    "soNgayTaoAcc": 0, // data_models[3] số ngày từ khi tạo (+1 mỗi ngày đăng nhập; UseItem đọc) | C#: Player.SoNgayTaoAcc (chưa nạp) [dùng]
+    "quocTich": 0, // data_models[4] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – quốc tịch (UseItem đọc) | C#: Player.QuocTich (chưa nạp) [dùng]
+    "trbGiap": 0, // data_models[5] trbgiap: chỉ load/lưu, không code game nào đặt/đọc | C#: Player.Trbgiap (chưa nạp) [không dùng]
+    "trbNe": 0, // data_models[6] ⚠ không code game nào đặt giá trị (chỉ đổi khi sửa DB) – trbne (NPoint đọc) | C#: Player.Trbne (chưa nạp) [dùng]
+    "giaiPhongAn": 0, // data_models[7] giải phóng ấn (NpcFactory) | C#: Player.Giaiphongan (chưa nạp) [dùng]
+    "pointRank": 0, // data_models[8] điểm rank trong ngày (Player) | C#: Player.PointRank (chưa nạp) [dùng]
+    "unused9": 0 // data_models[9] đệm: DEFAULT có 10 số 0, Java chỉ đọc/ghi 9 → mất sau lần lưu đầu | C#: chưa có [không dùng]
+  },
+  "hp_point_fusion": 0, // % HP cộng khi hợp thể: DetuService set nhưng NPoint KHÔNG dùng | C#: chưa có (PointFusion rỗng) [chỉ ghi]
+  "mp_point_fusion": 0, // % KI cộng khi hợp thể: DetuService set nhưng NPoint KHÔNG dùng | C#: chưa có (PointFusion rỗng) [chỉ ghi]
+  "dame_point_fusion": 0, // % sức đánh đệ cộng khi hợp thể (NPoint dùng) | C#: chưa có (PointFusion rỗng) [dùng]
+  "lastTimeUpdateTask": 1, // PG: last_time_update_task | DEFAULT 1; hàm ghi DatabaseUpdater.updateLastTimeUpdateTask chỉ được gọi ở dòng đã comment; không ai đọc | C#: chưa có [không dùng]
+  // danh hiệu theo thời hạn; DEFAULT '[0×8]' [dùng]
+  "danh_hieu": {
+    "useThienTu": 0, // danh_hieu[0] đang dùng danh hiệu Thiên Tử (0/1) | C#: Player.IsUseDanhHieu_ThienTu (chưa nạp) [dùng]
+    "lastTimeThienTu": 0, // danh_hieu[1] hạn danh hiệu Thiên Tử (ms) | C#: Player.LastTimeDanhHieu_ThienTu (chưa nạp) [dùng]
+    "use2": 0, // danh_hieu[2] đang dùng danh hiệu 2 | C#: Player.IsUseDanhHieu_2 (chưa nạp) [dùng]
+    "lastTime2": 0, // danh_hieu[3] hạn danh hiệu 2 (ms) | C#: Player.LastTimeDanhHieu_2 (chưa nạp) [dùng]
+    "use3": 0, // danh_hieu[4] đang dùng danh hiệu 3 | C#: Player.IsUseDanhHieu_3 (chưa nạp) [dùng]
+    "lastTime3": 0, // danh_hieu[5] hạn danh hiệu 3 (ms) | C#: Player.LastTimeDanhHieu_3 (chưa nạp) [dùng]
+    "use4": 0, // danh_hieu[6] đang dùng danh hiệu 4 | C#: Player.IsUseDanhHieu_4 (chưa nạp) [dùng]
+    "lastTime4": 0 // danh_hieu[7] hạn danh hiệu 4 (ms) | C#: Player.LastTimeDanhHieu_4 (chưa nạp) [dùng]
+  }
+}

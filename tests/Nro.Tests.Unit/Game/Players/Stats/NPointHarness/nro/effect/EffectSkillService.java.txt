@@ -1,0 +1,18 @@
+package nro.effect;
+
+import nro.player.Player;
+
+public class EffectSkillService {
+
+    private static final EffectSkillService instance = new EffectSkillService();
+
+    public static EffectSkillService gI() {
+        return instance;
+    }
+
+    public void stopCharge(Player player) {
+        nro.harness.Log.add("stopCharge");
+        player.effectSkill.isCharging = false;
+        player.effectSkill.countCharging = 0;
+    }
+}

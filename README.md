@@ -23,7 +23,7 @@ python ../port-csharp/tools/check_port.py test
 
 ## Folder structure
 
-Same conventions as the reference solution `backend_manage` (folders per kind of code, interfaces in an `Interfaces` folder), kept on top of the 6 layered projects.
+Feature code is grouped by capability. Interfaces implemented in the same project sit beside their implementation; contracts implemented by another project live in that feature's `Ports/` folder. Foundation projects retain their own layouts where shown below.
 
 ```
 nro-csharp/
@@ -63,12 +63,12 @@ nro-csharp/
     └── golden/                reference data generated from the original Java code (do not edit by hand)
 ```
 
-Where new code goes (same names as the reference solution): `Configurations/` setup and options, `Data/` database access, `Entities/` table classes,
-`Exceptions/` custom exceptions, `Extensions/` extension methods, `Helpers/` small utilities, `Messages/` queue/game messages, `Repositories/` data access per
-aggregate with its `Repositories/Interfaces/`, `Services/` business logic with its `Services/Interfaces/` (feature subfolders inside `Services/`, as in the reference).
+Where new code goes: `Db/` database access, contracts, options, and database exceptions; `Entities/` table classes;
+`Repositories/<feature>/` data access plus its local models and implementation-owned interfaces; `Extensions/` extension methods,
+`Messages/` queue/game messages, and `Services/` business logic with implementation-owned interfaces beside the implementation and external contracts in the feature's `Ports/` folder.
 
 Notes:
-- Subfolders only organize files; the namespace stays at project level (`Nro.Data`, `Nro.Core.IO`), except `Interfaces` (`Nro.Data.Interfaces`, `Nro.Core.Interfaces`) and `Entities` (`Nro.Data.Entities`).
+- Namespaces mirror project folders (for example `Nro.Data.Db`, `Nro.Data.Repositories.Players`, and `Nro.Data.Entities.Runtime`).
 - Entities are generated with `python ../port-csharp/tools/entities/gen_entities.py` (add `--check` to verify they were not edited by hand). They follow the house format: one class per file, data annotations (`[Key]`, `[Required]`, `[MaxLength]`, `[ForeignKey]`; `[Table]` and `[Column("name")]` only where the snake_case naming convention would give a different name, `[Column(TypeName = ...)]` where the SQL type matters), a short VIETNAMESE comment above every property (the house format of the reference entities; the only Vietnamese prose left in the repo besides game data), navigation properties for the 15 high-confidence relationships. Property comments come from `port-csharp/tools/entities/comments/vi_short/*.json`.
 - JSON/array text columns are plain `string` marked `[JsonText]` (every character is preserved).
 - The data layer maps entities by a snake_case naming convention (`AccountId` to `account_id`); renamed properties such as the primary key `AccountId` to column `id` carry an explicit `[Column]`.

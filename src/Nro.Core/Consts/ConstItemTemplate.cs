@@ -1,10 +1,7 @@
 namespace Nro.Core.Consts;
 
-/// <summary>
-/// Port of <c>consts/ConstItemTemplate.java</c>: class and constant names are preserved; values were machine-translated from Java
-/// (port-csharp/tools/consts/gen_consts_cs.py), not copied by hand.
-/// Automatically verified against the real values read from the compiled Java class: <c>ConstsParityTests</c> (tests/golden/consts.json).
-/// </summary>
+// Hằng số mẫu vật phẩm (item template): bản Java để trống nên chưa có hằng số nào
+// Nguồn Java: consts/ConstItemTemplate.java (tên đổi sang tiếng Anh, tên Java gốc ghi cuối chú thích nếu khác; giá trị đối chiếu bằng ConstsParityTests)
 public static class ConstItemTemplate
 {
 }

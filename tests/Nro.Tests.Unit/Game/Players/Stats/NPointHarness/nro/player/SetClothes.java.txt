@@ -1,0 +1,38 @@
+package nro.player;
+
+public class SetClothes {
+
+    public byte songoku;
+    public byte thienXinHang;
+    public byte kirin;
+    public byte thanVuTruKaio;
+    public byte yamcha;
+    public byte ocTieu;
+    public byte pikkoroDaimao;
+    public byte picolo;
+    public byte nail;
+    public byte slug;
+    public byte kakarot;
+    public byte cadic;
+    public byte nappa;
+    public byte cadicM;
+    public byte broly;
+    public byte gohan;
+    public byte goten;
+    public byte frieza;
+    public byte cumber;
+    public byte thanhuydietchampa;
+    public byte worldcup;
+    public byte setDHD;
+    public boolean godClothes;
+    public int ctHaiTac = -1;
+    public int ctBunmaTocMau = -1;
+    public int ctTiecbaiBien = -1;
+    public int ctNezuko = -1;
+    public int ctTanjiro = -1;
+    public int ctInoHashi = -1;
+    public int ctInosuke = -1;
+    public int ctZenitsu = -1;
+    public int ctFideDaiCa = -1;
+    public int ctDanEmFide = -1;
+}

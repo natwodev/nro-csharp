@@ -2,67 +2,55 @@ using System.Buffers.Binary;
 
 namespace Nro.Core.IO;
 
-/// <summary>
-/// Replacement for JDK 17's <c>java.io.DataOutputStream</c> wrapping <c>java.io.ByteArrayOutputStream</c>: writes to a growable byte buffer,
-/// ALL multi-byte numbers are BIG-ENDIAN, strings are modified UTF-8 (<see cref="WriteUTF"/>).
-/// Does not use <c>BinaryWriter</c> (little-endian) or <c>Encoding.UTF8</c>.
-/// <para>
-/// Method names follow Java, capitalised. The only deliberate differences: a <c>null</c> argument throws
-/// <see cref="ArgumentNullException"/> (Java: <c>NullPointerException</c>) and an invalid range throws
-/// <see cref="ArgumentOutOfRangeException"/> (Java: <c>IndexOutOfBoundsException</c>); both happen BEFORE any byte is written.
-/// </para>
-/// <para>
-/// Not safe when several threads WRITE at once (just like using <c>Message</c> in the real Java code). Several threads calling
-/// <see cref="ToArray"/> when nobody is writing any more is safe.
-/// </para>
-/// </summary>
+// Bộ ghi vào bộ đệm byte tăng dần tương thích DataOutputStream bọc ByteArrayOutputStream: số nhiều byte theo big-endian, chuỗi theo modified UTF-8; không dùng BinaryWriter hoặc Encoding.UTF8.
+// Nguồn Java: java.io.DataOutputStream bọc java.io.ByteArrayOutputStream của JDK 17 (bảo toàn big-endian, modified UTF-8, chuẩn hoá NaN khi ghi float/double, close/flush không làm ngừng ghi và cách tăng sức chứa của ByteArrayOutputStream).
+// Khác biệt C# có chủ đích: null ném ArgumentNullException thay vì NullPointerException, phạm vi sai ném ArgumentOutOfRangeException thay vì IndexOutOfBoundsException; cả hai xảy ra trước khi ghi byte nào.
+// Không an toàn khi nhiều luồng cùng ghi như Message Java; nhiều luồng chỉ gọi ToArray sau khi đã ngừng ghi thì an toàn.
 public sealed class JavaDataOutput
 {
-    /// <summary>Initial capacity of the JDK's <c>ByteArrayOutputStream()</c>.</summary>
+    // Sức chứa ban đầu của ByteArrayOutputStream() trong JDK
     private const int DefaultCapacity = 32;
 
-    /// <summary>Maximum number of encoded bytes for <c>writeUTF</c> (the length is a uint16).</summary>
+    // Số byte mã hoá tối đa của writeUTF vì độ dài là uint16
     private const int MaxUtfLength = 65535;
 
     private byte[] _buf;
     private int _count;
 
+    // Tạo bộ ghi với sức chứa mặc định của ByteArrayOutputStream (Java: ByteArrayOutputStream())
     public JavaDataOutput()
         : this(DefaultCapacity)
     {
     }
 
-    /// <param name="capacity">Initial capacity (corresponds to <c>new ByteArrayOutputStream(size)</c>); a negative value throws, as in Java.</param>
+    // Tạo bộ ghi với sức chứa ban đầu; giá trị âm ném lỗi như Java (Java: ByteArrayOutputStream(int))
     public JavaDataOutput(int capacity)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(capacity);
         _buf = new byte[capacity];
     }
 
-    /// <summary>Number of bytes written (<c>DataOutputStream.size()</c>).</summary>
+    // Số byte đã ghi (Java: size)
     public int Size => _count;
 
-    /// <summary>
-    /// A COPY of the bytes written (<c>ByteArrayOutputStream.toByteArray()</c>). It must be a copy: the caller (packet writer)
-    /// XOR-encrypts this array in place, while the same <c>Message</c> may be waiting to be sent to many other players.
-    /// </summary>
+    // Trả bản sao byte đã ghi để nơi ghi gói có thể mã hoá XOR tại chỗ dù cùng Message còn chờ gửi cho nhiều người chơi (Java: toByteArray)
     public byte[] ToArray() => _buf.AsSpan(0, _count).ToArray();
 
-    /// <summary>Writes the low 8 bits of <paramref name="b"/> (<c>write(int)</c>).</summary>
+    // Ghi 8 bit thấp của b (Java: write)
     public void Write(int b)
     {
         Reserve(1);
         _buf[_count++] = unchecked((byte)b);
     }
 
-    /// <summary>Writes the whole array (<c>write(byte[])</c>).</summary>
+    // Ghi toàn bộ mảng (Java: write(byte[]))
     public void Write(byte[] b)
     {
         ArgumentNullException.ThrowIfNull(b);
         Write(b, 0, b.Length);
     }
 
-    /// <summary>Writes <paramref name="len"/> bytes from <paramref name="off"/> (<c>write(byte[], int, int)</c>); an invalid range writes nothing.</summary>
+    // Ghi len byte từ off; phạm vi sai không ghi byte nào (Java: write(byte[], int, int))
     public void Write(byte[] b, int off, int len)
     {
         ArgumentNullException.ThrowIfNull(b);
@@ -72,13 +60,13 @@ public sealed class JavaDataOutput
         _count += len;
     }
 
-    /// <summary>1 byte: <c>01</c> if true, <c>00</c> if false.</summary>
+    // Ghi 1 byte: 01 khi true, 00 khi false (Java: writeBoolean)
     public void WriteBoolean(bool v) => Write(v ? 1 : 0);
 
-    /// <summary>Keeps only the low 8 bits (<c>writeByte(256)</c> writes <c>00</c>, <c>writeByte(-1)</c> writes <c>FF</c>).</summary>
+    // Chỉ giữ 8 bit thấp; writeByte(256) ghi 00 và writeByte(-1) ghi FF (Java: writeByte)
     public void WriteByte(int v) => Write(v);
 
-    /// <summary>Keeps only the low 16 bits, big-endian.</summary>
+    // Chỉ giữ 16 bit thấp theo big-endian (Java: writeShort)
     public void WriteShort(int v)
     {
         Reserve(2);
@@ -86,9 +74,10 @@ public sealed class JavaDataOutput
         _count += 2;
     }
 
-    /// <summary>Same as <see cref="WriteShort"/>: keeps only the low 16 bits, big-endian.</summary>
+    // Như WriteShort: chỉ giữ 16 bit thấp theo big-endian (Java: writeChar)
     public void WriteChar(int v) => WriteShort(v);
 
+    // Ghi số nguyên 32 bit có dấu theo big-endian (Java: writeInt)
     public void WriteInt(int v)
     {
         Reserve(4);
@@ -96,6 +85,7 @@ public sealed class JavaDataOutput
         _count += 4;
     }
 
+    // Ghi số nguyên 64 bit có dấu theo big-endian (Java: writeLong)
     public void WriteLong(long v)
     {
         Reserve(8);
@@ -103,16 +93,13 @@ public sealed class JavaDataOutput
         _count += 8;
     }
 
-    /// <summary>
-    /// Like <c>Float.floatToIntBits</c>: the bits of the float, BUT every NaN is normalised to <c>7FC00000</c>
-    /// (unlike <c>BitConverter.SingleToInt32Bits</c>, which preserves the NaN payload).
-    /// </summary>
+    // Ghi bit float như Float.floatToIntBits: mọi NaN chuẩn hoá thành 7FC00000, không giữ phần tải NaN như BitConverter.SingleToInt32Bits (Java: writeFloat)
     public void WriteFloat(float v) => WriteInt(float.IsNaN(v) ? 0x7fc00000 : BitConverter.SingleToInt32Bits(v));
 
-    /// <summary>Like <c>Double.doubleToLongBits</c>: every NaN is normalised to <c>7FF8000000000000</c>.</summary>
+    // Ghi bit double như Double.doubleToLongBits: mọi NaN chuẩn hoá thành 7FF8000000000000 (Java: writeDouble)
     public void WriteDouble(double v) => WriteLong(double.IsNaN(v) ? 0x7ff8000000000000L : BitConverter.DoubleToInt64Bits(v));
 
-    /// <summary>Each character is written as 1 byte = the low 8 bits of the UTF-16 unit (characters &gt; U+00FF are truncated, as in Java).</summary>
+    // Ghi mỗi đơn vị UTF-16 thành 1 byte thấp; ký tự lớn hơn U+00FF bị cắt như Java (Java: writeBytes)
     public void WriteBytes(string s)
     {
         ArgumentNullException.ThrowIfNull(s);
@@ -128,7 +115,7 @@ public sealed class JavaDataOutput
         _count = count;
     }
 
-    /// <summary>Each UTF-16 unit is written as 2 big-endian bytes.</summary>
+    // Ghi mỗi đơn vị UTF-16 thành 2 byte big-endian (Java: writeChars)
     public void WriteChars(string s)
     {
         ArgumentNullException.ThrowIfNull(s);
@@ -146,12 +133,7 @@ public sealed class JavaDataOutput
         _count = count;
     }
 
-    /// <summary>
-    /// Modified UTF-8 exactly like JDK 17's <c>DataOutputStream.writeUTF</c>: a 2-byte length (uint16, the number of encoded BYTES) followed by
-    /// each UTF-16 unit encoded separately: U+0001..U+007F = 1 byte; U+0000 and U+0080..U+07FF = 2 bytes (U+0000 is <c>C0 80</c>);
-    /// U+0800..U+FFFF = 3 bytes. A character outside the BMP is TWO 3-byte sequences (a surrogate pair), and a lone surrogate is still encoded as 3 bytes.
-    /// If it exceeds 65535 bytes, throws <see cref="UtfDataFormatException"/> BEFORE any byte is written (the buffer is left unchanged).
-    /// </summary>
+    // Ghi modified UTF-8 đúng DataOutputStream.writeUTF của JDK 17: độ dài uint16 là số BYTE, U+0001..U+007F = 1 byte, U+0000/U+0080..U+07FF = 2 byte (U+0000 là C0 80), U+0800..U+FFFF = 3 byte; ngoài BMP là hai chuỗi 3 byte, surrogate đơn lẻ vẫn 3 byte; quá 65535 byte ném UtfDataFormatException trước khi đổi bộ đệm (Java: writeUTF)
     public void WriteUTF(string s)
     {
         ArgumentNullException.ThrowIfNull(s);
@@ -199,20 +181,17 @@ public sealed class JavaDataOutput
         _count = count;
     }
 
-    /// <summary>Does nothing (in-memory buffer; Java's <c>flush()</c> does the same). There are 5 call sites of <c>writer().flush()</c> in the game code.</summary>
+    // Không làm gì vì bộ đệm ở bộ nhớ như flush() Java; mã game gọi writer().flush() tại 5 chỗ (Java: flush)
     public void Flush()
     {
     }
 
-    /// <summary>
-    /// Does nothing, like <c>close()</c> of <c>DataOutputStream</c>/<c>ByteArrayOutputStream</c>: AFTER closing, writing can continue
-    /// and <see cref="ToArray"/> still returns all the data. Keep this behaviour (see <c>Message.Cleanup</c>).
-    /// </summary>
+    // Không làm gì như close() của DataOutputStream/ByteArrayOutputStream: đóng rồi vẫn ghi được và ToArray vẫn trả toàn bộ dữ liệu; Message.Cleanup phụ thuộc điều này (Java: close)
     public void Close()
     {
     }
 
-    /// <summary>The message is identical to the JDK 17 <c>DataOutputStream.tooLongMsg</c> (the real length, not overflowed as an int).</summary>
+    // Tạo thông báo giống DataOutputStream.tooLongMsg của JDK 17, dùng độ dài thực không tràn int
     private static string TooLongMessage(string s, long utflen)
     {
         string head = s.Substring(0, 8);
@@ -220,7 +199,7 @@ public sealed class JavaDataOutput
         return $"encoded string ({head}...{tail}) too long: {utflen} bytes";
     }
 
-    /// <summary>Ensures room for <paramref name="extra"/> more bytes (doubles the capacity, like <c>ByteArrayOutputStream</c>).</summary>
+    // Bảo đảm chỗ cho extra byte nữa bằng cách gấp đôi sức chứa như ByteArrayOutputStream
     private void Reserve(long extra)
     {
         long required = _count + extra;

@@ -1,0 +1,8 @@
+package Utils;
+
+public class Logger {
+
+    public static void error(String text) {
+        nro.harness.Log.add("Logger.error");
+    }
+}

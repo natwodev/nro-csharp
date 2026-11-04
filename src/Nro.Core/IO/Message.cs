@@ -1,73 +1,49 @@
-using Nro.Core.Interfaces;
-
 namespace Nro.Core.IO;
 
-/// <summary>
-/// Port of <c>network/io/Message.java</c>: a packet made of a <see cref="Command"/> (<c>sbyte</c>) and either a WRITE stream
-/// (constructors <c>(int)</c>/<c>(sbyte)</c>) or a READ stream (constructor <c>(sbyte, byte[])</c>). The <c>ReadX/WriteX</c> methods merely delegate to
-/// <see cref="Reader"/>/<see cref="Writer"/>.
-/// <para>
-/// LIFECYCLE (measured on the real Java code, JDK 17; the 587 <c>cleanup()</c> calls and the <c>dispose()</c> calls in the game depend on this):
-/// </para>
-/// <list type="bullet">
-/// <item><description><b><see cref="Cleanup"/> only "closes" in-memory streams, and closing <c>ByteArrayOutputStream/ByteArrayInputStream</c> does nothing.</b>
-/// After <c>Cleanup()</c> the data is intact, <see cref="Writer"/>/<see cref="Reader"/> still return the same object, writing/reading can continue,
-/// and <see cref="GetData"/> still returns everything. Calling it repeatedly, or after <see cref="Dispose"/>, never fails. This is REQUIRED: game code calls
-/// <c>session.sendMessage(msg); msg.cleanup();</c> while the packet is still in the queue, and the sender thread reads <see cref="GetData"/> afterwards.</description></item>
-/// <item><description><b><see cref="Dispose"/> = <see cref="Cleanup"/> followed by dropping the stream references.</b> Afterwards (Java returns <c>null</c>, and using it would throw
-/// <c>NullPointerException</c>): <see cref="Writer"/>, <see cref="Reader"/>, <see cref="GetData"/> and every <c>ReadX/WriteX</c> throw
-/// <see cref="ObjectDisposedException"/>. <see cref="Command"/> is still readable (<c>Controller.onMessage</c> still logs <c>_msg.command</c> after <c>dispose()</c>).
-/// Calling <see cref="Dispose"/> or <see cref="Cleanup"/> again does not fail.</description></item>
-/// <item><description>A write-mode packet has no <see cref="Reader"/>, and a read-mode packet has no <see cref="Writer"/>/<see cref="GetData"/> (Java: <c>null</c>/NPE);
-/// here they throw <see cref="InvalidOperationException"/>. This error does NOT derive from <c>IOException</c>, so the caller's <c>catch (IOException)</c> blocks
-/// do not swallow it, just as an NPE propagates through <c>catch (IOException)</c> in Java.</description></item>
-/// </list>
-/// <para>
-/// Deliberately does NOT extend <see cref="IDisposable"/> (see <see cref="IMessage"/>). There is no <c>ReadImage/WriteImage</c> (nothing calls them).
-/// </para>
-/// </summary>
+// Gói tin gồm lệnh Command (sbyte) và một luồng ghi hoặc một luồng đọc; các ReadX/WriteX chỉ ủy quyền cho Reader/Writer.
+// Nguồn Java: network/io/Message.java (đo trên JDK 17: bảo toàn ngữ nghĩa ByteArrayOutputStream/ByteArrayInputStream, Close không làm mất dữ liệu).
+// Vì vậy Cleanup vẫn cho đọc/ghi và GetData sau session.sendMessage(msg); msg.cleanup() (587 vị trí gọi trong game); Dispose mới dọn tham chiếu luồng,
+// còn Command vẫn đọc được; sai chế độ thay NPE Java bằng InvalidOperationException không kế thừa IOException.
+// Lớp cố ý không triển khai IDisposable theo IMessage; ReadImage/WriteImage của Java không được port vì không có nơi gọi.
 public class Message : IMessage
 {
     private JavaDataOutput? _dos;
     private JavaDataInput? _dis;
     private bool _disposed;
 
-    /// <summary>Java: <c>public byte command</c> (public, writable field) -> signed <c>sbyte</c> (e.g. -27, -28).</summary>
+    // Lệnh gói tin có dấu, tương ứng trường byte command công khai, ghi được của Java (ví dụ -27, -28) (Java: command)
     public sbyte Command { get; set; }
 
-    /// <summary>
-    /// Java's <c>Message(int command)</c>: truncates like <c>(byte) command</c>, i.e. the signed low 8 bits
-    /// (<c>new Message(-218)</c> is command 38, <c>new Message(200)</c> is -56, <c>new Message(256)</c> is 0).
-    /// </summary>
+    // Tạo gói ghi, cắt command như ép byte Java: lấy 8 bit thấp có dấu (-218 thành 38, 200 thành -56, 256 thành 0)
     public Message(int command)
         : this(unchecked((sbyte)command))
     {
     }
 
-    /// <summary>A packet in WRITE mode (empty write stream; <see cref="GetData"/> returns an empty array, not null).</summary>
+    // Tạo gói ở chế độ ghi; GetData trả mảng rỗng thay vì null khi chưa ghi dữ liệu
     public Message(sbyte command)
     {
         Command = command;
         _dos = new JavaDataOutput();
     }
 
-    /// <summary>
-    /// A packet in READ mode over <paramref name="data"/>. Does NOT copy the array (like <c>ByteArrayInputStream</c>);
-    /// a null <c>data</c> throws <see cref="ArgumentNullException"/> (Java: NPE in the constructor).
-    /// </summary>
+    // Tạo gói ở chế độ đọc trực tiếp trên data, không sao chép; data null ném ArgumentNullException như NPE khi dựng Java
     public Message(sbyte command, byte[] data)
     {
         Command = command;
         _dis = new JavaDataInput(data);
     }
 
+    // Trả luồng ghi; gói đọc hoặc đã Dispose ném lỗi tương ứng (Java: writer)
     public JavaDataOutput Writer() => _dos ?? throw Unavailable("writer", isWriter: true);
 
+    // Trả luồng đọc; gói ghi hoặc đã Dispose ném lỗi tương ứng (Java: reader)
     public JavaDataInput Reader() => _dis ?? throw Unavailable("reader", isWriter: false);
 
+    // Trả toàn bộ byte đã ghi; gói đọc hoặc đã Dispose ném lỗi tương ứng (Java: getData)
     public byte[] GetData() => (_dos ?? throw Unavailable("writer (GetData)", isWriter: true)).ToArray();
 
-    /// <summary>Java <c>writeCris</c>: <paramref name="is"/> = true writes a 4-byte <c>int</c> (truncated to the low 32 bits), otherwise an 8-byte <c>long</c>.</summary>
+    // Ghi int 4 byte từ 32 bit thấp khi is đúng, ngược lại ghi long 8 byte (Java: writeCris)
     public void WriteCris(long v, bool @is)
     {
         if (@is)
@@ -79,7 +55,7 @@ public class Message : IMessage
         WriteLong(v);
     }
 
-    /// <summary>Java <c>writeShortToLong</c>: <paramref name="is"/> = true writes a 2-byte <c>short</c> (truncated to the low 16 bits), otherwise an 8-byte <c>long</c>.</summary>
+    // Ghi short 2 byte từ 16 bit thấp khi is đúng, ngược lại ghi long 8 byte (Java: writeShortToLong)
     public void WriteShortToLong(long v, bool @is)
     {
         if (@is)
@@ -91,7 +67,7 @@ public class Message : IMessage
         WriteLong(v);
     }
 
-    /// <summary>Java <c>writeByteToLong</c>: <paramref name="is"/> = true writes a 1-byte <c>byte</c> (truncated to the low 8 bits), otherwise an 8-byte <c>long</c>.</summary>
+    // Ghi byte 1 byte từ 8 bit thấp khi is đúng, ngược lại ghi long 8 byte (Java: writeByteToLong)
     public void WriteByteToLong(long v, bool @is)
     {
         if (@is)
@@ -103,14 +79,14 @@ public class Message : IMessage
         WriteLong(v);
     }
 
-    /// <summary>Java <c>cleanup()</c>: closes the streams that are still referenced. Closing in-memory streams does nothing, so the data and further writes/reads are NOT affected.</summary>
+    // Đóng các luồng còn tham chiếu; đóng luồng bộ nhớ không ảnh hưởng dữ liệu hay việc đọc/ghi tiếp (Java: cleanup)
     public void Cleanup()
     {
         _dis?.Close();
         _dos?.Close();
     }
 
-    /// <summary>Java <c>dispose()</c>: <see cref="Cleanup"/> followed by dropping the stream references. <see cref="Command"/> is unchanged.</summary>
+    // Dọn luồng rồi bỏ tham chiếu chúng; Command không đổi, các lần gọi Cleanup/Dispose sau vẫn không lỗi (Java: dispose)
     public void Dispose()
     {
         Cleanup();
@@ -119,67 +95,97 @@ public class Message : IMessage
         _dos = null;
     }
 
+    // Đọc byte kế tiếp hoặc -1 ở cuối luồng (Java: read)
     public int Read() => Reader().Read();
 
+    // Đọc byte vào toàn bộ mảng đích (Java: read)
     public int Read(byte[] b) => Reader().Read(b);
 
+    // Đọc tối đa len byte vào mảng đích từ vị trí off (Java: read)
     public int Read(byte[] b, int off, int len) => Reader().Read(b, off, len);
 
+    // Đọc Boolean theo định dạng DataInput (Java: readBoolean)
     public bool ReadBoolean() => Reader().ReadBoolean();
 
+    // Đọc byte có dấu (Java: readByte)
     public sbyte ReadByte() => Reader().ReadByte();
 
+    // Đọc short big-endian có dấu (Java: readShort)
     public short ReadShort() => Reader().ReadShort();
 
+    // Đọc int big-endian có dấu (Java: readInt)
     public int ReadInt() => Reader().ReadInt();
 
+    // Đọc long big-endian có dấu (Java: readLong)
     public long ReadLong() => Reader().ReadLong();
 
+    // Đọc float IEEE 754 big-endian (Java: readFloat)
     public float ReadFloat() => Reader().ReadFloat();
 
+    // Đọc double IEEE 754 big-endian (Java: readDouble)
     public double ReadDouble() => Reader().ReadDouble();
 
+    // Đọc ký tự UTF-16 từ hai byte big-endian (Java: readChar)
     public char ReadChar() => Reader().ReadChar();
 
+    // Đọc chuỗi modified UTF-8 với tiền tố độ dài kiểu DataInput (Java: readUTF)
     public string ReadUTF() => Reader().ReadUTF();
 
+    // Đọc đủ toàn bộ mảng đích hoặc ném lỗi khi thiếu dữ liệu (Java: readFully)
     public void ReadFully(byte[] b) => Reader().ReadFully(b);
 
+    // Đọc đủ len byte vào mảng đích từ vị trí off hoặc ném lỗi khi thiếu dữ liệu (Java: readFully)
     public void ReadFully(byte[] b, int off, int len) => Reader().ReadFully(b, off, len);
 
+    // Đọc byte không dấu thành int 0..255 (Java: readUnsignedByte)
     public int ReadUnsignedByte() => Reader().ReadUnsignedByte();
 
+    // Đọc short không dấu big-endian thành int 0..65535 (Java: readUnsignedShort)
     public int ReadUnsignedShort() => Reader().ReadUnsignedShort();
 
+    // Ghi toàn bộ mảng byte (Java: write)
     public void Write(byte[] b) => Writer().Write(b);
 
+    // Ghi 8 bit thấp của int thành một byte (Java: write)
     public void Write(int b) => Writer().Write(b);
 
+    // Ghi len byte của mảng từ vị trí off (Java: write)
     public void Write(byte[] b, int off, int len) => Writer().Write(b, off, len);
 
+    // Ghi Boolean theo định dạng DataOutput (Java: writeBoolean)
     public void WriteBoolean(bool v) => Writer().WriteBoolean(v);
 
+    // Ghi 8 bit thấp của int thành byte (Java: writeByte)
     public void WriteByte(int v) => Writer().WriteByte(v);
 
+    // Ghi 8 bit thấp của từng ký tự chuỗi, không có tiền tố độ dài (Java: writeBytes)
     public void WriteBytes(string s) => Writer().WriteBytes(s);
 
+    // Ghi 16 bit thấp của int thành ký tự UTF-16 big-endian (Java: writeChar)
     public void WriteChar(int v) => Writer().WriteChar(v);
 
+    // Ghi từng ký tự UTF-16 big-endian, không có tiền tố độ dài (Java: writeChars)
     public void WriteChars(string s) => Writer().WriteChars(s);
 
+    // Ghi double IEEE 754 big-endian (Java: writeDouble)
     public void WriteDouble(double v) => Writer().WriteDouble(v);
 
+    // Ghi float IEEE 754 big-endian (Java: writeFloat)
     public void WriteFloat(float v) => Writer().WriteFloat(v);
 
+    // Ghi int big-endian (Java: writeInt)
     public void WriteInt(int v) => Writer().WriteInt(v);
 
+    // Ghi long big-endian (Java: writeLong)
     public void WriteLong(long v) => Writer().WriteLong(v);
 
+    // Ghi 16 bit thấp của int thành short big-endian (Java: writeShort)
     public void WriteShort(int v) => Writer().WriteShort(v);
 
+    // Ghi chuỗi modified UTF-8 với tiền tố độ dài kiểu DataOutput (Java: writeUTF)
     public void WriteUTF(string str) => Writer().WriteUTF(str);
 
-    /// <summary>The error replacing Java's "<c>null</c> then NullPointerException": <see cref="ObjectDisposedException"/> if already disposed, otherwise a wrong-mode error.</summary>
+    // Thay null/NPE của Java bằng ObjectDisposedException khi đã Dispose, còn lại là lỗi sai chế độ luồng
     private Exception Unavailable(string what, bool isWriter)
     {
         if (_disposed)

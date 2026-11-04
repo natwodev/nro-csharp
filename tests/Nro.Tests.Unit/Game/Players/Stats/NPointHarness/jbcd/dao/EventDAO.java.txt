@@ -1,0 +1,20 @@
+package jbcd.dao;
+
+public class EventDAO {
+
+    public static int hp = 0;
+    public static int mp = 0;
+    public static int dame = 0;
+
+    public static int getRemainingTimeToIncreaseHP() {
+        return hp;
+    }
+
+    public static int getRemainingTimeToIncreaseMP() {
+        return mp;
+    }
+
+    public static int getRemainingTimeToIncreaseDame() {
+        return dame;
+    }
+}

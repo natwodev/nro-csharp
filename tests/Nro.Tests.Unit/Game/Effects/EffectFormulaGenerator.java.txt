@@ -1,0 +1,209 @@
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+/**
+ * Generates tests/Nro.Tests/Game/Effects/effect-formulas.json: reference vectors produced by the REAL JDK 17 for the arithmetic of the effect classes.
+ * Run with: java -Dfile.encoding=UTF-8 EffectFormulaGenerator.java <output.json>   (copy this file to EffectFormulaGenerator.java first; the launcher wants that extension)
+ *
+ * The expressions are COPIED, line by line, from the original Java (the file and method are named above each block); only the player/zone plumbing around them is removed.
+ * All numbers are written as strings so that no JSON reader rounds a 64-bit value.
+ *   Utils/Util.java            CrisGH(double a)       with Manager.readInt passed as a parameter
+ *   nro/effect/EffectSkin.java updateOdo, updateXenHutXungQuanh, updateMaPhongBa, updateCTHaiTac, updateBunmaTocMau
+ *   nro/effect/EffectSkillService.java setIsMonkey, setIsMonkeyTrungThu
+ *   Utils/SkillUtil.java       getTimeMonkey
+ */
+public class EffectFormulaGenerator {
+
+    // Utils/Util.java
+    static long CrisGH(double a, boolean readInt) {
+        if (readInt) {
+            if (a > Integer.MAX_VALUE) {
+                a = Integer.MAX_VALUE;
+            }
+            return (int) a;
+        }
+        return (long) a;
+    }
+
+    // Utils/SkillUtil.java
+    static int getTimeMonkey(int level) {
+        return (level + 5) * 10000;
+    }
+
+    static final long[] HP_MAX = {1, 99, 100, 101, 1999, 2147483647L, 2147483648L, 4_000_000_000L, 9_000_000_000_000L, 1_000_000_000_000_000_000L, Long.MAX_VALUE};
+    static final int[] PARAMS = {1, 10, 33, 50, 100, 100000};
+
+    static StringBuilder out = new StringBuilder();
+
+    static void row(String... cells) {
+        out.append("[");
+        for (int i = 0; i < cells.length; i++) {
+            if (i > 0) out.append(",");
+            out.append("\"").append(cells[i]).append("\"");
+        }
+        out.append("],\n");
+    }
+
+    static void begin(String name) {
+        out.append("\"").append(name).append("\": [\n");
+    }
+
+    static void end(boolean last) {
+        if (out.length() >= 2 && out.charAt(out.length() - 2) == ',') {
+            out.setLength(out.length() - 2);
+            out.append("\n");
+        }
+        out.append(last ? "]\n" : "],\n");
+    }
+
+    public static void main(String[] args) throws Exception {
+        out.append("{\n\"meta\": {\"jdk\": \"").append(System.getProperty("java.version")).append("\"},\n");
+
+        // updateOdo: long subHp = Util.CrisGH(pl.nPoint.hpMax * param / 100); if (subHp >= pl.nPoint.hp) subHp = pl.nPoint.hp - 1;
+        begin("odo");
+        for (long hpMax : HP_MAX) {
+            long[] hps = {1, 2, 100, hpMax / 2 + 1, hpMax - 1, hpMax};
+            for (long hp : hps) {
+                if (hp < 1) continue;
+                for (int param : PARAMS) {
+                    for (boolean readInt : new boolean[]{false, true}) {
+                        long subHp = CrisGH(hpMax * param / 100, readInt);
+                        if (subHp >= hp) {
+                            subHp = hp - 1;
+                        }
+                        row("" + hpMax, "" + hp, "" + param, readInt ? "1" : "0", "" + subHp);
+                    }
+                }
+            }
+        }
+        end(false);
+
+        // updateXenHutXungQuanh
+        //   mob:    long subHp = Util.CrisGH(mob.point.getHpFull() * param / 100); if (subHp >= mob.point.gethp()) subHp = mob.point.gethp() - 1;
+        //   player: long subHp = Util.CrisGH((long) pl.nPoint.hpMax * param / 100); long subMp = Util.CrisGH((long) pl.nPoint.mpMax * param / 100);
+        //           if (subHp >= pl.nPoint.hp) subHp = pl.nPoint.hp - 1; if (subMp >= pl.nPoint.mp) subMp = pl.nPoint.mp - 1;
+        begin("xen");
+        long[] mobFulls = {1000, 2147483648L, 9_000_000_000_000L};
+        long[] plMaxes = {1, 100, 1999, 4_000_000_000L, 1_000_000_000_000_000_000L};
+        for (long mobFull : mobFulls) {
+            long[] mobHps = {2, 500, mobFull};
+            for (long mobHp : mobHps) {
+                for (long plMax : plMaxes) {
+                    long[] plHps = {1, 50, plMax};
+                    for (long plHp : plHps) {
+                        long[] plMps = {1, 20, plMax};
+                        for (long plMp : plMps) {
+                            for (int param : new int[]{1, 10, 50, 100}) {
+                                for (boolean readInt : new boolean[]{false, true}) {
+                                    long mobSub = CrisGH(mobFull * param / 100, readInt);
+                                    if (mobSub >= mobHp) {
+                                        mobSub = mobHp - 1;
+                                    }
+                                    long subHp = CrisGH((long) plMax * param / 100, readInt);
+                                    long subMp = CrisGH((long) plMax * param / 100, readInt);
+                                    if (subHp >= plHp) {
+                                        subHp = plHp - 1;
+                                    }
+                                    if (subMp >= plMp) {
+                                        subMp = plMp - 1;
+                                    }
+                                    row("" + mobFull, "" + mobHp, "" + plMax, "" + plHp, "" + plMp, "" + param, readInt ? "1" : "0", "" + mobSub, "" + subHp, "" + subMp);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        end(false);
+
+        // updateMaPhongBa: double param = <skill point> * (typeBinh == 0 ? 1 : 2);
+        //   long subHp = Util.CrisGH((long) (playerUseMafuba.nPoint.hpMax * param / 100)); if (subHp >= nPoint.hp) subHp = Math.abs(nPoint.hp - 100);
+        begin("mafuba");
+        long[] ownerMaxes = {1, 1000, 1999, 2147483648L, 9_000_000_000_000L, Long.MAX_VALUE};
+        int[] points = {0, 1, 4, 7, 1_000_000_000, 2147483647};
+        long[] victimHps = {1, 20, 100, 5000, 1_000_000_000_000L};
+        for (long ownerMax : ownerMaxes) {
+            for (int point : points) {
+                for (int typeBinh : new int[]{0, 1}) {
+                    for (long hp : victimHps) {
+                        for (boolean readInt : new boolean[]{false, true}) {
+                            double param = point * (typeBinh == 0 ? 1 : 2);
+                            long subHp = CrisGH((long) (ownerMax * param / 100), readInt);
+                            if (subHp >= hp) {
+                                subHp = Math.abs(hp - 100);
+                            }
+                            row("" + ownerMax, "" + point, "" + typeBinh, "" + hp, readInt ? "1" : "0", "" + subHp);
+                        }
+                    }
+                }
+            }
+        }
+        end(false);
+
+        // setIsMonkey: int timeMonkey = SkillUtil.getTimeMonkey(point); if (player.setClothes.cadic == 5) timeMonkey *= 5;
+        //   levelMonkey = (byte) point; player.nPoint.setHp(Util.CrisGH(player.nPoint.hp * 2));
+        begin("monkey");
+        int[] levels = {0, 1, 5, 7, 127, 128, 200, 255, 256, 100000, 214748364, 2147483647, -1, -5};
+        long[] monkeyHps = {1, 1000, 2147483647L, 3_000_000_000L, 4611686018427387904L, Long.MAX_VALUE};
+        for (int level : levels) {
+            for (int cadic : new int[]{0, 5}) {
+                for (long hp : monkeyHps) {
+                    for (boolean readInt : new boolean[]{false, true}) {
+                        int timeMonkey = getTimeMonkey(level);
+                        if (cadic == 5) {
+                            timeMonkey *= 5;
+                        }
+                        byte levelMonkey = (byte) level;
+                        long newHp = CrisGH(hp * 2, readInt);
+                        row("" + level, "" + cadic, "" + hp, readInt ? "1" : "0", "" + timeMonkey, "" + levelMonkey, "" + newHp);
+                    }
+                }
+            }
+        }
+        end(false);
+
+        // setIsMonkeyTrungThu: if (khi.point == 0) timeMonkey = (1 + 5) * 10000; else timeMonkey = SkillUtil.getTimeMonkey(khi.point); if (cadic == 5) timeMonkey *= 5;
+        //   levelMonkey = khi.point == 0 ? 1 : (byte) khi.point; player.nPoint.setHp(Util.CrisGH(player.nPoint.hp * 2));
+        begin("trungthu");
+        for (int point : levels) {
+            for (int cadic : new int[]{0, 5}) {
+                for (long hp : monkeyHps) {
+                    for (boolean readInt : new boolean[]{false, true}) {
+                        int timeMonkey;
+                        if (point == 0) {
+                            timeMonkey = (1 + 5) * 10000;
+                        } else {
+                            timeMonkey = getTimeMonkey(point);
+                        }
+                        if (cadic == 5) {
+                            timeMonkey *= 5;
+                        }
+                        byte levelMonkey;
+                        if (point == 0) {
+                            levelMonkey = 1;
+                        } else {
+                            levelMonkey = (byte) point;
+                        }
+                        long newHp = CrisGH(hp * 2, readInt);
+                        row("" + point, "" + cadic, "" + hp, readInt ? "1" : "0", "" + timeMonkey, "" + levelMonkey, "" + newHp);
+                    }
+                }
+            }
+        }
+        end(false);
+
+        // updateCTHaiTac: io.param = count * 3;   updateBunmaTocMau: io.param = Math.min(count * 3, 10);   updateTiecbaiBien: io.param = io.param - Math.min(count * 5, 15);
+        begin("costume");
+        for (int count = 0; count <= 9; count++) {
+            row("" + count, "" + (count * 3), "" + Math.min(count * 3, 10), "" + Math.min(count * 5, 15));
+        }
+        end(true);
+
+        out.append("}\n");
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(args[0]), StandardCharsets.UTF_8)) {
+            w.write(out.toString());
+        }
+    }
+}

@@ -1,0 +1,176 @@
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+/**
+ * Generates tests/Nro.Tests/Maps/map-mob-differential.json: reference values produced by the REAL JDK for the pure arithmetic of the map/mob model.
+ * Run with: java MapMobDifferentialGenerator.java <output.json>   (rename this file to .java first; it is kept as .java.txt so the build ignores it)
+ * The bodies below are copied VERBATIM from nro/map/Map.java (yPhysicInTop, isTileTop, LastY, tileTypeAt), nro/mob/Mob.java (CrisGH / getTiemNangForPlayer arithmetic and the
+ * Hirudegarn branch of injured), nro/mob/MobPoint.java (getDameAttack) and Utils/Util.java (nextInt, Crisnext). Util.rand is a java.util.Random that the generator seeds, so the
+ * C# SeededRandomProvider (same JDK algorithm) must give the same sequence.
+ */
+public class MapMobDifferentialGenerator {
+    static final int SIZE = 24;
+    static Random rand;
+
+    // ---- Utils/Util.java
+    static int nextInt(int from, int to) { return from + rand.nextInt(to - from + 1); }
+    static long Crisnext(double from, double to) { return (long) (from + rand.nextInt((int) (to - from + 1))); }
+    static long CrisGH(double a) { // Manager.readInt == true
+        if (a > Integer.MAX_VALUE) { a = Integer.MAX_VALUE; }
+        return (int) a;
+    }
+
+    // ---- nro/map/Map.java
+    static boolean isTileTop(int[] tileTop, int tileMap) {
+        for (int i = 0; i < tileTop.length; i++) { if (tileTop[i] == tileMap) { return true; } }
+        return false;
+    }
+
+    static int yPhysicInTop(int[][] tileMap, int[] tileTop, int x, int y) {
+        try {
+            int rX = (int) x / SIZE;
+            int rY = 0;
+            if (isTileTop(tileTop, tileMap[y / SIZE][rX])) { return y; }
+            for (int i = y / SIZE; i < tileMap.length; i++) {
+                if (isTileTop(tileTop, tileMap[i][rX])) { rY = i * SIZE; break; }
+            }
+            return rY;
+        } catch (Exception e) {
+            return y;
+        }
+    }
+
+    static boolean tileTypeAt(int[] types, int tmw, int x, int y, int type) {
+        try { return (types[y / 24 * tmw + x / 24] & type) == type; } catch (Exception e) { return false; }
+    }
+
+    static int LastY(int[] types, int tmw, int cx, int cy) {
+        int num = 0;
+        int ySd = 0;
+        int xSd = cx;
+        if (tileTypeAt(types, tmw, cx, cy, 2)) { return cy; }
+        while (num < 30) {
+            num++;
+            ySd += 24;
+            if (tileTypeAt(types, tmw, xSd, ySd, 2)) {
+                if (ySd % 24 != 0) { ySd -= ySd % 24; }
+                break;
+            }
+        }
+        return ySd;
+    }
+
+    // ---- nro/mob/Mob.java getTiemNangForPlayer (calSucManhTiemNang taken as identity)
+    static long tiemNang(long hpFull, long maxTiemNang, int levelPlayer, int mobLevel, double dame) {
+        int n = levelPlayer - mobLevel;
+        long pDameHit;
+        if (hpFull >= 100000000) { pDameHit = CrisGH(dame) * 500 / hpFull; } else { pDameHit = CrisGH(dame) * 100 / hpFull; }
+        long tiemNang = pDameHit * maxTiemNang / 100;
+        if (n >= 0) {
+            for (int j = 0; j < n; j++) { long sub = tiemNang * 10 / 100; if (sub <= 0) { sub = 1; } tiemNang -= sub; }
+        } else {
+            for (int j = 0; j < -n; j++) { long add = tiemNang * 10 / 100; if (add <= 0) { add = 1; } tiemNang += add; }
+        }
+        if (tiemNang <= 0) { tiemNang = 1; }
+        return CrisGH(tiemNang);
+    }
+
+    // ---- nro/mob/MobPoint.java getDameAttack
+    static long dameAttack(long dame, long hpFull, int pDame, int level) {
+        return dame != 0 ? dame + Crisnext(-(dame / 100), (dame / 100))
+                : hpFull * nextInt(pDame - 1, pDame + 1) / 100
+                + nextInt(-(level * 10), level * 10);
+    }
+
+    // ---- nro/mob/Mob.java injured(), plAtt == null, dieWhenHpFull == false, normal map, HIRUDEGARN; Hirudegarn.injured first line included. Returns hp afterwards.
+    static long hirudegarnHpAfter(long hp, long maxHp) {
+        double damage = hp / 100 > 0 ? hp / 100 : 1;
+        if (damage >= hp) { damage = hp; }
+        if (hp == maxHp && damage >= hp) { damage = hp - 1; }
+        double maxDamageAtFullHP = 20_000_000;
+        double hpRatio = (double) hp / maxHp;
+        double power = 0.8;
+        int calcDamage = (int) (maxDamageAtFullHP * Math.pow(hpRatio, power));
+        int minDamage = (int) (calcDamage * 0.5);
+        int maxDamage = Math.max(calcDamage, 10);
+        damage = nextInt(minDamage, maxDamage);
+        if (damage < 10) { damage = 10; }
+        return (long) (hp - damage);
+    }
+
+    static String arr(int[] a) { StringBuilder b = new StringBuilder("["); for (int i = 0; i < a.length; i++) { if (i > 0) b.append(','); b.append(a[i]); } return b.append(']').toString(); }
+
+    public static void main(String[] args) throws Exception {
+        Random gen = new Random(20261103L);
+        StringBuilder out = new StringBuilder("{\n");
+
+        // physics: 40 maps, 60 queries each
+        out.append("\"physics\":[\n");
+        for (int m = 0; m < 40; m++) {
+            int w = 5 + gen.nextInt(26), h = 5 + gen.nextInt(26);
+            int[][] tileMap = new int[h][w];
+            for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) tileMap[y][x] = gen.nextInt(7);
+            int[] tileTop = m % 5 == 0 ? new int[0] : new int[]{2, 3};
+            int[] types = new int[w * h];
+            for (int i = 0; i < types.length; i++) types[i] = gen.nextInt(4);
+            if (m > 0) out.append(",\n");
+            out.append("{\"w\":").append(w).append(",\"h\":").append(h).append(",\"tileTop\":").append(arr(tileTop)).append(",\"tileMap\":[");
+            for (int y = 0; y < h; y++) { if (y > 0) out.append(','); out.append(arr(tileMap[y])); }
+            out.append("],\"types\":").append(arr(types)).append(",\"queries\":[");
+            for (int q = 0; q < 60; q++) {
+                int x = gen.nextInt(w * SIZE + 80) - 30;
+                int y = gen.nextInt(h * SIZE + 80) - 30;
+                if (q > 0) out.append(',');
+                out.append('[').append(x).append(',').append(y).append(',').append(yPhysicInTop(tileMap, tileTop, x, y)).append(',')
+                        .append(LastY(types, w, x, y)).append(',').append(tileTypeAt(types, w, x, y, 2) ? 1 : 0).append(',').append(tileTypeAt(types, w, x, y, 1) ? 1 : 0).append(']');
+            }
+            out.append("]}");
+        }
+        out.append("\n],\n");
+
+        // exp
+        out.append("\"tiemNang\":[\n");
+        long[] hps = {1, 99, 500, 12345, 999999, 99999999, 100000000, 2000000000L, 5000000000L};
+        for (int i = 0; i < 300; i++) {
+            long hpFull = hps[gen.nextInt(hps.length)];
+            long maxTn = gen.nextInt(5) == 0 ? gen.nextInt(1000) : hpFull * (3 + gen.nextInt(8)) / 100;
+            int lp = gen.nextInt(80), ml = gen.nextInt(80);
+            double dame = gen.nextInt(4) == 0 ? gen.nextInt(100) : gen.nextDouble() * hpFull * 1.2;
+            if (i % 50 == 0) dame = 6e9;
+            if (i > 0) out.append(",\n");
+            out.append("[").append(hpFull).append(',').append(maxTn).append(',').append(lp).append(',').append(ml).append(',').append(Double.toString(dame)).append(',').append(tiemNang(hpFull, maxTn, lp, ml, dame)).append(']');
+        }
+        out.append("\n],\n");
+
+        // dame attack: three draws from one seeded Random
+        out.append("\"dameAttack\":[\n");
+        long[] dames = {0, 0, 1000, 123456, 5};
+        for (int i = 0; i < 60; i++) {
+            long seed = 1000 + i * 7919L;
+            long dame = dames[i % dames.length];
+            long hpFull = new long[]{100, 5000, 120000, 40000000L, 2000000000L}[gen.nextInt(5)];
+            int pDame = gen.nextInt(10), level = gen.nextInt(60);
+            rand = new Random(seed);
+            long a = dameAttack(dame, hpFull, pDame, level), b = dameAttack(dame, hpFull, pDame, level), c = dameAttack(dame, hpFull, pDame, level);
+            if (i > 0) out.append(",\n");
+            out.append("[").append(seed).append(',').append(dame).append(',').append(hpFull).append(',').append(pDame).append(',').append(level).append(',').append(a).append(',').append(b).append(',').append(c).append(']');
+        }
+        out.append("\n],\n");
+
+        // hirudegarn
+        out.append("\"hirudegarn\":[\n");
+        for (int i = 0; i < 80; i++) {
+            long seed = 5000 + i * 104729L;
+            long maxHp = new long[]{1000, 500000, 80000000L, 2000000000L}[gen.nextInt(4)];
+            long hp = i % 4 == 0 ? maxHp : 1 + (long) (gen.nextDouble() * (maxHp - 1));
+            rand = new Random(seed);
+            nextInt(-2, 2); // the Hirudegarn(Mob) constructor calls setTiemNang(), which draws once
+            if (i > 0) out.append(",\n");
+            out.append("[").append(seed).append(',').append(maxHp).append(',').append(hp).append(',').append(hirudegarnHpAfter(hp, maxHp)).append(']');
+        }
+        out.append("\n]\n}\n");
+
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(args[0]), StandardCharsets.UTF_8)) { w.write(out.toString()); }
+    }
+}

@@ -1,0 +1,40 @@
+package nro.services;
+
+import nro.player.Player;
+
+public class Service {
+
+    private static final Service instance = new Service();
+
+    public static Service gI() {
+        return instance;
+    }
+
+    public void sendThongBao(Player player, String text) {
+        nro.harness.Log.add("sendThongBao(" + text + ")");
+    }
+
+    public void sendThongBaoOK(Player player, String text) {
+        nro.harness.Log.add("sendThongBaoOK(" + text + ")");
+    }
+
+    public void sendMoney(Player player) {
+        nro.harness.Log.add("sendMoney");
+    }
+
+    public void point(Player player) {
+        nro.harness.Log.add("point");
+    }
+
+    public void InfoPetGoc(Player player) {
+        nro.harness.Log.add("InfoPetGoc");
+    }
+
+    public void showInfoPet(Player player) {
+        nro.harness.Log.add("showInfoPet");
+    }
+
+    public void chat(Player player, String text) {
+        nro.harness.Log.add("chat(" + text + ")");
+    }
+}

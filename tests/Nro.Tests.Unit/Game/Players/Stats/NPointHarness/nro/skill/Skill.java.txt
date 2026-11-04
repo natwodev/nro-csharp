@@ -1,0 +1,9 @@
+package nro.skill;
+
+public class Skill {
+
+//@@GENERATED Skill.constants
+    public SkillTemplate template = new SkillTemplate();
+    public int point;
+    public short damage;
+}

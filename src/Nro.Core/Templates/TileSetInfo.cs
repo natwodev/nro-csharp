@@ -1,13 +1,10 @@
 namespace Nro.Core.Templates;
 
-/// <summary>
-/// Port of <c>nro/template/TileSetInfo.java</c>. The <c>TileSetInfoData</c> property has the same name as the class
-/// <see cref="Nro.Core.Templates.TileSetInfoData"/> (because Java names the field <c>tileSetInfoData</c> and the rule is to capitalize only
-/// the first letter); this is still valid because the type <c>List&lt;TileSetInfoData&gt;</c> differs from the type <c>TileSetInfoData</c>.
-/// Java has only one single-parameter constructor (no default constructor).
-/// </summary>
+// Lưu danh sách dữ liệu của một bộ ô bản đồ.
+// Nguồn Java: nro/template/TileSetInfo.java (giữ tên TileSetInfoData theo trường tileSetInfoData của Java dù trùng tên lớp; kiểu List khác kiểu phần tử và Java chỉ có hàm tạo một tham số).
 public class TileSetInfo
 {
+    // Danh sách dữ liệu bộ ô (Java: tileSetInfoData)
     public List<TileSetInfoData> TileSetInfoData { get; set; }
 
     public TileSetInfo(List<TileSetInfoData> tileSetInfoData)

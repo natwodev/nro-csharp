@@ -1,9 +1,7 @@
 namespace Nro.Data.Entities;
 
-/// <summary>
-/// Marks a text column that holds JSON or a nested array. The value is stored and read as the exact string: every character is preserved
-/// (rule D8 of the port plan), so the entity layer never parses or reformats it. Metadata only, no behaviour.
-/// </summary>
+// Thuộc tính đánh dấu cột text chứa JSON hoặc mảng lồng; giá trị được lưu và đọc đúng nguyên chuỗi, giữ mọi ký tự theo quy tắc D8 của kế hoạch port; tầng entity không phân tích hay định dạng lại; chỉ là metadata, không có hành vi.
+// Nguồn Java: không có tương ứng trong Java, là thuộc tính đánh dấu của bản C#.
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
 public sealed class JsonTextAttribute : Attribute
 {

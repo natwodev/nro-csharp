@@ -1,0 +1,800 @@
+package nro.harness;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import nro.harness.NPointHarness.Case;
+import nro.harness.NPointHarness.PS;
+import static nro.harness.NPointHarness.ACTIVE;
+import static nro.harness.NPointHarness.EXPIRED;
+import static nro.harness.NPointHarness.item;
+import static nro.harness.NPointHarness.itemNullOpts;
+import static nro.harness.NPointHarness.o;
+import static nro.harness.NPointHarness.oc;
+
+/** The scenarios. Every Case becomes one entry of npoint-characterization.json; the expected values are whatever the original NPoint.java produced. */
+public class NPointScenarios {
+
+    static final String[] IT_FLAGS = {
+        "Isthuocmothuong", "Isthuocmodacbiet", "isUseHoiSieuCap", "isUseBanhDeoC1", "isUseBanhDeoC2", "isUseBanhDeoC3", "isUseRocket1h",
+        "isRongXuong", "isRongXuong_2", "isRongXuong_3", "isUseBoHuyet", "isUseBoHuyet2", "isUseBoKhi", "isUseBoKhi2",
+        "isUseHongDao0", "isUseHongDao", "isUseHongDao1", "isUseHongDao3", "isUseHongDao5", "isUseHongDao10", "isUseHongDao25", "isUseHongDao50", "isUseHongDao99", "isUseHongDao999",
+        "istrbhp", "istrbhpxd", "istrbki", "istrbkixd", "istrbsd", "istrbsdxd", "IsSupbihacam", "istomtambot", "IsDuoiKhi",
+        "isUseTrungThu1Trung", "isUseTrungThu2Trung", "isUseTrungThuDB", "isUseHBTrungThu", "isEatMeal", "isUseCuongNo", "isUseCuongNo2",
+        "isUseBanhTet", "isUseBanhTrung", "Ishamburgersau", "iscuarangme", "Isbanhgatonhen",
+        "isUseNedon", "isUseNedon2", "isUsePhanSatThuong", "isUsePhanSatThuong2", "isUsePhanSatThuong3",
+        "IsKhauTrang", "isUseSatThuongChuan", "isUseSatThuongChuan2", "isUseSauRieng", "isUseTHUOCTANGHINH", "isUseTHUOCTANGHINH10",
+        "isUseChiMang2", "isUseChiMang3", "IsBocPha", "IsKeoMotMat", "isbachtuocnuong", "isUseDuoiKhiTNSM", "isUseBuaTNSMDetu"};
+
+    /** Option ids handled by NPoint.addOption (plus a few it ignores). */
+    static final int[] OPTION_IDS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 16, 18, 19, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+        77, 80, 81, 83, 88, 94, 95, 96, 97, 98, 99, 100, 101, 103, 104, 105, 106, 108, 109, 110, 111, 114, 115, 116, 117, 147, 148, 153, 155, 156, 157, 159, 160, 162, 163,
+        173, 176, 192, 197, 198, 199, 200, 201, 202, 203, 204, 226, 227, 236, 256, 258, 259, 260};
+
+    static List<Case> cases = new ArrayList<>();
+
+    static Case add(Case c) {
+        cases.add(c);
+        return c;
+    }
+
+    /** A normal player with prime-ish base stats, an attack skill and a very large current hp / ki (so the clamp to the maximum is visible). */
+    static PS base() {
+        PS p = new PS("player");
+        p.set("p.id", 1L).set("p.isPlayer", true).set("p.name", "Tester")
+                .set("npoint.hpg", 100003L).set("npoint.mpg", 100007L).set("npoint.dameg", 10009L).set("npoint.defg", 777).set("npoint.critg", 7)
+                .set("npoint.hp", 9_000_000_000_000L).set("npoint.mp", 9_000_000_000_000L)
+                .set("skill.id", 0).set("skill.damage", 120).set("skill.point", 3);
+        return p;
+    }
+
+    static Case calc(String name, PS p) {
+        return add(new Case(name, p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 77L));
+    }
+
+    static List<Case> all() {
+        optionTables();
+        itemTimeSweep();
+        itemTimeCombos();
+        effectSweep();
+        setClothesSweep();
+        playerFlags();
+        mapMatrix();
+        petFusion();
+        whisRanks();
+        equipment();
+        overflow();
+        attackMatrix();
+        tiemNang();
+        increasePoint();
+        misc();
+        update();
+        return cases;
+    }
+
+    // ---------------------------------------------------------------- option tables (item table and card table)
+
+    static void optionTables() {
+        for (int id : OPTION_IDS) {
+            for (int param : new int[]{7, 1250}) {
+                add(new Case("option/" + id + "/p" + param, base().body(0, item(100, 0, o(id, param)))).op("calPoint"));
+            }
+            add(new Case("card-option/" + id, base().card(1, 0, oc(id, 9, 0))).op("calPoint"));
+        }
+        // the same option on five items: set counters and additive options accumulate
+        for (int id : new int[]{34, 35, 36}) {
+            for (int count : new int[]{4, 5, 6}) {
+                PS p = base();
+                for (int i = 0; i < count; i++) {
+                    p.body(i, item(200 + i, 0, o(id, 1)));
+                }
+                add(new Case("set-seal/" + id + "/x" + count, p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 5L));
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- one item-time flag at a time
+
+    static void itemTimeSweep() {
+        for (String f : IT_FLAGS) {
+            calc("itemtime/" + f, base().set("it." + f, true));
+        }
+    }
+
+    /** Several flags at once, to check the ORDER of the multiplications (doubling before/after a percent, 2.2x cut to long). */
+    static void itemTimeCombos() {
+        Random r = new Random(20261103);
+        for (int k = 0; k < 14; k++) {
+            PS p = base();
+            p.set("npoint.hpg", 1_000_000L + r.nextInt(900_000)).set("npoint.mpg", 1_000_000L + r.nextInt(900_000)).set("npoint.dameg", 50_000L + r.nextInt(90_000));
+            int n = 3 + r.nextInt(10);
+            StringBuilder names = new StringBuilder();
+            for (int i = 0; i < n; i++) {
+                String f = IT_FLAGS[r.nextInt(IT_FLAGS.length)];
+                p.set("it." + f, true);
+                names.append(f).append(' ');
+            }
+            calc("itemtime-combo/" + k, p);
+        }
+        PS all = base();
+        all.set("npoint.hpg", 3_000_000L).set("npoint.mpg", 2_000_000L).set("npoint.dameg", 90_000L);
+        for (String f : IT_FLAGS) {
+            all.set("it." + f, true);
+        }
+        calc("itemtime-all-on", all);
+        PS allBig = base();
+        allBig.set("npoint.hpg", 2_000_000_000_000_000L).set("npoint.mpg", 1_500_000_000_000_000L).set("npoint.dameg", 900_000_000_000_000L);
+        for (String f : IT_FLAGS) {
+            allBig.set("it." + f, true);
+        }
+        calc("itemtime-all-on-big", allBig);
+    }
+
+    // ---------------------------------------------------------------- effect skill / skin
+
+    static void effectSweep() {
+        calc("effect/virus", base().set("es.isVirus", true));
+        calc("effect/bongtuyet", base().set("es.isBongTuyet", true));
+        for (int lv : new int[]{0, 1, 3, 6, 7}) {
+            calc("effect/monkey/L" + lv, base().set("es.isMonkey", true).set("es.levelMonkey", lv));
+        }
+        PS monkeyMaster = new PS("player").set("p.id", 1L).set("p.isPlayer", true);
+        calc("effect/monkey-as-fused-pet", pet(0, 4).master(monkeyMaster).set("es.isMonkey", true).set("es.levelMonkey", 3).set("es.tiLeHPHuytSao", 40));
+        calc("effect/monkey-as-unfused-pet", pet(0, 1).master(monkeyMaster).set("es.isMonkey", true).set("es.levelMonkey", 3).set("es.tiLeHPHuytSao", 40));
+        for (int tl : new int[]{10, 55, 100}) {
+            calc("effect/huytsao/" + tl, base().set("es.tiLeHPHuytSao", tl));
+        }
+        for (int type : new int[]{0, 1, 2, 3}) {
+            calc("effect/chibi/type" + type, base().set("es.isChibi", true).set("p.typeChibi", type));
+        }
+        calc("effect/cumber", base().set("es.iscumber", true));
+        calc("effect/cumber2", base().set("es.iscumber2", true));
+        calc("effect/kefla", base().set("es.iskefla", true));
+        calc("effect/kefla-plus-cumber", base().set("es.iskefla", true).set("es.iscumber", true).set("es.iscumber2", true));
+        calc("effect/sucmanhbocpha", base().set("es.isSUcManhBocPha", true).set("skill.point", 5));
+        calc("effect/sucmanhbocpha-no-skill", new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.dameg", 10009L).set("es.isSUcManhBocPha", true));
+        calc("effect/dame-buff", base().set("es.isDameBuff", true).set("es.tileDameBuff", 30));
+        calc("effect/slow", base().set("ek.isSlow", true).body(0, item(100, 0, o(16, 40))));
+        calc("effect/slow-off-speed-wrap", base().body(0, item(100, 0, o(16, 100), o(114, 100), o(148, 100))).body(1, item(101, 0, o(16, 100), o(16, 100), o(16, 100))));
+        calc("effect/tho-dai-ka", base().set("ek.isThoDaiKa", true));
+        for (int x : new int[]{1, 2, 7}) {
+            calc("effect/xhpki-scroll/" + x, base().set("zone.isMapBlackBallWar", true).set("ek.xHPKI", x).set("ek.xDame", x + 1));
+        }
+        calc("effect/xienca", base().set("fb.useXienCa", true));
+    }
+
+    // ---------------------------------------------------------------- set clothes counters
+
+    static void setClothesSweep() {
+        String[] names = {"songoku", "kirin", "thanVuTruKaio", "yamcha", "ocTieu", "pikkoroDaimao", "picolo", "nail", "kakarot", "nappa", "cadicM", "gohan", "goten", "cumber"};
+        for (String n : names) {
+            for (int v : new int[]{1, 2, 4, 5}) {
+                PS p = base().set("sc." + n, v);
+                add(new Case("setclothes/" + n + "/" + v, p).op("setBasePoint").op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+            }
+        }
+        for (int v : new int[]{0, 1, 2, 3}) {
+            add(new Case("setclothes/worldcup-counter/" + v, base().set("sc.worldcup", v)).op("setBasePoint").op("calPoint"));
+        }
+        for (String n : new String[]{"ctNezuko", "ctTanjiro", "ctInosuke", "ctInoHashi"}) {
+            for (int v : new int[]{-1, 0, 3}) {
+                add(new Case("setclothes/" + n + "/" + v, base().set("sc." + n, v)).op("setBasePoint").op("calPoint"));
+            }
+        }
+        // the world cup set is counted from the worn items
+        for (int count = 0; count <= 5; count++) {
+            PS p = base();
+            int[] ids = {966, 982, 983, 883, 904};
+            for (int i = 0; i < count; i++) {
+                p.body(i, item(ids[i], 0));
+            }
+            add(new Case("setclothes/worldcup-items/" + count, p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        }
+    }
+
+    // ---------------------------------------------------------------- player data
+
+    static void playerFlags() {
+        String[] cards = {"TUAN", "THANG", "NAM", "CHI_TON"};
+        for (String c : cards) {
+            for (int kind : new int[]{1, 2}) {
+                calc("cards/" + c + "/kind" + kind + "/active", base().set("p.THE_" + c, kind).set("p.LASTTIME_THE_" + c, ACTIVE));
+                calc("cards/" + c + "/kind" + kind + "/expired", base().set("p.THE_" + c, kind).set("p.LASTTIME_THE_" + c, EXPIRED));
+            }
+        }
+        PS all = base();
+        for (String c : cards) {
+            all.set("p.THE_" + c, 2).set("p.LASTTIME_THE_" + c, ACTIVE);
+        }
+        all.set("p.THE_CHI_TON", 1);
+        calc("cards/all-active", all);
+        calc("clan-add/hp", base().set("p.tlHpClanAdd", 5));
+        calc("clan-add/mp", base().set("p.tlMpClanAdd", 7));
+        calc("clan-add/dame", base().set("p.tlDameClanAdd", 9));
+        calc("clan-add/negative-ignored", base().set("p.tlHpClanAdd", -5).set("p.tlMpClanAdd", 0).set("p.tlDameClanAdd", -1));
+        calc("danhhieu/thientu", base().set("p.isUseDanhHieu_ThienTu", true).set("p.LastTimeDanhHieu_ThienTu", 5L));
+        calc("danhhieu/thientu-zero-time", base().set("p.isUseDanhHieu_ThienTu", true).set("p.LastTimeDanhHieu_ThienTu", 0L));
+        calc("danhhieu/thientu-not-player", base().set("p.isPlayer", false).set("p.isBoss", true).set("p.isUseDanhHieu_ThienTu", true).set("p.LastTimeDanhHieu_ThienTu", 5L));
+        for (String b : new String[]{"NONE", "BUFF_ATK", "BUFF_HP", "BUFF_KI", "BUFF_CRIT", "BUFF_DEF"}) {
+            calc("buff/" + b, base().set("p.buff", b));
+        }
+        calc("phuho-mabu", base().set("p.isPhuHoMapMabu", true));
+        for (int b = 0; b <= 6; b++) {
+            calc("bienhinh/" + b, base().set("p.isbienhinh", b));
+        }
+        for (int t = 0; t <= 11; t++) {
+            add(new Case("trbne/" + t, base().set("p.trbne", t).body(0, item(100, 0, o(108, 11)))).op("calPoint"));
+        }
+        calc("womansday", base().set("npoint.hpg", 100003L)).srv("womansDay", true).srv("wdHp", 7).srv("wdMp", 9).srv("wdDame", 11);
+        calc("womansday-off", base()).srv("womansDay", false).srv("wdHp", 7).srv("wdMp", 9).srv("wdDame", 11);
+        calc("attribute/all", base()).attr(4, 12, false).attr(3, 13, false).attr(5, 14, false).attr(1, 15, false);
+        calc("attribute/expired", base()).attr(4, 12, true).attr(3, 13, true).attr(5, 14, true).attr(1, 15, true);
+        calc("attribute/not-plman", base().set("p.isPlayer", false).set("p.isBoss", true)).attr(4, 12, false).attr(3, 13, false).attr(5, 14, false);
+        calc("inventory-service/rongnhi", base().set("inv.rongNhi", true).set("inv.hpBox", 4).set("inv.mpBox", 5).set("inv.dameBox", 6).set("inv.critBox", 7));
+        calc("inventory-service/not-player", base().set("p.isPlayer", false).set("inv.rongNhi", true).set("inv.hpBox", 4).set("inv.mpBox", 5).set("inv.dameBox", 6).set("inv.critBox", 7));
+        calc("blackball/all-active", base().set("bb.0", ACTIVE).set("bb.1", ACTIVE).set("bb.2", ACTIVE).set("bb.3", ACTIVE).set("bb.4", ACTIVE).set("bb.5", ACTIVE).set("bb.6", ACTIVE));
+        for (int i = 0; i < 7; i++) {
+            calc("blackball/star" + (i + 1), base().set("bb." + i, ACTIVE));
+        }
+        calc("blackball/expired", base().set("bb.0", EXPIRED).set("bb.3", 0L));
+        // regeneration
+        calc("regen/options", base().body(0, item(100, 0, o(27, 100), o(28, 200), o(80, 3), o(81, 4), o(173, 2), o(259, 5), o(162, 6))));
+        calc("regen/clamp-over-100", base().body(0, item(100, 0, o(80, 70), o(81, 130), o(173, 60))));
+        calc("regen/clamp-negative", base().body(0, item(100, 0, o(80, -20), o(81, -5), o(173, -9))));
+        calc("regen/nezuko-drugs", base().set("sc.ctNezuko", 0).set("it.Isthuocmothuong", true).set("it.Isthuocmodacbiet", true).set("it.isUseHoiSieuCap", true).set("it.isUseBanhDeoC3", true));
+        // intrinsic read by setOptions (stale until the first attack)
+        add(new Case("intrinsic/gold-before-attack", base().set("intr.id", 23).set("intr.param1", 17)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 8L).op("calPoint").op("settlGold"));
+        add(new Case("intrinsic/gold-gohan", base().set("intr.id", 23).set("intr.param1", 17).set("sc.gohan", 5)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 8L).op("calPoint"));
+    }
+
+    // ---------------------------------------------------------------- maps
+
+    static void mapMatrix() {
+        String[] flags = {"isMapCold", "isMapChristMasEvent", "isMap5000NamTruoc", "isMapCereal", "isMapVohinh", "isMapBlackBallWar"};
+        for (String f : flags) {
+            for (String who : new String[]{"player", "boss", "bot", "bot-event", "xayda", "xayda-boss", "khonglanh"}) {
+                PS p = base().set("zone." + f, true).set("ek.xHPKI", 3).set("ek.xDame", 4);
+                switch (who) {
+                    case "boss":
+                        p.set("p.isBoss", true);
+                        break;
+                    case "bot":
+                        p.set("p.isBot", true);
+                        break;
+                    case "bot-event":
+                        p.set("p.isBot_Event", true);
+                        break;
+                    case "xayda":
+                        p.set("p.gender", 2);
+                        break;
+                    case "xayda-boss":
+                        p.set("p.gender", 2).set("p.isBoss", true);
+                        break;
+                    case "khonglanh":
+                        p.body(0, item(100, 0, o(106, 1)));
+                        break;
+                    default:
+                        break;
+                }
+                add(new Case("map/" + f + "/" + who, p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 9L));
+            }
+        }
+        calc("map/none", base());
+        calc("map/type3-zone", base().set("zone.type", 3));
+    }
+
+    // ---------------------------------------------------------------- pet fusion
+
+    static PS pet(int type, int status) {
+        PS d = new PS("detu");
+        d.set("p.id", 2L).set("p.isDeTu", true).set("dt.typeDeTu", type).set("dt.status", status)
+                .set("npoint.hpg", 40007L).set("npoint.mpg", 30011L).set("npoint.dameg", 3001L).set("npoint.defg", 77).set("npoint.critg", 2)
+                .set("skill.id", 0).set("skill.damage", 100).set("skill.point", 1);
+        return d;
+    }
+
+    static void petFusion() {
+        int[] fusions = {0, 4, 6, 8, 10, 12, 14};
+        int[] types = {0, 1, 2, 5, 6};
+        for (int f : fusions) {
+            for (int t : types) {
+                PS p = base().set("fusion.typeFusion", f).set("pf.dameFusion", 25).detu(pet(t, 4));
+                add(new Case("pet/fusion" + f + "/type" + t, p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 11L));
+            }
+        }
+        // pet with its own equipment: the pet recalculates first and its numbers feed the master
+        PS rich = pet(5, 4).body(0, item(300, 0, o(77, 20), o(103, 10), o(50, 30), o(2, 5)));
+        add(new Case("pet/pet-has-equipment", base().set("fusion.typeFusion", 8).set("pf.dameFusion", 10).detu(rich)).op("calPoint"));
+        // a pet that is not fused still recalculates, the master does not add it
+        add(new Case("pet/not-fused", base().set("fusion.typeFusion", 0).detu(pet(5, 1))).op("calPoint"));
+        // gogeta: 1693 + 1553 in either order
+        int[][] pairs = {{1693, 1553}, {1553, 1693}, {1693, 1693}, {1553, 1553}, {584, 1553}};
+        for (int[] pr : pairs) {
+            PS p = base().body(5, item(pr[0], 0)).detu(pet(0, 1).body(5, item(pr[1], 0)));
+            add(new Case("pet/gogeta/" + pr[0] + "-" + pr[1], p).op("calPoint"));
+        }
+        add(new Case("pet/gogeta/pet-skin-empty", base().body(5, item(1693, 0)).detu(pet(0, 1))).op("calPoint"));
+        // skins in slot 5
+        for (int id : new int[]{584, 1207, 1208, 1209, 1210, 1211, 1233, 1234, 1235, 1236, 1237}) {
+            add(new Case("skin/" + id, base().body(5, item(id, 0))).op("calPoint"));
+        }
+        // pet that is the main character: master supplies food and charm
+        PS master = new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.hpMax", 1000L).set("it.isEatMeal", true).set("npoint.tlTNSMPet", 15).set("ch.tdDeTu", ACTIVE);
+        PS petMain = pet(2, 1).master(master);
+        add(new Case("pet/as-main/eat-meal", petMain).op("calPoint").op("getDameAttack", "isMob", true, "seed", 12L).op("getDameAttack", "isMob", false, "seed", 13L));
+        // clone (phan than)
+        PS cloneMaster = new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.hpMax", 900_000L).set("npoint.mpMax", 800_000L).set("npoint.dame", 70_000L);
+        for (int pt : new int[]{-1, 1, 3, 7}) {
+            PS clone = new PS("phanthan").set("p.id", 3L).set("p.isPhanThan", true).master(cloneMaster)
+                    .set("npoint.hpg", 10L).set("npoint.mpg", 10L).set("npoint.dameg", 10L);
+            if (pt >= 0) {
+                clone.set("skill.id", 0).set("skill.damage", 100).set("skill.point", pt);
+            }
+            add(new Case("clone/skillpoint" + pt, clone).op("calPoint"));
+        }
+    }
+
+    // ---------------------------------------------------------------- Whis ranking
+
+    static void whisRanks() {
+        for (int size : new int[]{2, 3, 4, 5, 8, 10, 12}) {
+            for (int rank = 1; rank <= size + 1; rank++) {
+                if (size == 12 && rank != 1 && rank != 3 && rank != 6 && rank != 10 && rank != 11 && rank != 13) {
+                    continue;
+                }
+                PS p = base().set("p.id", 500L + rank);
+                Case c = new Case("whis/size" + size + "/rank" + rank, p);
+                long[] ids = new long[size];
+                for (int i = 0; i < size; i++) {
+                    ids[i] = 500L + (i + 1);
+                }
+                c.whis(ids);
+                c.op("calPoint").op("getDameAttack", "isMob", false, "seed", 21L);
+                add(c);
+            }
+        }
+        PS notPl = base().set("p.isPlayer", false).set("p.isBoss", true).set("p.id", 501L);
+        Case c = new Case("whis/not-player", notPl).whis(501, 502, 503, 504, 505, 506).op("calPoint");
+        add(c);
+    }
+
+    // ---------------------------------------------------------------- equipment details
+
+    static void equipment() {
+        calc("equip/sums", base().body(0, item(10, 0, o(0, 500), o(6, 3000), o(7, 2000)))
+                .body(1, item(11, 0, o(2, 3), o(22, 4), o(23, 5), o(47, 90), o(48, 100)))
+                .body(2, item(12, 0, o(14, 3), o(192, 2), o(5, 20), o(5, 30), o(3, 7))));
+        calc("equip/percent-chain-truncation", base().set("npoint.hpg", 999L).set("npoint.mpg", 1001L).set("npoint.dameg", 99L)
+                .body(0, item(10, 0, o(77, 10), o(77, 15), o(77, 7), o(103, 9), o(103, 11), o(49, 5), o(50, 6), o(147, 7)))
+                .body(1, item(11, 0, o(77, 3), o(49, 1))));
+        calc("equip/speed", base().body(0, item(10, 0, o(16, 20), o(114, 35), o(148, 50))));
+        calc("equip/speed-wrap-byte", base().body(0, item(10, 0, o(16, 100), o(16, 100), o(16, 100), o(16, 100), o(16, 100))));
+        calc("equip/exp-options", base().body(0, item(10, 0, o(88, 10), o(101, 20), o(155, 35), o(100, 12), o(104, 8), o(98, 4), o(99, 5), o(97, 6), o(95, 7), o(96, 8))));
+        calc("equip/max-of-options", base().body(0, item(10, 0, o(117, 5), o(117, 9), o(117, 4), o(258, 3), o(258, 8), o(226, 2), o(226, 6), o(226, 1))));
+        calc("equip/flags", base().body(0, item(10, 0, o(24, 1), o(25, 1), o(26, 1), o(29, 1), o(32, 1), o(38, 1), o(105, 1), o(106, 1), o(110, 1), o(111, 1), o(115, 1), o(116, 1), o(163, 1), o(256, 1), o(33, 1))));
+        calc("equip/teleport-items", base().body(0, item(592, 0)));
+        calc("equip/teleport-items-593-594", base().body(3, item(594, 0)).body(4, item(593, 0)));
+        calc("equip/teleport-items-595", base().body(0, item(595, 0)));
+        calc("equip/mob-race-options", base().body(0, item(10, 0, o(42, 5), o(43, 6), o(44, 7), o(45, 8), o(46, 9), o(197, 3), o(198, 4), o(199, 5), o(200, 6), o(201, 7), o(202, 8), o(203, 9), o(204, 10))));
+        calc("equip/option-176-player", base().body(0, item(10, 0, o(176, 1), o(16, 30))));
+        calc("equip/option-176-boss", base().set("p.isPlayer", false).set("p.isBoss", true).body(0, item(10, 0, o(176, 1), o(16, 30))));
+        calc("equip/option-159-xchuong", base().body(0, item(10, 0, o(159, 3), o(160, 4))));
+        calc("equip/empty-slot-ignored", base().body(0, empty()).body(1, item(10, 0, o(0, 5))));
+        // Tinh/Nhat/Nguyet An set bonus applied to hp / ki / attack
+        PS tinh = base();
+        for (int i = 0; i < 5; i++) {
+            tinh.body(i, item(400 + i, 0, o(34, 1), o(35, 1), o(36, 1)));
+        }
+        calc("equip/all-three-seals", tinh);
+        // earrings
+        PS ear2 = base().set("fusion.typeFusion", 8).bag(item(5, 0)).bag(item(921, 0, o(0, 300), o(72, 4), o(77, 12), o(14, 5)));
+        add(new Case("equip/earring2", ear2).op("calPoint"));
+        PS ear3 = base().set("fusion.typeFusion", 10).bag(item(921, 0, o(0, 999))).bag(item(1943, 0, o(0, 300), o(72, 7), o(103, 12)));
+        add(new Case("equip/earring3", ear3).op("calPoint"));
+        add(new Case("equip/earring-wrong-fusion", base().set("fusion.typeFusion", 6).bag(item(921, 0, o(0, 300), o(72, 4)))).op("calPoint"));
+        add(new Case("equip/earring-first-only", base().set("fusion.typeFusion", 8).bag(item(921, 0, o(0, 1))).bag(item(921, 0, o(0, 1000)))).op("calPoint"));
+        add(new Case("equip/badge", base().badge(o(0, 100), o(77, 5), o(14, 2))).op("calPoint"));
+        // cards
+        add(new Case("card/level-match", base().card(1, 2, oc(0, 100, 2), oc(6, 200, 0), oc(7, 300, 3), oc(77, 5, 2))).op("calPoint"));
+        add(new Case("card/level-minus1", base().card(1, -1, oc(0, 100, 0), oc(6, 200, 1), oc(7, 300, -1))).op("calPoint"));
+        add(new Case("card/not-used", base().card(0, 0, oc(0, 100, 0)).card(1, 0, oc(6, 55, 0))).op("calPoint"));
+        add(new Case("card/two-used-first-counts", base().card(1, 0, oc(0, 10, 0)).card(1, 0, oc(0, 20, 0))).op("calPoint"));
+        // training armour
+        add(new Case("trainarmor/worn-529", base().body(6, item(529, 0))).op("calPoint").op("getDameAttack", "isMob", false, "seed", 1L));
+        for (int id : new int[]{530, 531, 534, 535, 536, 1797, 1000}) {
+            add(new Case("trainarmor/worn-" + id, base().body(6, item(id, 0))).op("calPoint"));
+        }
+        add(new Case("trainarmor/bag", base().bag(item(7, 0)).bag(item(531, 32, o(9, 5), o(0, 1)))).op("calPoint"));
+        add(new Case("trainarmor/bag-no-param", base().bag(item(531, 32, o(9, 0)))).op("calPoint"));
+        add(new Case("trainarmor/bag-wrong-type", base().bag(item(531, 31, o(9, 5)))).op("calPoint"));
+        add(new Case("trainarmor/bag-nothing", base().bag(item(531, 32, o(8, 5)))).op("calPoint"));
+        add(new Case("trainarmor/bag-null-options", base().bag(itemNullOpts(531, 32))).op("calPoint"));
+        add(new Case("trainarmor/previously-held", base().trainArmor(item(530, 32, o(9, 3)))).op("calPoint"));
+        add(new Case("trainarmor/previously-held-no-option", base().trainArmor(item(530, 32, o(8, 3)))).op("calPoint"));
+        add(new Case("trainarmor/short-body-list", trimBody(base().body(6, item(529, 0)), 6)).op("calPoint"));
+        add(new Case("trainarmor/not-player", base().set("p.isPlayer", false).set("p.isBoss", true).body(6, item(529, 0))).op("calPoint"));
+        // body list of exactly 5 items: setThoBulma reads index 5 (a Java slip)
+    }
+
+    static Object empty() {
+        return NPointHarness.empty();
+    }
+
+    // ---------------------------------------------------------------- overflow and extremes
+
+    static void overflow() {
+        calc("overflow/option-2-int-wrap", base().body(0, item(10, 0, o(2, 3_000_000), o(22, 2_500_000))));
+        calc("overflow/hp-add-negative", base().body(0, item(10, 0, o(6, -50_000), o(7, -60_000), o(0, -100_000), o(47, -2000))));
+        calc("overflow/hp-long-wrap", base().set("npoint.hpg", 9_000_000_000_000_000_000L).body(0, item(10, 0, o(77, 50), o(77, 80), o(77, 99))));
+        calc("overflow/hp-near-max", base().set("npoint.hpg", 9_223_372_036_854_775_000L));
+        calc("overflow/dame-long-wrap", base().set("npoint.dameg", 5_000_000_000_000_000_000L).set("it.isUseCuongNo", true).set("it.isUseHongDao999", true));
+        calc("overflow/double-2.2-big", base().set("npoint.hpg", 4_000_000_000_000_000_000L).set("npoint.mpg", 4_000_000_000_000_000_000L).set("npoint.dameg", 4_000_000_000_000_000_000L)
+                .set("it.isUseBoHuyet2", true).set("it.isUseBoKhi2", true).set("it.isUseCuongNo2", true));
+        calc("overflow/double-2.2-precision", base().set("npoint.hpg", 9_007_199_254_740_993L).set("npoint.mpg", 9_007_199_254_740_993L).set("npoint.dameg", 9_007_199_254_740_993L)
+                .set("it.isUseBoHuyet2", true).set("it.isUseBoKhi2", true).set("it.isUseCuongNo2", true));
+        calc("overflow/def-int-wrap", base().set("npoint.defg", 1_000_000_000).body(0, item(10, 0, o(47, 2_000_000_000))));
+        calc("overflow/def-int-wrap-bienhinh", base().set("npoint.defg", 536_870_000).set("p.isbienhinh", 5).set("sc.ctInosuke", 1).set("sc.ctInoHashi", 1).set("it.Isbanhgatonhen", true));
+        calc("overflow/crit-cap", base().set("npoint.critg", 95).body(0, item(10, 0, o(14, 50))).set("p.buff", "BUFF_CRIT").set("p.isbienhinh", 5));
+        calc("overflow/crit-negative", base().set("npoint.critg", -30).body(0, item(10, 0, o(14, -50))));
+        calc("overflow/crit-forced-100", base().set("npoint.critg", 1).set("it.IsDuoiKhi", true));
+        calc("overflow/hp-zero-base", base().set("npoint.hpg", 0L).set("npoint.mpg", 0L).set("npoint.dameg", 0L).set("npoint.defg", 0).set("npoint.critg", 0));
+        calc("overflow/negative-base", base().set("npoint.hpg", -1000L).set("npoint.mpg", -2000L).set("npoint.dameg", -3000L).set("npoint.defg", -5));
+        calc("overflow/tl-sub-hp-over-100", base().body(0, item(10, 0, o(155, 10))).body(1, item(11, 0, o(155, 10))).body(2, item(12, 0, o(155, 10))));
+        calc("overflow/hongdao0-then-99", base().set("it.isUseHongDao0", true).set("it.isUseHongDao99", true).set("it.isUseHongDao999", true));
+        add(new Case("overflow/currpercent-mpmax-zero", base().set("npoint.mpg", 0L).set("npoint.mp", 0L)).op("calPoint").op("getCurrPercentMP"));
+        add(new Case("overflow/currpercent-hpmax-zero", base().set("npoint.hpg", 0L).set("npoint.hp", 0L)).op("calPoint").op("getCurrPercentHP"));
+        add(new Case("overflow/currpercent-int-cut", base().set("npoint.hpMax", 3_000_000_000L).set("npoint.hp", 9_000_000_000L)).op("getCurrPercentHP"));
+        add(new Case("overflow/body-list-of-5", ps5()).op("calPoint"));
+        add(new Case("overflow/body-list-of-4", ps4()).op("calPoint"));
+    }
+
+    static PS ps5() {
+        PS p = new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.hpg", 1000L);
+        return trimBody(p, 5);
+    }
+
+    static PS ps4() {
+        PS p = new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.hpg", 1000L);
+        return trimBody(p, 4);
+    }
+
+    @SuppressWarnings("unchecked")
+    static PS trimBody(PS p, int size) {
+        List<Object> body = (List<Object>) p.m.get("body");
+        while (body.size() > size) {
+            body.remove(body.size() - 1);
+        }
+        return p;
+    }
+
+    // ---------------------------------------------------------------- getDameAttack
+
+    static final int[] SKILL_IDS = {0, 1, 2, 3, 4, 5, 9, 10, 11, 12, 14, 17, 20, 99};
+
+    static void attackMatrix() {
+        int[][] intrinsicBySkill = {{0, 1}, {1, 2}, {2, 8}, {3, 9}, {4, 16}, {5, 17}, {9, 26}, {17, 13}};
+        for (int skill : SKILL_IDS) {
+            for (boolean mob : new boolean[]{false, true}) {
+                for (int crit : new int[]{0, 100}) {
+                    PS p = base().set("zone.type", 0).set("npoint.critg", crit).set("skill.id", skill).set("skill.damage", 135).set("skill.point", 4).set("it.IsKhauTrang", true)
+                            .set("npoint.mpg", 1_000_000L);
+                    add(new Case("attack/skill" + skill + (mob ? "/mob" : "/pl") + "/crit" + crit, p).op("calPoint").op("getDameAttack", "isMob", mob, "seed", 100L + skill));
+                }
+            }
+        }
+        for (int[] is : intrinsicBySkill) {
+            PS p = base().set("skill.id", is[0]).set("skill.damage", 110).set("intr.id", is[1]).set("intr.param1", 25).set("npoint.critg", 0);
+            add(new Case("attack/intrinsic" + is[1] + "/skill" + is[0], p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 5L).op("getDameAttack", "isMob", false, "seed", 6L));
+        }
+        // set bonuses that multiply a specific skill
+        Object[][] setSkill = {{"songoku", 5, 1}, {"kakarot", 5, 4}, {"nail", 5, 3}, {"ocTieu", 5, 17}, {"yamcha", 5, 9}, {"thanVuTruKaio", 5, 9}, {"cadicM", 4, 14}, {"cadicM", 5, 14},
+            {"kirin", 5, 10}, {"pikkoroDaimao", 5, 12}};
+        for (Object[] ss : setSkill) {
+            PS p = base().set("zone.type", 0).set("sc." + ss[0], ss[1]).set("skill.id", ss[2]).set("skill.damage", 150).set("skill.point", 5).set("npoint.critg", 0);
+            // a calPoint would not change the sets (they are inputs), the attack facts read them directly
+            add(new Case("attack/set-" + ss[0] + ss[1] + "/skill" + ss[2], p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 31L));
+        }
+        // critical flow
+        add(new Case("attack/crit100-flag", base().set("npoint.critg", 0)).op("calPoint").op("set", "path", "npoint.isCrit100", "value", true).op("getDameAttack", "isMob", false, "seed", 1L)
+                .op("getDameAttack", "isMob", false, "seed", 1L));
+        add(new Case("attack/intrinsic25-low-hp", base().set("intr.id", 25).set("intr.param1", 50).set("npoint.critg", 0)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 1L)
+                .op("setHp", "arg", 10L).op("getDameAttack", "isMob", false, "seed", 1L).op("setHp", "arg", 90000L).op("getDameAttack", "isMob", false, "seed", 1L));
+        add(new Case("attack/tele-then-other-skill", base().set("skill.id", 20).set("skill.damage", 60).set("npoint.critg", 0).set("npoint.mpg", 5000L)).op("calPoint")
+                .op("getDameAttack", "isMob", false, "seed", 41L).op("set", "path", "skill.id", "value", 0).op("getDameAttack", "isMob", false, "seed", 42L).op("getDameAttack", "isMob", false, "seed", 43L));
+        add(new Case("attack/tele-big-mp-readint-false", base().set("skill.id", 20).set("skill.damage", 5000).set("npoint.mpg", 900_000_000_000L)).srv("readInt", false)
+                .op("calPoint").op("getDameAttack", "isMob", false, "seed", 41L));
+        add(new Case("attack/tele-big-mp-readint-true", base().set("skill.id", 20).set("skill.damage", 5000).set("npoint.mpg", 900_000_000_000L)).srv("readInt", true)
+                .op("calPoint").op("getDameAttack", "isMob", false, "seed", 41L));
+        add(new Case("attack/makankosappo-readint-false", base().set("skill.id", 11).set("skill.damage", 9000).set("npoint.mpg", 9_000_000_000_000L)).srv("readInt", false)
+                .op("calPoint").op("getDameAttack", "isMob", false, "seed", 41L));
+        add(new Case("attack/makankosappo-readint-true", base().set("skill.id", 11).set("skill.damage", 9000).set("npoint.mpg", 9_000_000_000_000L)).srv("readInt", true)
+                .op("calPoint").op("getDameAttack", "isMob", false, "seed", 41L));
+        // x-palm
+        for (int sk : new int[]{1, 5, 3, 4}) {
+            add(new Case("attack/xchuong/skill" + sk, base().set("skill.id", sk).set("skill.damage", 100).set("ek.isXChuong", true).set("npoint.critg", 0))
+                    .op("calPoint").op("set", "path", "npoint.xChuong", "value", 3).op("getDameAttack", "isMob", false, "seed", 77L).op("getDameAttack", "isMob", false, "seed", 78L));
+        }
+        // dame buff and the three "handsome / cool / cute" options
+        add(new Case("attack/dame-buff-no-options", base().set("es.isDameBuff", true).set("es.tileDameBuff", 40).set("npoint.critg", 0)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/dame-buff-all-options", base().set("es.isDameBuff", true).set("es.tileDameBuff", 40).set("npoint.critg", 0).body(0, item(10, 0, o(117, 5), o(258, 6), o(226, 7))))
+                .op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/dame-buff-some-options", base().set("es.isDameBuff", true).set("es.tileDameBuff", 40).set("npoint.critg", 0).body(0, item(10, 0, o(117, 5))))
+                .op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/dame-after", base().set("npoint.critg", 0)).op("calPoint").op("set", "path", "npoint.dameAfter", "value", 50L).op("getDameAttack", "isMob", false, "seed", 3L)
+                .op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/crit-damage-list", base().set("npoint.critg", 100).body(0, item(10, 0, o(5, 40), o(5, 25)))).op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/mob-list-twice", base().set("npoint.critg", 0).body(0, item(10, 0, o(19, 10), o(19, 20)))).op("calPoint").op("getDameAttack", "isMob", true, "seed", 3L)
+                .op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/small-damage-jitter", base().set("npoint.dameg", 3L).set("npoint.critg", 0)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L)
+                .op("getDameAttack", "isMob", false, "seed", 4L).op("getDameAttack", "isMob", false, "seed", 5L));
+        add(new Case("attack/zero-damage", base().set("npoint.dameg", 0L).set("npoint.critg", 0)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/negative-damage", base().set("npoint.dameg", -5000L).set("npoint.critg", 0)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/huge-damage-jitter", base().set("npoint.dameg", 4_000_000_000_000_000_000L).set("npoint.critg", 100)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/pet-doubles-vs-mob", pet(0, 1).set("npoint.critg", 0).master(new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("ch.tdDeTu", ACTIVE)))
+                .op("calPoint").op("getDameAttack", "isMob", true, "seed", 3L).op("getDameAttack", "isMob", false, "seed", 3L));
+        add(new Case("attack/pet-charm-expired", pet(0, 1).set("npoint.critg", 0).master(new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("ch.tdDeTu", EXPIRED)))
+                .op("calPoint").op("getDameAttack", "isMob", true, "seed", 3L));
+        // energy ball: monsters and players around
+        for (int point : new int[]{1, 3, 7}) {
+            int range = 350 + point * 30;
+            PS p = base().set("skill.id", 10).set("skill.damage", 100).set("skill.point", point).set("loc.x", 100).set("loc.y", 100).set("npoint.critg", 0)
+                    .mob(100 + range, 100, 5000, false).mob(100 + range + 1, 100, 7000, false).mob(100, 100 + range, 300, false).mob(100, 100, 9000, true).mob(90, 90, 1234567, false)
+                    .human(1L, 100, 100, 111, false).human(2L, 110, 100, 2222, false).human(3L, 100 + range + 1, 100, 33333, false).human(4L, 120, 120, 444, true);
+            add(new Case("attack/qckk/point" + point, p).op("calPoint").op("getDameAttack", "isMob", false, "seed", 5L));
+        }
+        add(new Case("attack/qckk/kirin", base().set("zone.type", 0).set("skill.id", 10).set("skill.point", 2).set("sc.kirin", 5).set("loc.x", 0).set("loc.y", 0).mob(10, 10, 100000, false)).op("calPoint")
+                .op("getDameAttack", "isMob", false, "seed", 6L));
+        add(new Case("attack/qckk/no-zone-npe", base().set("skill.id", 10).set("skill.point", 2)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 6L));
+        add(new Case("attack/qckk/alone", base().set("zone.type", 0).set("skill.id", 10).set("skill.point", 2)).op("calPoint").op("getDameAttack", "isMob", false, "seed", 6L));
+    }
+
+    // ---------------------------------------------------------------- potential
+
+    static PS tnBase() {
+        PS p = base().set("zone.type", 0).set("npoint.power", 1_000_000L).set("npoint.limitPower", 0);
+        return p;
+    }
+
+    static Case tn(String name, PS p, long arg) {
+        Case c = new Case(name, p);
+        c.limit(0, 10_000_000_000_000L, 1000000L, 1000000L, 100000L, 10000, 20);
+        c.op("initPowerLimit").op("calSucManhTiemNang", "arg", arg);
+        return add(c);
+    }
+
+    static void tiemNang() {
+        for (long arg : new long[]{0L, 1L, 99L, 100L, 1000L, 123_456_789L, 1_000_000_000L, -500L, Long.MAX_VALUE / 100}) {
+            tn("tnsm/arg/" + arg, tnBase(), arg);
+        }
+        for (String f : new String[]{"IsKhauTrang", "isRongXuong_3", "isUseDuoiKhiTNSM", "isRongXuong", "isUseBuaTNSMDetu"}) {
+            tn("tnsm/itemtime/" + f, tnBase().set("it." + f, true), 100_003L);
+        }
+        for (String c : new String[]{"TUAN", "THANG", "NAM", "CHI_TON"}) {
+            for (int kind : new int[]{1, 2}) {
+                tn("tnsm/card/" + c + kind + "/active", tnBase().set("p.THE_" + c, kind).set("p.LASTTIME_THE_" + c, ACTIVE), 100_003L);
+            }
+            tn("tnsm/card/" + c + "/expired", tnBase().set("p.THE_" + c, 1).set("p.LASTTIME_THE_" + c, EXPIRED), 100_003L);
+        }
+        String[] charms = {"tdTriTue", "tdTriTue3", "tdTriTue4", "tdTriTue5", "tdTriTue7", "tdTriTue10", "tdTriTue20"};
+        for (String ch : charms) {
+            tn("tnsm/charm/" + ch, tnBase().set("ch." + ch, ACTIVE), 100_003L);
+        }
+        PS allCharms = tnBase();
+        for (String ch : charms) {
+            allCharms.set("ch." + ch, ACTIVE);
+        }
+        tn("tnsm/charm/all", allCharms, 10_000L);
+        tn("tnsm/charm/expired", tnBase().set("ch.tdTriTue", EXPIRED), 100_003L);
+        for (int cflag : new int[]{0, 3, 8}) {
+            tn("tnsm/cflag/" + cflag, tnBase().set("p.cFlag", cflag), 100_003L);
+        }
+        tn("tnsm/chibi2", tnBase().set("es.isChibi", true).set("p.typeChibi", 2), 100_003L);
+        tn("tnsm/chibi3", tnBase().set("es.isChibi", true).set("p.typeChibi", 3), 100_003L);
+        tn("tnsm/satellite", tnBase().set("sat.isIntelligent", true), 100_003L);
+        tn("tnsm/vip", tnBase().set("session.Vip_Point", 5), 100_003L);
+        tn("tnsm/vip-zero", tnBase().set("session.Vip_Point", 0), 100_003L);
+        tn("tnsm/goten", tnBase().set("sc.goten", 5), 100_003L);
+        tn("tnsm/goten-4", tnBase().set("sc.goten", 4), 100_003L);
+        tn("tnsm/bo-me", tnBase().set("p.isBo", true).set("p.isMe", true), 100_003L);
+        Case cc = new Case("tnsm/attribute", tnBase());
+        cc.attr(1, 50, false).limit(0, 10_000_000_000_000L, 1000000L, 1000000L, 100000L, 10000, 20);
+        cc.op("initPowerLimit").op("calSucManhTiemNang", "arg", 100_003L);
+        add(cc);
+        Case ce = new Case("tnsm/attribute-expired", tnBase());
+        ce.attr(1, 50, true).limit(0, 10_000_000_000_000L, 1000000L, 1000000L, 100000L, 10000, 20);
+        ce.op("initPowerLimit").op("calSucManhTiemNang", "arg", 100_003L);
+        add(ce);
+        Case cn = new Case("tnsm/attribute-not-player", tnBase().set("p.isPlayer", false).set("p.isBoss", true));
+        cn.attr(1, 50, false).limit(0, 10_000_000_000_000L, 1000000L, 1000000L, 100000L, 10000, 20);
+        cn.op("initPowerLimit").op("calSucManhTiemNang", "arg", 100_003L);
+        add(cn);
+        for (int lv : new int[]{1, 3, 9, 10, 11, 15}) {
+            tn("tnsm/clan-bua-trituetue/level" + lv, tnBase().set("clan.BuaTriTue", ACTIVE).set("clan.level", lv), 100_003L);
+        }
+        tn("tnsm/clan-buff-exp", tnBase().set("clan.LasttimeBuffExp", 1_000L).set("clan.TimeStarBuffExp", ACTIVE).set("clan.CongTiemNangSucManhToanBangHoi", 3), 100_003L);
+        tn("tnsm/clan-expired", tnBase().set("clan.LasttimeBuffExp", 1_000L).set("clan.TimeStarBuffExp", 5L).set("clan.CongTiemNangSucManhToanBangHoi", 3).set("clan.BuaTriTue", 5L), 100_003L);
+        tn("tnsm/option-tnsm", tnBase().body(0, item(10, 0, o(88, 10), o(101, 25), o(155, 40))), 100_003L);
+        tn("tnsm/option-cong20", tnBase().body(0, item(10, 0, o(83, 1))), 100_003L);
+        tn("tnsm/option-cong20-plus-percent", tnBase().body(0, item(10, 0, o(83, 1), o(88, 10))), 100_003L);
+        tn("tnsm/intrinsic24", tnBase().set("intr.id", 24).set("intr.param1", 30), 100_003L);
+        add(new Case("tnsm/intrinsic24-after-attack", tnBase().set("intr.id", 24).set("intr.param1", 30)).limit(0, 10_000_000_000_000L, 1000000L, 1000000L, 100000L, 10000, 20)
+                .op("initPowerLimit").op("calPoint").op("getDameAttack", "isMob", false, "seed", 1L).op("calSucManhTiemNang", "arg", 100_003L));
+        // maps
+        tn("tnsm/map/type3", tnBase().set("zone.type", 3), 100_003L);
+        tn("tnsm/map/no-zone", new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.power", 1000L), 100_003L);
+        tn("tnsm/map/bandokhobau", tnBase().set("zone.isMapBanDoKhoBau", true), 100_003L);
+        tn("tnsm/map/doanhtrai", tnBase().set("zone.isMapDoanhTrai", true), 100_003L);
+        tn("tnsm/map/divided", tnBase().set("zone.isTnsmDividedMap", true), 100_003L);
+        tn("tnsm/map/bandokhobau-and-divided", tnBase().set("zone.isMapBanDoKhoBau", true).set("zone.isMapDoanhTrai", true).set("zone.isTnsmDividedMap", true), 100_003L);
+        tn("tnsm/map/divided-truncation", tnBase().set("zone.isTnsmDividedMap", true), 9L);
+        // server rate
+        for (int rate : new int[]{0, 1, 5, 100, 1000}) {
+            add(new Case("tnsm/rate/" + rate, tnBase()).srv("rateExp", rate).limit(0, 10_000_000_000_000L, 1000000L, 1000000L, 100000L, 10000, 20).op("initPowerLimit")
+                    .op("calSucManhTiemNang", "arg", 7_001L));
+        }
+        // power limit and milestones
+        long[] powers = {0L, 39_999_999_999L, 40_000_000_000L, 49_999_999_999L, 50_000_000_000L, 99_999_999_999L, 100_000_000_000L, 119_999_999_999L, 120_000_000_000L, 9_999_999_999_999L};
+        for (long pw : powers) {
+            for (long arg : new long[]{1_000L, 30_000_000L, 5_000_000_000L}) {
+                tn("tnsm/power/" + pw + "/arg" + arg, tnBase().set("npoint.power", pw), arg);
+            }
+        }
+        Case atLimit = new Case("tnsm/power/at-limit", tnBase().set("npoint.power", 10_000_000_000_000L));
+        atLimit.limit(0, 10_000_000_000_000L, 1, 1, 1, 1, 1).op("initPowerLimit").op("calSucManhTiemNang", "arg", 100L).op("calSubTNSM", "arg", 100L).op("canOpenPower");
+        add(atLimit);
+        add(new Case("tnsm/power/limit-not-loaded", tnBase()).op("calSucManhTiemNang", "arg", 100L).op("getPowerLimit").op("canOpenPower"));
+        add(new Case("tnsm/power/next-limit", tnBase().set("npoint.limitPower", 2)).limit(2, 5_000L, 1, 1, 1, 1, 1).limit(3, 9_000L, 1, 1, 1, 1, 1).op("initPowerLimit").op("getPowerLimit")
+                .op("getPowerNextLimit").op("canOpenPower"));
+        add(new Case("tnsm/power/missing-level", tnBase().set("npoint.limitPower", 12)).limit(2, 5_000L, 1, 1, 1, 1, 1).op("initPowerLimit").op("getPowerLimit").op("getPowerNextLimit"));
+        for (long arg : new long[]{-1L, 0L, 1L, 19_999_999L, 20_000_000L, 20_000_001L, Long.MAX_VALUE}) {
+            add(new Case("tnsm/calSubTNSM/arg" + arg, tnBase().set("npoint.power", 60_000_000_000L)).limit(0, 10_000_000_000_000L, 1, 1, 1, 1, 1).op("initPowerLimit").op("calSubTNSM", "arg", arg));
+        }
+        // pets: experience of a pet is divided by a factor and gets the master's bonuses
+        for (int type : new int[]{0, 1, 2, 3, 4, 5, 6, 7}) {
+            PS master = new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.tlTNSMPet", 20);
+            PS pt = pet(type, 1).master(master).set("zone.type", 0).set("npoint.power", 1_000L).set("npoint.limitPower", 0);
+            Case c = new Case("tnsm/pet/type" + type, pt);
+            c.limit(0, 10_000_000_000_000L, 1, 1, 1, 1, 1).op("initPowerLimit").op("calSucManhTiemNang", "arg", 100_003L);
+            add(c);
+        }
+        PS masterAll = new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("npoint.tlTNSMPet", 50).set("it.isUseBuaTNSMDetu", true).set("it.isRongXuong", true)
+                .set("p.THE_TUAN", 1).set("p.LASTTIME_THE_TUAN", ACTIVE).set("p.THE_THANG", 2).set("p.LASTTIME_THE_THANG", ACTIVE).set("p.THE_NAM", 1).set("p.LASTTIME_THE_NAM", ACTIVE)
+                .set("p.THE_CHI_TON", 1).set("p.LASTTIME_THE_CHI_TON", ACTIVE);
+        for (String ch : new String[]{"tdDeTu", "tdDeTu2", "tdDeTu3", "tdDeTu4", "tdDeTu5", "tdDeTu7", "tdDeTu10", "tdDeTu20"}) {
+            masterAll.set("ch." + ch, ACTIVE);
+        }
+        PS ptAll = pet(2, 1).master(masterAll).set("zone.type", 0).set("zone.isMapKVTH", true).set("npoint.power", 1_000L).set("npoint.limitPower", 0);
+        Case ca = new Case("tnsm/pet/master-all-bonuses", ptAll);
+        ca.limit(0, 10_000_000_000_000L, 1, 1, 1, 1, 1).op("initPowerLimit").op("calSucManhTiemNang", "arg", 1_003L);
+        add(ca);
+        for (String ch : new String[]{"tdDeTu", "tdDeTu2", "tdDeTu3", "tdDeTu4", "tdDeTu5", "tdDeTu7", "tdDeTu10", "tdDeTu20"}) {
+            PS m = new PS("player").set("p.id", 1L).set("p.isPlayer", true).set("ch." + ch, ACTIVE);
+            PS pt = pet(0, 1).master(m).set("zone.type", 0).set("npoint.power", 1_000L).set("npoint.limitPower", 0);
+            Case c = new Case("tnsm/pet/master-charm-" + ch, pt);
+            c.limit(0, 10_000_000_000_000L, 1, 1, 1, 1, 1).op("initPowerLimit").op("calSucManhTiemNang", "arg", 10_003L);
+            add(c);
+        }
+    }
+
+    // ---------------------------------------------------------------- spending potential
+
+    static PS spend(long tiemNang) {
+        return base().set("npoint.tiemNang", tiemNang).set("npoint.limitPower", 0).set("npoint.hpg", 2000L).set("npoint.mpg", 2000L).set("npoint.dameg", 100L).set("npoint.defg", 10).set("npoint.critg", 2);
+    }
+
+    static Case sp(String name, PS p) {
+        Case c = new Case(name, p);
+        c.limit(0, 10_000_000_000_000L, 20000L, 20000L, 1000L, 100, 5).op("initPowerLimit");
+        return add(c);
+    }
+
+    static void increasePoint() {
+        for (int type = 0; type <= 5; type++) {
+            for (int point : new int[]{1, 5, 100}) {
+                sp("increase/type" + type + "/point" + point + "/rich", spend(1_000_000_000_000L)).op("increasePoint", "type", type, "point", point, "manual", false);
+                sp("increase/type" + type + "/point" + point + "/poor", spend(10L)).op("increasePoint", "type", type, "point", point, "manual", false);
+            }
+        }
+        sp("increase/point-zero", spend(1_000_000_000L)).op("increasePoint", "type", 0, "point", 0, "manual", false);
+        sp("increase/point-negative", spend(1_000_000_000L)).op("increasePoint", "type", 0, "point", -3, "manual", false);
+        sp("increase/protected-account", spend(1_000_000_000L).set("p.baovetaikhoan", true)).op("increasePoint", "type", 0, "point", 1, "manual", false);
+        add(new Case("increase/no-limit-loaded", spend(1_000_000_000L)).op("increasePoint", "type", 0, "point", 1, "manual", false));
+        sp("increase/manual-pet", spend(1_000_000_000L).detu(pet(0, 1))).op("increasePoint", "type", 2, "point", 1, "manual", true);
+        sp("increase/manual-no-pet", spend(1_000_000_000L)).op("increasePoint", "type", 2, "point", 1, "manual", true);
+        // exactly at the cap, one over
+        Case c1 = new Case("increase/hp-exactly-cap", spend(1_000_000_000_000L).set("npoint.hpg", 19980L));
+        c1.limit(0, 10_000_000_000_000L, 20000L, 20000L, 1000L, 100, 5).op("initPowerLimit").op("increasePoint", "type", 0, "point", 1, "manual", false).op("increasePoint", "type", 0, "point", 1, "manual", false);
+        add(c1);
+        Case c2 = new Case("increase/dame-cap", spend(1_000_000_000_000L).set("npoint.dameg", 999L));
+        c2.limit(0, 10_000_000_000_000L, 20000L, 20000L, 1000L, 100, 5).op("initPowerLimit").op("increasePoint", "type", 2, "point", 1, "manual", false).op("increasePoint", "type", 2, "point", 1, "manual", false);
+        add(c2);
+        Case c3 = new Case("increase/def-int-overflow", spend(Long.MAX_VALUE).set("npoint.defg", 900_000_000));
+        c3.limit(0, 10_000_000_000_000L, 20000L, 20000L, 1000L, 2_000_000_000, 5).op("initPowerLimit").op("increasePoint", "type", 3, "point", 1, "manual", false);
+        add(c3);
+        Case c4 = new Case("increase/def-int-overflow-negative-cost", spend(1_000L).set("npoint.defg", 200_000_000));
+        c4.limit(0, 10_000_000_000_000L, 20000L, 20000L, 1000L, 2_000_000_000, 5).op("initPowerLimit").op("increasePoint", "type", 3, "point", 1, "manual", false);
+        add(c4);
+        Case c5 = new Case("increase/crit-cost-wrap", spend(Long.MAX_VALUE).set("npoint.critg", 30));
+        c5.limit(0, 10_000_000_000_000L, 20000L, 20000L, 1000L, 100, 100).op("initPowerLimit").op("increasePoint", "type", 4, "point", 1, "manual", false);
+        add(c5);
+        for (int critg : new int[]{0, 1, 5, 10, 22, 27}) {
+            Case c = new Case("increase/crit-cost/" + critg, spend(Long.MAX_VALUE).set("npoint.critg", critg));
+            c.limit(0, 10_000_000_000_000L, 20000L, 20000L, 1000L, 100, 100).op("initPowerLimit").op("increasePoint", "type", 4, "point", 1, "manual", false);
+            add(c);
+        }
+        Case c6 = new Case("increase/hp-large-point", spend(Long.MAX_VALUE).set("npoint.hpg", 1_000_000L));
+        c6.limit(0, 10_000_000_000_000L, 90_000_000_000L, 20000L, 1000L, 100, 5).op("initPowerLimit").op("increasePoint", "type", 0, "point", 32767, "manual", false);
+        add(c6);
+        Case c7 = new Case("increase/dame-large-point", spend(Long.MAX_VALUE).set("npoint.dameg", 1_000_000L));
+        c7.limit(0, 10_000_000_000_000L, 20000L, 20000L, 90_000_000_000L, 100, 5).op("initPowerLimit").op("increasePoint", "type", 2, "point", 32767, "manual", false);
+        add(c7);
+        // getFullTN
+        for (long[] v : new long[][]{{0, 0, 0, 0, 0}, {20, 20, 1, 1, 1}, {2000, 3000, 100, 10, 2}, {100000, 80000, 5000, 400, 5}, {20000000, 20000000, 1000000, 60000, 10},
+            {21, 39, 2, 1, 0}, {2_000_000_000_000L, 2_000_000_000_000L, 50_000_000_000L, 2000000, 25}, {-100, -100, -1, -5, -2}}) {
+            PS p = base().set("npoint.hpg", v[0]).set("npoint.mpg", v[1]).set("npoint.dameg", v[2]).set("npoint.defg", (int) v[3]).set("npoint.critg", (int) v[4]);
+            add(new Case("fulltn/" + v[0] + "-" + v[1] + "-" + v[2] + "-" + v[3] + "-" + v[4], p).op("getFullTN"));
+        }
+        for (int critg : new int[]{1, 2, 3, 10, 20, 22, 23, 25, 30, 40, 60}) {
+            add(new Case("fulltn/crit" + critg, base().set("npoint.hpg", 0L).set("npoint.mpg", 0L).set("npoint.dameg", 0L).set("npoint.defg", 0).set("npoint.critg", critg)).op("getFullTN"));
+        }
+    }
+
+    // ---------------------------------------------------------------- small operations
+
+    static void misc() {
+        Case h = new Case("misc/hp-mp-accessors", base().set("npoint.hpMax", 1000L).set("npoint.mpMax", 500L).set("npoint.hp", 900L).set("npoint.mp", 100L));
+        h.op("getHP").op("getMP").op("setHP", "arg", 5000L).op("getHP").op("setHP", "arg", 700L).op("setHP", "arg", 0L).op("setHP", "arg", -3L).op("setMP", "arg", 9999L).op("setMP", "arg", -1L)
+                .op("setMP", "arg", 250L).op("addHp", "arg", 100000L).op("addHp", "arg", -50L).op("setHp", "arg", 3000L).op("getHP").op("addMp", "arg", -999999L).op("addMp", "arg", 300L)
+                .op("addMp", "arg", 99999L).op("setMp", "arg", -4L).op("setHp", "arg", -4L).op("setFullHpMp").op("getCurrPercentHP").op("getCurrPercentMP");
+        add(h);
+        Case s = new Case("misc/sub", base().set("npoint.hpMax", 1000L).set("npoint.hp", 900L).set("npoint.mpMax", 500L).set("npoint.mp", 100L).set("npoint.power", 100L).set("npoint.tiemNang", 50L));
+        s.op("subHP", "arg", "100.7").op("subHP", "arg", "0.5").op("subHP", "arg", "2.5E10").op("subMP", "arg", 30L).op("subMP", "arg", 5000L).op("subSucManh", "arg", 30L).op("subSucManh", "arg", 500L)
+                .op("subTiemNang", "arg", 20L).op("subTiemNang", "arg", 99L).op("subSucManhTiemNang", "arg", 5L);
+        add(s);
+        add(new Case("misc/subHP-saturates", base().set("npoint.hp", 5L)).op("subHP", "arg", "-1.0E30").op("subHP", "arg", "NaN"));
+        add(new Case("misc/subSucManh-both", base().set("npoint.power", 40L).set("npoint.tiemNang", 60L)).op("subSucManhTiemNang", "arg", 50L));
+        add(new Case("misc/powerUp", base().set("npoint.power", 10L)).op("powerUp", "arg", 90L).op("powerUp", "arg", 5L));
+        add(new Case("misc/dame-inj", base().set("npoint.defg", 100)).op("calPoint").op("subDameInjureWithDeff", "arg", "5000.5").op("subDameInjureWithDeff", "arg", "10.0").op("subDameInjureWithDeff", "arg", "-3.0"));
+        add(new Case("misc/hut", base().body(0, item(10, 0, o(95, 7), o(104, 5), o(96, 9)))).op("calPoint").op("getTileHutHp", "isMob", true).op("getTileHutHp", "isMob", false));
+        add(new Case("misc/calPercent", base()).op("calPercent", "a", 199L, "b", 50L).op("calPercent", "a", 1L, "b", 99L).op("calPercent", "a", Long.MAX_VALUE, "b", 3L).op("calPercent", "a", -7L, "b", 50L));
+        add(new Case("misc/hp-clamp-in-setbasepoint", base().set("npoint.hp", 5L).set("npoint.mp", 6L)).op("setBasePoint"));
+        add(new Case("misc/hp-clamp-in-setbasepoint-over", base().set("npoint.hp", 9_000_000_000_000L).set("npoint.mp", 9_000_000_000_000L)).op("setBasePoint"));
+        add(new Case("misc/calpoint-twice", base().body(0, item(10, 0, o(0, 100), o(77, 10), o(5, 3)))).op("calPoint").op("calPoint").op("setBasePoint"));
+        add(new Case("misc/hpmax-lowers-hp", base().set("npoint.hp", 90_000L)).op("calPoint").op("set", "path", "npoint.hpg", "value", 1000L).op("calPoint"));
+    }
+
+    // ---------------------------------------------------------------- update (timers use the real clock in the original: the first call is always due)
+
+    static void update() {
+        PS ch = base().set("npoint.hpMax", 10_000L).set("npoint.mpMax", 8_000L).set("npoint.hp", 100L).set("npoint.mp", 100L).set("es.isCharging", true).set("es.countCharging", 0)
+                .set("skill.point", 4).set("npoint.hpHoi", 123L).set("npoint.mpHoi", 456L).set("npoint.tlHpHoiBanthan_DongMinh", 7).set("npoint.stamina", 5).set("npoint.maxStamina", 10);
+        add(new Case("update/charging-first-tick", ch).op("update").op("update").op("update"));
+        PS ch3 = base().set("npoint.hpMax", 10_000L).set("npoint.mpMax", 8_000L).set("npoint.hp", 100L).set("npoint.mp", 100L).set("es.isCharging", true).set("es.countCharging", 3)
+                .set("skill.point", 4).set("npoint.maxStamina", 3).set("npoint.stamina", 3);
+        add(new Case("update/charging-count-3-chat", ch3).op("update"));
+        PS chLast = base().set("npoint.hpMax", 10_000L).set("npoint.mpMax", 8_000L).set("npoint.hp", 100L).set("npoint.mp", 100L).set("es.isCharging", true).set("es.countCharging", 9)
+                .set("skill.point", 4);
+        add(new Case("update/charging-last-tick", chLast).op("update"));
+        PS chFull = base().set("npoint.hpMax", 10_000L).set("npoint.mpMax", 8_000L).set("npoint.hp", 10_000L).set("npoint.mp", 8_000L).set("es.isCharging", true).set("es.countCharging", 1)
+                .set("skill.point", 4);
+        add(new Case("update/charging-already-full", chFull).op("update"));
+        PS chEffect = base().set("npoint.hpMax", 10_000L).set("npoint.mpMax", 8_000L).set("npoint.hp", 100L).set("npoint.mp", 100L).set("es.isCharging", true).set("es.countCharging", 1)
+                .set("skill.point", 4).set("es.haveEffectSkill", true);
+        add(new Case("update/charging-has-effect-skill", chEffect).op("update"));
+        PS chDead = base().set("npoint.hpMax", 10_000L).set("npoint.mpMax", 8_000L).set("npoint.hp", 0L).set("npoint.mp", 100L).set("es.isCharging", true).set("es.countCharging", 1)
+                .set("skill.point", 4);
+        add(new Case("update/charging-dead", chDead).op("update"));
+        PS chBig = base().set("npoint.hpMax", 9_000_000_000_000L).set("npoint.mpMax", 8_000_000_000_000L).set("npoint.hp", 1L).set("npoint.mp", 1L).set("es.isCharging", true)
+                .set("es.countCharging", 0).set("skill.point", 4).set("npoint.hpHoi", 9_000_000_000_000L).set("npoint.mpHoi", 5L);
+        add(new Case("update/charging-big-readint-true", chBig).op("update"));
+        add(new Case("update/charging-big-readint-false", chBig).srv("readInt", false).op("update"));
+        PS noCharge = base().set("npoint.stamina", 5).set("npoint.maxStamina", 10);
+        add(new Case("update/idle-stamina", noCharge).op("update").op("update"));
+        add(new Case("update/stamina-full", base().set("npoint.stamina", 10).set("npoint.maxStamina", 10)).op("update"));
+        add(new Case("update/stamina-boss-no-packet", base().set("p.isPlayer", false).set("p.isBoss", true).set("npoint.stamina", 1).set("npoint.maxStamina", 10)).op("update"));
+        add(new Case("update/stamina-pet-no-packet", pet(0, 1).set("npoint.stamina", 1).set("npoint.maxStamina", 10)).op("update"));
+        for (String who : new String[]{"isBo", "isMe", "isNguoiYeu", "isConOne", "isConTwo", "isConThree"}) {
+            add(new Case("update/stamina-" + who + "-no-packet", base().set("p." + who, true).set("npoint.stamina", 1).set("npoint.maxStamina", 10)).op("update"));
+        }
+    }
+}

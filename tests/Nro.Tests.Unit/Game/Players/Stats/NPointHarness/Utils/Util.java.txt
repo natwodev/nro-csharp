@@ -1,0 +1,14 @@
+package Utils;
+
+import java.util.Random;
+import nro.mob.Mob;
+import nro.player.Player;
+import nro.server.Manager;
+
+/** The functions of the original Utils.Util that NPoint calls, copied verbatim by the build script (see GENERATED); only the random source is a field the harness can reseed. */
+public class Util {
+
+    public static Random rand = new Random(1);
+
+//@@GENERATED Util
+}

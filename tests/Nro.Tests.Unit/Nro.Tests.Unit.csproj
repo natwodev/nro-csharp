@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nro.Tests.Shared\Nro.Tests.Shared.csproj" />
+    <ProjectReference Include="..\..\src\Nro.Core\Nro.Core.csproj" />
+    <ProjectReference Include="..\..\src\Nro.Data\Nro.Data.csproj" />
+    <ProjectReference Include="..\..\src\Nro.Network\Nro.Network.csproj" />
+    <ProjectReference Include="..\..\src\Nro.Game\Nro.Game.csproj" />
+    <ProjectReference Include="..\..\src\Nro.Content\Nro.Content.csproj" />
+    <ProjectReference Include="..\..\src\Nro.Host\Nro.Host.csproj" />
+  </ItemGroup>
+
+</Project>

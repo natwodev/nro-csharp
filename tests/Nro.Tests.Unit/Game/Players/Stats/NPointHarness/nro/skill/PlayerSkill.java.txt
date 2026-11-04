@@ -1,0 +1,6 @@
+package nro.skill;
+
+public class PlayerSkill {
+
+    public Skill skillSelect;
+}

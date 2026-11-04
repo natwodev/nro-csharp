@@ -1,0 +1,20 @@
+package nro.player;
+
+public class Charms {
+
+    public long tdTriTue;
+    public long tdDeTu;
+    public long tdDeTu2;
+    public long tdDeTu3;
+    public long tdDeTu4;
+    public long tdDeTu5;
+    public long tdDeTu7;
+    public long tdDeTu10;
+    public long tdDeTu20;
+    public long tdTriTue3;
+    public long tdTriTue4;
+    public long tdTriTue5;
+    public long tdTriTue7;
+    public long tdTriTue10;
+    public long tdTriTue20;
+}

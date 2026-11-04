@@ -1,0 +1,7 @@
+package models.Reward;
+
+public class RewardBlackBall {
+
+//@@GENERATED RewardBlackBall.constants
+    public long[] timeOutOfDateReward = new long[7];
+}

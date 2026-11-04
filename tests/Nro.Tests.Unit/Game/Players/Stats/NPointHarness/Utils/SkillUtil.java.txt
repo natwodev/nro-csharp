@@ -1,0 +1,9 @@
+package Utils;
+
+import nro.player.Player;
+
+/** The six pure formulas NPoint calls, copied verbatim from the original by the build script (see GENERATED). */
+public class SkillUtil {
+
+//@@GENERATED SkillUtil
+}

@@ -1,0 +1,121 @@
+package nro.player;
+
+import java.util.ArrayList;
+import java.util.List;
+import models.Item.ItemTime;
+import models.Reward.RewardBlackBall;
+import nro.card.Card;
+import nro.clan.Buff;
+import nro.clan.Clan;
+import nro.effect.EffectFlagBag;
+import nro.effect.EffectSkill;
+import nro.effect.EffectSkin;
+import nro.intrinsic.IntrinsicPlayer;
+import nro.inventory.Inventory;
+import nro.map.Zone;
+import nro.satellite.Satellite;
+import nro.skill.PlayerSkill;
+import network.session.MySession;
+
+/** Test double of nro.player.Player: the data members NPoint reads, with the types of the original. */
+public class Player {
+
+    public long id;
+    public String name;
+    public byte gender;
+    public Detu Detu;
+    public NPoint nPoint;
+    public RewardBlackBall rewardBlackBall = new RewardBlackBall();
+    public List<Card> Cards = new ArrayList<>();
+    public Fusion fusion = new Fusion();
+    public PointFusion pointfusion = new PointFusion();
+    public Inventory inventory = new Inventory();
+    public SetClothes setClothes = new SetClothes();
+    public ItemTime itemTime = new ItemTime();
+    public EffectSkill effectSkill = new EffectSkill();
+    public EffectSkin effectSkin = new EffectSkin();
+    public EffectFlagBag effectFlagBag = new EffectFlagBag();
+    public Charms charms = new Charms();
+    public Zone zone;
+    public Clan clan;
+    public Satellite satellite;
+    public PlayerSkill playerSkill = new PlayerSkill();
+    public IntrinsicPlayer playerIntrinsic = new IntrinsicPlayer();
+    public MySession session;
+    public Location location = new Location();
+    public Buff buff = Buff.NONE;
+
+    public boolean isPlayer;
+    public boolean isDeTu;
+    public boolean isBo;
+    public boolean isMe;
+    public boolean isBoss;
+    public boolean isPetFollow;
+    public boolean isDuongTang;
+    public boolean isPhanThan;
+    public boolean isBot_Valentine;
+    public boolean isBot;
+    public boolean isBot_Event;
+    public boolean isBot_New;
+    public boolean IsSaibamen;
+    public boolean isNguoiYeu;
+    public boolean isConOne;
+    public boolean isConTwo;
+    public boolean isConThree;
+
+    public int tlHpClanAdd = 0;
+    public int tlMpClanAdd = 0;
+    public int tlDameClanAdd = 0;
+    public int THE_TUAN;
+    public long LASTTIME_THE_TUAN;
+    public int THE_THANG;
+    public long LASTTIME_THE_THANG;
+    public int THE_NAM;
+    public long LASTTIME_THE_NAM;
+    public int THE_CHI_TON;
+    public long LASTTIME_THE_CHI_TON;
+    public boolean isUseDanhHieu_ThienTu;
+    public long LastTimeDanhHieu_ThienTu;
+    public boolean isPhuHoMapMabu;
+    public int typeChibi;
+    public int isbienhinh;
+    public byte trbne;
+    public byte cFlag;
+    public boolean baovetaikhoan;
+
+    public Buff getBuff() {
+        return this.buff;
+    }
+
+    public PointFusion getPointfusion() {
+        return this.pointfusion;
+    }
+
+    public MySession getSession() {
+        return this.session;
+    }
+
+    public boolean isDie() {
+        if (this.nPoint != null) {
+            return this.nPoint.hp <= 0;
+        }
+        return true;
+    }
+
+    public void setDie() {
+        nro.harness.Log.add("setDie");
+    }
+
+    // isPl / isPlMan / getBot: bodies of the original, minus the "instanceof NonInteractiveNPC" test (that class is not part of the harness)
+    public boolean isPl() {
+        return isPlayer && !isDeTu && !isBo && !isMe && !isBoss && !isPetFollow && !isDuongTang && !isPhanThan && !isBot_Valentine && !isBot && !isBot_Event && !isBot_New && !IsSaibamen && !isNguoiYeu && !isConOne && !isConTwo && !isConThree;
+    }
+
+    public boolean isPlMan() {
+        return (isPlayer || isDeTu || isBo || isMe || isNguoiYeu || isConOne || isConTwo || isConThree || isPhanThan) && !isBoss && !isPetFollow && !isDuongTang && !isBot && !isBot_Event && !isBot_New && !isBot_Valentine && !IsSaibamen;
+    }
+
+    public boolean getBot() {
+        return (isBot || isBot_New || isBot_Event || isBot_Valentine);
+    }
+}

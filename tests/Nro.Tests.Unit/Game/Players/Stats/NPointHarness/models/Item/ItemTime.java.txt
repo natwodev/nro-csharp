@@ -1,0 +1,14 @@
+package models.Item;
+
+public class ItemTime {
+
+    public boolean Isthuocmothuong, Isthuocmodacbiet, isUseHoiSieuCap, isUseBanhDeoC1, isUseBanhDeoC2, isUseBanhDeoC3, isUseRocket1h;
+    public boolean isRongXuong, isRongXuong_2, isRongXuong_3, isUseBoHuyet, isUseBoHuyet2, isUseBoKhi, isUseBoKhi2;
+    public boolean isUseHongDao0, isUseHongDao, isUseHongDao1, isUseHongDao3, isUseHongDao5, isUseHongDao10, isUseHongDao25, isUseHongDao50, isUseHongDao99, isUseHongDao999;
+    public boolean istrbhp, istrbhpxd, istrbki, istrbkixd, istrbsd, istrbsdxd, IsSupbihacam, istomtambot, IsDuoiKhi;
+    public boolean isUseTrungThu1Trung, isUseTrungThu2Trung, isUseTrungThuDB, isUseHBTrungThu, isEatMeal, isUseCuongNo, isUseCuongNo2;
+    public boolean isUseBanhTet, isUseBanhTrung, Ishamburgersau, iscuarangme, Isbanhgatonhen;
+    public boolean isUseNedon, isUseNedon2, isUsePhanSatThuong, isUsePhanSatThuong2, isUsePhanSatThuong3;
+    public boolean IsKhauTrang, isUseSatThuongChuan, isUseSatThuongChuan2, isUseSauRieng, isUseTHUOCTANGHINH, isUseTHUOCTANGHINH10;
+    public boolean isUseChiMang2, isUseChiMang3, IsBocPha, IsKeoMotMat, isbachtuocnuong, isUseDuoiKhiTNSM, isUseBuaTNSMDetu;
+}

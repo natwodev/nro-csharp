@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Nro.Tests" />
+    <InternalsVisibleTo Include="Nro.Tests.Unit" />
+    <InternalsVisibleTo Include="Nro.Tests.Integration" />
   </ItemGroup>
 
   <PropertyGroup>

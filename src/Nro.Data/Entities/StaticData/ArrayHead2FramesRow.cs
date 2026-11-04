@@ -1,7 +1,10 @@
+using Nro.Data.Entities.StaticData;
+using Nro.Data.Entities.Runtime;
+using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nro.Data.Entities;
+namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho hoạt ảnh đầu nhiều khung hình trong hệ thống
 // Bảng cơ sở dữ liệu: array_head_2_frames (sinh tự động, không sửa tay)

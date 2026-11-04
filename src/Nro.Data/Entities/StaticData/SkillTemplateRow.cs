@@ -1,7 +1,10 @@
+using Nro.Data.Entities.StaticData;
+using Nro.Data.Entities.Runtime;
+using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nro.Data.Entities;
+namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho mẫu kỹ năng trong hệ thống
 // Bảng cơ sở dữ liệu: skill_template (sinh tự động, không sửa tay)

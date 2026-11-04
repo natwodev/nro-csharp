@@ -1,0 +1,815 @@
+package nro.harness;
+
+import Utils.Util;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
+import models.Item.Item;
+import models.Item.ItemOption;
+import models.Item.ItemTime;
+import nro.attribute.Attribute;
+import nro.card.Card;
+import nro.card.OptionCard;
+import nro.clan.Clan;
+import nro.effect.EffectFlagBag;
+import nro.effect.EffectSkill;
+import nro.effect.EffectSkin;
+import nro.intrinsic.Intrinsic;
+import nro.map.Zone;
+import nro.mob.Mob;
+import nro.player.Detu;
+import nro.player.NPoint;
+import nro.player.PhanThan;
+import nro.player.Player;
+import nro.power.PowerLimit;
+import nro.power.PowerLimitManager;
+import nro.satellite.Satellite;
+import nro.server.Manager;
+import nro.server.ServerManager;
+import nro.skill.Skill;
+import nro.template.ItemOptionTemplate;
+import nro.template.ItemTemplate;
+import network.session.MySession;
+
+/**
+ * Characterization harness for nro.player.NPoint. It runs the ORIGINAL NPoint.java (copied unchanged from the source tree by the build script) against test doubles of the
+ * classes around it, drives it with scenarios built in code below, and writes the scenario (inputs) together with what the original did (outputs) as JSON.
+ * The C# test replays the same inputs on the port and compares every field. Nothing here is a model of NPoint: it only builds objects and records.
+ */
+public class NPointHarness {
+
+    static class HarnessError extends RuntimeException {
+
+        HarnessError(String m) {
+            super(m);
+        }
+    }
+
+    // ------------------------------------------------------------------ scenario DSL
+
+    static final long ACTIVE = Long.MAX_VALUE / 4; // an expiry far in the future (the original compares with the real clock)
+    static final long EXPIRED = 1L;
+
+    @SuppressWarnings("unchecked")
+    static class PS {
+
+        final LinkedHashMap<String, Object> m = new LinkedHashMap<>();
+
+        PS(String kind) {
+            m.put("kind", kind);
+            m.put("sets", new ArrayList<Object>());
+            List<Object> body = new ArrayList<>();
+            for (int i = 0; i < 12; i++) {
+                body.add(empty());
+            }
+            m.put("body", body);
+            m.put("bag", new ArrayList<Object>());
+            m.put("cards", new ArrayList<Object>());
+            m.put("badge", new ArrayList<Object>());
+            m.put("mobs", new ArrayList<Object>());
+            m.put("humans", new ArrayList<Object>());
+        }
+
+        PS set(String path, Object v) {
+            ((List<Object>) m.get("sets")).add(new ArrayList<Object>(Arrays.asList(path, v)));
+            return this;
+        }
+
+        PS body(int slot, Object item) {
+            ((List<Object>) m.get("body")).set(slot, item);
+            return this;
+        }
+
+        PS bag(Object item) {
+            ((List<Object>) m.get("bag")).add(item);
+            return this;
+        }
+
+        PS card(int used, int level, int[]... opts) {
+            LinkedHashMap<String, Object> c = new LinkedHashMap<>();
+            c.put("used", used);
+            c.put("level", level);
+            List<Object> o = new ArrayList<>();
+            for (int[] x : opts) {
+                o.add(new ArrayList<Object>(Arrays.asList(x[0], x[1], x[2])));
+            }
+            c.put("opts", o);
+            ((List<Object>) m.get("cards")).add(c);
+            return this;
+        }
+
+        PS badge(int[]... opts) {
+            for (int[] x : opts) {
+                ((List<Object>) m.get("badge")).add(new ArrayList<Object>(Arrays.asList(x[0], x[1])));
+            }
+            return this;
+        }
+
+        PS trainArmor(Object item) {
+            m.put("trainArmor", item);
+            return this;
+        }
+
+        PS mob(int x, int y, long hp, boolean die) {
+            ((List<Object>) m.get("mobs")).add(new ArrayList<Object>(Arrays.asList(x, y, hp, die)));
+            return this;
+        }
+
+        PS human(long id, int x, int y, long hp, boolean die) {
+            ((List<Object>) m.get("humans")).add(new ArrayList<Object>(Arrays.asList(id, x, y, hp, die)));
+            return this;
+        }
+
+        PS detu(PS d) {
+            m.put("detu", d.m);
+            return this;
+        }
+
+        PS master(PS d) {
+            m.put("master", d.m);
+            return this;
+        }
+    }
+
+    static LinkedHashMap<String, Object> empty() {
+        LinkedHashMap<String, Object> i = new LinkedHashMap<>();
+        i.put("empty", true);
+        return i;
+    }
+
+    static LinkedHashMap<String, Object> item(int id, int type, int[]... opts) {
+        LinkedHashMap<String, Object> i = new LinkedHashMap<>();
+        i.put("id", id);
+        i.put("type", type);
+        List<Object> o = new ArrayList<>();
+        for (int[] x : opts) {
+            o.add(new ArrayList<Object>(Arrays.asList(x[0], x[1])));
+        }
+        i.put("opts", o);
+        return i;
+    }
+
+    static LinkedHashMap<String, Object> itemNullOpts(int id, int type) {
+        LinkedHashMap<String, Object> i = new LinkedHashMap<>();
+        i.put("id", id);
+        i.put("type", type);
+        i.put("opts", null);
+        return i;
+    }
+
+    static int[] o(int id, int param) {
+        return new int[]{id, param};
+    }
+
+    static int[] oc(int id, int param, int active) {
+        return new int[]{id, param, active};
+    }
+
+    static class Case {
+
+        final String name;
+        final PS main;
+        final LinkedHashMap<String, Object> server = new LinkedHashMap<>();
+        final List<Object> ops = new ArrayList<>();
+
+        @SuppressWarnings("unchecked")
+        Case(String name, PS main) {
+            this.name = name;
+            this.main = main;
+            server.put("sets", new ArrayList<Object>());
+            server.put("attrs", new ArrayList<Object>());
+            server.put("whis", new ArrayList<Object>());
+            server.put("limits", new ArrayList<Object>());
+        }
+
+        @SuppressWarnings("unchecked")
+        Case srv(String path, Object v) {
+            ((List<Object>) server.get("sets")).add(new ArrayList<Object>(Arrays.asList(path, v)));
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        Case attr(int templateId, int value, boolean expired) {
+            ((List<Object>) server.get("attrs")).add(new ArrayList<Object>(Arrays.asList(templateId, value, expired)));
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        Case whis(long... ids) {
+            for (long id : ids) {
+                ((List<Object>) server.get("whis")).add(id);
+            }
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        Case limit(int level, long power, long hp, long mp, long damage, int defense, int critical) {
+            ((List<Object>) server.get("limits")).add(new ArrayList<Object>(Arrays.asList(level, power, hp, mp, damage, defense, critical)));
+            return this;
+        }
+
+        Case op(String name, Object... kv) {
+            LinkedHashMap<String, Object> o = new LinkedHashMap<>();
+            o.put("op", name);
+            for (int i = 0; i < kv.length; i += 2) {
+                o.put((String) kv[i], kv[i + 1]);
+            }
+            ops.add(o);
+            return this;
+        }
+    }
+
+    // ------------------------------------------------------------------ building the objects
+
+    static int nextMapId = 1000;
+
+    static void assign(Object target, String field, Object value) throws Exception {
+        Field f = target.getClass().getField(field);
+        Class<?> t = f.getType();
+        if (t == boolean.class) {
+            f.setBoolean(target, (Boolean) value);
+        } else if (t == byte.class) {
+            f.setByte(target, ((Number) value).byteValue());
+        } else if (t == short.class) {
+            f.setShort(target, ((Number) value).shortValue());
+        } else if (t == int.class) {
+            f.setInt(target, ((Number) value).intValue());
+        } else if (t == long.class) {
+            f.setLong(target, ((Number) value).longValue());
+        } else if (t == String.class) {
+            f.set(target, (String) value);
+        } else if (t.isEnum()) {
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            Object e = Enum.valueOf((Class) t, (String) value);
+            f.set(target, e);
+        } else {
+            throw new HarnessError("cannot assign " + field + " of type " + t);
+        }
+    }
+
+    static void ensureZone(Player p) {
+        if (p.zone == null) {
+            p.zone = new Zone();
+            p.zone.map.mapId = nextMapId++;
+            Maps.registry.put(p.zone.map.mapId, p.zone.map);
+        }
+    }
+
+    static void applySet(Player p, String path, Object v) throws Exception {
+        int dot = path.indexOf('.');
+        String group = path.substring(0, dot);
+        String field = path.substring(dot + 1);
+        switch (group) {
+            case "p":
+                assign(p, field, v);
+                break;
+            case "npoint":
+                assign(p.nPoint, field, v);
+                break;
+            case "it":
+                assign(p.itemTime, field, v);
+                break;
+            case "es":
+                assign(p.effectSkill, field, v);
+                break;
+            case "ek":
+                assign(p.effectSkin, field, v);
+                break;
+            case "sc":
+                assign(p.setClothes, field, v);
+                break;
+            case "ch":
+                assign(p.charms, field, v);
+                break;
+            case "clan":
+                if (p.clan == null) {
+                    p.clan = new Clan();
+                }
+                assign(p.clan, field, v);
+                break;
+            case "sat":
+                if (p.satellite == null) {
+                    p.satellite = new Satellite();
+                }
+                assign(p.satellite, field, v);
+                break;
+            case "fb":
+                assign(p.effectFlagBag, field, v);
+                break;
+            case "inv":
+                assign(p.inventory, field, v);
+                break;
+            case "intr":
+                assign(p.playerIntrinsic.intrinsic, field, v);
+                break;
+            case "skill":
+                if (p.playerSkill.skillSelect == null) {
+                    p.playerSkill.skillSelect = new Skill();
+                }
+                if (field.equals("id")) {
+                    p.playerSkill.skillSelect.template.id = ((Number) v).byteValue();
+                } else {
+                    assign(p.playerSkill.skillSelect, field, v);
+                }
+                break;
+            case "fusion":
+                assign(p.fusion, field, v);
+                break;
+            case "dt":
+                assign((Detu) p, field, v);
+                break;
+            case "pf":
+                p.pointfusion.setDameFusion(((Number) v).intValue());
+                break;
+            case "bb":
+                p.rewardBlackBall.timeOutOfDateReward[Integer.parseInt(field)] = ((Number) v).longValue();
+                break;
+            case "zone":
+                ensureZone(p);
+                assign(p.zone.map, field, v);
+                break;
+            case "session":
+                if (p.session == null) {
+                    p.session = new MySession();
+                }
+                assign(p.session, field, v);
+                break;
+            case "loc":
+                assign(p.location, field, v);
+                break;
+            default:
+                throw new HarnessError("unknown group " + group);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    static Item buildItem(Object spec) {
+        Item item = new Item();
+        Map<String, Object> m = (Map<String, Object>) spec;
+        if (m.containsKey("empty")) {
+            return item;
+        }
+        item.template = new ItemTemplate();
+        item.template.id = ((Number) m.get("id")).shortValue();
+        item.template.type = ((Number) m.get("type")).byteValue();
+        List<Object> opts = (List<Object>) m.get("opts");
+        if (opts == null) {
+            item.itemOptions = null;
+        } else {
+            for (Object x : opts) {
+                List<Object> xs = (List<Object>) x;
+                ItemOption io = new ItemOption();
+                io.optionTemplate = new ItemOptionTemplate();
+                io.optionTemplate.id = ((Number) xs.get(0)).intValue();
+                io.param = ((Number) xs.get(1)).intValue();
+                item.itemOptions.add(io);
+            }
+        }
+        return item;
+    }
+
+    @SuppressWarnings("unchecked")
+    static Player build(Map<String, Object> spec, Player masterOverride) throws Exception {
+        String kind = (String) spec.get("kind");
+        Player p;
+        if (kind.equals("detu")) {
+            Player master = masterOverride != null ? masterOverride : (spec.get("master") != null ? build((Map<String, Object>) spec.get("master"), null) : new Player());
+            if (master.nPoint == null) {
+                master.nPoint = new NPoint(master);
+            }
+            p = new Detu(master);
+        } else if (kind.equals("phanthan")) {
+            Player master = spec.get("master") != null ? build((Map<String, Object>) spec.get("master"), null) : new Player();
+            if (master.nPoint == null) {
+                master.nPoint = new NPoint(master);
+            }
+            p = new PhanThan(master);
+        } else {
+            p = new Player();
+        }
+        p.nPoint = new NPoint(p);
+        for (Object s : (List<Object>) spec.get("sets")) {
+            List<Object> kv = (List<Object>) s;
+            applySet(p, (String) kv.get(0), kv.get(1));
+        }
+        for (Object it : (List<Object>) spec.get("body")) {
+            p.inventory.itemsBody.add(buildItem(it));
+        }
+        for (Object it : (List<Object>) spec.get("bag")) {
+            p.inventory.itemsBag.add(buildItem(it));
+        }
+        if (spec.get("trainArmor") != null) {
+            p.inventory.trainArmor = buildItem(spec.get("trainArmor"));
+        }
+        for (Object c : (List<Object>) spec.get("cards")) {
+            Map<String, Object> cm = (Map<String, Object>) c;
+            Card card = new Card();
+            card.Used = ((Number) cm.get("used")).byteValue();
+            card.Level = ((Number) cm.get("level")).byteValue();
+            for (Object oo : (List<Object>) cm.get("opts")) {
+                List<Object> x = (List<Object>) oo;
+                OptionCard oc = new OptionCard();
+                oc.id = ((Number) x.get(0)).intValue();
+                oc.param = ((Number) x.get(1)).intValue();
+                oc.active = ((Number) x.get(2)).byteValue();
+                card.Options.add(oc);
+            }
+            p.Cards.add(card);
+        }
+        for (Object b : (List<Object>) spec.get("badge")) {
+            List<Object> x = (List<Object>) b;
+            ItemOption io = new ItemOption();
+            io.optionTemplate = new ItemOptionTemplate();
+            io.optionTemplate.id = ((Number) x.get(0)).intValue();
+            io.param = ((Number) x.get(1)).intValue();
+            nro.badges.BagesTemplate.badgeOptions.add(io);
+        }
+        List<Object> mobs = (List<Object>) spec.get("mobs");
+        List<Object> humans = (List<Object>) spec.get("humans");
+        if (!mobs.isEmpty() || !humans.isEmpty()) {
+            ensureZone(p);
+        }
+        for (Object mm : mobs) {
+            List<Object> x = (List<Object>) mm;
+            Mob mob = new Mob();
+            mob.location.x = ((Number) x.get(0)).intValue();
+            mob.location.y = ((Number) x.get(1)).intValue();
+            mob.point.hp = ((Number) x.get(2)).longValue();
+            mob.die = (Boolean) x.get(3);
+            p.zone.mobs.add(mob);
+        }
+        for (Object hh : humans) {
+            List<Object> x = (List<Object>) hh;
+            Player h = new Player();
+            h.id = ((Number) x.get(0)).longValue();
+            h.location.x = ((Number) x.get(1)).intValue();
+            h.location.y = ((Number) x.get(2)).intValue();
+            h.nPoint = new NPoint(h);
+            h.nPoint.hp = ((Number) x.get(3)).longValue();
+            h.nPoint.hpMax = Math.max(h.nPoint.hp, 1);
+            if ((Boolean) x.get(4)) {
+                h.nPoint.hp = 0;
+            }
+            p.zone.humanoids.add(h);
+        }
+        if (spec.get("detu") != null) {
+            Map<String, Object> ds = (Map<String, Object>) spec.get("detu");
+            p.Detu = (Detu) build(ds, p);
+        }
+        return p;
+    }
+
+    // ------------------------------------------------------------------ running
+
+    static void resetGlobals() {
+        Manager.readInt = true;
+        Manager.RATE_EXP_SERVER = 10;
+        event.EventManager.INTERNATIONAL_WOMANS_DAY = false;
+        jbcd.dao.EventDAO.hp = 0;
+        jbcd.dao.EventDAO.mp = 0;
+        jbcd.dao.EventDAO.dame = 0;
+        ServerManager.gI().attributeManager.attributes.clear();
+        PowerLimitManager.getInstance().table.clear();
+        nro.boss.map.TrainingBoss.TopKillWhisManager.getInstance().list.clear();
+        nro.badges.BagesTemplate.badgeOptions.clear();
+        Maps.registry.clear();
+        nextMapId = 1000;
+        Log.lines.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    static void applyServer(Map<String, Object> server) throws Exception {
+        for (Object s : (List<Object>) server.get("sets")) {
+            List<Object> kv = (List<Object>) s;
+            String path = (String) kv.get(0);
+            Object v = kv.get(1);
+            switch (path) {
+                case "readInt":
+                    Manager.readInt = (Boolean) v;
+                    break;
+                case "rateExp":
+                    Manager.RATE_EXP_SERVER = ((Number) v).intValue();
+                    break;
+                case "womansDay":
+                    event.EventManager.INTERNATIONAL_WOMANS_DAY = (Boolean) v;
+                    break;
+                case "wdHp":
+                    jbcd.dao.EventDAO.hp = ((Number) v).intValue();
+                    break;
+                case "wdMp":
+                    jbcd.dao.EventDAO.mp = ((Number) v).intValue();
+                    break;
+                case "wdDame":
+                    jbcd.dao.EventDAO.dame = ((Number) v).intValue();
+                    break;
+                default:
+                    throw new HarnessError("unknown server setting " + path);
+            }
+        }
+        for (Object a : (List<Object>) server.get("attrs")) {
+            List<Object> x = (List<Object>) a;
+            Attribute at = new Attribute();
+            at.value = ((Number) x.get(1)).intValue();
+            at.expired = (Boolean) x.get(2);
+            ServerManager.gI().attributeManager.attributes.put(((Number) x.get(0)).intValue(), at);
+        }
+        for (Object w : (List<Object>) server.get("whis")) {
+            Player pl = new Player();
+            pl.id = ((Number) w).longValue();
+            nro.boss.map.TrainingBoss.TopKillWhisManager.getInstance().list.add(pl);
+        }
+        for (Object l : (List<Object>) server.get("limits")) {
+            List<Object> x = (List<Object>) l;
+            int level = ((Number) x.get(0)).intValue();
+            PowerLimitManager.getInstance().table.put(level, new PowerLimit(level, ((Number) x.get(1)).longValue(), ((Number) x.get(2)).longValue(), ((Number) x.get(3)).longValue(),
+                    ((Number) x.get(4)).longValue(), ((Number) x.get(5)).intValue(), ((Number) x.get(6)).intValue()));
+        }
+    }
+
+    static LinkedHashMap<String, Object> DEFAULTS;
+
+    static LinkedHashMap<String, Object> sparse(LinkedHashMap<String, Object> full) {
+        LinkedHashMap<String, Object> s = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> e : full.entrySet()) {
+            if (!java.util.Objects.equals(e.getValue(), DEFAULTS.get(e.getKey()))) {
+                s.put(e.getKey(), e.getValue());
+            }
+        }
+        return s;
+    }
+
+    static LinkedHashMap<String, Object> state(NPoint n) throws Exception {
+        TreeMap<String, Object> sorted = new TreeMap<>();
+        for (Field f : NPoint.class.getFields()) {
+            if (Modifier.isStatic(f.getModifiers())) {
+                continue;
+            }
+            String name = f.getName();
+            if (name.equals("player") || name.equals("powerLimit") || name.equals("trainArmor")) {
+                continue;
+            }
+            Object v = f.get(n);
+            if (v instanceof List) {
+                sorted.put(name, new ArrayList<Object>((List<?>) v));
+            } else {
+                sorted.put(name, v);
+            }
+        }
+        return new LinkedHashMap<>(sorted);
+    }
+
+    static LinkedHashMap<String, Object> effects(Player p) {
+        LinkedHashMap<String, Object> e = new LinkedHashMap<>();
+        e.put("worldcup", p.setClothes.worldcup);
+        e.put("trainArmorId", p.inventory.trainArmor == null ? null : (Object) (int) p.inventory.trainArmor.template.id);
+        e.put("isXChuong", p.effectSkin.isXChuong);
+        e.put("isXDame", p.effectSkin.isXDame);
+        e.put("isCharging", p.effectSkill.isCharging);
+        e.put("countCharging", p.effectSkill.countCharging);
+        return e;
+    }
+
+    static String exact(double d) {
+        if (Double.isNaN(d) || Double.isInfinite(d)) {
+            return Double.toString(d);
+        }
+        return new BigDecimal(d).toPlainString();
+    }
+
+    @SuppressWarnings("unchecked")
+    static LinkedHashMap<String, Object> runCase(Case c) throws Exception {
+        resetGlobals();
+        Player p = build(c.main.m, null);
+        applyServer(c.server);
+        LinkedHashMap<String, Object> out = new LinkedHashMap<>();
+        out.put("name", c.name);
+        out.put("main", c.main.m);
+        out.put("server", c.server);
+        List<Object> results = new ArrayList<>();
+        int opIndex = 0;
+        for (Object oo : c.ops) {
+            Map<String, Object> op = (Map<String, Object>) oo;
+            String name = (String) op.get("op");
+            long seed = op.containsKey("seed") ? ((Number) op.get("seed")).longValue() : 1000 + opIndex;
+            Util.rand = new Random(seed);
+            Log.lines.clear();
+            NPoint n = p.nPoint;
+            Object ret = null;
+            String ex = null;
+            try {
+                switch (name) {
+                    case "calPoint":
+                        n.calPoint();
+                        break;
+                    case "setBasePoint":
+                        n.setBasePoint();
+                        break;
+                    case "initPowerLimit":
+                        n.initPowerLimit();
+                        ret = n.powerLimit == null ? null : (Object) n.powerLimit.getPower();
+                        break;
+                    case "getDameAttack":
+                        ret = exact(n.getDameAttack((Boolean) op.get("isMob")));
+                        break;
+                    case "calSucManhTiemNang":
+                        ret = n.calSucManhTiemNang(((Number) op.get("arg")).longValue());
+                        break;
+                    case "calSubTNSM":
+                        ret = n.calSubTNSM(((Number) op.get("arg")).longValue());
+                        break;
+                    case "increasePoint":
+                        n.increasePoint(((Number) op.get("type")).byteValue(), ((Number) op.get("point")).shortValue(), (Boolean) op.get("manual"));
+                        break;
+                    case "getFullTN":
+                        ret = n.getFullTN();
+                        break;
+                    case "update":
+                        n.update();
+                        break;
+                    case "setHP":
+                        n.setHP(((Number) op.get("arg")).longValue());
+                        break;
+                    case "setHp":
+                        n.setHp(((Number) op.get("arg")).longValue());
+                        break;
+                    case "setMP":
+                        n.setMP(((Number) op.get("arg")).longValue());
+                        break;
+                    case "setMp":
+                        n.setMp(((Number) op.get("arg")).longValue());
+                        break;
+                    case "addHp":
+                        n.addHp(((Number) op.get("arg")).longValue());
+                        break;
+                    case "addMp":
+                        n.addMp(((Number) op.get("arg")).longValue());
+                        break;
+                    case "subHP":
+                        n.subHP(Double.parseDouble((String) op.get("arg")));
+                        break;
+                    case "subMP":
+                        n.subMP(((Number) op.get("arg")).longValue());
+                        break;
+                    case "getHP":
+                        ret = n.getHP();
+                        break;
+                    case "getMP":
+                        ret = n.getMP();
+                        break;
+                    case "getCurrPercentHP":
+                        ret = n.getCurrPercentHP();
+                        break;
+                    case "getCurrPercentMP":
+                        ret = n.getCurrPercentMP();
+                        break;
+                    case "setFullHpMp":
+                        n.setFullHpMp();
+                        break;
+                    case "subSucManh":
+                        n.subSucManh(((Number) op.get("arg")).longValue());
+                        break;
+                    case "subTiemNang":
+                        n.subTiemNang(((Number) op.get("arg")).longValue());
+                        break;
+                    case "subSucManhTiemNang":
+                        n.subSucManhTiemNang(((Number) op.get("arg")).longValue());
+                        break;
+                    case "powerUp":
+                        n.powerUp(((Number) op.get("arg")).longValue());
+                        break;
+                    case "settlGold":
+                        n.settlGold();
+                        break;
+                    case "subDameInjureWithDeff":
+                        ret = exact(n.subDameInjureWithDeff(Double.parseDouble((String) op.get("arg"))));
+                        break;
+                    case "getTileHutHp":
+                        ret = n.getTileHutHp((Boolean) op.get("isMob"));
+                        break;
+                    case "getPowerLimit":
+                        ret = n.getPowerLimit();
+                        break;
+                    case "getPowerNextLimit":
+                        ret = n.getPowerNextLimit();
+                        break;
+                    case "canOpenPower":
+                        ret = n.canOpenPower();
+                        break;
+                    case "calPercent":
+                        ret = n.calPercent(((Number) op.get("a")).longValue(), ((Number) op.get("b")).longValue());
+                        break;
+                    case "set":
+                        applySet(p, (String) op.get("path"), op.get("value"));
+                        break;
+                    default:
+                        throw new HarnessError("unknown op " + name);
+                }
+            } catch (HarnessError iae) {
+                throw iae;
+            } catch (Exception e) {
+                ex = e.getClass().getSimpleName();
+            }
+            LinkedHashMap<String, Object> r = new LinkedHashMap<>();
+            r.put("op", name);
+            if (ret != null) {
+                r.put("ret", ret);
+            }
+            if (ex != null) {
+                r.put("ex", ex);
+            }
+            r.put("state", sparse(state(n)));
+            if (p.Detu != null) {
+                r.put("detuState", sparse(state(p.Detu.nPoint)));
+            }
+            r.put("effects", effects(p));
+            r.put("host", new ArrayList<Object>(Log.lines));
+            results.add(r);
+            opIndex++;
+        }
+        out.put("ops", c.ops);
+        out.put("results", results);
+        return out;
+    }
+
+    // ------------------------------------------------------------------ JSON writer
+
+    static void json(Object o, StringBuilder sb) {
+        if (o == null) {
+            sb.append("null");
+        } else if (o instanceof String) {
+            sb.append('"');
+            for (char ch : ((String) o).toCharArray()) {
+                if (ch == '"' || ch == '\\') {
+                    sb.append('\\').append(ch);
+                } else if (ch < 0x20) {
+                    sb.append(String.format("\\u%04x", (int) ch));
+                } else if (ch > 0x7e) {
+                    sb.append(String.format("\\u%04x", (int) ch));
+                } else {
+                    sb.append(ch);
+                }
+            }
+            sb.append('"');
+        } else if (o instanceof Boolean || o instanceof Long || o instanceof Integer || o instanceof Short || o instanceof Byte) {
+            sb.append(o.toString());
+        } else if (o instanceof Map) {
+            sb.append('{');
+            boolean first = true;
+            for (Map.Entry<?, ?> e : ((Map<?, ?>) o).entrySet()) {
+                if (!first) {
+                    sb.append(',');
+                }
+                first = false;
+                json(e.getKey().toString(), sb);
+                sb.append(':');
+                json(e.getValue(), sb);
+            }
+            sb.append('}');
+        } else if (o instanceof List) {
+            sb.append('[');
+            boolean first = true;
+            for (Object x : (List<?>) o) {
+                if (!first) {
+                    sb.append(',');
+                }
+                first = false;
+                json(x, sb);
+            }
+            sb.append(']');
+        } else {
+            throw new IllegalArgumentException("cannot write " + o.getClass());
+        }
+    }
+
+    // ------------------------------------------------------------------ entry point
+
+    public static void main(String[] args) throws Exception {
+        List<Case> cases = NPointScenarios.all();
+        StringBuilder sb = new StringBuilder();
+        DEFAULTS = state(new NPoint(new Player()));
+        sb.append("{\"defaults\":");
+        json(DEFAULTS, sb);
+        sb.append(",\"cases\":[\n");
+        boolean first = true;
+        for (Case c : cases) {
+            if (!first) {
+                sb.append(",\n");
+            }
+            first = false;
+            json(runCase(c), sb);
+        }
+        sb.append("\n]}\n");
+        Files.write(Paths.get(args[0]), sb.toString().getBytes(StandardCharsets.UTF_8));
+        System.out.println(cases.size() + " cases written to " + args[0]);
+    }
+}

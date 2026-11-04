@@ -1,14 +1,13 @@
 namespace Nro.Core.Templates;
 
-/// <summary>
-/// Port of <c>nro/template/AchievementQuest.java</c>: a player's progress on one achievement.
-/// Java has only one two-parameter constructor (no default constructor), so the same applies here.
-/// </summary>
+// Tiến độ hoàn thành một thành tựu của người chơi.
+// Nguồn Java: nro/template/AchievementQuest.java (giữ constructor hai tham số duy nhất của Java, không có constructor mặc định).
 public class AchievementQuest
 {
+    // Số lần hoặc mức độ đã hoàn thành thành tựu (Java: completed)
     public long Completed { get; set; }
 
-    /// <summary>The Java name is <c>isRecieve</c> (misspelled); kept as is so it can be found with grep.</summary>
+    // Cho biết đã nhận thưởng; giữ nguyên lỗi chính tả của tên Java để dễ tìm kiếm (Java: isRecieve)
     public bool IsRecieve { get; set; }
 
     public AchievementQuest(long completed, bool isRecieve)

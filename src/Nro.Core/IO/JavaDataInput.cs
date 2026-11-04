@@ -2,44 +2,34 @@ using System.Buffers.Binary;
 
 namespace Nro.Core.IO;
 
-/// <summary>
-/// Replacement for JDK 17's <c>java.io.DataInputStream</c> wrapping <c>java.io.ByteArrayInputStream</c>: reads from a <c>byte[]</c>,
-/// multi-byte numbers are BIG-ENDIAN, strings are modified UTF-8 (<see cref="ReadUTF"/>). Does not use <c>BinaryReader</c>/<c>Encoding.UTF8</c>.
-/// <para>
-/// Preserves the JDK details that are easy to get silently wrong: when a full read cannot be satisfied it throws <see cref="EndOfStreamException"/>
-/// (= <c>EOFException</c>) AFTER consuming whatever remains; <see cref="Read(byte[], int, int)"/> returns -1 at the end of the data
-/// even when <c>len == 0</c>; <see cref="ReadByte"/> returns <c>sbyte</c> (Java's <c>byte</c> is signed).
-/// </para>
-/// <para>The constructor does NOT copy the source array (like <c>ByteArrayInputStream</c>): later changes to the source array show up when reading.</para>
-/// </summary>
+// Bộ đọc byte[] tương thích DataInputStream bọc ByteArrayInputStream của JDK 17: số nhiều byte big-endian, chuỗi modified UTF-8, không dùng BinaryReader hoặc Encoding.UTF8.
+// Nguồn Java: JDK 17 src/java.base/share/classes/java/io/DataInputStream.java và src/java.base/share/classes/java/io/ByteArrayInputStream.java (big-endian; modified UTF-8; EOFException chỉ sau khi đã tiêu hết dữ liệu còn lại; Read trả -1 ở cuối kể cả len = 0; ReadByte trả sbyte; không sao chép mảng nguồn).
 public sealed class JavaDataInput
 {
     private readonly byte[] _buf;
     private int _pos;
 
+    // Tạo bộ đọc trên mảng gốc, không sao chép nên thay đổi mảng sau đó sẽ được thấy khi đọc (Java: ByteArrayInputStream(byte[]))
     public JavaDataInput(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
         _buf = data;
     }
 
-    /// <summary>Number of bytes still readable (<c>available()</c>).</summary>
+    // Số byte vẫn còn đọc được (Java: available)
     public int Available => _buf.Length - _pos;
 
-    /// <summary>The next byte (0..255), or -1 at the end of the data (<c>read()</c>).</summary>
+    // Byte kế tiếp từ 0 đến 255, hoặc -1 ở cuối dữ liệu (Java: read)
     public int Read() => _pos < _buf.Length ? _buf[_pos++] : -1;
 
-    /// <summary>Reads up to <c>b.Length</c> bytes; returns the number of bytes read, or -1 at the end of the data (<c>read(byte[])</c>).</summary>
+    // Đọc tối đa b.Length byte; trả số byte đã đọc hoặc -1 ở cuối dữ liệu (Java: read(byte[]))
     public int Read(byte[] b)
     {
         ArgumentNullException.ThrowIfNull(b);
         return Read(b, 0, b.Length);
     }
 
-    /// <summary>
-    /// <c>read(byte[], int, int)</c>: checks the range first; at the end of the data returns -1 (even when <paramref name="len"/> = 0);
-    /// otherwise returns the number of bytes read (possibly fewer than <paramref name="len"/>).
-    /// </summary>
+    // Kiểm tra phạm vi trước, trả -1 ở cuối kể cả len = 0; nếu không trả số byte đã đọc, có thể ít hơn len (Java: read(byte[], int, int))
     public int Read(byte[] b, int off, int len)
     {
         ArgumentNullException.ThrowIfNull(b);
@@ -65,17 +55,14 @@ public sealed class JavaDataInput
         return len;
     }
 
-    /// <summary>Fills <paramref name="b"/> completely; if there is not enough data, throws <see cref="EndOfStreamException"/>.</summary>
+    // Lấp đầy b; thiếu dữ liệu thì ném EndOfStreamException (Java: readFully(byte[]))
     public void ReadFully(byte[] b)
     {
         ArgumentNullException.ThrowIfNull(b);
         ReadFully(b, 0, b.Length);
     }
 
-    /// <summary>
-    /// <c>readFully(byte[], int, int)</c>. If there is not enough data, the part that could be read is ALREADY in <paramref name="b"/>, the position is already at the end
-    /// of the data, and only then is <see cref="EndOfStreamException"/> thrown. <c>len = 0</c> never throws (even when the data is already exhausted).
-    /// </summary>
+    // Lấp đầy đoạn b; khi thiếu, phần đã đọc vẫn nằm trong b và vị trí đã ở cuối rồi mới ném EndOfStreamException; len = 0 không ném kể cả khi đã hết dữ liệu (Java: readFully(byte[], int, int))
     public void ReadFully(byte[] b, int off, int len)
     {
         ArgumentNullException.ThrowIfNull(b);
@@ -93,10 +80,7 @@ public sealed class JavaDataInput
         }
     }
 
-    /// <summary>
-    /// <c>skipBytes(int)</c>: skips at most <paramref name="n"/> bytes and returns the number of bytes actually skipped. Returns 0 when <paramref name="n"/> &lt;= 0;
-    /// stops at the end of the data (does not throw).
-    /// </summary>
+    // Bỏ qua tối đa n byte và trả số thực tế; n <= 0 trả 0, dừng ở cuối dữ liệu không ném lỗi (Java: skipBytes)
     public int SkipBytes(int n)
     {
         int total = 0;
@@ -114,7 +98,7 @@ public sealed class JavaDataInput
         return total;
     }
 
-    /// <summary>True when the byte read is non-zero (bytes 02, 80 and FF are all true).</summary>
+    // Đúng khi byte đọc được khác 0, gồm cả 02, 80 và FF (Java: readBoolean)
     public bool ReadBoolean()
     {
         int ch = Read();
@@ -126,7 +110,7 @@ public sealed class JavaDataInput
         return ch != 0;
     }
 
-    /// <summary>SIGNED byte (-128..127), corresponding to Java's <c>byte</c>.</summary>
+    // Byte có dấu từ -128 đến 127, tương ứng byte của Java (Java: readByte)
     public sbyte ReadByte()
     {
         int ch = Read();
@@ -138,7 +122,7 @@ public sealed class JavaDataInput
         return unchecked((sbyte)ch);
     }
 
-    /// <summary>UNSIGNED byte (0..255).</summary>
+    // Byte không dấu từ 0 đến 255 (Java: readUnsignedByte)
     public int ReadUnsignedByte()
     {
         int ch = Read();
@@ -150,28 +134,28 @@ public sealed class JavaDataInput
         return ch;
     }
 
+    // Số nguyên 16 bit có dấu theo big-endian (Java: readShort)
     public short ReadShort() => BinaryPrimitives.ReadInt16BigEndian(Take(2));
 
+    // Số nguyên 16 bit không dấu theo big-endian (Java: readUnsignedShort)
     public int ReadUnsignedShort() => BinaryPrimitives.ReadUInt16BigEndian(Take(2));
 
+    // Ký tự UTF-16 theo big-endian (Java: readChar)
     public char ReadChar() => (char)BinaryPrimitives.ReadUInt16BigEndian(Take(2));
 
+    // Số nguyên 32 bit có dấu theo big-endian (Java: readInt)
     public int ReadInt() => BinaryPrimitives.ReadInt32BigEndian(Take(4));
 
+    // Số nguyên 64 bit có dấu theo big-endian (Java: readLong)
     public long ReadLong() => BinaryPrimitives.ReadInt64BigEndian(Take(8));
 
-    /// <summary>Preserves every bit (including the NaN payload), like <c>Float.intBitsToFloat</c>.</summary>
+    // Giữ nguyên mọi bit, kể cả phần tải NaN (Java: readFloat / Float.intBitsToFloat)
     public float ReadFloat() => BitConverter.Int32BitsToSingle(ReadInt());
 
-    /// <summary>Preserves every bit (including the NaN payload), like <c>Double.longBitsToDouble</c>.</summary>
+    // Giữ nguyên mọi bit, kể cả phần tải NaN (Java: readDouble / Double.longBitsToDouble)
     public double ReadDouble() => BitConverter.Int64BitsToDouble(ReadLong());
 
-    /// <summary>
-    /// Modified UTF-8 exactly like JDK 17's <c>DataInputStream.readUTF</c>: reads a uint16 length and then exactly that many bytes
-    /// (<see cref="EndOfStreamException"/> if short), then decodes. Accepts a bare <c>00</c> and <c>C0 80</c> as U+0000, accepts overlong forms
-    /// (e.g. <c>C1 81</c> = 'A'), accepts 2x3-byte surrogate pairs and lone surrogates; REJECTS standard 4-byte UTF-8 (lead F0..FF) with
-    /// <see cref="UtfDataFormatException"/> carrying the same message as the JDK. After a format error, the position is at the end of the declared length.
-    /// </summary>
+    // Đọc modified UTF-8 sau độ dài uint16; thiếu byte ném EndOfStreamException, nhận 00/C0 80 là U+0000, mã hoá dài và surrogate đơn lẻ/cặp, từ chối F0..FF bằng UtfDataFormatException JDK và sau lỗi định dạng vị trí ở cuối đoạn đã khai báo (Java: readUTF)
     public string ReadUTF()
     {
         int utflen = ReadUnsignedShort();
@@ -205,14 +189,14 @@ public sealed class JavaDataInput
                 case 5:
                 case 6:
                 case 7:
-                    // 0xxxxxxx
+                    // Dạng một byte 0xxxxxxx.
                     count++;
                     chars[charCount++] = (char)c;
                     break;
                 case 12:
                 case 13:
                 {
-                    // 110xxxxx 10xxxxxx
+                    // Dạng hai byte 110xxxxx 10xxxxxx.
                     count += 2;
                     if (count > utflen)
                     {
@@ -231,7 +215,7 @@ public sealed class JavaDataInput
 
                 case 14:
                 {
-                    // 1110xxxx 10xxxxxx 10xxxxxx
+                    // Dạng ba byte 1110xxxx 10xxxxxx 10xxxxxx.
                     count += 3;
                     if (count > utflen)
                     {
@@ -250,7 +234,7 @@ public sealed class JavaDataInput
                 }
 
                 default:
-                    // 10xxxxxx, 1111xxxx
+                    // Dạng byte tiếp tục hoặc bốn byte không hợp lệ.
                     throw new UtfDataFormatException("malformed input around byte " + count);
             }
         }
@@ -258,15 +242,12 @@ public sealed class JavaDataInput
         return new string(chars, 0, charCount);
     }
 
-    /// <summary>Does nothing, like <c>close()</c> of <c>DataInputStream</c>/<c>ByteArrayInputStream</c>: reading after closing still works.</summary>
+    // Không làm gì; vẫn đọc được sau khi đóng như DataInputStream và ByteArrayInputStream (Java: close)
     public void Close()
     {
     }
 
-    /// <summary>
-    /// Takes exactly the next <paramref name="n"/> bytes. If there are too few, CONSUMES whatever remains and then throws <see cref="EndOfStreamException"/>
-    /// (the JDK reads byte by byte / via <c>readFully</c>, so the position is also at the end when the <c>EOFException</c> is thrown).
-    /// </summary>
+    // Lấy đúng n byte; thiếu thì tiêu thụ phần còn lại rồi ném EndOfStreamException như EOFException của JDK.
     private ReadOnlySpan<byte> Take(int n)
     {
         if (_buf.Length - _pos < n)
@@ -280,10 +261,7 @@ public sealed class JavaDataInput
         return span;
     }
 
-    /// <summary>
-    /// Core of <c>ByteArrayInputStream.skip(long)</c> for n &gt; 0 (only <see cref="SkipBytes"/> calls it, and always with n &gt; 0,
-    /// so the n &lt; 0 branch is unnecessary): skips at most <paramref name="n"/> of the remaining bytes and returns the number of bytes skipped.
-    /// </summary>
+    // Lõi ByteArrayInputStream.skip(long) khi n > 0: bỏ qua tối đa n byte còn lại và trả số đã bỏ qua.
     private int Skip(int n)
     {
         int k = Math.Min(n, _buf.Length - _pos);

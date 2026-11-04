@@ -1,0 +1,17 @@
+package nro.server;
+
+import nro.attribute.AttributeManager;
+
+public class ServerManager {
+
+    private static final ServerManager instance = new ServerManager();
+    public final AttributeManager attributeManager = new AttributeManager();
+
+    public static ServerManager gI() {
+        return instance;
+    }
+
+    public AttributeManager getAttributeManager() {
+        return attributeManager;
+    }
+}

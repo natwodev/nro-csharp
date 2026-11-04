@@ -1,7 +1,10 @@
+using Nro.Data.Entities.StaticData;
+using Nro.Data.Entities.Runtime;
+using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nro.Data.Entities;
+namespace Nro.Data.Entities.Unused;
 
 // Entity đại diện cho nhật ký nạp tiền qua ngân hàng trong hệ thống
 // Bảng cơ sở dữ liệu: history_bank (sinh tự động, không sửa tay)

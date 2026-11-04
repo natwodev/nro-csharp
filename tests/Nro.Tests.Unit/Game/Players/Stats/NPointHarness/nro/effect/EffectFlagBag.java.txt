@@ -1,0 +1,6 @@
+package nro.effect;
+
+public class EffectFlagBag {
+
+    public boolean useXienCa;
+}

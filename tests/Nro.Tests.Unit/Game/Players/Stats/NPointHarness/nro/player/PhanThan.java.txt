@@ -1,0 +1,10 @@
+package nro.player;
+
+public class PhanThan extends Player {
+
+    public Player master;
+
+    public PhanThan(Player master) {
+        this.master = master;
+    }
+}

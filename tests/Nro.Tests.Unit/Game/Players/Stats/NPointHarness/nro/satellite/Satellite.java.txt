@@ -1,0 +1,6 @@
+package nro.satellite;
+
+public class Satellite {
+
+    public boolean isIntelligent;
+}

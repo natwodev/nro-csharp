@@ -1,0 +1,6 @@
+package event;
+
+public class EventManager {
+
+    public static boolean INTERNATIONAL_WOMANS_DAY = false;
+}

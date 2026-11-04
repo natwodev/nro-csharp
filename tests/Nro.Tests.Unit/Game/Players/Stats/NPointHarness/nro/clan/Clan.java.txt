@@ -1,0 +1,10 @@
+package nro.clan;
+
+public class Clan {
+
+    public long LasttimeBuffExp;
+    public long TimeStarBuffExp;
+    public int CongTiemNangSucManhToanBangHoi;
+    public long BuaTriTue;
+    public int level;
+}

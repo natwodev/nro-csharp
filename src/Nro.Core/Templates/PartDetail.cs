@@ -1,15 +1,16 @@
 namespace Nro.Core.Templates;
 
-/// <summary>
-/// Port of <c>nro/template/PartDetail.java</c>. <c>dx</c> and <c>dy</c> are signed Java <c>byte</c> values (the offset can be negative),
-/// so they are <see cref="sbyte"/>. Java has only one three-parameter constructor (no default constructor).
-/// </summary>
+// Lưu chi tiết hình ảnh và độ lệch của một phần nhân vật.
+// Nguồn Java: nro/template/PartDetail.java (giữ dx và dy là sbyte có dấu để biểu diễn độ lệch âm; Java chỉ có hàm tạo ba tham số, không có hàm tạo mặc định).
 public class PartDetail
 {
+    // Mã biểu tượng của phần (Java: iconId)
     public short IconId { get; set; }
 
+    // Độ lệch ngang có dấu (Java: dx)
     public sbyte Dx { get; set; }
 
+    // Độ lệch dọc có dấu (Java: dy)
     public sbyte Dy { get; set; }
 
     public PartDetail(short iconId, sbyte dx, sbyte dy)

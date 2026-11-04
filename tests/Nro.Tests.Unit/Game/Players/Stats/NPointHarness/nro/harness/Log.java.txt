@@ -1,0 +1,13 @@
+package nro.harness;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Log {
+
+    public static final List<String> lines = new ArrayList<>();
+
+    public static void add(String line) {
+        lines.add(line);
+    }
+}

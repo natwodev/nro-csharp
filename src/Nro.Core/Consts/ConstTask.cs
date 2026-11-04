@@ -1,67 +1,139 @@
 namespace Nro.Core.Consts;
 
-/// <summary>
-/// Port of <c>consts/ConstTask.java</c>: class and constant names are preserved; values were machine-translated from Java
-/// (port-csharp/tools/consts/gen_consts_cs.py), not copied by hand.
-/// Automatically verified against the real values read from the compiled Java class: <c>ConstsParityTests</c> (tests/golden/consts.json).
-/// </summary>
+// Hằng số nhiệm vụ: cấp độ và giới hạn nhiệm vụ phụ, mã bản đồ/NPC/chữ thay theo hành tinh trong dữ liệu nhiệm vụ chính, và mã bước nhiệm vụ chính TASK_x_y = x * 2048 + y * 2
+// Nguồn Java: consts/ConstTask.java (tên đổi sang tiếng Anh, tên Java gốc ghi cuối chú thích nếu khác; giá trị đối chiếu bằng ConstsParityTests)
 public static class ConstTask
 {
-    //const level side task
+    // Cấp độ nhiệm vụ phụ hằng ngày, dùng chung cho nhiệm vụ bang và nhiệm vụ sự kiện; cấp k lấy số lượng từ cột max_count_lv(k+1) của side_task_template
+
+    // Dễ
     public const sbyte EASY = 0;
+
+    // Bình thường
     public const sbyte NORMAL = 1;
+
+    // Khó
     public const sbyte HARD = 2;
+
+    // Rất khó
     public const sbyte VERY_HARD = 3;
+
+    // Địa ngục
     public const sbyte HELL = 4;
 
-    //const gold reward side task
+    // Vàng thưởng nhiệm vụ phụ theo cấp độ; mã Java hiện không dùng, phần thưởng thật là thỏi vàng
+
+    // Cấp dễ: 10 triệu vàng
     public const int GOLD_EASY = 10000000;
+
+    // Cấp bình thường: 30 triệu vàng
     public const int GOLD_NORMAL = 30000000;
+
+    // Cấp khó: 50 triệu vàng
     public const int GOLD_HARD = 50000000;
+
+    // Cấp rất khó: 80 triệu vàng
     public const int GOLD_VERY_HARD = 80000000;
+
+    // Cấp địa ngục: 100 triệu vàng
     public const int GOLD_HELL = 100000000;
 
-    //const max side task of date
+    // Số nhiệm vụ phụ tối đa mỗi ngày (nhận tại Bò Mộng)
     public const sbyte MAX_SIDE_TASK = 20;
 
-    //const max event task of date
+    // Số nhiệm vụ sự kiện tối đa mỗi ngày
     public const sbyte MAX_EVENT_TASK = 10;
 
-    //const max clan task of date
+    // Số nhiệm vụ bang tối đa mỗi ngày (nhận tại Dr. Brief)
     public const sbyte MAX_CLAN_TASK = 5;
 
-    //const change map id
-    public const sbyte MAP_NHA = -2;
+    // Mã bản đồ giả trong cột map của task_sub_template, TaskService.transformMapId đổi sang bản đồ thật theo hành tinh Trái Đất / Namếc / Xayda; số trong tên là HP của quái ở đó
+
+    // Nhà của nhân vật: bản đồ 21 / 22 / 23 (Nhà Gôhan / Nhà Moori / Nhà Broly) (Java: MAP_NHA)
+    public const sbyte MAP_HOME = -2;
+
+    // Đồi có quái 200 HP: bản đồ 1 / 8 / 15 (Đồi hoa cúc / Đồi nấm tím / Đồi hoang)
     public const sbyte MAP_200 = -3;
-    public const sbyte MAP_VACH_NUI = -4;
+
+    // Vách núi: bản đồ 39 / 40 / 41 (Vách núi Aru / Vách núi Moori / Vực Plant) (Java: MAP_VACH_NUI)
+    public const sbyte MAP_CLIFF = -4;
+
+    // Nơi có quái mẹ 500 HP: bản đồ 2 / 9 / 16 (Thung lũng tre / Thị trấn Moori / Làng Plant); lỗi Java: nhánh của mã này trong transformMapId lại so MAP_200 nên -5 không được đổi
     public const sbyte MAP_500 = -5;
-    public const sbyte MAP_TTVT = -6;
-    public const sbyte MAP_QUAI_BAY_600 = -7;
-    public const sbyte MAP_LANG = -8;
-    public const sbyte MAP_QUY_LAO = -9;
 
-    //const change npc id
-    public const sbyte NPC_NHA = -2;
-    public const sbyte NPC_TTVT = -3;
-    public const sbyte NPC_SHOP_LANG = -4;
-    public const sbyte NPC_QUY_LAO = -5;
+    // Trạm tàu vũ trụ: bản đồ 24 / 25 / 26 (Java: MAP_TTVT)
+    public const sbyte MAP_SPACESHIP_STATION = -6;
 
-    //const change text
-    public const string TEN_LANG = "%1";
-    public const string TEN_NPC_NHA = "%2";
-    public const string TEN_MAP_200 = "%3";
-    public const string TEN_QUAI_200 = "%4";
-    public const string TEN_VACH_NUI = "%5";
-    public const string TEN_MAP_500 = "%6";
-    public const string TEN_NPC_TTVT = "%7";
-    public const string TEN_NPC_SHOP_LANG = "%8";
-    public const string TEN_QUAI_BAY_600 = "%9";
-    public const string TEN_NPC_QUY_LAO = "%10";
-    public const string TEN_MAP_QUY_LAO = "%11";
-    public const string TEN_QUAI_3000 = "%12";
-    public const string TEN_MAP_600 = "%13";
-    public const string TEN_QUAI_1000 = "%14";
+    // Nơi có quái bay 600 HP: bản đồ 3 / 11 / 17 (Rừng nấm / Thung lũng Maima / Rừng nguyên sinh) (Java: MAP_QUAI_BAY_600)
+    public const sbyte MAP_FLYING_MOB_600 = -7;
 
+    // Làng khởi đầu: bản đồ 0 / 7 / 14 (Làng Aru / Làng Mori / Làng Kakarot) (Java: MAP_LANG)
+    public const sbyte MAP_VILLAGE = -8;
+
+    // Nơi ở của sư phụ: bản đồ 5 / 13 / 20 (Đảo Kamê / Đảo Guru / Vách núi đen) (Java: MAP_QUY_LAO)
+    public const sbyte MAP_MASTER = -9;
+
+    // Mã NPC giả trong cột npc_id của task_sub_template, TaskService.transformNpcId đổi sang NPC thật theo hành tinh Trái Đất / Namếc / Xayda
+
+    // NPC ở nhà: Ông Gôhan / Ông Moori / Ông Paragus (Java: NPC_NHA)
+    public const sbyte NPC_HOME = -2;
+
+    // NPC trạm tàu vũ trụ: Dr. Brief / Cargo / Cui (Java: NPC_TTVT)
+    public const sbyte NPC_SPACESHIP_STATION = -3;
+
+    // NPC cửa hàng ở làng: Bunma / Dende / Appule (Java: NPC_SHOP_LANG)
+    public const sbyte NPC_VILLAGE_SHOP = -4;
+
+    // Sư phụ: Quy Lão Kame / Trưởng lão Guru / Vua Vegeta (Java: NPC_QUY_LAO)
+    public const sbyte NPC_MASTER = -5;
+
+    // Chỗ giữ chỗ trong tên và mô tả nhiệm vụ, TaskService.transformName thay bằng chữ theo hành tinh Trái Đất / Namếc / Xayda (thay %10 đến %14 trước %1)
+
+    // Tên làng: Làng Aru / Làng Mori / Làng Kakarot (Java: TEN_LANG)
+    public const string NAME_VILLAGE = "%1";
+
+    // Tên NPC ở nhà: ông Gôhan / ông Moori / ông Paragus (Java: TEN_NPC_NHA)
+    public const string NAME_NPC_HOME = "%2";
+
+    // Tên đồi có quái 200 HP: Đồi hoa cúc / Đồi nấm tím / Đồi hoang (Java: TEN_MAP_200)
+    public const string NAME_MAP_200 = "%3";
+
+    // Tên quái 200 HP: khủng long / lợn lòi / quỷ đất (Java: TEN_QUAI_200)
+    public const string NAME_MOB_200 = "%4";
+
+    // Tên vách núi: Vách núi Aru / Vách núi Moori / Vách núi Kakarot (Java: TEN_VACH_NUI)
+    public const string NAME_CLIFF = "%5";
+
+    // Tên nơi có quái mẹ 500 HP: Thung lũng tre / Thị trấn Moori / Làng Plant (Java: TEN_MAP_500)
+    public const string NAME_MAP_500 = "%6";
+
+    // Tên NPC trạm tàu vũ trụ: Dr. Brief / Cargo / Cui (Java: TEN_NPC_TTVT)
+    public const string NAME_NPC_SPACESHIP_STATION = "%7";
+
+    // Tên NPC cửa hàng ở làng: Bunma / Dende / Appule (Java: TEN_NPC_SHOP_LANG)
+    public const string NAME_NPC_VILLAGE_SHOP = "%8";
+
+    // Tên quái bay 600 HP: thằn lằn bay / phi long / quỷ bay (Java: TEN_QUAI_BAY_600)
+    public const string NAME_FLYING_MOB_600 = "%9";
+
+    // Tên sư phụ: Quy Lão Kame / Trưởng lão Guru / Vua Vegeta (Java: TEN_NPC_QUY_LAO)
+    public const string NAME_NPC_MASTER = "%10";
+
+    // Tên nơi ở của sư phụ: Đảo Kamê / Đảo Guru / Vách núi đen (Java: TEN_MAP_QUY_LAO)
+    public const string NAME_MAP_MASTER = "%11";
+
+    // Tên quái 3000 HP: ốc mượn hồn / ốc sên / heo Xayda mẹ (Java: TEN_QUAI_3000)
+    public const string NAME_MOB_3000 = "%12";
+
+    // Tên nơi có quái bay 600 HP: Rừng nấm / Thung lũng Namếc / Rừng nguyên sinh (Java: TEN_MAP_600)
+    public const string NAME_MAP_600 = "%13";
+
+    // Tên quái mẹ 1000 HP: phi long mẹ / quỷ bay mẹ / thằn lằn mẹ, Java gán lệch hành tinh so với quái bay 600 HP (Java: TEN_QUAI_1000)
+    public const string NAME_MOB_1000 = "%14";
+
+    // Mã bước nhiệm vụ chính TASK_x_y = x * 2048 + y * 2, khớp TaskService.getIdTask; x = id trong task_main_template, y = thứ tự nhiệm vụ con trong task_sub_template; dữ liệu game chỉ có nhiệm vụ 0 đến 32
+
+    // Nhiệm vụ 0: đầu tiên (về nhà, mở rương lấy rađa, thu hoạch đậu thần)
     public const int TASK_0_0 = 0;
     public const int TASK_0_1 = 2;
     public const int TASK_0_2 = 4;
@@ -83,6 +155,8 @@ public static class ConstTask
     public const int TASK_0_18 = 36;
     public const int TASK_0_19 = 38;
     public const int TASK_0_20 = 40;
+
+    // Nhiệm vụ 1: tập luyện (đánh ngã 5 mộc nhân)
     public const int TASK_1_0 = 2048;
     public const int TASK_1_1 = 2050;
     public const int TASK_1_2 = 2052;
@@ -104,6 +178,8 @@ public static class ConstTask
     public const int TASK_1_18 = 2084;
     public const int TASK_1_19 = 2086;
     public const int TASK_1_20 = 2088;
+
+    // Nhiệm vụ 2: tìm thức ăn (nhặt 10 đùi gà từ quái 200 HP)
     public const int TASK_2_0 = 4096;
     public const int TASK_2_1 = 4098;
     public const int TASK_2_2 = 4100;
@@ -125,6 +201,8 @@ public static class ConstTask
     public const int TASK_2_18 = 4132;
     public const int TASK_2_19 = 4134;
     public const int TASK_2_20 = 4136;
+
+    // Nhiệm vụ 3: sao băng (dùng tiềm năng, khám phá vật thể lạ)
     public const int TASK_3_0 = 6144;
     public const int TASK_3_1 = 6146;
     public const int TASK_3_2 = 6148;
@@ -146,6 +224,8 @@ public static class ConstTask
     public const int TASK_3_18 = 6180;
     public const int TASK_3_19 = 6182;
     public const int TASK_3_20 = 6184;
+
+    // Nhiệm vụ 4: thử thách (hạ quái mẹ ở cả 3 hành tinh, bắt đầu từ Trái Đất)
     public const int TASK_4_0 = 8192;
     public const int TASK_4_1 = 8194;
     public const int TASK_4_2 = 8196;
@@ -167,6 +247,8 @@ public static class ConstTask
     public const int TASK_4_18 = 8228;
     public const int TASK_4_19 = 8230;
     public const int TASK_4_20 = 8232;
+
+    // Nhiệm vụ 5: thử thách (hạ quái mẹ ở cả 3 hành tinh, bắt đầu từ Namếc)
     public const int TASK_5_0 = 10240;
     public const int TASK_5_1 = 10242;
     public const int TASK_5_2 = 10244;
@@ -188,6 +270,8 @@ public static class ConstTask
     public const int TASK_5_18 = 10276;
     public const int TASK_5_19 = 10278;
     public const int TASK_5_20 = 10280;
+
+    // Nhiệm vụ 6: thử thách (hạ quái mẹ ở cả 3 hành tinh, bắt đầu từ Xayda)
     public const int TASK_6_0 = 12288;
     public const int TASK_6_1 = 12290;
     public const int TASK_6_2 = 12292;
@@ -209,6 +293,8 @@ public static class ConstTask
     public const int TASK_6_18 = 12324;
     public const int TASK_6_19 = 12326;
     public const int TASK_6_20 = 12328;
+
+    // Nhiệm vụ 7: giải cứu (hạ 20 quái bay, gặp NPC cửa hàng làng)
     public const int TASK_7_0 = 14336;
     public const int TASK_7_1 = 14338;
     public const int TASK_7_2 = 14340;
@@ -230,6 +316,8 @@ public static class ConstTask
     public const int TASK_7_18 = 14372;
     public const int TASK_7_19 = 14374;
     public const int TASK_7_20 = 14376;
+
+    // Nhiệm vụ 8: tìm ngọc (lấy lại ngọc rồng 7 sao từ quái mẹ 1000 HP)
     public const int TASK_8_0 = 16384;
     public const int TASK_8_1 = 16386;
     public const int TASK_8_2 = 16388;
@@ -251,6 +339,8 @@ public static class ConstTask
     public const int TASK_8_18 = 16420;
     public const int TASK_8_19 = 16422;
     public const int TASK_8_20 = 16424;
+
+    // Nhiệm vụ 9: tìm ngọc (gặp Bò Mộng, lên tháp Karin gặp Thần Mèo)
     public const int TASK_9_0 = 18432;
     public const int TASK_9_1 = 18434;
     public const int TASK_9_2 = 18436;
@@ -272,6 +362,8 @@ public static class ConstTask
     public const int TASK_9_18 = 18468;
     public const int TASK_9_19 = 18470;
     public const int TASK_9_20 = 18472;
+
+    // Nhiệm vụ 10: tìm ngọc (thắng Thần Mèo, diệt Tàu Pảy Pảy)
     public const int TASK_10_0 = 20480;
     public const int TASK_10_1 = 20482;
     public const int TASK_10_2 = 20484;
@@ -293,6 +385,8 @@ public static class ConstTask
     public const int TASK_10_18 = 20516;
     public const int TASK_10_19 = 20518;
     public const int TASK_10_20 = 20520;
+
+    // Nhiệm vụ 11: bái sư (tìm sư phụ xin làm đệ tử)
     public const int TASK_11_0 = 22528;
     public const int TASK_11_1 = 22530;
     public const int TASK_11_2 = 22532;
@@ -314,6 +408,8 @@ public static class ConstTask
     public const int TASK_11_18 = 22564;
     public const int TASK_11_19 = 22566;
     public const int TASK_11_20 = 22568;
+
+    // Nhiệm vụ 12: gia nhập bang hội (vào bang hội rồi báo sư phụ)
     public const int TASK_12_0 = 24576;
     public const int TASK_12_1 = 24578;
     public const int TASK_12_2 = 24580;
@@ -335,6 +431,8 @@ public static class ConstTask
     public const int TASK_12_18 = 24612;
     public const int TASK_12_19 = 24614;
     public const int TASK_12_20 = 24616;
+
+    // Nhiệm vụ 13: bang hội đầu tiên (cùng đồng đội diệt heo rừng)
     public const int TASK_13_0 = 26624;
     public const int TASK_13_1 = 26626;
     public const int TASK_13_2 = 26628;
@@ -356,6 +454,8 @@ public static class ConstTask
     public const int TASK_13_18 = 26660;
     public const int TASK_13_19 = 26662;
     public const int TASK_13_20 = 26664;
+
+    // Nhiệm vụ 14: bái sư (đánh quái 3000 HP lấy truyện Doremon tập 2)
     public const int TASK_14_0 = 28672;
     public const int TASK_14_1 = 28674;
     public const int TASK_14_2 = 28676;
@@ -377,6 +477,8 @@ public static class ConstTask
     public const int TASK_14_18 = 28708;
     public const int TASK_14_19 = 28710;
     public const int TASK_14_20 = 28712;
+
+    // Nhiệm vụ 15: bang hội thứ 2 (diệt Bulon, Ukulele, Quỷ mập)
     public const int TASK_15_0 = 30720;
     public const int TASK_15_1 = 30722;
     public const int TASK_15_2 = 30724;
@@ -398,6 +500,8 @@ public static class ConstTask
     public const int TASK_15_18 = 30756;
     public const int TASK_15_19 = 30758;
     public const int TASK_15_20 = 30760;
+
+    // Nhiệm vụ 16: thách đấu (thắng 10 người)
     public const int TASK_16_0 = 32768;
     public const int TASK_16_1 = 32770;
     public const int TASK_16_2 = 32772;
@@ -419,6 +523,8 @@ public static class ConstTask
     public const int TASK_16_18 = 32804;
     public const int TASK_16_19 = 32806;
     public const int TASK_16_20 = 32808;
+
+    // Nhiệm vụ 17: tiêu diệt Boss Trùm (diệt Akkuman, Tamborine, Drum)
     public const int TASK_17_0 = 34816;
     public const int TASK_17_1 = 34818;
     public const int TASK_17_2 = 34820;
@@ -440,6 +546,8 @@ public static class ConstTask
     public const int TASK_17_18 = 34852;
     public const int TASK_17_19 = 34854;
     public const int TASK_17_20 = 34856;
+
+    // Nhiệm vụ 18: thử thách (thắng vòng 2 đại hội võ thuật)
     public const int TASK_18_0 = 36864;
     public const int TASK_18_1 = 36866;
     public const int TASK_18_2 = 36868;
@@ -461,6 +569,8 @@ public static class ConstTask
     public const int TASK_18_18 = 36900;
     public const int TASK_18_19 = 36902;
     public const int TASK_18_20 = 36904;
+
+    // Nhiệm vụ 19: cam go (diệt Trung Úy Trắng ở trại Độc Nhãn)
     public const int TASK_19_0 = 38912;
     public const int TASK_19_1 = 38914;
     public const int TASK_19_2 = 38916;
@@ -482,6 +592,8 @@ public static class ConstTask
     public const int TASK_19_18 = 38948;
     public const int TASK_19_19 = 38950;
     public const int TASK_19_20 = 38952;
+
+    // Nhiệm vụ 20: bất khả thi (diệt tay sai của Fide ở Xayda)
     public const int TASK_20_0 = 40960;
     public const int TASK_20_1 = 40962;
     public const int TASK_20_2 = 40964;
@@ -503,6 +615,8 @@ public static class ConstTask
     public const int TASK_20_18 = 40996;
     public const int TASK_20_19 = 40998;
     public const int TASK_20_20 = 41000;
+
+    // Nhiệm vụ 21: tìm diệt đệ tử (diệt Kuku, Mập Đầu Đinh, Rambo)
     public const int TASK_21_0 = 43008;
     public const int TASK_21_1 = 43010;
     public const int TASK_21_2 = 43012;
@@ -524,6 +638,8 @@ public static class ConstTask
     public const int TASK_21_18 = 43044;
     public const int TASK_21_19 = 43046;
     public const int TASK_21_20 = 43048;
+
+    // Nhiệm vụ 22: Tiểu đội sát thủ (diệt Số 4, Số 3, Số 1, Tiểu Đội Trưởng)
     public const int TASK_22_0 = 45056;
     public const int TASK_22_1 = 45058;
     public const int TASK_22_2 = 45060;
@@ -545,6 +661,8 @@ public static class ConstTask
     public const int TASK_22_18 = 45092;
     public const int TASK_22_19 = 45094;
     public const int TASK_22_20 = 45096;
+
+    // Nhiệm vụ 23: Fide đại ca (diệt Fide cấp 1 đến 3)
     public const int TASK_23_0 = 47104;
     public const int TASK_23_1 = 47106;
     public const int TASK_23_2 = 47108;
@@ -566,6 +684,8 @@ public static class ConstTask
     public const int TASK_23_18 = 47140;
     public const int TASK_23_19 = 47142;
     public const int TASK_23_20 = 47144;
+
+    // Nhiệm vụ 24: Chú bé đến từ tương lai (đưa thuốc cho Quy Lão, sang tương lai gặp Bunma)
     public const int TASK_24_0 = 49152;
     public const int TASK_24_1 = 49154;
     public const int TASK_24_2 = 49156;
@@ -587,6 +707,8 @@ public static class ConstTask
     public const int TASK_24_18 = 49188;
     public const int TASK_24_19 = 49190;
     public const int TASK_24_20 = 49192;
+
+    // Nhiệm vụ 25: Chạm trán Rôbốt Sát Thủ lần 1 (diệt Android 19, 20 và Xên con cấp 3)
     public const int TASK_25_0 = 51200;
     public const int TASK_25_1 = 51202;
     public const int TASK_25_2 = 51204;
@@ -608,6 +730,8 @@ public static class ConstTask
     public const int TASK_25_18 = 51236;
     public const int TASK_25_19 = 51238;
     public const int TASK_25_20 = 51240;
+
+    // Nhiệm vụ 26: Chạm trán Rôbốt Sát Thủ lần 2 (diệt Android 15, 14, 13)
     public const int TASK_26_0 = 53248;
     public const int TASK_26_1 = 53250;
     public const int TASK_26_2 = 53252;
@@ -629,6 +753,8 @@ public static class ConstTask
     public const int TASK_26_18 = 53284;
     public const int TASK_26_19 = 53286;
     public const int TASK_26_20 = 53288;
+
+    // Nhiệm vụ 27: Chạm trán Rôbốt Sát Thủ lần 3 (diệt Píc, Póc, King Kong và Xên con cấp 5)
     public const int TASK_27_0 = 55296;
     public const int TASK_27_1 = 55298;
     public const int TASK_27_2 = 55300;
@@ -650,6 +776,8 @@ public static class ConstTask
     public const int TASK_27_18 = 55332;
     public const int TASK_27_19 = 55334;
     public const int TASK_27_20 = 55336;
+
+    // Nhiệm vụ 28: Chạm trán Xên bọ hung (diệt Xên Bọ Hung các cấp ở thị trấn Ginder)
     public const int TASK_28_0 = 57344;
     public const int TASK_28_1 = 57346;
     public const int TASK_28_2 = 57348;
@@ -671,6 +799,8 @@ public static class ConstTask
     public const int TASK_28_18 = 57380;
     public const int TASK_28_19 = 57382;
     public const int TASK_28_20 = 57384;
+
+    // Nhiệm vụ 29: Cuộc dạo chơi của Xên (diệt 7 Xên con và Siêu Bọ Hung ở võ đài Xên)
     public const int TASK_29_0 = 59392;
     public const int TASK_29_1 = 59394;
     public const int TASK_29_2 = 59396;
@@ -692,6 +822,8 @@ public static class ConstTask
     public const int TASK_29_18 = 59428;
     public const int TASK_29_19 = 59430;
     public const int TASK_29_20 = 59432;
+
+    // Nhiệm vụ 30: Cuộc đối đầu không cân sức (theo Ôsin hạ Drabura, Pui Pui, Yacôn, Mabư)
     public const int TASK_30_0 = 61440;
     public const int TASK_30_1 = 61442;
     public const int TASK_30_2 = 61444;
@@ -713,6 +845,8 @@ public static class ConstTask
     public const int TASK_30_18 = 61476;
     public const int TASK_30_19 = 61478;
     public const int TASK_30_20 = 61480;
+
+    // Nhiệm vụ 31: Chạm trán người ngoài hành tinh (bảo vệ hành tinh thực vật, diệt Chilled và Gomah)
     public const int TASK_31_0 = 63488;
     public const int TASK_31_1 = 63490;
     public const int TASK_31_2 = 63492;
@@ -734,6 +868,8 @@ public static class ConstTask
     public const int TASK_31_18 = 63524;
     public const int TASK_31_19 = 63526;
     public const int TASK_31_20 = 63528;
+
+    // Nhiệm vụ 32: Vui lòng chờ nhiệm vụ mới (nhiệm vụ cuối trong dữ liệu)
     public const int TASK_32_0 = 65536;
     public const int TASK_32_1 = 65538;
     public const int TASK_32_2 = 65540;
@@ -755,6 +891,8 @@ public static class ConstTask
     public const int TASK_32_18 = 65572;
     public const int TASK_32_19 = 65574;
     public const int TASK_32_20 = 65576;
+
+    // Nhiệm vụ 33
     public const int TASK_33_0 = 67584;
     public const int TASK_33_1 = 67586;
     public const int TASK_33_2 = 67588;
@@ -776,6 +914,8 @@ public static class ConstTask
     public const int TASK_33_18 = 67620;
     public const int TASK_33_19 = 67622;
     public const int TASK_33_20 = 67624;
+
+    // Nhiệm vụ 34
     public const int TASK_34_0 = 69632;
     public const int TASK_34_1 = 69634;
     public const int TASK_34_2 = 69636;
@@ -797,6 +937,8 @@ public static class ConstTask
     public const int TASK_34_18 = 69668;
     public const int TASK_34_19 = 69670;
     public const int TASK_34_20 = 69672;
+
+    // Nhiệm vụ 35
     public const int TASK_35_0 = 71680;
     public const int TASK_35_1 = 71682;
     public const int TASK_35_2 = 71684;
@@ -818,6 +960,8 @@ public static class ConstTask
     public const int TASK_35_18 = 71716;
     public const int TASK_35_19 = 71718;
     public const int TASK_35_20 = 71720;
+
+    // Nhiệm vụ 36
     public const int TASK_36_0 = 73728;
     public const int TASK_36_1 = 73730;
     public const int TASK_36_2 = 73732;
@@ -839,6 +983,8 @@ public static class ConstTask
     public const int TASK_36_18 = 73764;
     public const int TASK_36_19 = 73766;
     public const int TASK_36_20 = 73768;
+
+    // Nhiệm vụ 37
     public const int TASK_37_0 = 75776;
     public const int TASK_37_1 = 75778;
     public const int TASK_37_2 = 75780;
@@ -860,6 +1006,8 @@ public static class ConstTask
     public const int TASK_37_18 = 75812;
     public const int TASK_37_19 = 75814;
     public const int TASK_37_20 = 75816;
+
+    // Nhiệm vụ 38
     public const int TASK_38_0 = 77824;
     public const int TASK_38_1 = 77826;
     public const int TASK_38_2 = 77828;
@@ -881,6 +1029,8 @@ public static class ConstTask
     public const int TASK_38_18 = 77860;
     public const int TASK_38_19 = 77862;
     public const int TASK_38_20 = 77864;
+
+    // Nhiệm vụ 39
     public const int TASK_39_0 = 79872;
     public const int TASK_39_1 = 79874;
     public const int TASK_39_2 = 79876;
@@ -902,6 +1052,8 @@ public static class ConstTask
     public const int TASK_39_18 = 79908;
     public const int TASK_39_19 = 79910;
     public const int TASK_39_20 = 79912;
+
+    // Nhiệm vụ 40
     public const int TASK_40_0 = 81920;
     public const int TASK_40_1 = 81922;
     public const int TASK_40_2 = 81924;
@@ -923,6 +1075,8 @@ public static class ConstTask
     public const int TASK_40_18 = 81956;
     public const int TASK_40_19 = 81958;
     public const int TASK_40_20 = 81960;
+
+    // Nhiệm vụ 41
     public const int TASK_41_0 = 83968;
     public const int TASK_41_1 = 83970;
     public const int TASK_41_2 = 83972;
@@ -944,6 +1098,8 @@ public static class ConstTask
     public const int TASK_41_18 = 84004;
     public const int TASK_41_19 = 84006;
     public const int TASK_41_20 = 84008;
+
+    // Nhiệm vụ 42
     public const int TASK_42_0 = 86016;
     public const int TASK_42_1 = 86018;
     public const int TASK_42_2 = 86020;
@@ -965,6 +1121,8 @@ public static class ConstTask
     public const int TASK_42_18 = 86052;
     public const int TASK_42_19 = 86054;
     public const int TASK_42_20 = 86056;
+
+    // Nhiệm vụ 43
     public const int TASK_43_0 = 88064;
     public const int TASK_43_1 = 88066;
     public const int TASK_43_2 = 88068;
@@ -986,6 +1144,8 @@ public static class ConstTask
     public const int TASK_43_18 = 88100;
     public const int TASK_43_19 = 88102;
     public const int TASK_43_20 = 88104;
+
+    // Nhiệm vụ 44
     public const int TASK_44_0 = 90112;
     public const int TASK_44_1 = 90114;
     public const int TASK_44_2 = 90116;
@@ -1007,6 +1167,8 @@ public static class ConstTask
     public const int TASK_44_18 = 90148;
     public const int TASK_44_19 = 90150;
     public const int TASK_44_20 = 90152;
+
+    // Nhiệm vụ 45
     public const int TASK_45_0 = 92160;
     public const int TASK_45_1 = 92162;
     public const int TASK_45_2 = 92164;
@@ -1028,6 +1190,8 @@ public static class ConstTask
     public const int TASK_45_18 = 92196;
     public const int TASK_45_19 = 92198;
     public const int TASK_45_20 = 92200;
+
+    // Nhiệm vụ 46
     public const int TASK_46_0 = 94208;
     public const int TASK_46_1 = 94210;
     public const int TASK_46_2 = 94212;
@@ -1049,6 +1213,8 @@ public static class ConstTask
     public const int TASK_46_18 = 94244;
     public const int TASK_46_19 = 94246;
     public const int TASK_46_20 = 94248;
+
+    // Nhiệm vụ 47
     public const int TASK_47_0 = 96256;
     public const int TASK_47_1 = 96258;
     public const int TASK_47_2 = 96260;
@@ -1070,6 +1236,8 @@ public static class ConstTask
     public const int TASK_47_18 = 96292;
     public const int TASK_47_19 = 96294;
     public const int TASK_47_20 = 96296;
+
+    // Nhiệm vụ 48
     public const int TASK_48_0 = 98304;
     public const int TASK_48_1 = 98306;
     public const int TASK_48_2 = 98308;
@@ -1091,6 +1259,8 @@ public static class ConstTask
     public const int TASK_48_18 = 98340;
     public const int TASK_48_19 = 98342;
     public const int TASK_48_20 = 98344;
+
+    // Nhiệm vụ 49
     public const int TASK_49_0 = 100352;
     public const int TASK_49_1 = 100354;
     public const int TASK_49_2 = 100356;
@@ -1112,6 +1282,8 @@ public static class ConstTask
     public const int TASK_49_18 = 100388;
     public const int TASK_49_19 = 100390;
     public const int TASK_49_20 = 100392;
+
+    // Nhiệm vụ 50
     public const int TASK_50_0 = 102400;
     public const int TASK_50_1 = 102402;
     public const int TASK_50_2 = 102404;
@@ -1133,6 +1305,8 @@ public static class ConstTask
     public const int TASK_50_18 = 102436;
     public const int TASK_50_19 = 102438;
     public const int TASK_50_20 = 102440;
+
+    // Nhiệm vụ 51
     public const int TASK_51_0 = 104448;
     public const int TASK_51_1 = 104450;
     public const int TASK_51_2 = 104452;
@@ -1154,6 +1328,8 @@ public static class ConstTask
     public const int TASK_51_18 = 104484;
     public const int TASK_51_19 = 104486;
     public const int TASK_51_20 = 104488;
+
+    // Nhiệm vụ 52
     public const int TASK_52_0 = 106496;
     public const int TASK_52_1 = 106498;
     public const int TASK_52_2 = 106500;
@@ -1175,6 +1351,8 @@ public static class ConstTask
     public const int TASK_52_18 = 106532;
     public const int TASK_52_19 = 106534;
     public const int TASK_52_20 = 106536;
+
+    // Nhiệm vụ 53
     public const int TASK_53_0 = 108544;
     public const int TASK_53_1 = 108546;
     public const int TASK_53_2 = 108548;
@@ -1196,6 +1374,8 @@ public static class ConstTask
     public const int TASK_53_18 = 108580;
     public const int TASK_53_19 = 108582;
     public const int TASK_53_20 = 108584;
+
+    // Nhiệm vụ 54
     public const int TASK_54_0 = 110592;
     public const int TASK_54_1 = 110594;
     public const int TASK_54_2 = 110596;
@@ -1217,6 +1397,8 @@ public static class ConstTask
     public const int TASK_54_18 = 110628;
     public const int TASK_54_19 = 110630;
     public const int TASK_54_20 = 110632;
+
+    // Nhiệm vụ 55
     public const int TASK_55_0 = 112640;
     public const int TASK_55_1 = 112642;
     public const int TASK_55_2 = 112644;
@@ -1238,6 +1420,8 @@ public static class ConstTask
     public const int TASK_55_18 = 112676;
     public const int TASK_55_19 = 112678;
     public const int TASK_55_20 = 112680;
+
+    // Nhiệm vụ 56
     public const int TASK_56_0 = 114688;
     public const int TASK_56_1 = 114690;
     public const int TASK_56_2 = 114692;
@@ -1259,6 +1443,8 @@ public static class ConstTask
     public const int TASK_56_18 = 114724;
     public const int TASK_56_19 = 114726;
     public const int TASK_56_20 = 114728;
+
+    // Nhiệm vụ 57
     public const int TASK_57_0 = 116736;
     public const int TASK_57_1 = 116738;
     public const int TASK_57_2 = 116740;
@@ -1280,6 +1466,8 @@ public static class ConstTask
     public const int TASK_57_18 = 116772;
     public const int TASK_57_19 = 116774;
     public const int TASK_57_20 = 116776;
+
+    // Nhiệm vụ 58
     public const int TASK_58_0 = 118784;
     public const int TASK_58_1 = 118786;
     public const int TASK_58_2 = 118788;
@@ -1301,6 +1489,8 @@ public static class ConstTask
     public const int TASK_58_18 = 118820;
     public const int TASK_58_19 = 118822;
     public const int TASK_58_20 = 118824;
+
+    // Nhiệm vụ 59
     public const int TASK_59_0 = 120832;
     public const int TASK_59_1 = 120834;
     public const int TASK_59_2 = 120836;
@@ -1322,6 +1512,8 @@ public static class ConstTask
     public const int TASK_59_18 = 120868;
     public const int TASK_59_19 = 120870;
     public const int TASK_59_20 = 120872;
+
+    // Nhiệm vụ 60
     public const int TASK_60_0 = 122880;
     public const int TASK_60_1 = 122882;
     public const int TASK_60_2 = 122884;
@@ -1343,6 +1535,8 @@ public static class ConstTask
     public const int TASK_60_18 = 122916;
     public const int TASK_60_19 = 122918;
     public const int TASK_60_20 = 122920;
+
+    // Nhiệm vụ 61
     public const int TASK_61_0 = 124928;
     public const int TASK_61_1 = 124930;
     public const int TASK_61_2 = 124932;
@@ -1364,6 +1558,8 @@ public static class ConstTask
     public const int TASK_61_18 = 124964;
     public const int TASK_61_19 = 124966;
     public const int TASK_61_20 = 124968;
+
+    // Nhiệm vụ 62
     public const int TASK_62_0 = 126976;
     public const int TASK_62_1 = 126978;
     public const int TASK_62_2 = 126980;
@@ -1385,6 +1581,8 @@ public static class ConstTask
     public const int TASK_62_18 = 127012;
     public const int TASK_62_19 = 127014;
     public const int TASK_62_20 = 127016;
+
+    // Nhiệm vụ 63
     public const int TASK_63_0 = 129024;
     public const int TASK_63_1 = 129026;
     public const int TASK_63_2 = 129028;
@@ -1406,6 +1604,8 @@ public static class ConstTask
     public const int TASK_63_18 = 129060;
     public const int TASK_63_19 = 129062;
     public const int TASK_63_20 = 129064;
+
+    // Nhiệm vụ 64
     public const int TASK_64_0 = 131072;
     public const int TASK_64_1 = 131074;
     public const int TASK_64_2 = 131076;
@@ -1427,6 +1627,8 @@ public static class ConstTask
     public const int TASK_64_18 = 131108;
     public const int TASK_64_19 = 131110;
     public const int TASK_64_20 = 131112;
+
+    // Nhiệm vụ 65
     public const int TASK_65_0 = 133120;
     public const int TASK_65_1 = 133122;
     public const int TASK_65_2 = 133124;
@@ -1448,6 +1650,8 @@ public static class ConstTask
     public const int TASK_65_18 = 133156;
     public const int TASK_65_19 = 133158;
     public const int TASK_65_20 = 133160;
+
+    // Nhiệm vụ 66
     public const int TASK_66_0 = 135168;
     public const int TASK_66_1 = 135170;
     public const int TASK_66_2 = 135172;
@@ -1469,6 +1673,8 @@ public static class ConstTask
     public const int TASK_66_18 = 135204;
     public const int TASK_66_19 = 135206;
     public const int TASK_66_20 = 135208;
+
+    // Nhiệm vụ 67
     public const int TASK_67_0 = 137216;
     public const int TASK_67_1 = 137218;
     public const int TASK_67_2 = 137220;
@@ -1490,6 +1696,8 @@ public static class ConstTask
     public const int TASK_67_18 = 137252;
     public const int TASK_67_19 = 137254;
     public const int TASK_67_20 = 137256;
+
+    // Nhiệm vụ 68
     public const int TASK_68_0 = 139264;
     public const int TASK_68_1 = 139266;
     public const int TASK_68_2 = 139268;
@@ -1511,6 +1719,8 @@ public static class ConstTask
     public const int TASK_68_18 = 139300;
     public const int TASK_68_19 = 139302;
     public const int TASK_68_20 = 139304;
+
+    // Nhiệm vụ 69
     public const int TASK_69_0 = 141312;
     public const int TASK_69_1 = 141314;
     public const int TASK_69_2 = 141316;
@@ -1532,6 +1742,8 @@ public static class ConstTask
     public const int TASK_69_18 = 141348;
     public const int TASK_69_19 = 141350;
     public const int TASK_69_20 = 141352;
+
+    // Nhiệm vụ 70
     public const int TASK_70_0 = 143360;
     public const int TASK_70_1 = 143362;
     public const int TASK_70_2 = 143364;
@@ -1553,6 +1765,8 @@ public static class ConstTask
     public const int TASK_70_18 = 143396;
     public const int TASK_70_19 = 143398;
     public const int TASK_70_20 = 143400;
+
+    // Nhiệm vụ 71
     public const int TASK_71_0 = 145408;
     public const int TASK_71_1 = 145410;
     public const int TASK_71_2 = 145412;
@@ -1574,6 +1788,8 @@ public static class ConstTask
     public const int TASK_71_18 = 145444;
     public const int TASK_71_19 = 145446;
     public const int TASK_71_20 = 145448;
+
+    // Nhiệm vụ 72
     public const int TASK_72_0 = 147456;
     public const int TASK_72_1 = 147458;
     public const int TASK_72_2 = 147460;
@@ -1595,6 +1811,8 @@ public static class ConstTask
     public const int TASK_72_18 = 147492;
     public const int TASK_72_19 = 147494;
     public const int TASK_72_20 = 147496;
+
+    // Nhiệm vụ 73
     public const int TASK_73_0 = 149504;
     public const int TASK_73_1 = 149506;
     public const int TASK_73_2 = 149508;
@@ -1616,6 +1834,8 @@ public static class ConstTask
     public const int TASK_73_18 = 149540;
     public const int TASK_73_19 = 149542;
     public const int TASK_73_20 = 149544;
+
+    // Nhiệm vụ 74
     public const int TASK_74_0 = 151552;
     public const int TASK_74_1 = 151554;
     public const int TASK_74_2 = 151556;
@@ -1637,6 +1857,8 @@ public static class ConstTask
     public const int TASK_74_18 = 151588;
     public const int TASK_74_19 = 151590;
     public const int TASK_74_20 = 151592;
+
+    // Nhiệm vụ 75
     public const int TASK_75_0 = 153600;
     public const int TASK_75_1 = 153602;
     public const int TASK_75_2 = 153604;
@@ -1658,6 +1880,8 @@ public static class ConstTask
     public const int TASK_75_18 = 153636;
     public const int TASK_75_19 = 153638;
     public const int TASK_75_20 = 153640;
+
+    // Nhiệm vụ 76
     public const int TASK_76_0 = 155648;
     public const int TASK_76_1 = 155650;
     public const int TASK_76_2 = 155652;
@@ -1679,6 +1903,8 @@ public static class ConstTask
     public const int TASK_76_18 = 155684;
     public const int TASK_76_19 = 155686;
     public const int TASK_76_20 = 155688;
+
+    // Nhiệm vụ 77
     public const int TASK_77_0 = 157696;
     public const int TASK_77_1 = 157698;
     public const int TASK_77_2 = 157700;
@@ -1700,6 +1926,8 @@ public static class ConstTask
     public const int TASK_77_18 = 157732;
     public const int TASK_77_19 = 157734;
     public const int TASK_77_20 = 157736;
+
+    // Nhiệm vụ 78
     public const int TASK_78_0 = 159744;
     public const int TASK_78_1 = 159746;
     public const int TASK_78_2 = 159748;
@@ -1721,6 +1949,8 @@ public static class ConstTask
     public const int TASK_78_18 = 159780;
     public const int TASK_78_19 = 159782;
     public const int TASK_78_20 = 159784;
+
+    // Nhiệm vụ 79
     public const int TASK_79_0 = 161792;
     public const int TASK_79_1 = 161794;
     public const int TASK_79_2 = 161796;
@@ -1742,6 +1972,8 @@ public static class ConstTask
     public const int TASK_79_18 = 161828;
     public const int TASK_79_19 = 161830;
     public const int TASK_79_20 = 161832;
+
+    // Nhiệm vụ 80
     public const int TASK_80_0 = 163840;
     public const int TASK_80_1 = 163842;
     public const int TASK_80_2 = 163844;
@@ -1763,6 +1995,8 @@ public static class ConstTask
     public const int TASK_80_18 = 163876;
     public const int TASK_80_19 = 163878;
     public const int TASK_80_20 = 163880;
+
+    // Nhiệm vụ 81
     public const int TASK_81_0 = 165888;
     public const int TASK_81_1 = 165890;
     public const int TASK_81_2 = 165892;
@@ -1784,6 +2018,8 @@ public static class ConstTask
     public const int TASK_81_18 = 165924;
     public const int TASK_81_19 = 165926;
     public const int TASK_81_20 = 165928;
+
+    // Nhiệm vụ 82
     public const int TASK_82_0 = 167936;
     public const int TASK_82_1 = 167938;
     public const int TASK_82_2 = 167940;
@@ -1805,6 +2041,8 @@ public static class ConstTask
     public const int TASK_82_18 = 167972;
     public const int TASK_82_19 = 167974;
     public const int TASK_82_20 = 167976;
+
+    // Nhiệm vụ 83
     public const int TASK_83_0 = 169984;
     public const int TASK_83_1 = 169986;
     public const int TASK_83_2 = 169988;
@@ -1826,6 +2064,8 @@ public static class ConstTask
     public const int TASK_83_18 = 170020;
     public const int TASK_83_19 = 170022;
     public const int TASK_83_20 = 170024;
+
+    // Nhiệm vụ 84
     public const int TASK_84_0 = 172032;
     public const int TASK_84_1 = 172034;
     public const int TASK_84_2 = 172036;
@@ -1847,6 +2087,8 @@ public static class ConstTask
     public const int TASK_84_18 = 172068;
     public const int TASK_84_19 = 172070;
     public const int TASK_84_20 = 172072;
+
+    // Nhiệm vụ 85
     public const int TASK_85_0 = 174080;
     public const int TASK_85_1 = 174082;
     public const int TASK_85_2 = 174084;
@@ -1868,6 +2110,8 @@ public static class ConstTask
     public const int TASK_85_18 = 174116;
     public const int TASK_85_19 = 174118;
     public const int TASK_85_20 = 174120;
+
+    // Nhiệm vụ 86
     public const int TASK_86_0 = 176128;
     public const int TASK_86_1 = 176130;
     public const int TASK_86_2 = 176132;
@@ -1889,6 +2133,8 @@ public static class ConstTask
     public const int TASK_86_18 = 176164;
     public const int TASK_86_19 = 176166;
     public const int TASK_86_20 = 176168;
+
+    // Nhiệm vụ 87
     public const int TASK_87_0 = 178176;
     public const int TASK_87_1 = 178178;
     public const int TASK_87_2 = 178180;
@@ -1910,6 +2156,8 @@ public static class ConstTask
     public const int TASK_87_18 = 178212;
     public const int TASK_87_19 = 178214;
     public const int TASK_87_20 = 178216;
+
+    // Nhiệm vụ 88
     public const int TASK_88_0 = 180224;
     public const int TASK_88_1 = 180226;
     public const int TASK_88_2 = 180228;
@@ -1931,6 +2179,8 @@ public static class ConstTask
     public const int TASK_88_18 = 180260;
     public const int TASK_88_19 = 180262;
     public const int TASK_88_20 = 180264;
+
+    // Nhiệm vụ 89
     public const int TASK_89_0 = 182272;
     public const int TASK_89_1 = 182274;
     public const int TASK_89_2 = 182276;
@@ -1952,6 +2202,8 @@ public static class ConstTask
     public const int TASK_89_18 = 182308;
     public const int TASK_89_19 = 182310;
     public const int TASK_89_20 = 182312;
+
+    // Nhiệm vụ 90
     public const int TASK_90_0 = 184320;
     public const int TASK_90_1 = 184322;
     public const int TASK_90_2 = 184324;
@@ -1973,6 +2225,8 @@ public static class ConstTask
     public const int TASK_90_18 = 184356;
     public const int TASK_90_19 = 184358;
     public const int TASK_90_20 = 184360;
+
+    // Nhiệm vụ 91
     public const int TASK_91_0 = 186368;
     public const int TASK_91_1 = 186370;
     public const int TASK_91_2 = 186372;
@@ -1994,6 +2248,8 @@ public static class ConstTask
     public const int TASK_91_18 = 186404;
     public const int TASK_91_19 = 186406;
     public const int TASK_91_20 = 186408;
+
+    // Nhiệm vụ 92
     public const int TASK_92_0 = 188416;
     public const int TASK_92_1 = 188418;
     public const int TASK_92_2 = 188420;
@@ -2015,6 +2271,8 @@ public static class ConstTask
     public const int TASK_92_18 = 188452;
     public const int TASK_92_19 = 188454;
     public const int TASK_92_20 = 188456;
+
+    // Nhiệm vụ 93
     public const int TASK_93_0 = 190464;
     public const int TASK_93_1 = 190466;
     public const int TASK_93_2 = 190468;
@@ -2036,6 +2294,8 @@ public static class ConstTask
     public const int TASK_93_18 = 190500;
     public const int TASK_93_19 = 190502;
     public const int TASK_93_20 = 190504;
+
+    // Nhiệm vụ 94
     public const int TASK_94_0 = 192512;
     public const int TASK_94_1 = 192514;
     public const int TASK_94_2 = 192516;
@@ -2057,6 +2317,8 @@ public static class ConstTask
     public const int TASK_94_18 = 192548;
     public const int TASK_94_19 = 192550;
     public const int TASK_94_20 = 192552;
+
+    // Nhiệm vụ 95
     public const int TASK_95_0 = 194560;
     public const int TASK_95_1 = 194562;
     public const int TASK_95_2 = 194564;
@@ -2078,6 +2340,8 @@ public static class ConstTask
     public const int TASK_95_18 = 194596;
     public const int TASK_95_19 = 194598;
     public const int TASK_95_20 = 194600;
+
+    // Nhiệm vụ 96
     public const int TASK_96_0 = 196608;
     public const int TASK_96_1 = 196610;
     public const int TASK_96_2 = 196612;
@@ -2099,6 +2363,8 @@ public static class ConstTask
     public const int TASK_96_18 = 196644;
     public const int TASK_96_19 = 196646;
     public const int TASK_96_20 = 196648;
+
+    // Nhiệm vụ 97
     public const int TASK_97_0 = 198656;
     public const int TASK_97_1 = 198658;
     public const int TASK_97_2 = 198660;
@@ -2120,6 +2386,8 @@ public static class ConstTask
     public const int TASK_97_18 = 198692;
     public const int TASK_97_19 = 198694;
     public const int TASK_97_20 = 198696;
+
+    // Nhiệm vụ 98
     public const int TASK_98_0 = 200704;
     public const int TASK_98_1 = 200706;
     public const int TASK_98_2 = 200708;
@@ -2141,6 +2409,8 @@ public static class ConstTask
     public const int TASK_98_18 = 200740;
     public const int TASK_98_19 = 200742;
     public const int TASK_98_20 = 200744;
+
+    // Nhiệm vụ 99
     public const int TASK_99_0 = 202752;
     public const int TASK_99_1 = 202754;
     public const int TASK_99_2 = 202756;
@@ -2162,6 +2432,8 @@ public static class ConstTask
     public const int TASK_99_18 = 202788;
     public const int TASK_99_19 = 202790;
     public const int TASK_99_20 = 202792;
+
+    // Nhiệm vụ 100
     public const int TASK_100_0 = 204800;
     public const int TASK_100_1 = 204802;
     public const int TASK_100_2 = 204804;
@@ -2183,6 +2455,8 @@ public static class ConstTask
     public const int TASK_100_18 = 204836;
     public const int TASK_100_19 = 204838;
     public const int TASK_100_20 = 204840;
+
+    // Nhiệm vụ 101
     public const int TASK_101_0 = 206848;
     public const int TASK_101_1 = 206850;
     public const int TASK_101_2 = 206852;
@@ -2204,6 +2478,8 @@ public static class ConstTask
     public const int TASK_101_18 = 206884;
     public const int TASK_101_19 = 206886;
     public const int TASK_101_20 = 206888;
+
+    // Nhiệm vụ 102
     public const int TASK_102_0 = 208896;
     public const int TASK_102_1 = 208898;
     public const int TASK_102_2 = 208900;
@@ -2225,6 +2501,8 @@ public static class ConstTask
     public const int TASK_102_18 = 208932;
     public const int TASK_102_19 = 208934;
     public const int TASK_102_20 = 208936;
+
+    // Nhiệm vụ 103
     public const int TASK_103_0 = 210944;
     public const int TASK_103_1 = 210946;
     public const int TASK_103_2 = 210948;
@@ -2246,6 +2524,8 @@ public static class ConstTask
     public const int TASK_103_18 = 210980;
     public const int TASK_103_19 = 210982;
     public const int TASK_103_20 = 210984;
+
+    // Nhiệm vụ 104
     public const int TASK_104_0 = 212992;
     public const int TASK_104_1 = 212994;
     public const int TASK_104_2 = 212996;
@@ -2267,6 +2547,8 @@ public static class ConstTask
     public const int TASK_104_18 = 213028;
     public const int TASK_104_19 = 213030;
     public const int TASK_104_20 = 213032;
+
+    // Nhiệm vụ 105
     public const int TASK_105_0 = 215040;
     public const int TASK_105_1 = 215042;
     public const int TASK_105_2 = 215044;
@@ -2288,6 +2570,8 @@ public static class ConstTask
     public const int TASK_105_18 = 215076;
     public const int TASK_105_19 = 215078;
     public const int TASK_105_20 = 215080;
+
+    // Nhiệm vụ 106
     public const int TASK_106_0 = 217088;
     public const int TASK_106_1 = 217090;
     public const int TASK_106_2 = 217092;
@@ -2309,6 +2593,8 @@ public static class ConstTask
     public const int TASK_106_18 = 217124;
     public const int TASK_106_19 = 217126;
     public const int TASK_106_20 = 217128;
+
+    // Nhiệm vụ 107
     public const int TASK_107_0 = 219136;
     public const int TASK_107_1 = 219138;
     public const int TASK_107_2 = 219140;
@@ -2330,6 +2616,8 @@ public static class ConstTask
     public const int TASK_107_18 = 219172;
     public const int TASK_107_19 = 219174;
     public const int TASK_107_20 = 219176;
+
+    // Nhiệm vụ 108
     public const int TASK_108_0 = 221184;
     public const int TASK_108_1 = 221186;
     public const int TASK_108_2 = 221188;
@@ -2351,6 +2639,8 @@ public static class ConstTask
     public const int TASK_108_18 = 221220;
     public const int TASK_108_19 = 221222;
     public const int TASK_108_20 = 221224;
+
+    // Nhiệm vụ 109
     public const int TASK_109_0 = 223232;
     public const int TASK_109_1 = 223234;
     public const int TASK_109_2 = 223236;
@@ -2372,6 +2662,8 @@ public static class ConstTask
     public const int TASK_109_18 = 223268;
     public const int TASK_109_19 = 223270;
     public const int TASK_109_20 = 223272;
+
+    // Nhiệm vụ 110
     public const int TASK_110_0 = 225280;
     public const int TASK_110_1 = 225282;
     public const int TASK_110_2 = 225284;
@@ -2393,6 +2685,8 @@ public static class ConstTask
     public const int TASK_110_18 = 225316;
     public const int TASK_110_19 = 225318;
     public const int TASK_110_20 = 225320;
+
+    // Nhiệm vụ 111
     public const int TASK_111_0 = 227328;
     public const int TASK_111_1 = 227330;
     public const int TASK_111_2 = 227332;
@@ -2414,6 +2708,8 @@ public static class ConstTask
     public const int TASK_111_18 = 227364;
     public const int TASK_111_19 = 227366;
     public const int TASK_111_20 = 227368;
+
+    // Nhiệm vụ 112
     public const int TASK_112_0 = 229376;
     public const int TASK_112_1 = 229378;
     public const int TASK_112_2 = 229380;
@@ -2435,6 +2731,8 @@ public static class ConstTask
     public const int TASK_112_18 = 229412;
     public const int TASK_112_19 = 229414;
     public const int TASK_112_20 = 229416;
+
+    // Nhiệm vụ 113
     public const int TASK_113_0 = 231424;
     public const int TASK_113_1 = 231426;
     public const int TASK_113_2 = 231428;
@@ -2456,6 +2754,8 @@ public static class ConstTask
     public const int TASK_113_18 = 231460;
     public const int TASK_113_19 = 231462;
     public const int TASK_113_20 = 231464;
+
+    // Nhiệm vụ 114
     public const int TASK_114_0 = 233472;
     public const int TASK_114_1 = 233474;
     public const int TASK_114_2 = 233476;
@@ -2477,6 +2777,8 @@ public static class ConstTask
     public const int TASK_114_18 = 233508;
     public const int TASK_114_19 = 233510;
     public const int TASK_114_20 = 233512;
+
+    // Nhiệm vụ 115
     public const int TASK_115_0 = 235520;
     public const int TASK_115_1 = 235522;
     public const int TASK_115_2 = 235524;
@@ -2498,6 +2800,8 @@ public static class ConstTask
     public const int TASK_115_18 = 235556;
     public const int TASK_115_19 = 235558;
     public const int TASK_115_20 = 235560;
+
+    // Nhiệm vụ 116
     public const int TASK_116_0 = 237568;
     public const int TASK_116_1 = 237570;
     public const int TASK_116_2 = 237572;
@@ -2519,6 +2823,8 @@ public static class ConstTask
     public const int TASK_116_18 = 237604;
     public const int TASK_116_19 = 237606;
     public const int TASK_116_20 = 237608;
+
+    // Nhiệm vụ 117
     public const int TASK_117_0 = 239616;
     public const int TASK_117_1 = 239618;
     public const int TASK_117_2 = 239620;
@@ -2540,6 +2846,8 @@ public static class ConstTask
     public const int TASK_117_18 = 239652;
     public const int TASK_117_19 = 239654;
     public const int TASK_117_20 = 239656;
+
+    // Nhiệm vụ 118
     public const int TASK_118_0 = 241664;
     public const int TASK_118_1 = 241666;
     public const int TASK_118_2 = 241668;
@@ -2561,6 +2869,8 @@ public static class ConstTask
     public const int TASK_118_18 = 241700;
     public const int TASK_118_19 = 241702;
     public const int TASK_118_20 = 241704;
+
+    // Nhiệm vụ 119
     public const int TASK_119_0 = 243712;
     public const int TASK_119_1 = 243714;
     public const int TASK_119_2 = 243716;
@@ -2582,6 +2892,8 @@ public static class ConstTask
     public const int TASK_119_18 = 243748;
     public const int TASK_119_19 = 243750;
     public const int TASK_119_20 = 243752;
+
+    // Nhiệm vụ 120
     public const int TASK_120_0 = 245760;
     public const int TASK_120_1 = 245762;
     public const int TASK_120_2 = 245764;
@@ -2603,6 +2915,8 @@ public static class ConstTask
     public const int TASK_120_18 = 245796;
     public const int TASK_120_19 = 245798;
     public const int TASK_120_20 = 245800;
+
+    // Nhiệm vụ 121
     public const int TASK_121_0 = 247808;
     public const int TASK_121_1 = 247810;
     public const int TASK_121_2 = 247812;
@@ -2624,6 +2938,8 @@ public static class ConstTask
     public const int TASK_121_18 = 247844;
     public const int TASK_121_19 = 247846;
     public const int TASK_121_20 = 247848;
+
+    // Nhiệm vụ 122
     public const int TASK_122_0 = 249856;
     public const int TASK_122_1 = 249858;
     public const int TASK_122_2 = 249860;
@@ -2645,6 +2961,8 @@ public static class ConstTask
     public const int TASK_122_18 = 249892;
     public const int TASK_122_19 = 249894;
     public const int TASK_122_20 = 249896;
+
+    // Nhiệm vụ 123
     public const int TASK_123_0 = 251904;
     public const int TASK_123_1 = 251906;
     public const int TASK_123_2 = 251908;
@@ -2666,6 +2984,8 @@ public static class ConstTask
     public const int TASK_123_18 = 251940;
     public const int TASK_123_19 = 251942;
     public const int TASK_123_20 = 251944;
+
+    // Nhiệm vụ 124
     public const int TASK_124_0 = 253952;
     public const int TASK_124_1 = 253954;
     public const int TASK_124_2 = 253956;
@@ -2687,6 +3007,8 @@ public static class ConstTask
     public const int TASK_124_18 = 253988;
     public const int TASK_124_19 = 253990;
     public const int TASK_124_20 = 253992;
+
+    // Nhiệm vụ 125
     public const int TASK_125_0 = 256000;
     public const int TASK_125_1 = 256002;
     public const int TASK_125_2 = 256004;
@@ -2708,6 +3030,8 @@ public static class ConstTask
     public const int TASK_125_18 = 256036;
     public const int TASK_125_19 = 256038;
     public const int TASK_125_20 = 256040;
+
+    // Nhiệm vụ 126
     public const int TASK_126_0 = 258048;
     public const int TASK_126_1 = 258050;
     public const int TASK_126_2 = 258052;
@@ -2729,6 +3053,8 @@ public static class ConstTask
     public const int TASK_126_18 = 258084;
     public const int TASK_126_19 = 258086;
     public const int TASK_126_20 = 258088;
+
+    // Nhiệm vụ 127
     public const int TASK_127_0 = 260096;
     public const int TASK_127_1 = 260098;
     public const int TASK_127_2 = 260100;
@@ -2750,6 +3076,8 @@ public static class ConstTask
     public const int TASK_127_18 = 260132;
     public const int TASK_127_19 = 260134;
     public const int TASK_127_20 = 260136;
+
+    // Nhiệm vụ 128
     public const int TASK_128_0 = 262144;
     public const int TASK_128_1 = 262146;
     public const int TASK_128_2 = 262148;
@@ -2771,6 +3099,8 @@ public static class ConstTask
     public const int TASK_128_18 = 262180;
     public const int TASK_128_19 = 262182;
     public const int TASK_128_20 = 262184;
+
+    // Nhiệm vụ 129
     public const int TASK_129_0 = 264192;
     public const int TASK_129_1 = 264194;
     public const int TASK_129_2 = 264196;
@@ -2792,6 +3122,8 @@ public static class ConstTask
     public const int TASK_129_18 = 264228;
     public const int TASK_129_19 = 264230;
     public const int TASK_129_20 = 264232;
+
+    // Nhiệm vụ 130
     public const int TASK_130_0 = 266240;
     public const int TASK_130_1 = 266242;
     public const int TASK_130_2 = 266244;
@@ -2813,6 +3145,8 @@ public static class ConstTask
     public const int TASK_130_18 = 266276;
     public const int TASK_130_19 = 266278;
     public const int TASK_130_20 = 266280;
+
+    // Nhiệm vụ 131
     public const int TASK_131_0 = 268288;
     public const int TASK_131_1 = 268290;
     public const int TASK_131_2 = 268292;
@@ -2834,6 +3168,8 @@ public static class ConstTask
     public const int TASK_131_18 = 268324;
     public const int TASK_131_19 = 268326;
     public const int TASK_131_20 = 268328;
+
+    // Nhiệm vụ 132
     public const int TASK_132_0 = 270336;
     public const int TASK_132_1 = 270338;
     public const int TASK_132_2 = 270340;
@@ -2855,6 +3191,8 @@ public static class ConstTask
     public const int TASK_132_18 = 270372;
     public const int TASK_132_19 = 270374;
     public const int TASK_132_20 = 270376;
+
+    // Nhiệm vụ 133
     public const int TASK_133_0 = 272384;
     public const int TASK_133_1 = 272386;
     public const int TASK_133_2 = 272388;
@@ -2876,6 +3214,8 @@ public static class ConstTask
     public const int TASK_133_18 = 272420;
     public const int TASK_133_19 = 272422;
     public const int TASK_133_20 = 272424;
+
+    // Nhiệm vụ 134
     public const int TASK_134_0 = 274432;
     public const int TASK_134_1 = 274434;
     public const int TASK_134_2 = 274436;
@@ -2897,6 +3237,8 @@ public static class ConstTask
     public const int TASK_134_18 = 274468;
     public const int TASK_134_19 = 274470;
     public const int TASK_134_20 = 274472;
+
+    // Nhiệm vụ 135
     public const int TASK_135_0 = 276480;
     public const int TASK_135_1 = 276482;
     public const int TASK_135_2 = 276484;
@@ -2918,6 +3260,8 @@ public static class ConstTask
     public const int TASK_135_18 = 276516;
     public const int TASK_135_19 = 276518;
     public const int TASK_135_20 = 276520;
+
+    // Nhiệm vụ 136
     public const int TASK_136_0 = 278528;
     public const int TASK_136_1 = 278530;
     public const int TASK_136_2 = 278532;
@@ -2939,6 +3283,8 @@ public static class ConstTask
     public const int TASK_136_18 = 278564;
     public const int TASK_136_19 = 278566;
     public const int TASK_136_20 = 278568;
+
+    // Nhiệm vụ 137
     public const int TASK_137_0 = 280576;
     public const int TASK_137_1 = 280578;
     public const int TASK_137_2 = 280580;
@@ -2960,6 +3306,8 @@ public static class ConstTask
     public const int TASK_137_18 = 280612;
     public const int TASK_137_19 = 280614;
     public const int TASK_137_20 = 280616;
+
+    // Nhiệm vụ 138
     public const int TASK_138_0 = 282624;
     public const int TASK_138_1 = 282626;
     public const int TASK_138_2 = 282628;
@@ -2981,6 +3329,8 @@ public static class ConstTask
     public const int TASK_138_18 = 282660;
     public const int TASK_138_19 = 282662;
     public const int TASK_138_20 = 282664;
+
+    // Nhiệm vụ 139
     public const int TASK_139_0 = 284672;
     public const int TASK_139_1 = 284674;
     public const int TASK_139_2 = 284676;
@@ -3002,6 +3352,8 @@ public static class ConstTask
     public const int TASK_139_18 = 284708;
     public const int TASK_139_19 = 284710;
     public const int TASK_139_20 = 284712;
+
+    // Nhiệm vụ 140
     public const int TASK_140_0 = 286720;
     public const int TASK_140_1 = 286722;
     public const int TASK_140_2 = 286724;
@@ -3023,6 +3375,8 @@ public static class ConstTask
     public const int TASK_140_18 = 286756;
     public const int TASK_140_19 = 286758;
     public const int TASK_140_20 = 286760;
+
+    // Nhiệm vụ 141
     public const int TASK_141_0 = 288768;
     public const int TASK_141_1 = 288770;
     public const int TASK_141_2 = 288772;
@@ -3044,6 +3398,8 @@ public static class ConstTask
     public const int TASK_141_18 = 288804;
     public const int TASK_141_19 = 288806;
     public const int TASK_141_20 = 288808;
+
+    // Nhiệm vụ 142
     public const int TASK_142_0 = 290816;
     public const int TASK_142_1 = 290818;
     public const int TASK_142_2 = 290820;
@@ -3065,6 +3421,8 @@ public static class ConstTask
     public const int TASK_142_18 = 290852;
     public const int TASK_142_19 = 290854;
     public const int TASK_142_20 = 290856;
+
+    // Nhiệm vụ 143
     public const int TASK_143_0 = 292864;
     public const int TASK_143_1 = 292866;
     public const int TASK_143_2 = 292868;
@@ -3086,6 +3444,8 @@ public static class ConstTask
     public const int TASK_143_18 = 292900;
     public const int TASK_143_19 = 292902;
     public const int TASK_143_20 = 292904;
+
+    // Nhiệm vụ 144
     public const int TASK_144_0 = 294912;
     public const int TASK_144_1 = 294914;
     public const int TASK_144_2 = 294916;
@@ -3107,6 +3467,8 @@ public static class ConstTask
     public const int TASK_144_18 = 294948;
     public const int TASK_144_19 = 294950;
     public const int TASK_144_20 = 294952;
+
+    // Nhiệm vụ 145
     public const int TASK_145_0 = 296960;
     public const int TASK_145_1 = 296962;
     public const int TASK_145_2 = 296964;
@@ -3128,6 +3490,8 @@ public static class ConstTask
     public const int TASK_145_18 = 296996;
     public const int TASK_145_19 = 296998;
     public const int TASK_145_20 = 297000;
+
+    // Nhiệm vụ 146
     public const int TASK_146_0 = 299008;
     public const int TASK_146_1 = 299010;
     public const int TASK_146_2 = 299012;
@@ -3149,6 +3513,8 @@ public static class ConstTask
     public const int TASK_146_18 = 299044;
     public const int TASK_146_19 = 299046;
     public const int TASK_146_20 = 299048;
+
+    // Nhiệm vụ 147
     public const int TASK_147_0 = 301056;
     public const int TASK_147_1 = 301058;
     public const int TASK_147_2 = 301060;
@@ -3170,6 +3536,8 @@ public static class ConstTask
     public const int TASK_147_18 = 301092;
     public const int TASK_147_19 = 301094;
     public const int TASK_147_20 = 301096;
+
+    // Nhiệm vụ 148
     public const int TASK_148_0 = 303104;
     public const int TASK_148_1 = 303106;
     public const int TASK_148_2 = 303108;
@@ -3191,6 +3559,8 @@ public static class ConstTask
     public const int TASK_148_18 = 303140;
     public const int TASK_148_19 = 303142;
     public const int TASK_148_20 = 303144;
+
+    // Nhiệm vụ 149
     public const int TASK_149_0 = 305152;
     public const int TASK_149_1 = 305154;
     public const int TASK_149_2 = 305156;
@@ -3212,6 +3582,8 @@ public static class ConstTask
     public const int TASK_149_18 = 305188;
     public const int TASK_149_19 = 305190;
     public const int TASK_149_20 = 305192;
+
+    // Nhiệm vụ 150
     public const int TASK_150_0 = 307200;
     public const int TASK_150_1 = 307202;
     public const int TASK_150_2 = 307204;
@@ -3233,6 +3605,8 @@ public static class ConstTask
     public const int TASK_150_18 = 307236;
     public const int TASK_150_19 = 307238;
     public const int TASK_150_20 = 307240;
+
+    // Nhiệm vụ 151
     public const int TASK_151_0 = 309248;
     public const int TASK_151_1 = 309250;
     public const int TASK_151_2 = 309252;
@@ -3254,6 +3628,8 @@ public static class ConstTask
     public const int TASK_151_18 = 309284;
     public const int TASK_151_19 = 309286;
     public const int TASK_151_20 = 309288;
+
+    // Nhiệm vụ 152
     public const int TASK_152_0 = 311296;
     public const int TASK_152_1 = 311298;
     public const int TASK_152_2 = 311300;
@@ -3275,6 +3651,8 @@ public static class ConstTask
     public const int TASK_152_18 = 311332;
     public const int TASK_152_19 = 311334;
     public const int TASK_152_20 = 311336;
+
+    // Nhiệm vụ 153
     public const int TASK_153_0 = 313344;
     public const int TASK_153_1 = 313346;
     public const int TASK_153_2 = 313348;
@@ -3296,6 +3674,8 @@ public static class ConstTask
     public const int TASK_153_18 = 313380;
     public const int TASK_153_19 = 313382;
     public const int TASK_153_20 = 313384;
+
+    // Nhiệm vụ 154
     public const int TASK_154_0 = 315392;
     public const int TASK_154_1 = 315394;
     public const int TASK_154_2 = 315396;
@@ -3317,6 +3697,8 @@ public static class ConstTask
     public const int TASK_154_18 = 315428;
     public const int TASK_154_19 = 315430;
     public const int TASK_154_20 = 315432;
+
+    // Nhiệm vụ 155
     public const int TASK_155_0 = 317440;
     public const int TASK_155_1 = 317442;
     public const int TASK_155_2 = 317444;
@@ -3338,6 +3720,8 @@ public static class ConstTask
     public const int TASK_155_18 = 317476;
     public const int TASK_155_19 = 317478;
     public const int TASK_155_20 = 317480;
+
+    // Nhiệm vụ 156
     public const int TASK_156_0 = 319488;
     public const int TASK_156_1 = 319490;
     public const int TASK_156_2 = 319492;
@@ -3359,6 +3743,8 @@ public static class ConstTask
     public const int TASK_156_18 = 319524;
     public const int TASK_156_19 = 319526;
     public const int TASK_156_20 = 319528;
+
+    // Nhiệm vụ 157
     public const int TASK_157_0 = 321536;
     public const int TASK_157_1 = 321538;
     public const int TASK_157_2 = 321540;
@@ -3380,6 +3766,8 @@ public static class ConstTask
     public const int TASK_157_18 = 321572;
     public const int TASK_157_19 = 321574;
     public const int TASK_157_20 = 321576;
+
+    // Nhiệm vụ 158
     public const int TASK_158_0 = 323584;
     public const int TASK_158_1 = 323586;
     public const int TASK_158_2 = 323588;
@@ -3401,6 +3789,8 @@ public static class ConstTask
     public const int TASK_158_18 = 323620;
     public const int TASK_158_19 = 323622;
     public const int TASK_158_20 = 323624;
+
+    // Nhiệm vụ 159
     public const int TASK_159_0 = 325632;
     public const int TASK_159_1 = 325634;
     public const int TASK_159_2 = 325636;
@@ -3422,6 +3812,8 @@ public static class ConstTask
     public const int TASK_159_18 = 325668;
     public const int TASK_159_19 = 325670;
     public const int TASK_159_20 = 325672;
+
+    // Nhiệm vụ 160
     public const int TASK_160_0 = 327680;
     public const int TASK_160_1 = 327682;
     public const int TASK_160_2 = 327684;
@@ -3443,6 +3835,8 @@ public static class ConstTask
     public const int TASK_160_18 = 327716;
     public const int TASK_160_19 = 327718;
     public const int TASK_160_20 = 327720;
+
+    // Nhiệm vụ 161
     public const int TASK_161_0 = 329728;
     public const int TASK_161_1 = 329730;
     public const int TASK_161_2 = 329732;
@@ -3464,6 +3858,8 @@ public static class ConstTask
     public const int TASK_161_18 = 329764;
     public const int TASK_161_19 = 329766;
     public const int TASK_161_20 = 329768;
+
+    // Nhiệm vụ 162
     public const int TASK_162_0 = 331776;
     public const int TASK_162_1 = 331778;
     public const int TASK_162_2 = 331780;
@@ -3485,6 +3881,8 @@ public static class ConstTask
     public const int TASK_162_18 = 331812;
     public const int TASK_162_19 = 331814;
     public const int TASK_162_20 = 331816;
+
+    // Nhiệm vụ 163
     public const int TASK_163_0 = 333824;
     public const int TASK_163_1 = 333826;
     public const int TASK_163_2 = 333828;
@@ -3506,6 +3904,8 @@ public static class ConstTask
     public const int TASK_163_18 = 333860;
     public const int TASK_163_19 = 333862;
     public const int TASK_163_20 = 333864;
+
+    // Nhiệm vụ 164
     public const int TASK_164_0 = 335872;
     public const int TASK_164_1 = 335874;
     public const int TASK_164_2 = 335876;
@@ -3527,6 +3927,8 @@ public static class ConstTask
     public const int TASK_164_18 = 335908;
     public const int TASK_164_19 = 335910;
     public const int TASK_164_20 = 335912;
+
+    // Nhiệm vụ 165
     public const int TASK_165_0 = 337920;
     public const int TASK_165_1 = 337922;
     public const int TASK_165_2 = 337924;
@@ -3548,6 +3950,8 @@ public static class ConstTask
     public const int TASK_165_18 = 337956;
     public const int TASK_165_19 = 337958;
     public const int TASK_165_20 = 337960;
+
+    // Nhiệm vụ 166
     public const int TASK_166_0 = 339968;
     public const int TASK_166_1 = 339970;
     public const int TASK_166_2 = 339972;
@@ -3569,6 +3973,8 @@ public static class ConstTask
     public const int TASK_166_18 = 340004;
     public const int TASK_166_19 = 340006;
     public const int TASK_166_20 = 340008;
+
+    // Nhiệm vụ 167
     public const int TASK_167_0 = 342016;
     public const int TASK_167_1 = 342018;
     public const int TASK_167_2 = 342020;
@@ -3590,6 +3996,8 @@ public static class ConstTask
     public const int TASK_167_18 = 342052;
     public const int TASK_167_19 = 342054;
     public const int TASK_167_20 = 342056;
+
+    // Nhiệm vụ 168
     public const int TASK_168_0 = 344064;
     public const int TASK_168_1 = 344066;
     public const int TASK_168_2 = 344068;
@@ -3611,6 +4019,8 @@ public static class ConstTask
     public const int TASK_168_18 = 344100;
     public const int TASK_168_19 = 344102;
     public const int TASK_168_20 = 344104;
+
+    // Nhiệm vụ 169
     public const int TASK_169_0 = 346112;
     public const int TASK_169_1 = 346114;
     public const int TASK_169_2 = 346116;
@@ -3632,6 +4042,8 @@ public static class ConstTask
     public const int TASK_169_18 = 346148;
     public const int TASK_169_19 = 346150;
     public const int TASK_169_20 = 346152;
+
+    // Nhiệm vụ 170
     public const int TASK_170_0 = 348160;
     public const int TASK_170_1 = 348162;
     public const int TASK_170_2 = 348164;
@@ -3653,6 +4065,8 @@ public static class ConstTask
     public const int TASK_170_18 = 348196;
     public const int TASK_170_19 = 348198;
     public const int TASK_170_20 = 348200;
+
+    // Nhiệm vụ 171
     public const int TASK_171_0 = 350208;
     public const int TASK_171_1 = 350210;
     public const int TASK_171_2 = 350212;
@@ -3674,6 +4088,8 @@ public static class ConstTask
     public const int TASK_171_18 = 350244;
     public const int TASK_171_19 = 350246;
     public const int TASK_171_20 = 350248;
+
+    // Nhiệm vụ 172
     public const int TASK_172_0 = 352256;
     public const int TASK_172_1 = 352258;
     public const int TASK_172_2 = 352260;
@@ -3695,6 +4111,8 @@ public static class ConstTask
     public const int TASK_172_18 = 352292;
     public const int TASK_172_19 = 352294;
     public const int TASK_172_20 = 352296;
+
+    // Nhiệm vụ 173
     public const int TASK_173_0 = 354304;
     public const int TASK_173_1 = 354306;
     public const int TASK_173_2 = 354308;
@@ -3716,6 +4134,8 @@ public static class ConstTask
     public const int TASK_173_18 = 354340;
     public const int TASK_173_19 = 354342;
     public const int TASK_173_20 = 354344;
+
+    // Nhiệm vụ 174
     public const int TASK_174_0 = 356352;
     public const int TASK_174_1 = 356354;
     public const int TASK_174_2 = 356356;
@@ -3737,6 +4157,8 @@ public static class ConstTask
     public const int TASK_174_18 = 356388;
     public const int TASK_174_19 = 356390;
     public const int TASK_174_20 = 356392;
+
+    // Nhiệm vụ 175
     public const int TASK_175_0 = 358400;
     public const int TASK_175_1 = 358402;
     public const int TASK_175_2 = 358404;
@@ -3758,6 +4180,8 @@ public static class ConstTask
     public const int TASK_175_18 = 358436;
     public const int TASK_175_19 = 358438;
     public const int TASK_175_20 = 358440;
+
+    // Nhiệm vụ 176
     public const int TASK_176_0 = 360448;
     public const int TASK_176_1 = 360450;
     public const int TASK_176_2 = 360452;
@@ -3779,6 +4203,8 @@ public static class ConstTask
     public const int TASK_176_18 = 360484;
     public const int TASK_176_19 = 360486;
     public const int TASK_176_20 = 360488;
+
+    // Nhiệm vụ 177
     public const int TASK_177_0 = 362496;
     public const int TASK_177_1 = 362498;
     public const int TASK_177_2 = 362500;
@@ -3800,6 +4226,8 @@ public static class ConstTask
     public const int TASK_177_18 = 362532;
     public const int TASK_177_19 = 362534;
     public const int TASK_177_20 = 362536;
+
+    // Nhiệm vụ 178
     public const int TASK_178_0 = 364544;
     public const int TASK_178_1 = 364546;
     public const int TASK_178_2 = 364548;
@@ -3821,6 +4249,8 @@ public static class ConstTask
     public const int TASK_178_18 = 364580;
     public const int TASK_178_19 = 364582;
     public const int TASK_178_20 = 364584;
+
+    // Nhiệm vụ 179
     public const int TASK_179_0 = 366592;
     public const int TASK_179_1 = 366594;
     public const int TASK_179_2 = 366596;
@@ -3842,6 +4272,8 @@ public static class ConstTask
     public const int TASK_179_18 = 366628;
     public const int TASK_179_19 = 366630;
     public const int TASK_179_20 = 366632;
+
+    // Nhiệm vụ 180
     public const int TASK_180_0 = 368640;
     public const int TASK_180_1 = 368642;
     public const int TASK_180_2 = 368644;
@@ -3863,6 +4295,8 @@ public static class ConstTask
     public const int TASK_180_18 = 368676;
     public const int TASK_180_19 = 368678;
     public const int TASK_180_20 = 368680;
+
+    // Nhiệm vụ 181
     public const int TASK_181_0 = 370688;
     public const int TASK_181_1 = 370690;
     public const int TASK_181_2 = 370692;
@@ -3884,6 +4318,8 @@ public static class ConstTask
     public const int TASK_181_18 = 370724;
     public const int TASK_181_19 = 370726;
     public const int TASK_181_20 = 370728;
+
+    // Nhiệm vụ 182
     public const int TASK_182_0 = 372736;
     public const int TASK_182_1 = 372738;
     public const int TASK_182_2 = 372740;
@@ -3905,6 +4341,8 @@ public static class ConstTask
     public const int TASK_182_18 = 372772;
     public const int TASK_182_19 = 372774;
     public const int TASK_182_20 = 372776;
+
+    // Nhiệm vụ 183
     public const int TASK_183_0 = 374784;
     public const int TASK_183_1 = 374786;
     public const int TASK_183_2 = 374788;
@@ -3926,6 +4364,8 @@ public static class ConstTask
     public const int TASK_183_18 = 374820;
     public const int TASK_183_19 = 374822;
     public const int TASK_183_20 = 374824;
+
+    // Nhiệm vụ 184
     public const int TASK_184_0 = 376832;
     public const int TASK_184_1 = 376834;
     public const int TASK_184_2 = 376836;
@@ -3947,6 +4387,8 @@ public static class ConstTask
     public const int TASK_184_18 = 376868;
     public const int TASK_184_19 = 376870;
     public const int TASK_184_20 = 376872;
+
+    // Nhiệm vụ 185
     public const int TASK_185_0 = 378880;
     public const int TASK_185_1 = 378882;
     public const int TASK_185_2 = 378884;
@@ -3968,6 +4410,8 @@ public static class ConstTask
     public const int TASK_185_18 = 378916;
     public const int TASK_185_19 = 378918;
     public const int TASK_185_20 = 378920;
+
+    // Nhiệm vụ 186
     public const int TASK_186_0 = 380928;
     public const int TASK_186_1 = 380930;
     public const int TASK_186_2 = 380932;
@@ -3989,6 +4433,8 @@ public static class ConstTask
     public const int TASK_186_18 = 380964;
     public const int TASK_186_19 = 380966;
     public const int TASK_186_20 = 380968;
+
+    // Nhiệm vụ 187
     public const int TASK_187_0 = 382976;
     public const int TASK_187_1 = 382978;
     public const int TASK_187_2 = 382980;
@@ -4010,6 +4456,8 @@ public static class ConstTask
     public const int TASK_187_18 = 383012;
     public const int TASK_187_19 = 383014;
     public const int TASK_187_20 = 383016;
+
+    // Nhiệm vụ 188
     public const int TASK_188_0 = 385024;
     public const int TASK_188_1 = 385026;
     public const int TASK_188_2 = 385028;
@@ -4031,6 +4479,8 @@ public static class ConstTask
     public const int TASK_188_18 = 385060;
     public const int TASK_188_19 = 385062;
     public const int TASK_188_20 = 385064;
+
+    // Nhiệm vụ 189
     public const int TASK_189_0 = 387072;
     public const int TASK_189_1 = 387074;
     public const int TASK_189_2 = 387076;
@@ -4052,6 +4502,8 @@ public static class ConstTask
     public const int TASK_189_18 = 387108;
     public const int TASK_189_19 = 387110;
     public const int TASK_189_20 = 387112;
+
+    // Nhiệm vụ 190
     public const int TASK_190_0 = 389120;
     public const int TASK_190_1 = 389122;
     public const int TASK_190_2 = 389124;
@@ -4073,6 +4525,8 @@ public static class ConstTask
     public const int TASK_190_18 = 389156;
     public const int TASK_190_19 = 389158;
     public const int TASK_190_20 = 389160;
+
+    // Nhiệm vụ 191
     public const int TASK_191_0 = 391168;
     public const int TASK_191_1 = 391170;
     public const int TASK_191_2 = 391172;
@@ -4094,6 +4548,8 @@ public static class ConstTask
     public const int TASK_191_18 = 391204;
     public const int TASK_191_19 = 391206;
     public const int TASK_191_20 = 391208;
+
+    // Nhiệm vụ 192
     public const int TASK_192_0 = 393216;
     public const int TASK_192_1 = 393218;
     public const int TASK_192_2 = 393220;
@@ -4115,6 +4571,8 @@ public static class ConstTask
     public const int TASK_192_18 = 393252;
     public const int TASK_192_19 = 393254;
     public const int TASK_192_20 = 393256;
+
+    // Nhiệm vụ 193
     public const int TASK_193_0 = 395264;
     public const int TASK_193_1 = 395266;
     public const int TASK_193_2 = 395268;
@@ -4136,6 +4594,8 @@ public static class ConstTask
     public const int TASK_193_18 = 395300;
     public const int TASK_193_19 = 395302;
     public const int TASK_193_20 = 395304;
+
+    // Nhiệm vụ 194
     public const int TASK_194_0 = 397312;
     public const int TASK_194_1 = 397314;
     public const int TASK_194_2 = 397316;
@@ -4157,6 +4617,8 @@ public static class ConstTask
     public const int TASK_194_18 = 397348;
     public const int TASK_194_19 = 397350;
     public const int TASK_194_20 = 397352;
+
+    // Nhiệm vụ 195
     public const int TASK_195_0 = 399360;
     public const int TASK_195_1 = 399362;
     public const int TASK_195_2 = 399364;
@@ -4178,6 +4640,8 @@ public static class ConstTask
     public const int TASK_195_18 = 399396;
     public const int TASK_195_19 = 399398;
     public const int TASK_195_20 = 399400;
+
+    // Nhiệm vụ 196
     public const int TASK_196_0 = 401408;
     public const int TASK_196_1 = 401410;
     public const int TASK_196_2 = 401412;
@@ -4199,6 +4663,8 @@ public static class ConstTask
     public const int TASK_196_18 = 401444;
     public const int TASK_196_19 = 401446;
     public const int TASK_196_20 = 401448;
+
+    // Nhiệm vụ 197
     public const int TASK_197_0 = 403456;
     public const int TASK_197_1 = 403458;
     public const int TASK_197_2 = 403460;
@@ -4220,6 +4686,8 @@ public static class ConstTask
     public const int TASK_197_18 = 403492;
     public const int TASK_197_19 = 403494;
     public const int TASK_197_20 = 403496;
+
+    // Nhiệm vụ 198
     public const int TASK_198_0 = 405504;
     public const int TASK_198_1 = 405506;
     public const int TASK_198_2 = 405508;
@@ -4241,6 +4709,8 @@ public static class ConstTask
     public const int TASK_198_18 = 405540;
     public const int TASK_198_19 = 405542;
     public const int TASK_198_20 = 405544;
+
+    // Nhiệm vụ 199
     public const int TASK_199_0 = 407552;
     public const int TASK_199_1 = 407554;
     public const int TASK_199_2 = 407556;
@@ -4262,6 +4732,8 @@ public static class ConstTask
     public const int TASK_199_18 = 407588;
     public const int TASK_199_19 = 407590;
     public const int TASK_199_20 = 407592;
+
+    // Nhiệm vụ 200
     public const int TASK_200_0 = 409600;
     public const int TASK_200_1 = 409602;
     public const int TASK_200_2 = 409604;
@@ -4283,6 +4755,8 @@ public static class ConstTask
     public const int TASK_200_18 = 409636;
     public const int TASK_200_19 = 409638;
     public const int TASK_200_20 = 409640;
+
+    // Nhiệm vụ 201
     public const int TASK_201_0 = 411648;
     public const int TASK_201_1 = 411650;
     public const int TASK_201_2 = 411652;
@@ -4304,6 +4778,8 @@ public static class ConstTask
     public const int TASK_201_18 = 411684;
     public const int TASK_201_19 = 411686;
     public const int TASK_201_20 = 411688;
+
+    // Nhiệm vụ 202
     public const int TASK_202_0 = 413696;
     public const int TASK_202_1 = 413698;
     public const int TASK_202_2 = 413700;
@@ -4325,6 +4801,8 @@ public static class ConstTask
     public const int TASK_202_18 = 413732;
     public const int TASK_202_19 = 413734;
     public const int TASK_202_20 = 413736;
+
+    // Nhiệm vụ 203
     public const int TASK_203_0 = 415744;
     public const int TASK_203_1 = 415746;
     public const int TASK_203_2 = 415748;
@@ -4346,6 +4824,8 @@ public static class ConstTask
     public const int TASK_203_18 = 415780;
     public const int TASK_203_19 = 415782;
     public const int TASK_203_20 = 415784;
+
+    // Nhiệm vụ 204
     public const int TASK_204_0 = 417792;
     public const int TASK_204_1 = 417794;
     public const int TASK_204_2 = 417796;
@@ -4367,6 +4847,8 @@ public static class ConstTask
     public const int TASK_204_18 = 417828;
     public const int TASK_204_19 = 417830;
     public const int TASK_204_20 = 417832;
+
+    // Nhiệm vụ 205
     public const int TASK_205_0 = 419840;
     public const int TASK_205_1 = 419842;
     public const int TASK_205_2 = 419844;
@@ -4388,6 +4870,8 @@ public static class ConstTask
     public const int TASK_205_18 = 419876;
     public const int TASK_205_19 = 419878;
     public const int TASK_205_20 = 419880;
+
+    // Nhiệm vụ 206
     public const int TASK_206_0 = 421888;
     public const int TASK_206_1 = 421890;
     public const int TASK_206_2 = 421892;
@@ -4409,6 +4893,8 @@ public static class ConstTask
     public const int TASK_206_18 = 421924;
     public const int TASK_206_19 = 421926;
     public const int TASK_206_20 = 421928;
+
+    // Nhiệm vụ 207
     public const int TASK_207_0 = 423936;
     public const int TASK_207_1 = 423938;
     public const int TASK_207_2 = 423940;
@@ -4430,6 +4916,8 @@ public static class ConstTask
     public const int TASK_207_18 = 423972;
     public const int TASK_207_19 = 423974;
     public const int TASK_207_20 = 423976;
+
+    // Nhiệm vụ 208
     public const int TASK_208_0 = 425984;
     public const int TASK_208_1 = 425986;
     public const int TASK_208_2 = 425988;
@@ -4451,6 +4939,8 @@ public static class ConstTask
     public const int TASK_208_18 = 426020;
     public const int TASK_208_19 = 426022;
     public const int TASK_208_20 = 426024;
+
+    // Nhiệm vụ 209
     public const int TASK_209_0 = 428032;
     public const int TASK_209_1 = 428034;
     public const int TASK_209_2 = 428036;
@@ -4472,6 +4962,8 @@ public static class ConstTask
     public const int TASK_209_18 = 428068;
     public const int TASK_209_19 = 428070;
     public const int TASK_209_20 = 428072;
+
+    // Nhiệm vụ 210
     public const int TASK_210_0 = 430080;
     public const int TASK_210_1 = 430082;
     public const int TASK_210_2 = 430084;
@@ -4493,6 +4985,8 @@ public static class ConstTask
     public const int TASK_210_18 = 430116;
     public const int TASK_210_19 = 430118;
     public const int TASK_210_20 = 430120;
+
+    // Nhiệm vụ 211
     public const int TASK_211_0 = 432128;
     public const int TASK_211_1 = 432130;
     public const int TASK_211_2 = 432132;
@@ -4514,6 +5008,8 @@ public static class ConstTask
     public const int TASK_211_18 = 432164;
     public const int TASK_211_19 = 432166;
     public const int TASK_211_20 = 432168;
+
+    // Nhiệm vụ 212
     public const int TASK_212_0 = 434176;
     public const int TASK_212_1 = 434178;
     public const int TASK_212_2 = 434180;
@@ -4535,6 +5031,8 @@ public static class ConstTask
     public const int TASK_212_18 = 434212;
     public const int TASK_212_19 = 434214;
     public const int TASK_212_20 = 434216;
+
+    // Nhiệm vụ 213
     public const int TASK_213_0 = 436224;
     public const int TASK_213_1 = 436226;
     public const int TASK_213_2 = 436228;
@@ -4556,6 +5054,8 @@ public static class ConstTask
     public const int TASK_213_18 = 436260;
     public const int TASK_213_19 = 436262;
     public const int TASK_213_20 = 436264;
+
+    // Nhiệm vụ 214
     public const int TASK_214_0 = 438272;
     public const int TASK_214_1 = 438274;
     public const int TASK_214_2 = 438276;
@@ -4577,6 +5077,8 @@ public static class ConstTask
     public const int TASK_214_18 = 438308;
     public const int TASK_214_19 = 438310;
     public const int TASK_214_20 = 438312;
+
+    // Nhiệm vụ 215
     public const int TASK_215_0 = 440320;
     public const int TASK_215_1 = 440322;
     public const int TASK_215_2 = 440324;
@@ -4598,6 +5100,8 @@ public static class ConstTask
     public const int TASK_215_18 = 440356;
     public const int TASK_215_19 = 440358;
     public const int TASK_215_20 = 440360;
+
+    // Nhiệm vụ 216
     public const int TASK_216_0 = 442368;
     public const int TASK_216_1 = 442370;
     public const int TASK_216_2 = 442372;
@@ -4619,6 +5123,8 @@ public static class ConstTask
     public const int TASK_216_18 = 442404;
     public const int TASK_216_19 = 442406;
     public const int TASK_216_20 = 442408;
+
+    // Nhiệm vụ 217
     public const int TASK_217_0 = 444416;
     public const int TASK_217_1 = 444418;
     public const int TASK_217_2 = 444420;
@@ -4640,6 +5146,8 @@ public static class ConstTask
     public const int TASK_217_18 = 444452;
     public const int TASK_217_19 = 444454;
     public const int TASK_217_20 = 444456;
+
+    // Nhiệm vụ 218
     public const int TASK_218_0 = 446464;
     public const int TASK_218_1 = 446466;
     public const int TASK_218_2 = 446468;
@@ -4661,6 +5169,8 @@ public static class ConstTask
     public const int TASK_218_18 = 446500;
     public const int TASK_218_19 = 446502;
     public const int TASK_218_20 = 446504;
+
+    // Nhiệm vụ 219
     public const int TASK_219_0 = 448512;
     public const int TASK_219_1 = 448514;
     public const int TASK_219_2 = 448516;
@@ -4682,6 +5192,8 @@ public static class ConstTask
     public const int TASK_219_18 = 448548;
     public const int TASK_219_19 = 448550;
     public const int TASK_219_20 = 448552;
+
+    // Nhiệm vụ 220
     public const int TASK_220_0 = 450560;
     public const int TASK_220_1 = 450562;
     public const int TASK_220_2 = 450564;
@@ -4703,6 +5215,8 @@ public static class ConstTask
     public const int TASK_220_18 = 450596;
     public const int TASK_220_19 = 450598;
     public const int TASK_220_20 = 450600;
+
+    // Nhiệm vụ 221
     public const int TASK_221_0 = 452608;
     public const int TASK_221_1 = 452610;
     public const int TASK_221_2 = 452612;
@@ -4724,6 +5238,8 @@ public static class ConstTask
     public const int TASK_221_18 = 452644;
     public const int TASK_221_19 = 452646;
     public const int TASK_221_20 = 452648;
+
+    // Nhiệm vụ 222
     public const int TASK_222_0 = 454656;
     public const int TASK_222_1 = 454658;
     public const int TASK_222_2 = 454660;
@@ -4745,6 +5261,8 @@ public static class ConstTask
     public const int TASK_222_18 = 454692;
     public const int TASK_222_19 = 454694;
     public const int TASK_222_20 = 454696;
+
+    // Nhiệm vụ 223
     public const int TASK_223_0 = 456704;
     public const int TASK_223_1 = 456706;
     public const int TASK_223_2 = 456708;
@@ -4766,6 +5284,8 @@ public static class ConstTask
     public const int TASK_223_18 = 456740;
     public const int TASK_223_19 = 456742;
     public const int TASK_223_20 = 456744;
+
+    // Nhiệm vụ 224
     public const int TASK_224_0 = 458752;
     public const int TASK_224_1 = 458754;
     public const int TASK_224_2 = 458756;
@@ -4787,6 +5307,8 @@ public static class ConstTask
     public const int TASK_224_18 = 458788;
     public const int TASK_224_19 = 458790;
     public const int TASK_224_20 = 458792;
+
+    // Nhiệm vụ 225
     public const int TASK_225_0 = 460800;
     public const int TASK_225_1 = 460802;
     public const int TASK_225_2 = 460804;
@@ -4808,6 +5330,8 @@ public static class ConstTask
     public const int TASK_225_18 = 460836;
     public const int TASK_225_19 = 460838;
     public const int TASK_225_20 = 460840;
+
+    // Nhiệm vụ 226
     public const int TASK_226_0 = 462848;
     public const int TASK_226_1 = 462850;
     public const int TASK_226_2 = 462852;
@@ -4829,6 +5353,8 @@ public static class ConstTask
     public const int TASK_226_18 = 462884;
     public const int TASK_226_19 = 462886;
     public const int TASK_226_20 = 462888;
+
+    // Nhiệm vụ 227
     public const int TASK_227_0 = 464896;
     public const int TASK_227_1 = 464898;
     public const int TASK_227_2 = 464900;
@@ -4850,6 +5376,8 @@ public static class ConstTask
     public const int TASK_227_18 = 464932;
     public const int TASK_227_19 = 464934;
     public const int TASK_227_20 = 464936;
+
+    // Nhiệm vụ 228
     public const int TASK_228_0 = 466944;
     public const int TASK_228_1 = 466946;
     public const int TASK_228_2 = 466948;
@@ -4871,6 +5399,8 @@ public static class ConstTask
     public const int TASK_228_18 = 466980;
     public const int TASK_228_19 = 466982;
     public const int TASK_228_20 = 466984;
+
+    // Nhiệm vụ 229
     public const int TASK_229_0 = 468992;
     public const int TASK_229_1 = 468994;
     public const int TASK_229_2 = 468996;
@@ -4892,6 +5422,8 @@ public static class ConstTask
     public const int TASK_229_18 = 469028;
     public const int TASK_229_19 = 469030;
     public const int TASK_229_20 = 469032;
+
+    // Nhiệm vụ 230
     public const int TASK_230_0 = 471040;
     public const int TASK_230_1 = 471042;
     public const int TASK_230_2 = 471044;
@@ -4913,6 +5445,8 @@ public static class ConstTask
     public const int TASK_230_18 = 471076;
     public const int TASK_230_19 = 471078;
     public const int TASK_230_20 = 471080;
+
+    // Nhiệm vụ 231
     public const int TASK_231_0 = 473088;
     public const int TASK_231_1 = 473090;
     public const int TASK_231_2 = 473092;
@@ -4934,6 +5468,8 @@ public static class ConstTask
     public const int TASK_231_18 = 473124;
     public const int TASK_231_19 = 473126;
     public const int TASK_231_20 = 473128;
+
+    // Nhiệm vụ 232
     public const int TASK_232_0 = 475136;
     public const int TASK_232_1 = 475138;
     public const int TASK_232_2 = 475140;
@@ -4955,6 +5491,8 @@ public static class ConstTask
     public const int TASK_232_18 = 475172;
     public const int TASK_232_19 = 475174;
     public const int TASK_232_20 = 475176;
+
+    // Nhiệm vụ 233
     public const int TASK_233_0 = 477184;
     public const int TASK_233_1 = 477186;
     public const int TASK_233_2 = 477188;
@@ -4976,6 +5514,8 @@ public static class ConstTask
     public const int TASK_233_18 = 477220;
     public const int TASK_233_19 = 477222;
     public const int TASK_233_20 = 477224;
+
+    // Nhiệm vụ 234
     public const int TASK_234_0 = 479232;
     public const int TASK_234_1 = 479234;
     public const int TASK_234_2 = 479236;
@@ -4997,6 +5537,8 @@ public static class ConstTask
     public const int TASK_234_18 = 479268;
     public const int TASK_234_19 = 479270;
     public const int TASK_234_20 = 479272;
+
+    // Nhiệm vụ 235
     public const int TASK_235_0 = 481280;
     public const int TASK_235_1 = 481282;
     public const int TASK_235_2 = 481284;
@@ -5018,6 +5560,8 @@ public static class ConstTask
     public const int TASK_235_18 = 481316;
     public const int TASK_235_19 = 481318;
     public const int TASK_235_20 = 481320;
+
+    // Nhiệm vụ 236
     public const int TASK_236_0 = 483328;
     public const int TASK_236_1 = 483330;
     public const int TASK_236_2 = 483332;
@@ -5039,6 +5583,8 @@ public static class ConstTask
     public const int TASK_236_18 = 483364;
     public const int TASK_236_19 = 483366;
     public const int TASK_236_20 = 483368;
+
+    // Nhiệm vụ 237
     public const int TASK_237_0 = 485376;
     public const int TASK_237_1 = 485378;
     public const int TASK_237_2 = 485380;
@@ -5060,6 +5606,8 @@ public static class ConstTask
     public const int TASK_237_18 = 485412;
     public const int TASK_237_19 = 485414;
     public const int TASK_237_20 = 485416;
+
+    // Nhiệm vụ 238
     public const int TASK_238_0 = 487424;
     public const int TASK_238_1 = 487426;
     public const int TASK_238_2 = 487428;
@@ -5081,6 +5629,8 @@ public static class ConstTask
     public const int TASK_238_18 = 487460;
     public const int TASK_238_19 = 487462;
     public const int TASK_238_20 = 487464;
+
+    // Nhiệm vụ 239
     public const int TASK_239_0 = 489472;
     public const int TASK_239_1 = 489474;
     public const int TASK_239_2 = 489476;
@@ -5102,6 +5652,8 @@ public static class ConstTask
     public const int TASK_239_18 = 489508;
     public const int TASK_239_19 = 489510;
     public const int TASK_239_20 = 489512;
+
+    // Nhiệm vụ 240
     public const int TASK_240_0 = 491520;
     public const int TASK_240_1 = 491522;
     public const int TASK_240_2 = 491524;
@@ -5123,6 +5675,8 @@ public static class ConstTask
     public const int TASK_240_18 = 491556;
     public const int TASK_240_19 = 491558;
     public const int TASK_240_20 = 491560;
+
+    // Nhiệm vụ 241
     public const int TASK_241_0 = 493568;
     public const int TASK_241_1 = 493570;
     public const int TASK_241_2 = 493572;
@@ -5144,6 +5698,8 @@ public static class ConstTask
     public const int TASK_241_18 = 493604;
     public const int TASK_241_19 = 493606;
     public const int TASK_241_20 = 493608;
+
+    // Nhiệm vụ 242
     public const int TASK_242_0 = 495616;
     public const int TASK_242_1 = 495618;
     public const int TASK_242_2 = 495620;
@@ -5165,6 +5721,8 @@ public static class ConstTask
     public const int TASK_242_18 = 495652;
     public const int TASK_242_19 = 495654;
     public const int TASK_242_20 = 495656;
+
+    // Nhiệm vụ 243
     public const int TASK_243_0 = 497664;
     public const int TASK_243_1 = 497666;
     public const int TASK_243_2 = 497668;
@@ -5186,6 +5744,8 @@ public static class ConstTask
     public const int TASK_243_18 = 497700;
     public const int TASK_243_19 = 497702;
     public const int TASK_243_20 = 497704;
+
+    // Nhiệm vụ 244
     public const int TASK_244_0 = 499712;
     public const int TASK_244_1 = 499714;
     public const int TASK_244_2 = 499716;
@@ -5207,6 +5767,8 @@ public static class ConstTask
     public const int TASK_244_18 = 499748;
     public const int TASK_244_19 = 499750;
     public const int TASK_244_20 = 499752;
+
+    // Nhiệm vụ 245
     public const int TASK_245_0 = 501760;
     public const int TASK_245_1 = 501762;
     public const int TASK_245_2 = 501764;
@@ -5228,6 +5790,8 @@ public static class ConstTask
     public const int TASK_245_18 = 501796;
     public const int TASK_245_19 = 501798;
     public const int TASK_245_20 = 501800;
+
+    // Nhiệm vụ 246
     public const int TASK_246_0 = 503808;
     public const int TASK_246_1 = 503810;
     public const int TASK_246_2 = 503812;
@@ -5249,6 +5813,8 @@ public static class ConstTask
     public const int TASK_246_18 = 503844;
     public const int TASK_246_19 = 503846;
     public const int TASK_246_20 = 503848;
+
+    // Nhiệm vụ 247
     public const int TASK_247_0 = 505856;
     public const int TASK_247_1 = 505858;
     public const int TASK_247_2 = 505860;
@@ -5270,6 +5836,8 @@ public static class ConstTask
     public const int TASK_247_18 = 505892;
     public const int TASK_247_19 = 505894;
     public const int TASK_247_20 = 505896;
+
+    // Nhiệm vụ 248
     public const int TASK_248_0 = 507904;
     public const int TASK_248_1 = 507906;
     public const int TASK_248_2 = 507908;
@@ -5291,6 +5859,8 @@ public static class ConstTask
     public const int TASK_248_18 = 507940;
     public const int TASK_248_19 = 507942;
     public const int TASK_248_20 = 507944;
+
+    // Nhiệm vụ 249
     public const int TASK_249_0 = 509952;
     public const int TASK_249_1 = 509954;
     public const int TASK_249_2 = 509956;
@@ -5312,6 +5882,8 @@ public static class ConstTask
     public const int TASK_249_18 = 509988;
     public const int TASK_249_19 = 509990;
     public const int TASK_249_20 = 509992;
+
+    // Nhiệm vụ 250
     public const int TASK_250_0 = 512000;
     public const int TASK_250_1 = 512002;
     public const int TASK_250_2 = 512004;
@@ -5333,6 +5905,8 @@ public static class ConstTask
     public const int TASK_250_18 = 512036;
     public const int TASK_250_19 = 512038;
     public const int TASK_250_20 = 512040;
+
+    // Nhiệm vụ 251
     public const int TASK_251_0 = 514048;
     public const int TASK_251_1 = 514050;
     public const int TASK_251_2 = 514052;
@@ -5354,6 +5928,8 @@ public static class ConstTask
     public const int TASK_251_18 = 514084;
     public const int TASK_251_19 = 514086;
     public const int TASK_251_20 = 514088;
+
+    // Nhiệm vụ 252
     public const int TASK_252_0 = 516096;
     public const int TASK_252_1 = 516098;
     public const int TASK_252_2 = 516100;
@@ -5375,6 +5951,8 @@ public static class ConstTask
     public const int TASK_252_18 = 516132;
     public const int TASK_252_19 = 516134;
     public const int TASK_252_20 = 516136;
+
+    // Nhiệm vụ 253
     public const int TASK_253_0 = 518144;
     public const int TASK_253_1 = 518146;
     public const int TASK_253_2 = 518148;
@@ -5396,6 +5974,8 @@ public static class ConstTask
     public const int TASK_253_18 = 518180;
     public const int TASK_253_19 = 518182;
     public const int TASK_253_20 = 518184;
+
+    // Nhiệm vụ 254
     public const int TASK_254_0 = 520192;
     public const int TASK_254_1 = 520194;
     public const int TASK_254_2 = 520196;
@@ -5417,6 +5997,8 @@ public static class ConstTask
     public const int TASK_254_18 = 520228;
     public const int TASK_254_19 = 520230;
     public const int TASK_254_20 = 520232;
+
+    // Nhiệm vụ 255
     public const int TASK_255_0 = 522240;
     public const int TASK_255_1 = 522242;
     public const int TASK_255_2 = 522244;
@@ -5438,6 +6020,8 @@ public static class ConstTask
     public const int TASK_255_18 = 522276;
     public const int TASK_255_19 = 522278;
     public const int TASK_255_20 = 522280;
+
+    // Nhiệm vụ 256
     public const int TASK_256_0 = 524288;
     public const int TASK_256_1 = 524290;
     public const int TASK_256_2 = 524292;
@@ -5459,6 +6043,8 @@ public static class ConstTask
     public const int TASK_256_18 = 524324;
     public const int TASK_256_19 = 524326;
     public const int TASK_256_20 = 524328;
+
+    // Nhiệm vụ 257
     public const int TASK_257_0 = 526336;
     public const int TASK_257_1 = 526338;
     public const int TASK_257_2 = 526340;
@@ -5480,6 +6066,8 @@ public static class ConstTask
     public const int TASK_257_18 = 526372;
     public const int TASK_257_19 = 526374;
     public const int TASK_257_20 = 526376;
+
+    // Nhiệm vụ 258
     public const int TASK_258_0 = 528384;
     public const int TASK_258_1 = 528386;
     public const int TASK_258_2 = 528388;
@@ -5501,6 +6089,8 @@ public static class ConstTask
     public const int TASK_258_18 = 528420;
     public const int TASK_258_19 = 528422;
     public const int TASK_258_20 = 528424;
+
+    // Nhiệm vụ 259
     public const int TASK_259_0 = 530432;
     public const int TASK_259_1 = 530434;
     public const int TASK_259_2 = 530436;
@@ -5522,6 +6112,8 @@ public static class ConstTask
     public const int TASK_259_18 = 530468;
     public const int TASK_259_19 = 530470;
     public const int TASK_259_20 = 530472;
+
+    // Nhiệm vụ 260
     public const int TASK_260_0 = 532480;
     public const int TASK_260_1 = 532482;
     public const int TASK_260_2 = 532484;
@@ -5543,6 +6135,8 @@ public static class ConstTask
     public const int TASK_260_18 = 532516;
     public const int TASK_260_19 = 532518;
     public const int TASK_260_20 = 532520;
+
+    // Nhiệm vụ 261
     public const int TASK_261_0 = 534528;
     public const int TASK_261_1 = 534530;
     public const int TASK_261_2 = 534532;
@@ -5564,6 +6158,8 @@ public static class ConstTask
     public const int TASK_261_18 = 534564;
     public const int TASK_261_19 = 534566;
     public const int TASK_261_20 = 534568;
+
+    // Nhiệm vụ 262
     public const int TASK_262_0 = 536576;
     public const int TASK_262_1 = 536578;
     public const int TASK_262_2 = 536580;
@@ -5585,6 +6181,8 @@ public static class ConstTask
     public const int TASK_262_18 = 536612;
     public const int TASK_262_19 = 536614;
     public const int TASK_262_20 = 536616;
+
+    // Nhiệm vụ 263
     public const int TASK_263_0 = 538624;
     public const int TASK_263_1 = 538626;
     public const int TASK_263_2 = 538628;
@@ -5606,6 +6204,8 @@ public static class ConstTask
     public const int TASK_263_18 = 538660;
     public const int TASK_263_19 = 538662;
     public const int TASK_263_20 = 538664;
+
+    // Nhiệm vụ 264
     public const int TASK_264_0 = 540672;
     public const int TASK_264_1 = 540674;
     public const int TASK_264_2 = 540676;
@@ -5627,6 +6227,8 @@ public static class ConstTask
     public const int TASK_264_18 = 540708;
     public const int TASK_264_19 = 540710;
     public const int TASK_264_20 = 540712;
+
+    // Nhiệm vụ 265
     public const int TASK_265_0 = 542720;
     public const int TASK_265_1 = 542722;
     public const int TASK_265_2 = 542724;
@@ -5648,6 +6250,8 @@ public static class ConstTask
     public const int TASK_265_18 = 542756;
     public const int TASK_265_19 = 542758;
     public const int TASK_265_20 = 542760;
+
+    // Nhiệm vụ 266
     public const int TASK_266_0 = 544768;
     public const int TASK_266_1 = 544770;
     public const int TASK_266_2 = 544772;
@@ -5669,6 +6273,8 @@ public static class ConstTask
     public const int TASK_266_18 = 544804;
     public const int TASK_266_19 = 544806;
     public const int TASK_266_20 = 544808;
+
+    // Nhiệm vụ 267
     public const int TASK_267_0 = 546816;
     public const int TASK_267_1 = 546818;
     public const int TASK_267_2 = 546820;
@@ -5690,6 +6296,8 @@ public static class ConstTask
     public const int TASK_267_18 = 546852;
     public const int TASK_267_19 = 546854;
     public const int TASK_267_20 = 546856;
+
+    // Nhiệm vụ 268
     public const int TASK_268_0 = 548864;
     public const int TASK_268_1 = 548866;
     public const int TASK_268_2 = 548868;
@@ -5711,6 +6319,8 @@ public static class ConstTask
     public const int TASK_268_18 = 548900;
     public const int TASK_268_19 = 548902;
     public const int TASK_268_20 = 548904;
+
+    // Nhiệm vụ 269
     public const int TASK_269_0 = 550912;
     public const int TASK_269_1 = 550914;
     public const int TASK_269_2 = 550916;
@@ -5732,6 +6342,8 @@ public static class ConstTask
     public const int TASK_269_18 = 550948;
     public const int TASK_269_19 = 550950;
     public const int TASK_269_20 = 550952;
+
+    // Nhiệm vụ 270
     public const int TASK_270_0 = 552960;
     public const int TASK_270_1 = 552962;
     public const int TASK_270_2 = 552964;
@@ -5753,6 +6365,8 @@ public static class ConstTask
     public const int TASK_270_18 = 552996;
     public const int TASK_270_19 = 552998;
     public const int TASK_270_20 = 553000;
+
+    // Nhiệm vụ 271
     public const int TASK_271_0 = 555008;
     public const int TASK_271_1 = 555010;
     public const int TASK_271_2 = 555012;
@@ -5774,6 +6388,8 @@ public static class ConstTask
     public const int TASK_271_18 = 555044;
     public const int TASK_271_19 = 555046;
     public const int TASK_271_20 = 555048;
+
+    // Nhiệm vụ 272
     public const int TASK_272_0 = 557056;
     public const int TASK_272_1 = 557058;
     public const int TASK_272_2 = 557060;
@@ -5795,6 +6411,8 @@ public static class ConstTask
     public const int TASK_272_18 = 557092;
     public const int TASK_272_19 = 557094;
     public const int TASK_272_20 = 557096;
+
+    // Nhiệm vụ 273
     public const int TASK_273_0 = 559104;
     public const int TASK_273_1 = 559106;
     public const int TASK_273_2 = 559108;
@@ -5816,6 +6434,8 @@ public static class ConstTask
     public const int TASK_273_18 = 559140;
     public const int TASK_273_19 = 559142;
     public const int TASK_273_20 = 559144;
+
+    // Nhiệm vụ 274
     public const int TASK_274_0 = 561152;
     public const int TASK_274_1 = 561154;
     public const int TASK_274_2 = 561156;
@@ -5837,6 +6457,8 @@ public static class ConstTask
     public const int TASK_274_18 = 561188;
     public const int TASK_274_19 = 561190;
     public const int TASK_274_20 = 561192;
+
+    // Nhiệm vụ 275
     public const int TASK_275_0 = 563200;
     public const int TASK_275_1 = 563202;
     public const int TASK_275_2 = 563204;
@@ -5858,6 +6480,8 @@ public static class ConstTask
     public const int TASK_275_18 = 563236;
     public const int TASK_275_19 = 563238;
     public const int TASK_275_20 = 563240;
+
+    // Nhiệm vụ 276
     public const int TASK_276_0 = 565248;
     public const int TASK_276_1 = 565250;
     public const int TASK_276_2 = 565252;
@@ -5879,6 +6503,8 @@ public static class ConstTask
     public const int TASK_276_18 = 565284;
     public const int TASK_276_19 = 565286;
     public const int TASK_276_20 = 565288;
+
+    // Nhiệm vụ 277
     public const int TASK_277_0 = 567296;
     public const int TASK_277_1 = 567298;
     public const int TASK_277_2 = 567300;
@@ -5900,6 +6526,8 @@ public static class ConstTask
     public const int TASK_277_18 = 567332;
     public const int TASK_277_19 = 567334;
     public const int TASK_277_20 = 567336;
+
+    // Nhiệm vụ 278
     public const int TASK_278_0 = 569344;
     public const int TASK_278_1 = 569346;
     public const int TASK_278_2 = 569348;
@@ -5921,6 +6549,8 @@ public static class ConstTask
     public const int TASK_278_18 = 569380;
     public const int TASK_278_19 = 569382;
     public const int TASK_278_20 = 569384;
+
+    // Nhiệm vụ 279
     public const int TASK_279_0 = 571392;
     public const int TASK_279_1 = 571394;
     public const int TASK_279_2 = 571396;
@@ -5942,6 +6572,8 @@ public static class ConstTask
     public const int TASK_279_18 = 571428;
     public const int TASK_279_19 = 571430;
     public const int TASK_279_20 = 571432;
+
+    // Nhiệm vụ 280
     public const int TASK_280_0 = 573440;
     public const int TASK_280_1 = 573442;
     public const int TASK_280_2 = 573444;
@@ -5963,6 +6595,8 @@ public static class ConstTask
     public const int TASK_280_18 = 573476;
     public const int TASK_280_19 = 573478;
     public const int TASK_280_20 = 573480;
+
+    // Nhiệm vụ 281
     public const int TASK_281_0 = 575488;
     public const int TASK_281_1 = 575490;
     public const int TASK_281_2 = 575492;
@@ -5984,6 +6618,8 @@ public static class ConstTask
     public const int TASK_281_18 = 575524;
     public const int TASK_281_19 = 575526;
     public const int TASK_281_20 = 575528;
+
+    // Nhiệm vụ 282
     public const int TASK_282_0 = 577536;
     public const int TASK_282_1 = 577538;
     public const int TASK_282_2 = 577540;
@@ -6005,6 +6641,8 @@ public static class ConstTask
     public const int TASK_282_18 = 577572;
     public const int TASK_282_19 = 577574;
     public const int TASK_282_20 = 577576;
+
+    // Nhiệm vụ 283
     public const int TASK_283_0 = 579584;
     public const int TASK_283_1 = 579586;
     public const int TASK_283_2 = 579588;
@@ -6026,6 +6664,8 @@ public static class ConstTask
     public const int TASK_283_18 = 579620;
     public const int TASK_283_19 = 579622;
     public const int TASK_283_20 = 579624;
+
+    // Nhiệm vụ 284
     public const int TASK_284_0 = 581632;
     public const int TASK_284_1 = 581634;
     public const int TASK_284_2 = 581636;
@@ -6047,6 +6687,8 @@ public static class ConstTask
     public const int TASK_284_18 = 581668;
     public const int TASK_284_19 = 581670;
     public const int TASK_284_20 = 581672;
+
+    // Nhiệm vụ 285
     public const int TASK_285_0 = 583680;
     public const int TASK_285_1 = 583682;
     public const int TASK_285_2 = 583684;
@@ -6068,6 +6710,8 @@ public static class ConstTask
     public const int TASK_285_18 = 583716;
     public const int TASK_285_19 = 583718;
     public const int TASK_285_20 = 583720;
+
+    // Nhiệm vụ 286
     public const int TASK_286_0 = 585728;
     public const int TASK_286_1 = 585730;
     public const int TASK_286_2 = 585732;
@@ -6089,6 +6733,8 @@ public static class ConstTask
     public const int TASK_286_18 = 585764;
     public const int TASK_286_19 = 585766;
     public const int TASK_286_20 = 585768;
+
+    // Nhiệm vụ 287
     public const int TASK_287_0 = 587776;
     public const int TASK_287_1 = 587778;
     public const int TASK_287_2 = 587780;
@@ -6110,6 +6756,8 @@ public static class ConstTask
     public const int TASK_287_18 = 587812;
     public const int TASK_287_19 = 587814;
     public const int TASK_287_20 = 587816;
+
+    // Nhiệm vụ 288
     public const int TASK_288_0 = 589824;
     public const int TASK_288_1 = 589826;
     public const int TASK_288_2 = 589828;
@@ -6131,6 +6779,8 @@ public static class ConstTask
     public const int TASK_288_18 = 589860;
     public const int TASK_288_19 = 589862;
     public const int TASK_288_20 = 589864;
+
+    // Nhiệm vụ 289
     public const int TASK_289_0 = 591872;
     public const int TASK_289_1 = 591874;
     public const int TASK_289_2 = 591876;
@@ -6152,6 +6802,8 @@ public static class ConstTask
     public const int TASK_289_18 = 591908;
     public const int TASK_289_19 = 591910;
     public const int TASK_289_20 = 591912;
+
+    // Nhiệm vụ 290
     public const int TASK_290_0 = 593920;
     public const int TASK_290_1 = 593922;
     public const int TASK_290_2 = 593924;
@@ -6173,6 +6825,8 @@ public static class ConstTask
     public const int TASK_290_18 = 593956;
     public const int TASK_290_19 = 593958;
     public const int TASK_290_20 = 593960;
+
+    // Nhiệm vụ 291
     public const int TASK_291_0 = 595968;
     public const int TASK_291_1 = 595970;
     public const int TASK_291_2 = 595972;
@@ -6194,6 +6848,8 @@ public static class ConstTask
     public const int TASK_291_18 = 596004;
     public const int TASK_291_19 = 596006;
     public const int TASK_291_20 = 596008;
+
+    // Nhiệm vụ 292
     public const int TASK_292_0 = 598016;
     public const int TASK_292_1 = 598018;
     public const int TASK_292_2 = 598020;
@@ -6215,6 +6871,8 @@ public static class ConstTask
     public const int TASK_292_18 = 598052;
     public const int TASK_292_19 = 598054;
     public const int TASK_292_20 = 598056;
+
+    // Nhiệm vụ 293
     public const int TASK_293_0 = 600064;
     public const int TASK_293_1 = 600066;
     public const int TASK_293_2 = 600068;
@@ -6236,6 +6894,8 @@ public static class ConstTask
     public const int TASK_293_18 = 600100;
     public const int TASK_293_19 = 600102;
     public const int TASK_293_20 = 600104;
+
+    // Nhiệm vụ 294
     public const int TASK_294_0 = 602112;
     public const int TASK_294_1 = 602114;
     public const int TASK_294_2 = 602116;
@@ -6257,6 +6917,8 @@ public static class ConstTask
     public const int TASK_294_18 = 602148;
     public const int TASK_294_19 = 602150;
     public const int TASK_294_20 = 602152;
+
+    // Nhiệm vụ 295
     public const int TASK_295_0 = 604160;
     public const int TASK_295_1 = 604162;
     public const int TASK_295_2 = 604164;
@@ -6278,6 +6940,8 @@ public static class ConstTask
     public const int TASK_295_18 = 604196;
     public const int TASK_295_19 = 604198;
     public const int TASK_295_20 = 604200;
+
+    // Nhiệm vụ 296
     public const int TASK_296_0 = 606208;
     public const int TASK_296_1 = 606210;
     public const int TASK_296_2 = 606212;
@@ -6299,6 +6963,8 @@ public static class ConstTask
     public const int TASK_296_18 = 606244;
     public const int TASK_296_19 = 606246;
     public const int TASK_296_20 = 606248;
+
+    // Nhiệm vụ 297
     public const int TASK_297_0 = 608256;
     public const int TASK_297_1 = 608258;
     public const int TASK_297_2 = 608260;
@@ -6320,6 +6986,8 @@ public static class ConstTask
     public const int TASK_297_18 = 608292;
     public const int TASK_297_19 = 608294;
     public const int TASK_297_20 = 608296;
+
+    // Nhiệm vụ 298
     public const int TASK_298_0 = 610304;
     public const int TASK_298_1 = 610306;
     public const int TASK_298_2 = 610308;
@@ -6341,6 +7009,8 @@ public static class ConstTask
     public const int TASK_298_18 = 610340;
     public const int TASK_298_19 = 610342;
     public const int TASK_298_20 = 610344;
+
+    // Nhiệm vụ 299
     public const int TASK_299_0 = 612352;
     public const int TASK_299_1 = 612354;
     public const int TASK_299_2 = 612356;

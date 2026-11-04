@@ -1,0 +1,18 @@
+package nro.power;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class PowerLimitManager {
+
+    private static final PowerLimitManager instance = new PowerLimitManager();
+    public final Map<Integer, PowerLimit> table = new HashMap<>();
+
+    public static PowerLimitManager getInstance() {
+        return instance;
+    }
+
+    public PowerLimit get(int index) {
+        return table.get(index);
+    }
+}

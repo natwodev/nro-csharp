@@ -1,0 +1,6 @@
+package nro.player;
+
+public class Fusion {
+
+    public byte typeFusion;
+}

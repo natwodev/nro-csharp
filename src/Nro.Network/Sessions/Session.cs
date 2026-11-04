@@ -4,29 +4,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nro.Core.IO;
 using Nro.Network.Framing;
-using Nro.Network.Handshake;
-using Nro.Network.Interfaces;
+using Nro.Network.Protocol;
 
 namespace Nro.Network.Sessions;
 
-/// <summary>
-/// One client connection on the server side. Port of <c>network/session/Session.java</c> together with <c>Sender</c>, <c>Collector</c> and
-/// <c>QueueHandler</c>: where Java used three threads per connection polling every 33 ms, this class runs three asynchronous loops over
-/// <see cref="Channel{T}"/> queues.
-/// <list type="bullet">
-/// <item><description><b>Read loop</b> (Collector): reads packets with <see cref="FrameReader"/>. The hello (<c>-27</c>) is answered right here with the key
-/// packet, and the cipher is switched on before the next packet is read (deterministic, like Java); every other packet goes to the inbound queue.</description></item>
-/// <item><description><b>Dispatch loop</b> (QueueHandler): hands inbound packets to the <see cref="IMessageHandler"/> one at a time, in arrival order.</description></item>
-/// <item><description><b>Write loop</b> (Sender): writes the queued packets. Like the Java Sender, which <c>sendKey</c> starts, it writes nothing before the key
-/// packet has gone out; packets queued earlier then leave encrypted, in order.</description></item>
-/// </list>
-/// Rules kept from Java: inbound packets beyond <see cref="SessionOptions.InboundQueueLimit"/> (500) are dropped; order is preserved in both directions; the
-/// accept handler hears about the end of every session exactly once. Deliberate differences: a handler exception no longer kills delivery for the rest
-/// of the session; the outbound queue is bounded and a session that falls that far behind is disconnected; a packet too large for its size field is skipped with
-/// a warning instead of corrupting the stream; a connection that never sends the hello is closed after <see cref="SessionOptions.HandshakeTimeout"/> and, when
-/// configured, one that sends nothing for <see cref="SessionOptions.IdleTimeout"/> (Java has neither). A second hello disconnects the session, as in Java
-/// (its second <c>startSend()</c> threw and ended the Collector thread).
-/// </summary>
+// Đại diện một kết nối client phía server với ba vòng đọc, phân phối và ghi bất đồng bộ qua Channel.
+// Nguồn Java: network/session/Session.java, network/Sender.java, network/Collector.java, network/QueueHandler.java (thay ba thread polling 33 ms bằng ba vòng async).
+// Vòng đọc trả lời hello -27 bằng gói khóa XOR ngay tại chỗ rồi bật mã hóa trước khung kế tiếp; vòng phân phối giữ thứ tự đến; vòng ghi chờ gói khóa và giữ thứ tự gói đã xếp hàng.
+// Giữ Java: bỏ gói nhận khi quá 500, giữ thứ tự hai chiều và chỉ báo kết thúc phiên một lần. Khác Java: lỗi handler không dừng phân phối, hàng gửi có giới hạn và chậm đọc bị ngắt,
+// gói quá kích thước bị bỏ kèm cảnh báo, có timeout bắt tay/nhàn rỗi; hello lần hai ngắt phiên như Java vì startSend lần hai làm Collector kết thúc.
 public sealed class Session : ISession
 {
     private readonly record struct Outbound(sbyte Command, byte[] Payload);
@@ -48,6 +34,7 @@ public sealed class Session : ISession
     private int _helloSeen;
     private long _droppedInbound;
 
+    // Tạo phiên với mã, IP, stream, handler và các xử lý vòng đời/cấu hình/logger tùy chọn.
     public Session(
         long id,
         string ipAddress,
@@ -93,21 +80,22 @@ public sealed class Session : ISession
         });
     }
 
+    // Mã định danh phiên.
     public long Id { get; }
 
+    // Địa chỉ IP của client.
     public string IpAddress { get; }
 
+    // Cho biết phiên chưa bị đóng.
     public bool IsConnected => Volatile.Read(ref _closed) == 0;
 
-    /// <summary>How many inbound packets were dropped because the handler was more than <see cref="SessionOptions.InboundQueueLimit"/> packets behind.</summary>
+    // Số gói nhận bị bỏ vì handler chậm quá InboundQueueLimit gói.
     public long DroppedInboundCount => Interlocked.Read(ref _droppedInbound);
 
-    /// <summary>
-    /// Starts the session and returns a task that completes when it has fully ended (all loops stopped, the stream closed and
-    /// <see cref="ISessionAcceptHandler.SessionDisconnect"/> called). Calling it again returns the same task.
-    /// </summary>
+    // Khởi chạy phiên và trả task hoàn tất khi mọi vòng dừng, stream đóng và đã gọi SessionDisconnect; gọi lại trả cùng task.
     public Task RunAsync() => _run.Value;
 
+    // Xếp Message để gửi; trả false khi đã đóng hoặc gói không hợp lệ/không còn ở chế độ ghi.
     public bool Send(Message message)
     {
         ArgumentNullException.ThrowIfNull(message);
@@ -123,7 +111,7 @@ public sealed class Session : ISession
         }
         catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException)
         {
-            // Java failed inside the Sender and swallowed it; one bad packet must not abort a broadcast loop in the caller.
+            // Java lỗi trong Sender rồi nuốt lỗi; một gói lỗi không được làm dừng vòng broadcast của bên gọi.
             _logger.LogWarning(ex, "Session {Id}: command {Command} cannot be sent (the message is not in write mode or was disposed)", Id, message.Command);
             return false;
         }
@@ -131,6 +119,7 @@ public sealed class Session : ISession
         return Enqueue(new Outbound(message.Command, data));
     }
 
+    // Đóng phiên một lần, hủy các vòng, hoàn tất hàng đợi và giải phóng stream.
     public void Disconnect()
     {
         if (Interlocked.Exchange(ref _closed, 1) != 0)
@@ -169,7 +158,7 @@ public sealed class Session : ISession
 
     private async Task RunCoreAsync()
     {
-        // SessionInit would otherwise run on the caller's thread (the accept loop): a slow handler must not hold up accepting.
+        // Nếu không SessionInit chạy trên thread bên gọi (vòng accept); handler chậm không được chặn việc nhận kết nối.
         await Task.Yield();
         try
         {
@@ -206,8 +195,8 @@ public sealed class Session : ISession
         {
             while (!ct.IsCancellationRequested)
             {
-                // Deadline for the hello first, then the idle deadline (none by default) for every packet.
-                // The handshake deadline is ONE absolute time from the start of the session: junk frames before the hello do not extend it.
+                // Trước hello dùng hạn bắt tay, sau đó dùng hạn nhàn rỗi mặc định không giới hạn cho từng gói.
+                // Hạn bắt tay là một mốc tuyệt đối từ khi bắt đầu phiên: khung rác trước hello không gia hạn.
                 TimeSpan? deadline = Volatile.Read(ref _helloSeen) == 0
                     ? _options.HandshakeTimeout - Stopwatch.GetElapsedTime(startedAt)
                     : _options.IdleTimeout;
@@ -249,7 +238,7 @@ public sealed class Session : ISession
                         break;
                     }
 
-                    // Written here, not by the write loop, so the cipher is on before the next frame is read.
+                    // Ghi ngay tại đây thay vì vòng ghi để mã XOR hoạt động trước khi đọc khung kế tiếp.
                     byte[] wire = KeyPacket.CreateServerFrame(_cipher);
                     await _stream.WriteAsync(wire, ct).ConfigureAwait(false);
                     await _stream.FlushAsync(ct).ConfigureAwait(false);

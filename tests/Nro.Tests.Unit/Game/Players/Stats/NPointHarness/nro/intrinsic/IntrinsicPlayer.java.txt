@@ -1,0 +1,6 @@
+package nro.intrinsic;
+
+public class IntrinsicPlayer {
+
+    public Intrinsic intrinsic = new Intrinsic();
+}

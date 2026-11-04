@@ -1,0 +1,275 @@
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+public class InventoryServiceGenerator {
+
+    // ---------------------------------------------------------------- the verbatim code
+    static class InvLogic {
+        static Player player = null; // Java: "import static nro.server.Manager.player" - a static field nobody assigns
+
+@METHODS@
+    }
+
+    // ---------------------------------------------------------------- scenario helpers
+    static final int[] UNIVERSE = {1, 2, 3, 4, 5, 6, 7, 8, 457, 1705};
+    static final int[] QUANTITIES = {1, 2, 5, 9990, 9998, 9999, 10000, 50000, 99_990, 99_999_999, 100_000, 100_000_000, 2_000_000_000};
+    static final int[] OPTION_IDS = {1, 4, 30, 31, 73, 93, 127, 128, 139, 140, 241, 242, 243, 244};
+    static final int[] PARAMS = {0, 1, 5, 100, 29_999, 30_000, -3};
+
+    static Random rnd;
+
+    static ItemTemplate template(int id) {
+        ItemTemplate t = new ItemTemplate();
+        t.id = (short) id;
+        t.type = 99;
+        t.name = "item" + id;
+        t.strRequire = id * 10;
+        t.isUpToUp = (id >= 1 && id <= 4) || id == 1705;
+        return t;
+    }
+
+    static Item item(int id, int quantity, int[][] options) {
+        Item it = new Item();
+        it.template = template(id);
+        it.quantity = quantity;
+        for (int[] o : options) it.itemOptions.add(new ItemOption(o[0], o[1]));
+        return it;
+    }
+
+    static Item randomItem(boolean allowEmpty) {
+        if (allowEmpty && rnd.nextInt(3) == 0) return new Item();
+        int id = UNIVERSE[rnd.nextInt(UNIVERSE.length)];
+        int q = QUANTITIES[rnd.nextInt(QUANTITIES.length)];
+        int n = rnd.nextInt(4) == 0 ? 0 : 1 + rnd.nextInt(2);
+        int[][] opts = new int[n][];
+        for (int i = 0; i < n; i++) opts[i] = new int[]{OPTION_IDS[rnd.nextInt(OPTION_IDS.length)], PARAMS[rnd.nextInt(PARAMS.length)]};
+        return item(id, q, opts);
+    }
+
+    static List<Item> randomList(int size, boolean allowEmpty) {
+        List<Item> l = new ArrayList<>();
+        for (int i = 0; i < size; i++) l.add(randomItem(allowEmpty));
+        return l;
+    }
+
+    static String js(Item it) {
+        if (it == null) return "null";
+        if (!it.isNotNullItem()) return "0";
+        StringBuilder sb = new StringBuilder("[").append(it.template.id).append(',').append(it.quantity).append(",[");
+        for (int i = 0; i < it.itemOptions.size(); i++) {
+            ItemOption o = it.itemOptions.get(i);
+            sb.append(i > 0 ? "," : "").append('[').append(o.optionTemplate.id).append(',').append(o.param).append(']');
+        }
+        return sb.append("]]").toString();
+    }
+
+    static String js(List<Item> l) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < l.size(); i++) sb.append(i > 0 ? "," : "").append(js(l.get(i)));
+        return sb.append("]").toString();
+    }
+
+    static String hex(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (byte x : b) sb.append(String.format("%02x", x));
+        return sb.toString();
+    }
+
+    static Player player(int body, int bag, int box) {
+        Player p = new Player();
+        p.inventory = new Inventory();
+        for (int i = 0; i < body; i++) p.inventory.itemsBody.add(new Item());
+        for (int i = 0; i < bag; i++) p.inventory.itemsBag.add(new Item());
+        for (int i = 0; i < box; i++) p.inventory.itemsBox.add(new Item());
+        return p;
+    }
+
+    static final int[] SET_MARKERS = {127, 128, 129, 130, 131, 132, 133, 134, 135, 233, 250, 251, 252, 263, 265, 267};
+    static final int[] SET_BONUS = {139, 140, 141, 142, 143, 144, 136, 137, 138, 234, 253, 254, 255, 264, 266, 268};
+
+    static Item setItem(int idx, int marker, int[] bonuses, int bonusParam) {
+        List<int[]> o = new ArrayList<>();
+        if (marker >= 0) o.add(new int[]{marker, 1});
+        for (int b : bonuses) o.add(new int[]{b, bonusParam});
+        return item(10 + idx, 1, o.toArray(new int[0][]));
+    }
+
+    public static void main(String[] args) throws Exception {
+        StringBuilder out = new StringBuilder();
+        out.append("{\n  \"source\": \"nro/inventory/InventoryService.java (method bodies extracted verbatim)\",\n  \"sha256\": \"").append(args.length > 1 ? args[1] : "").append("\",\n");
+
+        // ---- addItemList ----
+        out.append("  \"addItemList\": [\n");
+        rnd = new Random(20261103L);
+        int n = 900;
+        for (int i = 0; i < n; i++) {
+            List<Item> list = randomList(1 + rnd.nextInt(6), true);
+            Item add = randomItem(false);
+            if (rnd.nextInt(3) == 0 && !list.isEmpty()) { // same template as a slot, to exercise stacking
+                Item mate = list.get(rnd.nextInt(list.size()));
+                if (mate.isNotNullItem()) add = item(mate.template.id, QUANTITIES[rnd.nextInt(QUANTITIES.length)], new int[0][]);
+            }
+            String before = js(list), addBefore = js(add);
+            InvLogic.player = null;
+            Service.notices.clear();
+            boolean result = new InvLogic().addItemList(list, add);
+            out.append("    {\"before\":").append(before).append(",\"add\":").append(addBefore).append(",\"result\":").append(result)
+               .append(",\"after\":").append(js(list)).append(",\"addAfter\":").append(js(add)).append(",\"notices\":").append(Service.notices.size()).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- sortItems / sortItemv2 / getCountEmptyListItem ----
+        out.append("  \"sort\": [\n");
+        rnd = new Random(77L);
+        n = 300;
+        for (int i = 0; i < n; i++) {
+            int size = rnd.nextInt(14);
+            List<Item> list = new ArrayList<>();
+            for (int j = 0; j < size; j++) list.add(rnd.nextInt(2) == 0 ? new Item() : item(100 + j, 1 + rnd.nextInt(3) - (rnd.nextInt(5) == 0 ? 2 : 0), new int[0][]));
+            List<Item> copy = new ArrayList<>(list);
+            List<Item> v2 = new ArrayList<>(list);
+            String before = js(list);
+            new InvLogic().sortItems(list);
+            new InvLogic().sortItemv2(v2);
+            out.append("    {\"before\":").append(before).append(",\"sorted\":").append(js(list)).append(",\"v2\":").append(js(v2))
+               .append(",\"empties\":").append(new InvLogic().getCountEmptyListItem(copy)).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+        out.append("  \"emptyCounts\": [");
+        int[] sizes = {0, 1, 100, 127, 128, 129, 200, 255, 256, 257};
+        for (int i = 0; i < sizes.length; i++) {
+            List<Item> l = new ArrayList<>();
+            for (int j = 0; j < sizes[i]; j++) l.add(new Item());
+            out.append(i > 0 ? "," : "").append("[").append(sizes[i]).append(',').append(new InvLogic().getCountEmptyListItem(l)).append("]");
+        }
+        out.append("],\n");
+
+        // ---- removeItem(list, item) / subQuantityItem ----
+        out.append("  \"remove\": [\n");
+        rnd = new Random(99L);
+        n = 300;
+        for (int i = 0; i < n; i++) {
+            List<Item> list = randomList(1 + rnd.nextInt(6), true);
+            int pick = rnd.nextInt(list.size() + 2); // size = a lookalike that is not in the list, size+1 = null
+            Item target = pick < list.size() ? list.get(pick) : pick == list.size() ? item(1, 1, new int[0][]) : null;
+            int[] qs = {1, 2, 5, 100, -3, 2_000_000_000, Integer.MIN_VALUE};
+            int q = qs[rnd.nextInt(qs.length)];
+            boolean sub = rnd.nextBoolean();
+            String before = js(list);
+            if (sub) new InvLogic().subQuantityItem(list, target, q); else new InvLogic().removeItem(list, target);
+            out.append("    {\"op\":\"").append(sub ? "sub" : "remove").append("\",\"before\":").append(before).append(",\"pick\":").append(pick).append(",\"quantity\":").append(q)
+               .append(",\"after\":").append(js(list)).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- set bonuses ----
+        out.append("  \"sets\": [\n");
+        rnd = new Random(4242L);
+        n = 500;
+        for (int i = 0; i < n; i++) {
+            int kind = rnd.nextInt(4);
+            Player p = player(12, 6, 6);
+            Player other = player(12, 6, 6);
+            int setIdx = rnd.nextInt(SET_MARKERS.length);
+            int pieces = rnd.nextInt(8);
+            boolean isNew = kind >= 2;
+            int[] newGroup = {241, 244};
+            int[] applyIds = rnd.nextBoolean() ? new int[]{242, 243, 244} : new int[]{238, 239, 240};
+            for (int s = 0; s < pieces && s < 12; s++) {
+                int marker = isNew ? 241 + rnd.nextInt(4) : (rnd.nextInt(5) == 0 ? -1 : SET_MARKERS[setIdx]);
+                int[] bonuses = isNew ? applyIds : new int[]{SET_BONUS[setIdx]};
+                if (rnd.nextInt(4) == 0) marker = -1;
+                p.inventory.itemsBody.set(s, setItem(s, marker, bonuses, rnd.nextInt(2)));
+            }
+            for (int s = 0; s < 3; s++) {
+                int[] bonuses = isNew ? applyIds : new int[]{SET_BONUS[setIdx]};
+                p.inventory.itemsBag.set(s, setItem(20 + s, -1, bonuses, 1));
+                other.inventory.itemsBag.set(s, setItem(30 + s, -1, bonuses, 1));
+                other.inventory.itemsBox.set(s, setItem(40 + s, -1, bonuses, 1));
+                p.inventory.itemsBox.set(s, setItem(50 + s, -1, bonuses, 1));
+                other.inventory.itemsBody.set(s, setItem(60 + s, -1, bonuses, 1));
+            }
+            boolean usePl = rnd.nextBoolean(), usePlbox = rnd.nextBoolean();
+            String[] names = {"updateSet", "resetSet", "updateSetNew", "resetSetNew"};
+            String sb = js(p.inventory.itemsBody) + "," + js(p.inventory.itemsBag) + "," + js(p.inventory.itemsBox) + "," + js(other.inventory.itemsBody) + "," + js(other.inventory.itemsBag) + "," + js(other.inventory.itemsBox);
+            InvLogic l = new InvLogic();
+            switch (kind) {
+                case 0: l.updateSet(p, SET_MARKERS[setIdx], SET_BONUS[setIdx]); break;
+                case 1: l.resetSet(p, usePl ? other : null, usePlbox ? other : null, SET_MARKERS[setIdx], SET_BONUS[setIdx]); break;
+                case 2: l.updateSetNew(p, newGroup[0], newGroup[1], applyIds); break;
+                default: l.resetSetNew(p, usePl ? other : null, usePlbox ? other : null, newGroup[0], newGroup[1], applyIds); break;
+            }
+            out.append("    {\"op\":\"").append(names[kind]).append("\",\"setOptionId\":").append(SET_MARKERS[setIdx]).append(",\"applyId\":").append(SET_BONUS[setIdx])
+               .append(",\"applyIds\":[").append(applyIds[0]).append(',').append(applyIds[1]).append(',').append(applyIds[2]).append("],\"usePl\":").append(usePl).append(",\"usePlbox\":").append(usePlbox)
+               .append(",\"before\":[").append(sb).append("],\"after\":[")
+               .append(js(p.inventory.itemsBody)).append(',').append(js(p.inventory.itemsBag)).append(',').append(js(p.inventory.itemsBox)).append(',')
+               .append(js(other.inventory.itemsBody)).append(',').append(js(other.inventory.itemsBag)).append(',').append(js(other.inventory.itemsBox)).append("]}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- collection box tiers ----
+        out.append("  \"tiers\": [");
+        for (int c = 0; c <= 135; c++) {
+            Player p = player(0, 0, 0);
+            for (int j = 0; j < 140; j++) p.inventory.itemsBoxCollection.add(j < c ? item(100 + j, 1, new int[0][]) : new Item());
+            InvLogic l = new InvLogic();
+            out.append(c > 0 ? "," : "").append('[').append(c).append(',').append(l.HpItemsInBoxCollection(p)).append(',').append(l.MpItemsInBoxCollection(p))
+               .append(',').append(l.DamageItemsInBoxCollection(p)).append(',').append(l.CritItemsInBoxCollection(p)).append(']');
+        }
+        out.append("],\n");
+
+        // ---- random option rolls (items with option 210 / 231) ----
+        out.append("  \"rolls\": [\n");
+        n = 400;
+        for (int i = 0; i < n; i++) {
+            long seed = 1000 + i;
+            Util.rand = new Random(seed);
+            boolean hsd = i % 3 == 0;
+            int count = hsd ? 1 : 1 + (i % 25);
+            Item it = item(5, 1, hsd ? new int[][]{{231, 1}, {4, 9}} : new int[][]{{210, count}, {4, 9}, {30, 0}});
+            String before = js(it);
+            if (hsd) new InvLogic().removeAndAddOptionTemplateHSD(it); else new InvLogic().removeAndAddOptionTemplate(it);
+            out.append("    {\"seed\":").append(seed).append(",\"kind\":\"").append(hsd ? "231" : "210").append("\",\"before\":").append(before).append(",\"after\":").append(js(it))
+               .append(",\"next\":").append(Util.rand.nextInt()).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ],\n");
+
+        // ---- packets ----
+        out.append("  \"packets\": [\n");
+        rnd = new Random(5150L);
+        n = 150;
+        for (int i = 0; i < n; i++) {
+            Player p = player(0, 0, 0);
+            int bagSize = rnd.nextInt(12);
+            for (int j = 0; j < bagSize; j++) p.inventory.itemsBag.add(rnd.nextInt(3) == 0 ? new Item() : randomItem(false));
+            for (int j = 0; j < 12; j++) p.inventory.itemsBody.add(rnd.nextInt(2) == 0 ? new Item() : randomItem(false));
+            int boxSize = rnd.nextInt(8);
+            for (int j = 0; j < boxSize; j++) p.inventory.itemsBox.add(rnd.nextInt(3) == 0 ? new Item() : randomItem(false));
+            String bagBefore = js(p.inventory.itemsBag), body = js(p.inventory.itemsBody), box = js(p.inventory.itemsBox);
+            InvLogic l = new InvLogic();
+            Player.sent.clear();
+            l.sendItemBag(p);
+            String bagHex = hex(Player.sent.get(0));
+            String bagAfter = js(p.inventory.itemsBag);
+            Player.sent.clear();
+            l.sendItemBody(p);
+            String bodyHex = hex(Player.sent.get(0));
+            Player.sent.clear();
+            l.sendItemBox(p);
+            out.append("    {\"bag\":").append(bagBefore).append(",\"body\":").append(body).append(",\"box\":").append(box)
+               .append(",\"bagAfter\":").append(bagAfter).append(",\"bagHex\":\"").append(bagHex).append("\",\"bodyHex\":\"").append(bodyHex)
+               .append("\",\"boxHex\":\"").append(hex(Player.sent.get(0))).append("\",\"openHex\":\"").append(hex(Player.sent.get(1))).append("\",\"head\":").append(Player.HEAD).append("}");
+            out.append(i + 1 < n ? ",\n" : "\n");
+        }
+        out.append("  ]\n}\n");
+
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(args[0]), StandardCharsets.UTF_8)) { w.write(out.toString()); }
+    }
+}

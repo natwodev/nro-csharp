@@ -1,0 +1,14 @@
+package nro.inventory;
+
+import java.util.ArrayList;
+import java.util.List;
+import models.Item.Item;
+
+public class Inventory {
+
+    public List<Item> itemsBody = new ArrayList<>();
+    public List<Item> itemsBag = new ArrayList<>();
+    public Item trainArmor;
+    public boolean rongNhi;
+    public int hpBox, mpBox, dameBox, critBox;
+}

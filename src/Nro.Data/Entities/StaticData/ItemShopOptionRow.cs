@@ -1,7 +1,10 @@
+using Nro.Data.Entities.StaticData;
+using Nro.Data.Entities.Runtime;
+using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nro.Data.Entities;
+namespace Nro.Data.Entities.StaticData;
 
 // Entity đại diện cho chỉ số của vật phẩm trong cửa hàng trong hệ thống
 // Bảng cơ sở dữ liệu: item_shop_option (sinh tự động, không sửa tay)

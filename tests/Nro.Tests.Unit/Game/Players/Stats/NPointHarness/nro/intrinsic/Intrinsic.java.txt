@@ -1,0 +1,7 @@
+package nro.intrinsic;
+
+public class Intrinsic {
+
+    public int id;
+    public short param1;
+}

@@ -2,22 +2,13 @@ using System.Text;
 
 namespace Nro.Network.Framing;
 
-/// <summary>
-/// The per-connection cipher state: the session key, the "key sent" flag and the two independent key pointers.
-/// Port of the state spread over <c>Session</c> (<c>KEYS</c>, <c>sentKey</c>) and <c>MessageSendCollect</c> (<c>curR</c>, <c>curW</c>).
-/// <para>
-/// The cipher is a repeating-key XOR stream: every byte that goes through <see cref="WriteKey"/> or <see cref="ReadKey"/> is XORed
-/// with the next key byte, and that direction's pointer advances, wrapping at the key length. The read and write directions have
-/// SEPARATE pointers, so the same key is used from position 0 in each direction.
-/// </para>
-/// <para>
-/// Threading: like the Java original, one reader may use the read side while one writer uses the write side at the same time
-/// (each side touches only its own pointer). Two concurrent writers, or two concurrent readers, are not supported.
-/// </para>
-/// </summary>
+// Trạng thái XOR lặp theo từng kết nối, gồm khóa, cờ đã gửi khóa và hai vị trí khóa.
+// Nguồn Java: network/session/Session.java và network/io/MessageSendCollect.java (mỗi byte XOR với byte khóa kế tiếp; vị trí đọc và ghi tách biệt, cùng bắt đầu từ 0; một luồng đọc và một luồng ghi có thể đồng thời, nhưng không hỗ trợ hai luồng cùng đọc hoặc cùng ghi).
+
 public sealed class WireCipher
 {
-    /// <summary>The key text hard-coded in <c>Session.java:59</c>; the key every connection starts with.</summary>
+
+    // Văn bản khóa mặc định của giao thức Java, giữ nguyên trong mã nguồn.
     public const string DefaultKeyText = "NguyenDucVuEntertainment";
 
     private byte[] _key;
@@ -25,37 +16,32 @@ public sealed class WireCipher
     private int _writePosition;
     private volatile bool _keySent;
 
+    // Tạo trạng thái XOR từ bản sao khóa không rỗng.
     public WireCipher(ReadOnlySpan<byte> key)
     {
         _key = CheckedCopy(key);
     }
 
-    /// <summary>A cipher with the protocol's default session key (<see cref="DefaultKeyText"/>).</summary>
+    // Tạo trạng thái XOR với khóa mặc định của giao thức.
     public static WireCipher CreateDefault() => new(Encoding.ASCII.GetBytes(DefaultKeyText));
 
-    /// <summary>The current key bytes (a view, do not modify).</summary>
+    // Các byte khóa hiện tại dưới dạng view chỉ đọc.
     public ReadOnlySpan<byte> Key => _key;
 
-    /// <summary>
-    /// Java <c>session.sentKey()</c>. While false, ordinary packets travel in clear text. It becomes true right after the key packet
-    /// (<c>-27</c>) is produced, and from then on every packet is encrypted.
-    /// </summary>
+    // Cho biết gói khóa -27 đã gửi; gói thường chỉ XOR sau thời điểm này.
     public bool KeySent
     {
         get => _keySent;
         set => _keySent = value;
     }
 
-    /// <summary>The next key index the reader will use.</summary>
+    // Chỉ số khóa kế tiếp dùng cho chiều đọc.
     public int ReadPosition => _readPosition;
 
-    /// <summary>The next key index the writer will use.</summary>
+    // Chỉ số khóa kế tiếp dùng cho chiều ghi.
     public int WritePosition => _writePosition;
 
-    /// <summary>
-    /// Replaces the key and restarts both pointers at 0. Used by a client that has just received the key packet
-    /// (in Java <c>KeyHandler.setKey</c>; the pointers were still 0 at that moment).
-    /// </summary>
+    // Thay khóa và đặt lại cả hai vị trí về 0 sau khi client nhận gói khóa.
     public void SetKey(ReadOnlySpan<byte> key)
     {
         _key = CheckedCopy(key);
@@ -63,7 +49,6 @@ public sealed class WireCipher
         _writePosition = 0;
     }
 
-    /// <summary>Test hook: places both pointers (the golden vectors start entries at arbitrary positions).</summary>
     internal void SetPositions(int readPosition, int writePosition)
     {
         if ((uint)readPosition >= (uint)_key.Length || (uint)writePosition >= (uint)_key.Length)
@@ -75,7 +60,7 @@ public sealed class WireCipher
         _writePosition = writePosition;
     }
 
-    /// <summary>Java <c>readKey</c>: XORs <paramref name="b"/> with the next read-side key byte and advances the read pointer.</summary>
+    // XOR byte với khóa đọc kế tiếp rồi làm tiến vị trí đọc (Java: readKey).
     public byte ReadKey(byte b)
     {
         byte result = (byte)(_key[_readPosition++] ^ b);
@@ -87,7 +72,7 @@ public sealed class WireCipher
         return result;
     }
 
-    /// <summary>Java <c>writeKey</c>: XORs <paramref name="b"/> with the next write-side key byte and advances the write pointer.</summary>
+    // XOR byte với khóa ghi kế tiếp rồi làm tiến vị trí ghi (Java: writeKey).
     public byte WriteKey(byte b)
     {
         byte result = (byte)(_key[_writePosition++] ^ b);

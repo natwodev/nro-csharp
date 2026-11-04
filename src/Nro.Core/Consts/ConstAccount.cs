@@ -1,15 +1,21 @@
 namespace Nro.Core.Consts;
 
-/// <summary>
-/// Port of <c>consts/ConstAccount.java</c>: class and constant names are preserved; values were machine-translated from Java
-/// (port-csharp/tools/consts/gen_consts_cs.py), not copied by hand.
-/// Automatically verified against the real values read from the compiled Java class: <c>ConstsParityTests</c> (tests/golden/consts.json).
-/// </summary>
+// Hằng số mã trạng thái tài khoản khi đăng nhập
+// Nguồn Java: consts/ConstAccount.java (tên đổi sang tiếng Anh, tên Java gốc ghi cuối chú thích nếu khác; giá trị đối chiếu bằng ConstsParityTests)
 public static class ConstAccount
 {
-    public const sbyte DEFAUT = -1;
+    // Mặc định, chưa xác định trạng thái (Java: DEFAUT)
+    public const sbyte DEFAULT = -1;
+
+    // Tài khoản đang ở trong game
     public const sbyte IS_INGAME = 0;
+
+    // Được phép đăng nhập
     public const sbyte CAN_LOGIN = 1;
+
+    // Sai tên tài khoản hoặc mật khẩu
     public const sbyte WRONG_ACCOUNT = 2;
+
+    // Tài khoản đang bị khóa
     public const sbyte IS_BAN = 3;
 }

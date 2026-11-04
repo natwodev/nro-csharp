@@ -1,13 +1,13 @@
 namespace Nro.Core.Templates;
 
-/// <summary>
-/// Port of <c>nro/template/TileSetInfoData.java</c>. Java has only one two-parameter constructor (no default constructor)
-/// and keeps the <c>data</c> array reference passed in as is (no copy).
-/// </summary>
+// Lưu loại và dữ liệu số nguyên của một mục trong bộ ô bản đồ.
+// Nguồn Java: nro/template/TileSetInfoData.java (giữ nguyên tham chiếu mảng data được truyền vào, không sao chép; Java chỉ có hàm tạo hai tham số).
 public class TileSetInfoData
 {
+    // Loại dữ liệu (Java: type)
     public int Type { get; set; }
 
+    // Mảng dữ liệu, giữ nguyên tham chiếu được truyền vào (Java: data)
     public int[] Data { get; set; }
 
     public TileSetInfoData(int type, int[] data)

@@ -1,0 +1,6 @@
+package nro.skill;
+
+public class SkillTemplate {
+
+    public byte id;
+}

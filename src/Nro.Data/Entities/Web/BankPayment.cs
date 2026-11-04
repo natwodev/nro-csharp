@@ -1,7 +1,10 @@
+using Nro.Data.Entities.StaticData;
+using Nro.Data.Entities.Runtime;
+using Nro.Data.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Nro.Data.Entities;
+namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho giao dịch nạp qua chuyển khoản ngân hàng trong hệ thống
 // Bảng cơ sở dữ liệu: payments (sinh tự động, không sửa tay)

@@ -1,0 +1,18 @@
+package nro.inventory;
+
+import nro.player.Player;
+
+public class InventoryService {
+
+    private static final InventoryService instance = new InventoryService();
+
+    public static InventoryService gI() {
+        return instance;
+    }
+
+    public boolean findItemRongNhi(Player player) { return player.inventory.rongNhi; }
+    public int HpItemsInBoxCollection(Player player) { return player.inventory.hpBox; }
+    public int MpItemsInBoxCollection(Player player) { return player.inventory.mpBox; }
+    public int DamageItemsInBoxCollection(Player player) { return player.inventory.dameBox; }
+    public int CritItemsInBoxCollection(Player player) { return player.inventory.critBox; }
+}

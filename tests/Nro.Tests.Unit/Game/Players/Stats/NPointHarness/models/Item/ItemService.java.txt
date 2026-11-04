@@ -1,0 +1,13 @@
+package models.Item;
+
+/** Only getPercentTrainArmor, copied verbatim from the original by the build script (see GENERATED). */
+public class ItemService {
+
+    private static final ItemService instance = new ItemService();
+
+    public static ItemService gI() {
+        return instance;
+    }
+
+//@@GENERATED ItemService.getPercentTrainArmor
+}

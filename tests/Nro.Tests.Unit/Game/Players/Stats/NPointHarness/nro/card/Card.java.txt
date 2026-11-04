@@ -1,0 +1,11 @@
+package nro.card;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Card {
+
+    public byte Level;
+    public byte Used;
+    public List<OptionCard> Options = new ArrayList<>();
+}
