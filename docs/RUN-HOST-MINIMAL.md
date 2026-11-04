@@ -10,6 +10,8 @@ dotnet run --project src/Nro.Host -- --port 14445
 
 Có thể giới hạn địa chỉ lắng nghe, ví dụ `--bind 127.0.0.1`. Không truyền `--bind` thì host nghe mọi giao diện. Nhấn Ctrl+C để dừng gọn gàng.
 
+Nếu cửa sổ console cũ vẫn vỡ chữ tiếng Việt, dùng Windows Terminal hoặc chạy `chcp 65001`.
+
 Khi host đang chạy, từ thư mục gốc chạy kiểm tra khói:
 
 ```powershell

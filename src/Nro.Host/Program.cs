@@ -15,6 +15,8 @@ public static class Program
     // Đọc tham số, khởi động GameServer và chờ Ctrl+C để dừng gọn gàng.
     public static async Task<int> Main(string[] args)
     {
+        Console.OutputEncoding = new System.Text.UTF8Encoding(false);
+
         if (!TryReadOptions(args, out GameServerOptions options, out string? error))
         {
             Console.Error.WriteLine(error);
