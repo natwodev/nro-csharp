@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Unused;
 
 // Entity đại diện cho mã quà tặng của website cũ trong hệ thống
-// Bảng cơ sở dữ liệu: cvh_giftcode (sinh tự động, không sửa tay)
-[Table("cvh_giftcode")]
+// Bảng cơ sở dữ liệu: cvh_gift_code (sinh tự động, không sửa tay)
 public class CvhGiftCode
 {
     // Khóa chính của bảng CvhGiftCode (tự tăng)

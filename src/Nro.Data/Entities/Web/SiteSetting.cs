@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho cấu hình website trong hệ thống
-// Bảng cơ sở dữ liệu: settings (sinh tự động, không sửa tay)
-[Table("settings")]
+// Bảng cơ sở dữ liệu: site_setting (sinh tự động, không sửa tay)
 public class SiteSetting
 {
     // Tiêu đề website

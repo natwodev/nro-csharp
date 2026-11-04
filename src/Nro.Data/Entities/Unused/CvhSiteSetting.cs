@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Unused;
 
 // Entity đại diện cho cấu hình website cũ trong hệ thống
-// Bảng cơ sở dữ liệu: cvh_setting (sinh tự động, không sửa tay)
-[Table("cvh_setting")]
+// Bảng cơ sở dữ liệu: cvh_site_setting (sinh tự động, không sửa tay)
 public class CvhSiteSetting
 {
     // Khóa chính của bảng CvhSiteSetting (tự tăng)

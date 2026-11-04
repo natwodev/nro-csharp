@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho giao dịch nạp qua chuyển khoản ngân hàng trong hệ thống
-// Bảng cơ sở dữ liệu: payments (sinh tự động, không sửa tay)
-[Table("payments")]
+// Bảng cơ sở dữ liệu: bank_payment (sinh tự động, không sửa tay)
 public class BankPayment
 {
     // Khóa chính của bảng BankPayment (tự tăng)

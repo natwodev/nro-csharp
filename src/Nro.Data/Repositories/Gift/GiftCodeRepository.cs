@@ -2,13 +2,13 @@ using Nro.Data.Db;
 
 namespace Nro.Data.Repositories.Gift;
 
-// Đọc, cập nhật mã quà và lưu lượt nhập mã trên các bảng giftcode, giftcode_save.
+// Đọc, cập nhật mã quà và lưu lượt nhập mã trên các bảng gift_code, gift_code_redemption.
 // Nguồn Java: nro/inventory/InventoryService.java (thay SQL nối chuỗi mã quà bằng tham số để tránh injection; chọn hàng id nhỏ nhất vì PostgreSQL không có UPDATE ... LIMIT 1).
 public sealed class GiftCodeRepository : IGiftCodeRepository
 {
-    private const string SelectCountLeftSql = "select count_left from giftcode where code = ? order by id limit 1";
-    private const string UpdateCountLeftSql = "update giftcode set count_left = ? where id = (select id from giftcode where code = ? order by id limit 1)";
-    private const string InsertUseSql = "insert into giftcode_save (id, player_id, redeemed_code, redeemed_at) values (?, ?, ?, ?)";
+    private const string SelectCountLeftSql = "select count_left from gift_code where code = ? order by id limit 1";
+    private const string UpdateCountLeftSql = "update gift_code set count_left = ? where id = (select id from gift_code where code = ? order by id limit 1)";
+    private const string InsertUseSql = "insert into gift_code_redemption (id, player_id, redeemed_code, redeemed_at) values (?, ?, ?, ?)";
 
     private readonly NroDatabase _database;
 

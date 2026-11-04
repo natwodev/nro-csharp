@@ -212,12 +212,12 @@ public class EntitiesTests
     }
 
     [Fact]
-    public void Account_is_keyed_by_id_alone_and_giftcode_save_id_is_the_account_id()
+    public void Account_is_keyed_by_id_alone_and_gift_code_redemption_id_is_the_account_id()
     {
         GoldenEntity account = Golden.Value.Entities.Single(x => x.Table == "account");
         Assert.Equal(["id"], account.PrimaryKey);
 
-        GoldenEntity redemption = Golden.Value.Entities.Single(x => x.Table == "giftcode_save");
+        GoldenEntity redemption = Golden.Value.Entities.Single(x => x.Table == "gift_code_redemption");
         Assert.Empty(redemption.PrimaryKey);
         Assert.Contains(redemption.Columns, c => c.Property == "AccountId" && c.Column == "id");
     }

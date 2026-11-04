@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho nhật ký kích hoạt thành viên trong hệ thống
-// Bảng cơ sở dữ liệu: history_active (sinh tự động, không sửa tay)
-[Table("history_active")]
+// Bảng cơ sở dữ liệu: activation_history (sinh tự động, không sửa tay)
 public class ActivationHistory
 {
     // Khóa chính của bảng ActivationHistory (tự tăng)

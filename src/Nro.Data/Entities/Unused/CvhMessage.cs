@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Unused;
 
 // Entity đại diện cho tin nhắn của website cũ trong hệ thống
-// Bảng cơ sở dữ liệu: cvh_messages (sinh tự động, không sửa tay)
-[Table("cvh_messages")]
+// Bảng cơ sở dữ liệu: cvh_message (sinh tự động, không sửa tay)
 public class CvhMessage
 {
     // Khóa chính của bảng CvhMessage (tự tăng)

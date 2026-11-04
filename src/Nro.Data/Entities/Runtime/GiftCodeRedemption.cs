@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Runtime;
 
 // Entity đại diện cho lượt nhập mã quà tặng trong hệ thống
-// Bảng cơ sở dữ liệu: giftcode_save (sinh tự động, không sửa tay)
-[Table("giftcode_save")]
+// Bảng cơ sở dữ liệu: gift_code_redemption (sinh tự động, không sửa tay)
 public class GiftCodeRedemption
 {
     // Tài khoản nhập mã

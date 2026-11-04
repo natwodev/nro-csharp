@@ -1736,13 +1736,13 @@
         {
           "name": "GiftCodeRedemptions",
           "element": "GiftCodeRedemption",
-          "viaTable": "giftcode_save",
+          "viaTable": "gift_code_redemption",
           "viaColumn": "player_id"
         },
         {
           "name": "GoldBarReceiveHistories",
           "element": "GoldBarReceiveHistory",
-          "viaTable": "history_receive_goldbar",
+          "viaTable": "gold_bar_receive_history",
           "viaColumn": "player_id"
         },
         {
@@ -2592,10 +2592,10 @@
       "collections": []
     },
     {
-      "table": "payments",
+      "table": "bank_payment",
       "entity": "BankPayment",
       "folder": "Web",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -2943,10 +2943,10 @@
       "collections": []
     },
     {
-      "table": "history_active",
+      "table": "activation_history",
       "entity": "ActivationHistory",
       "folder": "Web",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3000,10 +3000,10 @@
       "collections": []
     },
     {
-      "table": "history_bank",
+      "table": "bank_history",
       "entity": "BankHistory",
       "folder": "Unused",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3117,10 +3117,10 @@
       "collections": []
     },
     {
-      "table": "history_exchange",
+      "table": "exchange_history",
       "entity": "ExchangeHistory",
       "folder": "Web",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3219,10 +3219,10 @@
       "collections": []
     },
     {
-      "table": "history_gold",
+      "table": "gold_history",
       "entity": "GoldHistory",
       "folder": "Logs",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3276,10 +3276,10 @@
       "collections": []
     },
     {
-      "table": "history_receive_goldbar",
+      "table": "gold_bar_receive_history",
       "entity": "GoldBarReceiveHistory",
       "folder": "Logs",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [],
       "columns": [
         {
@@ -3426,10 +3426,10 @@
       "collections": []
     },
     {
-      "table": "history_transaction",
+      "table": "trade_history",
       "entity": "TradeHistory",
       "folder": "Runtime",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3588,10 +3588,10 @@
       "collections": []
     },
     {
-      "table": "cvh_baiviet",
+      "table": "cvh_article",
       "entity": "CvhArticle",
       "folder": "Unused",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3780,10 +3780,10 @@
       "collections": []
     },
     {
-      "table": "cvh_giftcode",
+      "table": "cvh_gift_code",
       "entity": "CvhGiftCode",
       "folder": "Unused",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3912,10 +3912,10 @@
       "collections": []
     },
     {
-      "table": "cvh_history_giftcode",
+      "table": "cvh_gift_code_history",
       "entity": "CvhGiftCodeHistory",
       "folder": "Unused",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -3984,10 +3984,10 @@
       "collections": []
     },
     {
-      "table": "cvh_messages",
+      "table": "cvh_message",
       "entity": "CvhMessage",
       "folder": "Unused",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -4350,10 +4350,10 @@
       "collections": []
     },
     {
-      "table": "cvh_setting",
+      "table": "cvh_site_setting",
       "entity": "CvhSiteSetting",
       "folder": "Unused",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -4602,10 +4602,10 @@
       "collections": []
     },
     {
-      "table": "posts",
+      "table": "forum_post",
       "entity": "ForumPost",
       "folder": "Web",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -4704,10 +4704,10 @@
       "collections": []
     },
     {
-      "table": "settings",
+      "table": "site_setting",
       "entity": "SiteSetting",
       "folder": "Web",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [],
       "columns": [
         {
@@ -5984,10 +5984,10 @@
       "collections": []
     },
     {
-      "table": "giftcode",
+      "table": "gift_code",
       "entity": "GiftCode",
       "folder": "Runtime",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [
         "id"
       ],
@@ -6116,10 +6116,10 @@
       "collections": []
     },
     {
-      "table": "giftcode_save",
+      "table": "gift_code_redemption",
       "entity": "GiftCodeRedemption",
       "folder": "Runtime",
-      "explicitTable": true,
+      "explicitTable": false,
       "primaryKey": [],
       "columns": [
         {

@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho nhật ký đổi VND sang thỏi vàng trong hệ thống
-// Bảng cơ sở dữ liệu: history_exchange (sinh tự động, không sửa tay)
-[Table("history_exchange")]
+// Bảng cơ sở dữ liệu: exchange_history (sinh tự động, không sửa tay)
 public class ExchangeHistory
 {
     // Khóa chính của bảng ExchangeHistory (tự tăng)

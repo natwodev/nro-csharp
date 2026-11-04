@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Unused;
 
 // Entity đại diện cho bài viết diễn đàn của website cũ trong hệ thống
-// Bảng cơ sở dữ liệu: cvh_baiviet (sinh tự động, không sửa tay)
-[Table("cvh_baiviet")]
+// Bảng cơ sở dữ liệu: cvh_article (sinh tự động, không sửa tay)
 public class CvhArticle
 {
     // Khóa chính của bảng CvhArticle (tự tăng)

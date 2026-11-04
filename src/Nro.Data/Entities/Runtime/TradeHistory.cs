@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Runtime;
 
 // Entity đại diện cho nhật ký giao dịch giữa người chơi trong hệ thống
-// Bảng cơ sở dữ liệu: history_transaction (sinh tự động, không sửa tay)
-[Table("history_transaction")]
+// Bảng cơ sở dữ liệu: trade_history (sinh tự động, không sửa tay)
 public class TradeHistory
 {
     // Khóa chính của bảng TradeHistory (tự tăng)

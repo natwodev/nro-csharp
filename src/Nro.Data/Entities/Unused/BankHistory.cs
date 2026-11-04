@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Unused;
 
 // Entity đại diện cho nhật ký nạp tiền qua ngân hàng trong hệ thống
-// Bảng cơ sở dữ liệu: history_bank (sinh tự động, không sửa tay)
-[Table("history_bank")]
+// Bảng cơ sở dữ liệu: bank_history (sinh tự động, không sửa tay)
 public class BankHistory
 {
     // Khóa chính của bảng BankHistory (tự tăng)

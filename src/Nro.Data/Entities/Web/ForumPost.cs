@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nro.Data.Entities.Web;
 
 // Entity đại diện cho bài viết diễn đàn của website trong hệ thống
-// Bảng cơ sở dữ liệu: posts (sinh tự động, không sửa tay)
-[Table("posts")]
+// Bảng cơ sở dữ liệu: forum_post (sinh tự động, không sửa tay)
 public class ForumPost
 {
     // Khóa chính của bảng ForumPost (tự tăng)
