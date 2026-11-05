@@ -1,37 +1,48 @@
-# Chạy host tối thiểu
+# Chạy Nro.Host Generic Host
 
-Host này chỉ mở TCP, trả khóa bắt tay `-27`, và ghi log kết nối/gói. Nó chưa đăng nhập, chưa có nhân vật, DB hay dữ liệu tĩnh.
+`Nro.Host` nạp static catalog trước rồi mới mở TCP. Nếu catalog hoặc cấu hình database lỗi, Host dừng fail-fast và không bind cổng. Listener vẫn dùng `LoggingMessageHandler` và `LoggingAcceptHandler` cho đến J-03A, nên chưa có login/nhân vật hoàn chỉnh.
 
-Từ thư mục `nro-csharp`, build và chạy:
+## Cấu hình
+
+Các giá trị không bí mật nằm ở `src/Nro.Host/appsettings.json`:
+
+- `GameServer`: `Port`, `BindAddress`, giới hạn mỗi IP, socket buffer, queue và timeout phiên.
+- `Startup:LoadStaticCatalogs`: mặc định `true`; chỉ đặt `false` để chạy thử khi không có DB.
+- `Startup:ShutdownSaveTimeout`: hạn lưu người chơi lúc Ctrl+C, mặc định 30 giây.
+- `Scheduling:AutoSaveInterval`: mặc định 5 phút; dịch vụ auto-save sẽ được nối ở gói sau.
+- `Persistence:ConnectionName`: mặc định `Nro`.
+- `Assets:Root`: vị trí dành cho J-06, hiện chưa có handler asset.
+
+Không đặt chuỗi kết nối, mật khẩu hay token trong `appsettings.json`. Đặt chuỗi kết nối bằng biến môi trường (PowerShell) trước khi chạy:
 
 ```powershell
-dotnet run --project src/Nro.Host -- --port 14445
+$env:ConnectionStrings__Nro = 'Host=127.0.0.1;Port=5432;Database=nro;Username=nro;Password=<secret>'
+dotnet run --project src/Nro.Host -- --port 14445 --bind 127.0.0.1
 ```
 
-Có thể giới hạn địa chỉ lắng nghe, ví dụ `--bind 127.0.0.1`. Không truyền `--bind` thì host nghe mọi giao diện. Nhấn Ctrl+C để dừng gọn gàng.
+`--port` và `--bind` là cấu hình ghi đè command line cho `GameServer:Port` và `GameServer:BindAddress`. Có thể thay biến môi trường bằng user-secrets/secret store của môi trường triển khai; không ghi bí mật vào repository.
 
-Nếu cửa sổ console cũ vẫn vỡ chữ tiếng Việt, dùng Windows Terminal hoặc chạy `chcp 65001`.
+## Chạy thử không DB
 
-Khi host đang chạy, từ thư mục gốc chạy kiểm tra khói:
+Chỉ để kiểm tra listener, dùng:
 
 ```powershell
-python -I port-csharp/tools/smoke_handshake.py
+$env:Startup__LoadStaticCatalogs = 'false'
+dotnet run --project src/Nro.Host -- --port 14445 --bind 127.0.0.1
 ```
 
-Kết quả đúng in khóa `NguyenDucVuEntertainment` (24 byte) và `BAT TAY DAT`.
+Host sẽ ghi cảnh báo rõ ràng. Chế độ này không xác thực dữ liệu tĩnh và không được dùng cho máy chủ công khai. Nhấn Ctrl+C: Host dừng accept, gọi cổng lưu người chơi (hiện là cài đặt rỗng có log cho đến khi registry người chơi được nối), rồi đóng listener.
+
+Nếu console cũ vẫn vỡ chữ tiếng Việt, dùng Windows Terminal hoặc chạy `chcp 65001`.
 
 ## Trỏ client Unity
 
 Bản PC ưu tiên là `client-mod/Mod_PC_Online/PC_srcnrofree.online/DragonBoy.exe`. Mã Unity tương ứng nằm ở `client-mod/Project_Client_Mod_Online/PRJ_2Tab_550K`.
 
-Đổi giá trị `Management.IpServer` trong `Assets/Scripts/Assembly-CSharp/Management.cs` thành đúng chuỗi sau rồi build lại project Unity:
+Đổi `Management.IpServer` trong `Assets/Scripts/Assembly-CSharp/Management.cs` thành:
 
 ```csharp
 public static string IpServer = "Local:127.0.0.1:14445:0,0,0";
 ```
 
-Giá trị này được `Game1/ServerListScreen.cs` (và bản sao `Game2/ServerListScreen.cs`) đọc làm `linkDefault`, sau đó tách thành tên, IP và cổng; `Game1/GameCanvas.cs` gán chúng vào `GameMidlet.IP` và `GameMidlet.PORT`. Chuỗi ở trên đã là giá trị local hiện có, nên không cần sửa nếu chưa bị thay đổi.
-
-Không tìm thấy tệp cấu hình văn bản riêng trong bản PC đã biên dịch; nó chứa `GameAssembly.dll`, vì vậy địa chỉ runtime của bản PC cần được xác nhận bằng cách build từ project Unity trên hoặc kiểm tra source/binary riêng của bản phát hành. Khi chạy client, log Host phải có `Phiên mở` và dòng `nhận cmd -27 (GET_SESSION_ID) bắt tay`; sau đó client sẽ không đi xa hơn vì host cố ý chưa xử lý đăng nhập.
-
-Client có thể thử kết nối nhiều lần. `GameServerOptions` giới hạn mặc định 3 kết nối đồng thời trên mỗi IP, nên hãy đóng các lần thử cũ trước khi thử lại nhiều lần.
+Khi host đang chạy, `python -I port-csharp/tools/smoke_handshake.py` vẫn chỉ xác minh bắt tay `-27`; sau đó client chưa đi tiếp được vì đăng nhập/dispatcher thật thuộc J-03A/J-04.

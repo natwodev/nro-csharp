@@ -88,4 +88,13 @@ public interface IStaticRowSource
 
     // Đọc thẻ radar theo id. (Java: RadarService.RADAR_TEMPLATE)
     Task<IReadOnlyList<RadarRow>> ReadRadarCardsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<RadarRow>>(Array.Empty<RadarRow>());
+
+    // Đọc mẫu quái theo id tăng dần để id còn là chỉ số catalog. (Java: mob_template)
+    Task<IReadOnlyList<MobTemplateRow>> ReadMobTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<MobTemplateRow>>(Array.Empty<MobTemplateRow>());
+
+    // Đọc mẫu NPC theo id tăng dần để id còn là chỉ số catalog. (Java: npc_template)
+    Task<IReadOnlyList<NpcTemplateRow>> ReadNpcTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<NpcTemplateRow>>(Array.Empty<NpcTemplateRow>());
+
+    // Đọc mẫu map theo id tăng dần để id còn là chỉ số catalog. (Java: map_template)
+    Task<IReadOnlyList<MapTemplateRow>> ReadMapTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<MapTemplateRow>>(Array.Empty<MapTemplateRow>());
 }

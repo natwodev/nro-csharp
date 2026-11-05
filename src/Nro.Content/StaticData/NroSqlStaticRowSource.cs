@@ -34,6 +34,9 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     private const string BadgeTemplatesSql = "select id, id_effect, id_item, name, options from data_badges order by id";
     private const string NotificationsSql = "select id, name, text from notify order by id desc";
     private const string RadarCardsSql = "select id, icon_id, rank, max, type, mob_id, body, name, info, options, aura_id from radar order by id";
+    private const string MobTemplatesSql = "select id, type, name, hp, range_move, speed, dart_type, percent_dame, percent_tiem_nang, percent_gold from mob_template order by id";
+    private const string NpcTemplatesSql = "select id, name, head, body, leg, avatar from npc_template order by id";
+    private const string MapTemplatesSql = "select id, name, zones, max_player, data, type, planet_id, bg_type, tile_id, bg_id, waypoints, mobs, npcs, genderType from map_template order by id";
     private readonly INroSqlExecutor database;
 
     // Tạo nguồn hàng từ executor có tham số hóa sẵn của Nro.Data. (Java: ConnectDB)
@@ -284,6 +287,24 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     public Task<IReadOnlyList<RadarRow>> ReadRadarCardsAsync(CancellationToken cancellationToken = default) => ReadAsync(RadarCardsSql, snapshot => new RadarRow
     {
         RadarId = snapshot.GetInt("id"), IconId = NullableInt(snapshot, "icon_id"), Rank = NullableShort(snapshot, "rank"), Max = NullableInt(snapshot, "max"), Type = NullableInt(snapshot, "type"), MobId = NullableInt(snapshot, "mob_id"), Body = NullableText(snapshot, "body"), Name = NullableText(snapshot, "name"), Info = NullableText(snapshot, "info"), Options = NullableText(snapshot, "options"), AuraId = NullableShort(snapshot, "aura_id"),
+    }, cancellationToken);
+
+    // Đọc mẫu quái theo id, thay thứ tự select * không xác định của Java. (Java: mob_template)
+    public Task<IReadOnlyList<MobTemplateRow>> ReadMobTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(MobTemplatesSql, snapshot => new MobTemplateRow
+    {
+        MobTemplateId = snapshot.GetInt("id"), Type = snapshot.GetInt("type"), Name = TextOrEmpty(snapshot, "name"), Hp = snapshot.GetInt("hp"), RangeMove = checked((short)snapshot.GetInt("range_move")), Speed = checked((short)snapshot.GetInt("speed")), DartType = checked((short)snapshot.GetInt("dart_type")), DamagePercent = checked((short)snapshot.GetInt("percent_dame")), PercentPotential = checked((short)snapshot.GetInt("percent_tiem_nang")), PercentGold = checked((short)snapshot.GetInt("percent_gold")),
+    }, cancellationToken);
+
+    // Đọc mẫu NPC theo id, giữ NULL avatar cho loader áp dụng getInt Java. (Java: npc_template)
+    public Task<IReadOnlyList<NpcTemplateRow>> ReadNpcTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(NpcTemplatesSql, snapshot => new NpcTemplateRow
+    {
+        NpcTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"), Head = snapshot.GetInt("head"), Body = snapshot.GetInt("body"), Leg = snapshot.GetInt("leg"), Avatar = NullableInt(snapshot, "avatar"),
+    }, cancellationToken);
+
+    // Đọc mẫu map theo id để phát hiện map 205 bị khuyết trước khi công bố snapshot. (Java: map_template)
+    public Task<IReadOnlyList<MapTemplateRow>> ReadMapTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(MapTemplatesSql, snapshot => new MapTemplateRow
+    {
+        MapTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"), Zones = snapshot.GetInt("zones"), MaxPlayer = snapshot.GetInt("max_player"), Data = TextOrEmpty(snapshot, "data"), Type = snapshot.GetInt("type"), PlanetId = snapshot.GetInt("planet_id"), BgType = snapshot.GetInt("bg_type"), TileId = snapshot.GetInt("tile_id"), BgId = snapshot.GetInt("bg_id"), Waypoints = TextOrEmpty(snapshot, "waypoints"), Mobs = TextOrEmpty(snapshot, "mobs"), Npcs = TextOrEmpty(snapshot, "npcs"), GenderType = snapshot.GetInt("genderType"),
     }, cancellationToken);
 
     private async Task<IReadOnlyList<T>> ReadAsync<T>(string sql, Func<IResultSnapshot, T> map, CancellationToken cancellationToken)

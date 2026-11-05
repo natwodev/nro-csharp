@@ -1,3 +1,4 @@
+// Nguồn Java: nro/server/ServerManager.java (dòng 520–582, 623–671).
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
@@ -34,6 +35,8 @@ public sealed class GameServer : IAsyncDisposable
     private TcpListener? _listener;
     private Task? _acceptLoop;
     private int _started;
+    // Đánh dấu listener đã khóa accept nhưng phiên hiện hữu còn được Host lưu. (Java: ServerManager.close)
+    private int _acceptingStopped;
     private int _stopped;
 
     // Tạo TCP server với cấu hình, handler gói, handler vòng đời và logger tùy chọn.
@@ -88,13 +91,22 @@ public sealed class GameServer : IAsyncDisposable
         _acceptLoop = Task.Run(AcceptLoopAsync);
     }
 
+    // Ngừng nhận kết nối mới nhưng giữ các phiên đang mở để Host kịp lưu trước khi đóng. (Java: ServerManager.close)
+    public void StopAccepting()
+    {
+        if (Interlocked.Exchange(ref _acceptingStopped, 1) == 0)
+        {
+            _cancel.Cancel();
+            _listener?.Stop();
+        }
+    }
+
     // Ngừng lắng nghe, ngắt mọi phiên và chờ kết thúc; gọi nhiều lần vẫn an toàn.
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
         if (Interlocked.Exchange(ref _stopped, 1) == 0)
         {
-            _cancel.Cancel();
-            _listener?.Stop();
+            StopAccepting();
             foreach (ISession session in _sessions.Snapshot())
             {
                 session.Disconnect();
@@ -205,7 +217,7 @@ public sealed class GameServer : IAsyncDisposable
             _running[session.Id] = done.Task;
             _sessions.Add(session);
             _ = RunSessionAsync(session, client, ip, done);
-            if (Volatile.Read(ref _stopped) != 0)
+            if (Volatile.Read(ref _acceptingStopped) != 0)
             {
                 // StopAsync có thể đã chụp trước khi thêm phiên này; phiên tự kết thúc để không còn kết nối.
                 session.Disconnect();

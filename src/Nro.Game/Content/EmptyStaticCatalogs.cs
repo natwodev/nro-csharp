@@ -3,6 +3,7 @@ using Nro.Core.Templates;
 using Nro.Data.Models.Shop;
 using Nro.Game.Cards;
 using Nro.Game.Progress.Badges;
+using Nro.Game.World.Maps;
 
 namespace Nro.Game.Content;
 
@@ -86,6 +87,15 @@ internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppear
     // Danh sách thẻ radar rỗng trước khi nạp. (Java: RadarService.RADAR_TEMPLATE)
     public IReadOnlyList<RadarCard> Cards { get; } = Array.Empty<RadarCard>();
 
+    // Không có mẫu quái trước lần nạp đầu tiên. (Java: MOB_TEMPLATES.size)
+    public int MobCount => 0;
+
+    // Không có mẫu NPC trước lần nạp đầu tiên. (Java: NPC_TEMPLATES.size)
+    public int NpcCount => 0;
+
+    // Không có mẫu bản đồ trước lần nạp đầu tiên. (Java: MAP_TEMPLATES.length)
+    public int MapCount => 0;
+
     // Từ chối tra cứu item khi snapshot chưa được nạp. (Java: ITEM_TEMPLATES.get)
     public ItemTemplate GetItemTemplate(int id) => throw new ArgumentOutOfRangeException(nameof(id));
 
@@ -168,4 +178,13 @@ internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppear
 
     // Từ chối tra thẻ radar khi snapshot chưa được nạp. (Java: RadarService.RADAR_TEMPLATE)
     RadarCard IRadarCatalog.Get(int id) => throw new KeyNotFoundException();
+
+    // Từ chối tra quái khi snapshot chưa được nạp. (Java: MOB_TEMPLATES.get)
+    public MobTemplate GetMob(int id) => throw new ArgumentOutOfRangeException(nameof(id));
+
+    // Từ chối tra NPC khi snapshot chưa được nạp. (Java: NPC_TEMPLATES.get)
+    public NpcTemplate GetNpc(int id) => throw new ArgumentOutOfRangeException(nameof(id));
+
+    // Từ chối tra map khi snapshot chưa được nạp. (Java: MAP_TEMPLATES[index])
+    public MapTemplate GetMap(int id) => throw new ArgumentOutOfRangeException(nameof(id));
 }

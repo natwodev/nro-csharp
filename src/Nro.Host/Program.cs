@@ -1,113 +1,101 @@
-// Điểm vào host TCP tối thiểu để kiểm tra bắt tay client Unity.
-// Nguồn Java: network/Network.java (chỉ phần mở cổng; chưa có đăng nhập hay vòng lặp game).
+// Nguồn Java: nro/server/ServerManager.java (dòng 132–218, 520–713).
 using System.Net;
-using System.Net.Sockets;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Nro.Content.StaticData;
+using Nro.Core.Logging;
+using Nro.Data.Db;
+using Nro.Host.Configurations;
 using Nro.Host.Hosting;
-using Nro.Network.Configurations;
 using Nro.Network.Protocol;
+using NetworkGameServerOptions = Nro.Network.Configurations.GameServerOptions;
+using NetworkSessionOptions = Nro.Network.Sessions.SessionOptions;
 
 namespace Nro.Host;
 
-// Khởi động và dừng host TCP tối thiểu từ dòng lệnh.
+// Điểm vào Generic Host, cấu hình DI trước khi dịch vụ nền chạy. (Java: ServerManager)
 public static class Program
 {
-    // Đọc tham số, khởi động GameServer và chờ Ctrl+C để dừng gọn gàng.
-    public static async Task<int> Main(string[] args)
+    // Tạo và chạy Host; ngoại lệ bootstrap không bị nuốt để tiến trình kết thúc mã khác 0. (Java: ServerManager.run)
+    public static async Task Main(string[] args)
     {
-        Console.OutputEncoding = new System.Text.UTF8Encoding(false);
+        Console.OutputEncoding = new UTF8Encoding(false);
 
-        if (!TryReadOptions(args, out GameServerOptions options, out string? error))
+        HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
+        builder.Configuration.AddCommandLine(args, new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            Console.Error.WriteLine(error);
-            Console.Error.WriteLine("Cách dùng: Nro.Host [--port <0-65535>] [--bind <địa chỉ IP>]");
-            return 2;
-        }
+            ["--port"] = "GameServer:Port",
+            ["--bind"] = "GameServer:BindAddress",
+        });
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
 
-        using var loggerFactory = new HostLoggerFactory();
-        ILogger logger = loggerFactory.CreateLogger("Nro.Host");
-        await using var server = new GameServer(
-            options,
-            new LoggingMessageHandler(loggerFactory.CreateLogger(nameof(LoggingMessageHandler))),
-            new LoggingAcceptHandler(loggerFactory.CreateLogger(nameof(LoggingAcceptHandler))),
-            logger);
+        builder.Services.AddSingleton<IValidateOptions<GameServerOptions>, GameServerOptionsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<StartupOptions>, StartupOptionsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<SchedulingOptions>, SchedulingOptionsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<PersistenceOptions>, PersistenceOptionsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<AssetsOptions>, AssetsOptionsValidator>();
+        builder.Services.AddOptions<GameServerOptions>().Bind(builder.Configuration.GetSection("GameServer")).ValidateOnStart();
+        builder.Services.AddOptions<StartupOptions>().Bind(builder.Configuration.GetSection("Startup")).ValidateOnStart();
+        builder.Services.AddOptions<PersistenceOptions>().Bind(builder.Configuration.GetSection("Persistence")).ValidateOnStart();
+        builder.Services.AddOptions<SchedulingOptions>().Bind(builder.Configuration.GetSection("Scheduling")).ValidateOnStart();
+        builder.Services.AddOptions<AssetsOptions>().Bind(builder.Configuration.GetSection("Assets")).ValidateOnStart();
 
-        try
-        {
-            server.Start();
-        }
-        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
-        {
-            Console.Error.WriteLine($"Không thể mở cổng {options.Port}: cổng này đang được sử dụng.");
-            return 1;
-        }
-        catch (SocketException ex)
-        {
-            Console.Error.WriteLine($"Không thể mở cổng {options.Port}: lỗi socket {ex.SocketErrorCode}.");
-            return 1;
-        }
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<NroDatabase>(CreateDatabase);
+        builder.Services.AddSingleton<INroSqlExecutor>(services => services.GetRequiredService<NroDatabase>());
+        builder.Services.AddSingleton<IStaticRowSource, NroSqlStaticRowSource>();
+        builder.Services.AddSingleton<Nro.Game.Content.IStaticCatalogLoader, HostStaticCatalogLoader>();
+        builder.Services.AddSingleton<LoggingMessageHandler>();
+        builder.Services.AddSingleton<LoggingAcceptHandler>();
+        builder.Services.AddSingleton<GameServer>(CreateGameServer);
+        builder.Services.AddSingleton<IGameServer, GameServerAdapter>();
+        builder.Services.AddSingleton<IPlayerSaveOnShutdown, LoggingPlayerSaveOnShutdown>();
+        builder.Services.AddHostedService<GameServerHostedService>();
 
-        Console.WriteLine($"Nro.Host đang lắng nghe cổng {server.Port}. Nhấn Ctrl+C để dừng.");
-
-        var stopRequested = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        ConsoleCancelEventHandler onCancelKeyPress = (_, eventArgs) =>
-        {
-            eventArgs.Cancel = true;
-            stopRequested.TrySetResult();
-        };
-
-        Console.CancelKeyPress += onCancelKeyPress;
-        try
-        {
-            await stopRequested.Task.ConfigureAwait(false);
-            await server.StopAsync().ConfigureAwait(false);
-            return 0;
-        }
-        finally
-        {
-            Console.CancelKeyPress -= onCancelKeyPress;
-        }
+        using IHost host = builder.Build();
+        Logger.Configure(host.Services.GetRequiredService<ILoggerFactory>());
+        await host.RunAsync().ConfigureAwait(false);
     }
 
-    private static bool TryReadOptions(string[] args, out GameServerOptions options, out string? error)
+    // Dựng NroDatabase từ tên ConnectionStrings đã được validator xác nhận, không log bí mật. (Java: Manager.loadProperties)
+    private static NroDatabase CreateDatabase(IServiceProvider services)
     {
-        int port = new GameServerOptions().Port;
-        IPAddress? bindAddress = null;
-        error = null;
+        IConfiguration configuration = services.GetRequiredService<IConfiguration>();
+        PersistenceOptions persistence = services.GetRequiredService<IOptions<PersistenceOptions>>().Value;
+        string connectionString = configuration.GetConnectionString(persistence.ConnectionName)
+            ?? throw new InvalidOperationException($"Thiếu ConnectionStrings:{persistence.ConnectionName}.");
+        return new NroDatabase(new NroDatabaseOptions { ConnectionString = connectionString }, services.GetRequiredService<ILogger<NroDatabase>>());
+    }
 
-        for (int index = 0; index < args.Length; index++)
+    // Ánh xạ Options Host sang listener Network hiện hữu, giữ handler logging đến J-03A. (Java: ServerManager.run)
+    private static GameServer CreateGameServer(IServiceProvider services)
+    {
+        GameServerOptions options = services.GetRequiredService<IOptions<GameServerOptions>>().Value;
+        IPAddress? bindAddress = string.IsNullOrWhiteSpace(options.BindAddress) ? null : IPAddress.Parse(options.BindAddress);
+        var networkOptions = new NetworkGameServerOptions
         {
-            string argument = args[index];
-            if (argument is not ("--port" or "--bind") || ++index >= args.Length)
-            {
-                options = null!;
-                error = $"Tham số không hợp lệ: {argument}.";
-                return false;
-            }
-
-            string value = args[index];
-            if (argument == "--port")
-            {
-                if (!int.TryParse(value, out port) || port is < 0 or > ushort.MaxValue)
-                {
-                    options = null!;
-                    error = $"Cổng không hợp lệ: {value}.";
-                    return false;
-                }
-            }
-            else if (!IPAddress.TryParse(value, out bindAddress))
-            {
-                options = null!;
-                error = $"Địa chỉ IP không hợp lệ: {value}.";
-                return false;
-            }
-        }
-
-        options = new GameServerOptions
-        {
-            Port = port,
+            Port = options.Port,
             BindAddress = bindAddress,
+            MaxConnectionsPerIp = options.MaxConnectionsPerIp,
+            SocketBufferBytes = options.SocketBufferBytes,
+            NoDelay = options.NoDelay,
+            Session = new NetworkSessionOptions
+            {
+                InboundQueueLimit = options.Session.InboundQueueLimit,
+                OutboundQueueLimit = options.Session.OutboundQueueLimit,
+                HandshakeTimeout = options.Session.HandshakeTimeout,
+                IdleTimeout = options.Session.IdleTimeout,
+            },
         };
-        return true;
+        return new GameServer(
+            networkOptions,
+            services.GetRequiredService<LoggingMessageHandler>(),
+            services.GetRequiredService<LoggingAcceptHandler>(),
+            services.GetRequiredService<ILogger<GameServer>>());
     }
 }

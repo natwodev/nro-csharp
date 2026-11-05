@@ -95,6 +95,15 @@ public static class ExpectedCounts
     // Số thẻ radar trong dump đã duyệt. (Java: radar)
     public const int Radar = 21;
 
+    // Số mẫu quái trong dump đã duyệt. (Java: mob_template)
+    public const int Mob = 127;
+
+    // Số mẫu NPC trong dump đã duyệt. (Java: npc_template)
+    public const int Npc = 118;
+
+    // Số mẫu map trong dump đã duyệt; dump hiện thiếu id 205 nên loader phải fail-fast. (Java: map_template)
+    public const int Map = 248;
+
     // Bảng số lượng gắn trực tiếp với tên bước, truyền cho StaticCatalogLoader để đưa vào CatalogLoadReport. (Java: loadDatabase)
     public static IReadOnlyDictionary<string, int> AppearanceItems { get; } = new ReadOnlyDictionary<string, int>(new Dictionary<string, int>(StringComparer.Ordinal)
     {
@@ -128,5 +137,13 @@ public static class ExpectedCounts
         [BadgesCatalogLoadStep.StepName] = Badge,
         [NotificationCatalogLoadStep.StepName] = Notification,
         [RadarCatalogLoadStep.StepName] = Radar,
+    });
+
+    // Số bản ghi J-01E gắn trực tiếp với từng bước nạp. (Java: loadDatabase)
+    public static IReadOnlyDictionary<string, int> WorldTemplates { get; } = new ReadOnlyDictionary<string, int>(new Dictionary<string, int>(StringComparer.Ordinal)
+    {
+        [MobTemplateCatalogLoadStep.StepName] = Mob,
+        [NpcTemplateCatalogLoadStep.StepName] = Npc,
+        [MapTemplateCatalogLoadStep.StepName] = Map,
     });
 }

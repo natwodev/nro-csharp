@@ -1,7 +1,7 @@
 namespace Nro.Content.Loaders;
 
 // Lỗi nạp danh mục rõ nghĩa để Host quyết định cách dừng hay ghi log. Nguồn Java: nro/server/Manager.java (dòng 1145–1199).
-public sealed class CatalogLoadException : Exception
+public class CatalogLoadException : Exception
 {
     // Khởi tạo lỗi gắn với bước đã thất bại hoặc phần xác thực. (Java: loadDatabase)
     public CatalogLoadException(string stepName, string message, Exception? innerException = null)

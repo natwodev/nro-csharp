@@ -39,15 +39,27 @@ internal static class StaticCatalogValidation
     // Kiểm id duy nhất, liên tục từ 0 khi consumer tra theo vị trí danh sách. (Java: List.get)
     public static void ContinuousZeroBasedIds(IEnumerable<int> ids, string stepName)
     {
-        int expected = 0;
-        foreach (int id in ids)
+        ArgumentNullException.ThrowIfNull(ids);
+        int[] ordered = ids.OrderBy(id => id).ToArray();
+        if (ordered.Length != 0 && ordered[0] < 0)
         {
-            if (id != expected)
-            {
-                throw new CatalogLoadException(stepName, $"Id phải liên tục từ 0 theo thứ tự nạp; kỳ vọng {expected} nhưng nhận {id}.");
-            }
+            throw new CatalogLoadException(stepName, $"Id phải không âm khi được dùng làm chỉ số Java; nhận {ordered[0]}.");
+        }
 
-            expected++;
+        var missing = new List<int>();
+        int maximum = ordered.Length == 0 ? -1 : ordered[^1];
+        var actual = new HashSet<int>(ordered);
+        for (int expected = 0; expected <= maximum; expected++)
+        {
+            if (!actual.Contains(expected))
+            {
+                missing.Add(expected);
+            }
+        }
+
+        if (missing.Count != 0)
+        {
+            throw new CatalogGapException(stepName, missing);
         }
     }
 
