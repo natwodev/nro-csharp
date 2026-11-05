@@ -4,6 +4,7 @@ using Nro.Data.Db;
 namespace Nro.Game.Skills.Power;
 
 // Nạp và tra cứu các mốc giới hạn sức mạnh.
+// Sẽ thay bằng Nro.Content ở J-01F.
 // Nguồn Java: nro/power/PowerLimitManager.java (không dùng singleton; copy-on-write/snapshot an toàn đa luồng; ORDER BY id là bắt buộc vì Get theo vị trí; lỗi DB ném ra và nạp atomically).
 public sealed class PowerLimitManager : IPowerLimitManager
 {

@@ -7,6 +7,7 @@ using Nro.Data.Db;
 namespace Nro.Game.Skills.Attributes;
 
 // Nạp, lưu và cập nhật các tăng cường toàn máy chủ.
+// Sẽ thay bằng Nro.Content ở J-01F.
 // Nguồn Java: nro/attribute/AttributeManager.java, Manager.loadAttributeServer/updateAttributeServer (tiêm VietnamClock; SQL PostgreSQL có tham số và ORDER BY id; một lock cùng snapshot tránh lỗi duyệt đa luồng).
 public sealed class AttributeManager : IAttributeManager
 {

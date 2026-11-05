@@ -4,6 +4,7 @@ using Nro.Data.Db;
 namespace Nro.Game.Skills.Attributes;
 
 // Nạp và quản lý mẫu thuộc tính tăng cường toàn máy chủ.
+// Sẽ thay bằng Nro.Content ở J-01F.
 // Nguồn Java: nro/attribute/AttributeTemplateManager.java (không dùng singleton; copy-on-write dưới lock trả snapshot bất biến; thêm ORDER BY id và ném lỗi DB thay vì in).
 public sealed class AttributeTemplateManager : IAttributeTemplateManager
 {

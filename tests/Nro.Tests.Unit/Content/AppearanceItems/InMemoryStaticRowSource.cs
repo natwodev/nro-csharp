@@ -53,4 +53,18 @@ internal sealed class InMemoryStaticRowSource : IStaticRowSource
 
     // Trả ảnh trong bộ nhớ. (Java: img_by_name)
     public Task<IReadOnlyList<ImgByNameRow>> ReadImagesByNameAsync(CancellationToken cancellationToken = default) => Task.FromResult(ImagesByName);
+
+    // Các catalog ngoài Appearance không thuộc fixture này; trả tập rỗng để đáp ứng hợp đồng nguồn tĩnh dùng chung.
+    public Task<IReadOnlyList<AttributeTemplateRow>> ReadAttributeTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<AttributeTemplateRow>>(Array.Empty<AttributeTemplateRow>());
+    public Task<IReadOnlyList<PowerLimitRow>> ReadPowerLimitsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<PowerLimitRow>>(Array.Empty<PowerLimitRow>());
+    public Task<IReadOnlyList<CaptionRow>> ReadCaptionsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<CaptionRow>>(Array.Empty<CaptionRow>());
+    public Task<IReadOnlyList<SkillTemplateRow>> ReadSkillTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<SkillTemplateRow>>(Array.Empty<SkillTemplateRow>());
+    public Task<IReadOnlyList<IntrinsicRow>> ReadIntrinsicsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<IntrinsicRow>>(Array.Empty<IntrinsicRow>());
+    public Task<IReadOnlyList<TaskMainTemplateRow>> ReadTaskMainsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TaskMainTemplateRow>>(Array.Empty<TaskMainTemplateRow>());
+    public Task<IReadOnlyList<TaskSubTemplateRow>> ReadTaskSubsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TaskSubTemplateRow>>(Array.Empty<TaskSubTemplateRow>());
+    public Task<IReadOnlyList<SideTaskTemplateRow>> ReadSideTaskTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<SideTaskTemplateRow>>(Array.Empty<SideTaskTemplateRow>());
+    public Task<IReadOnlyList<ClanTaskTemplateRow>> ReadClanTaskTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ClanTaskTemplateRow>>(Array.Empty<ClanTaskTemplateRow>());
+    public Task<IReadOnlyList<TaskKolTemplateRow>> ReadKolTaskTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TaskKolTemplateRow>>(Array.Empty<TaskKolTemplateRow>());
+    public Task<IReadOnlyList<TaskEventTemplateRow>> ReadEventTaskTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TaskEventTemplateRow>>(Array.Empty<TaskEventTemplateRow>());
+    public Task<IReadOnlyList<AchievementTemplateRow>> ReadAchievementTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<AchievementTemplateRow>>(Array.Empty<AchievementTemplateRow>());
 }

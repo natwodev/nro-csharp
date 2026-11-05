@@ -5,6 +5,7 @@ using Nro.Data.Db;
 namespace Nro.Game.Progress.Tasks;
 
 // Nạp nguyên khối và công bố snapshot bất biến để lần tra cứu đồng thời chỉ thấy bộ cũ hoặc mới. Thứ tự ORDER BY là dữ liệu: nhiệm vụ chính theo id, bước theo idmain và các template khác theo id; join trong nên nhiệm vụ không có bước bị bỏ.
+// Sẽ thay bằng Nro.Content ở J-01F.
 // Nguồn Java: nro/task/Manager.java và nro/task/TaskService.java (giữ nguyên mã, tên, chữ ký, giá trị và thứ tự C# hiện có).
 
 

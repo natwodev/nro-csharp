@@ -2,7 +2,7 @@ using Nro.Data.Entities.StaticData;
 
 namespace Nro.Content.StaticData;
 
-// Cổng đọc các hàng dữ liệu tĩnh; các bước nạp không biết hay gọi cơ sở dữ liệu. Nguồn Java: nro/server/Manager.java (dòng 351–436, 560–600, 727–741).
+// Cổng đọc các hàng dữ liệu tĩnh; các bước nạp không biết hay gọi cơ sở dữ liệu. Nguồn Java: nro/server/Manager.java (dòng 351–705).
 public interface IStaticRowSource
 {
     // Đọc part theo id tăng dần. (Java: part)
@@ -28,4 +28,40 @@ public interface IStaticRowSource
 
     // Đọc ảnh theo tên từ bảng ổn định theo id. (Java: img_by_name)
     Task<IReadOnlyList<ImgByNameRow>> ReadImagesByNameAsync(CancellationToken cancellationToken = default);
+
+    // Đọc mẫu thuộc tính theo id tăng dần. (Java: attribute_template)
+    Task<IReadOnlyList<AttributeTemplateRow>> ReadAttributeTemplatesAsync(CancellationToken cancellationToken = default);
+
+    // Đọc giới hạn sức mạnh theo id tăng dần. (Java: power_limit)
+    Task<IReadOnlyList<PowerLimitRow>> ReadPowerLimitsAsync(CancellationToken cancellationToken = default);
+
+    // Đọc danh hiệu theo id tăng dần. (Java: caption)
+    Task<IReadOnlyList<CaptionRow>> ReadCaptionsAsync(CancellationToken cancellationToken = default);
+
+    // Đọc template kỹ năng theo lớp, slot rồi id. (Java: skill_template)
+    Task<IReadOnlyList<SkillTemplateRow>> ReadSkillTemplatesAsync(CancellationToken cancellationToken = default);
+
+    // Đọc nội tại theo id tăng dần. (Java: intrinsic)
+    Task<IReadOnlyList<IntrinsicRow>> ReadIntrinsicsAsync(CancellationToken cancellationToken = default);
+
+    // Đọc nhiệm vụ chính theo id tăng dần. (Java: task_main_template)
+    Task<IReadOnlyList<TaskMainTemplateRow>> ReadTaskMainsAsync(CancellationToken cancellationToken = default);
+
+    // Đọc bước nhiệm vụ theo task_main_id rồi idmain. (Java: task_sub_template)
+    Task<IReadOnlyList<TaskSubTemplateRow>> ReadTaskSubsAsync(CancellationToken cancellationToken = default);
+
+    // Đọc template nhiệm vụ phụ theo id tăng dần. (Java: side_task_template)
+    Task<IReadOnlyList<SideTaskTemplateRow>> ReadSideTaskTemplatesAsync(CancellationToken cancellationToken = default);
+
+    // Đọc template nhiệm vụ bang hội theo id tăng dần. (Java: clan_task_template)
+    Task<IReadOnlyList<ClanTaskTemplateRow>> ReadClanTaskTemplatesAsync(CancellationToken cancellationToken = default);
+
+    // Đọc template nhiệm vụ KOL theo id tăng dần. (Java: task_kol_template)
+    Task<IReadOnlyList<TaskKolTemplateRow>> ReadKolTaskTemplatesAsync(CancellationToken cancellationToken = default);
+
+    // Đọc template nhiệm vụ sự kiện theo id tăng dần. (Java: task_event_template)
+    Task<IReadOnlyList<TaskEventTemplateRow>> ReadEventTaskTemplatesAsync(CancellationToken cancellationToken = default);
+
+    // Đọc template thành tựu theo id tăng dần. (Java: achievement_template)
+    Task<IReadOnlyList<AchievementTemplateRow>> ReadAchievementTemplatesAsync(CancellationToken cancellationToken = default);
 }

@@ -5,6 +5,7 @@ using Nro.Data.Db;
 namespace Nro.Game.Skills.Intrinsics;
 
 // Catalog các nội tại được nạp từ PostgreSQL và phân theo hệ.
+// Sẽ thay bằng Nro.Content ở J-01F.
 // Nguồn Java: Manager (ORDER BY id làm rõ thứ tự MySQL vốn ngầm định; vị trí 0 là không có nội tại; GetByte giữ tràn id trên 127 thành âm).
 public sealed class IntrinsicCatalog : IIntrinsicCatalog
 {

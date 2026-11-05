@@ -4,6 +4,7 @@ using Nro.Data.Db;
 namespace Nro.Game.Skills.Power;
 
 // Nạp và tra cứu danh hiệu theo sức mạnh.
+// Sẽ thay bằng Nro.Content ở J-01F.
 // Nguồn Java: nro/power/CaptionManager.java (không dùng singleton; copy-on-write/snapshot an toàn đa luồng; ORDER BY id; lỗi DB ném ra và nạp toàn bộ hoặc không nạp).
 public sealed class CaptionManager : ICaptionManager
 {

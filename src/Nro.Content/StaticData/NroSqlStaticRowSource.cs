@@ -3,7 +3,7 @@ using Nro.Data.Entities.StaticData;
 
 namespace Nro.Content.StaticData;
 
-// Adapter PostgreSQL chỉ đọc hàng static qua cơ chế INroSqlExecutor; không được gọi bởi bước nạp. Nguồn Java: nro/server/Manager.java (dòng 351–436, 560–600, 727–741).
+// Adapter PostgreSQL chỉ đọc hàng static qua cơ chế INroSqlExecutor; không được gọi bởi bước nạp. Nguồn Java: nro/server/Manager.java (dòng 199–202, 439–705).
 public sealed class NroSqlStaticRowSource : IStaticRowSource
 {
     private const string PartsSql = "select id, type, data from part order by id";
@@ -14,6 +14,18 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     private const string FlagBagsSql = "select id, icon_data, name, gold, gem, icon_id from flag_bag order by id";
     private const string HeadAnimationFramesSql = "select id, data from head_animation_frame order by id";
     private const string ImagesByNameSql = "select id, name, n_frame from img_by_name order by id";
+    private const string AttributeTemplatesSql = "select id, name from attribute_template order by id";
+    private const string PowerLimitsSql = "select id, power, hp, mp, damage, defense, critical from power_limit order by id";
+    private const string CaptionsSql = "select id, earth, saiya, namek, power from caption order by id";
+    private const string SkillTemplatesSql = "select nclass_id, id, name, max_point, mana_use_type, type, icon_id, dam_info, slot, skills from skill_template order by nclass_id, slot, id";
+    private const string IntrinsicsSql = "select id, name, param_from_1, param_to_1, param_from_2, param_to_2, icon, gender from intrinsic order by id";
+    private const string TaskMainsSql = "select id, name, detail from task_main_template order by id";
+    private const string TaskSubsSql = "select task_main_id, name, max_count, notify, npc_id, map, idmain from task_sub_template order by task_main_id, idmain";
+    private const string SideTaskTemplatesSql = "select id, name, max_count_lv1, max_count_lv2, max_count_lv3, max_count_lv4, max_count_lv5 from side_task_template order by id";
+    private const string ClanTaskTemplatesSql = "select id, name, max_count_lv1, max_count_lv2, max_count_lv3, max_count_lv4, max_count_lv5 from clan_task_template order by id";
+    private const string KolTaskTemplatesSql = "select id, info, max_count from task_kol_template order by id";
+    private const string EventTaskTemplatesSql = "select id, name, max_count_lv1, max_count_lv2, max_count_lv3, max_count_lv4, max_count_lv5 from task_event_template order by id";
+    private const string AchievementTemplatesSql = "select id, info1, info2, money, max_count from achievement_template order by id";
     private readonly INroSqlExecutor database;
 
     // Tạo nguồn hàng từ executor có tham số hóa sẵn của Nro.Data. (Java: ConnectDB)
@@ -106,6 +118,116 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
         ImgByNameId = snapshot.GetInt("id"),
         Name = TextOrEmpty(snapshot, "name"),
         NFrame = snapshot.GetInt("n_frame"),
+    }, cancellationToken);
+
+    // Đọc mẫu thuộc tính có ORDER BY id rõ ràng. (Java: attribute_template)
+    public Task<IReadOnlyList<AttributeTemplateRow>> ReadAttributeTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(AttributeTemplatesSql, snapshot => new AttributeTemplateRow
+    {
+        AttributeTemplateId = snapshot.GetInt("id"),
+        Name = TextOrEmpty(snapshot, "name"),
+    }, cancellationToken);
+
+    // Đọc mốc giới hạn sức mạnh có ORDER BY id rõ ràng. (Java: power_limit)
+    public Task<IReadOnlyList<PowerLimitRow>> ReadPowerLimitsAsync(CancellationToken cancellationToken = default) => ReadAsync(PowerLimitsSql, snapshot => new PowerLimitRow
+    {
+        PowerLimitId = snapshot.GetInt("id"),
+        Power = snapshot.GetLong("power"),
+        Hp = snapshot.GetInt("hp"),
+        Mp = snapshot.GetInt("mp"),
+        Damage = snapshot.GetInt("damage"),
+        Defense = snapshot.GetInt("defense"),
+        Critical = snapshot.GetInt("critical"),
+    }, cancellationToken);
+
+    // Đọc danh hiệu có ORDER BY id rõ ràng. (Java: caption)
+    public Task<IReadOnlyList<CaptionRow>> ReadCaptionsAsync(CancellationToken cancellationToken = default) => ReadAsync(CaptionsSql, snapshot => new CaptionRow
+    {
+        CaptionId = snapshot.GetInt("id"),
+        Earth = TextOrEmpty(snapshot, "earth"),
+        Saiya = TextOrEmpty(snapshot, "saiya"),
+        Namek = TextOrEmpty(snapshot, "namek"),
+        Power = snapshot.GetLong("power"),
+    }, cancellationToken);
+
+    // Đọc kỹ năng theo nclass_id, slot và id để phá tie ổn định. (Java: skill_template)
+    public Task<IReadOnlyList<SkillTemplateRow>> ReadSkillTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(SkillTemplatesSql, snapshot => new SkillTemplateRow
+    {
+        NclassId = snapshot.GetInt("nclass_id"),
+        SkillTemplateId = snapshot.GetInt("id"),
+        Name = TextOrEmpty(snapshot, "name"),
+        MaxPoint = snapshot.GetShort("max_point"),
+        ManaUseType = snapshot.GetShort("mana_use_type"),
+        Type = snapshot.GetShort("type"),
+        IconId = snapshot.GetInt("icon_id"),
+        DamInfo = TextOrEmpty(snapshot, "dam_info"),
+        Slot = snapshot.GetInt("slot"),
+        Skills = TextOrEmpty(snapshot, "skills"),
+    }, cancellationToken);
+
+    // Đọc nội tại có ORDER BY id rõ ràng. (Java: intrinsic)
+    public Task<IReadOnlyList<IntrinsicRow>> ReadIntrinsicsAsync(CancellationToken cancellationToken = default) => ReadAsync(IntrinsicsSql, snapshot => new IntrinsicRow
+    {
+        IntrinsicId = snapshot.GetInt("id"),
+        Name = TextOrEmpty(snapshot, "name"),
+        ParamFrom1 = snapshot.GetInt("param_from_1"),
+        ParamTo1 = snapshot.GetInt("param_to_1"),
+        ParamFrom2 = snapshot.GetInt("param_from_2"),
+        ParamTo2 = snapshot.GetInt("param_to_2"),
+        Icon = snapshot.GetInt("icon"),
+        Gender = snapshot.GetShort("gender"),
+    }, cancellationToken);
+
+    // Đọc nhiệm vụ chính theo id; bước được đọc riêng để kiểm FK. (Java: task_main_template)
+    public Task<IReadOnlyList<TaskMainTemplateRow>> ReadTaskMainsAsync(CancellationToken cancellationToken = default) => ReadAsync(TaskMainsSql, snapshot => new TaskMainTemplateRow
+    {
+        TaskMainTemplateId = snapshot.GetInt("id"),
+        Name = TextOrEmpty(snapshot, "name"),
+        Detail = TextOrEmpty(snapshot, "detail"),
+    }, cancellationToken);
+
+    // Đọc bước theo parent/idmain để grouping không phụ thuộc thứ tự máy chủ. (Java: task_sub_template)
+    public Task<IReadOnlyList<TaskSubTemplateRow>> ReadTaskSubsAsync(CancellationToken cancellationToken = default) => ReadAsync(TaskSubsSql, snapshot => new TaskSubTemplateRow
+    {
+        TaskMainId = snapshot.GetInt("task_main_id"),
+        Name = TextOrEmpty(snapshot, "name"),
+        MaxCount = snapshot.GetInt("max_count"),
+        Notify = TextOrEmpty(snapshot, "notify"),
+        NpcId = snapshot.GetInt("npc_id"),
+        Map = snapshot.GetInt("map"),
+        Idmain = snapshot.GetInt("idmain"),
+    }, cancellationToken);
+
+    // Đọc nhiệm vụ phụ theo id. (Java: side_task_template)
+    public Task<IReadOnlyList<SideTaskTemplateRow>> ReadSideTaskTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(SideTaskTemplatesSql, snapshot => new SideTaskTemplateRow
+    {
+        SideTaskTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"),
+        MaxCountLv1 = TextOrEmpty(snapshot, "max_count_lv1"), MaxCountLv2 = TextOrEmpty(snapshot, "max_count_lv2"), MaxCountLv3 = TextOrEmpty(snapshot, "max_count_lv3"), MaxCountLv4 = TextOrEmpty(snapshot, "max_count_lv4"), MaxCountLv5 = TextOrEmpty(snapshot, "max_count_lv5"),
+    }, cancellationToken);
+
+    // Đọc nhiệm vụ bang hội theo id. (Java: clan_task_template)
+    public Task<IReadOnlyList<ClanTaskTemplateRow>> ReadClanTaskTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(ClanTaskTemplatesSql, snapshot => new ClanTaskTemplateRow
+    {
+        ClanTaskTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"),
+        MaxCountLv1 = TextOrEmpty(snapshot, "max_count_lv1"), MaxCountLv2 = TextOrEmpty(snapshot, "max_count_lv2"), MaxCountLv3 = TextOrEmpty(snapshot, "max_count_lv3"), MaxCountLv4 = TextOrEmpty(snapshot, "max_count_lv4"), MaxCountLv5 = TextOrEmpty(snapshot, "max_count_lv5"),
+    }, cancellationToken);
+
+    // Đọc nhiệm vụ KOL theo id. (Java: task_kol_template)
+    public Task<IReadOnlyList<TaskKolTemplateRow>> ReadKolTaskTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(KolTaskTemplatesSql, snapshot => new TaskKolTemplateRow
+    {
+        TaskKolTemplateId = snapshot.GetInt("id"), Info = TextOrEmpty(snapshot, "info"), MaxCount = TextOrEmpty(snapshot, "max_count"),
+    }, cancellationToken);
+
+    // Đọc nhiệm vụ sự kiện theo id. (Java: task_event_template)
+    public Task<IReadOnlyList<TaskEventTemplateRow>> ReadEventTaskTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(EventTaskTemplatesSql, snapshot => new TaskEventTemplateRow
+    {
+        TaskEventTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"),
+        MaxCountLv1 = TextOrEmpty(snapshot, "max_count_lv1"), MaxCountLv2 = TextOrEmpty(snapshot, "max_count_lv2"), MaxCountLv3 = TextOrEmpty(snapshot, "max_count_lv3"), MaxCountLv4 = TextOrEmpty(snapshot, "max_count_lv4"), MaxCountLv5 = TextOrEmpty(snapshot, "max_count_lv5"),
+    }, cancellationToken);
+
+    // Đọc thành tựu theo id. (Java: achievement_template)
+    public Task<IReadOnlyList<AchievementTemplateRow>> ReadAchievementTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(AchievementTemplatesSql, snapshot => new AchievementTemplateRow
+    {
+        AchievementTemplateId = snapshot.GetInt("id"), Info1 = TextOrEmpty(snapshot, "info1"), Info2 = TextOrEmpty(snapshot, "info2"), Money = snapshot.GetInt("money"), MaxCount = snapshot.GetLong("max_count"),
     }, cancellationToken);
 
     private async Task<IReadOnlyList<T>> ReadAsync<T>(string sql, Func<IResultSnapshot, T> map, CancellationToken cancellationToken)

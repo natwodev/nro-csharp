@@ -5,6 +5,7 @@ using Nro.Data.Db;
 namespace Nro.Game.Progress.Achievements;
 
 // Catalog template thành tựu từ PostgreSQL, thay danh sách static Manager và công bố danh sách chỉ đọc nguyên khối.
+// Sẽ thay bằng Nro.Content ở J-01F.
 // Nguồn Java: nro/achievement/Manager.java (giữ nguyên mã, tên, chữ ký, giá trị và thứ tự C# hiện có).
 
 
