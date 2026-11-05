@@ -1,4 +1,5 @@
 using Nro.Game.Players.Ports;
+using Nro.Game.Players.Companions;
 
 namespace Nro.Game.Players;
 
@@ -143,6 +144,12 @@ public partial class Player : IDisposable
     {
         if (dependent is null)
         {
+            return;
+        }
+
+        if (dependent is IPlayerCompanion companion)
+        {
+            companion.DisposeCompanion();
             return;
         }
 

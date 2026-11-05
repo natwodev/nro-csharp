@@ -12,4 +12,7 @@ public sealed class PlayerRuntimeContext
 
     // Cổng các service/map/event chưa port hoàn chỉnh (Java: Service, MapService, ClanService, NPC/Boss).
     public required IPlayerRuntimeServices Services { get; init; }
+
+    // Cổng companion của Zone hiện tại; null cho tới khi track I ghép adapter Zone/MapService/Combat.
+    public IPlayerCompanionGateway? CompanionGateway { get; init; }
 }

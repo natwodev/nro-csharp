@@ -51,7 +51,7 @@ public partial class Player
                     return;
                 }
 
-                UpdateActivePlayerComponents(services);
+                UpdateActivePlayerComponents(context);
                 ExpireTemporaryTitles(now);
 
                 if (Zone is { } homeMapZone && homeMapZone.Map.MapId == 21 + Gender)
@@ -110,8 +110,9 @@ public partial class Player
     }
 
     // Đẩy các component có Update đã port và các placeholder qua cổng theo đúng thứ tự Java (Java: PhanThan.update ... dropItem.update).
-    private void UpdateActivePlayerComponents(IPlayerRuntimeServices services)
+    private void UpdateActivePlayerComponents(PlayerRuntimeContext context)
     {
+        IPlayerRuntimeServices services = context.Services;
         if (BodyClone is not null)
         {
             services.UpdateBodyClone(this);
@@ -119,7 +120,14 @@ public partial class Player
 
         if (Saibamen is not null)
         {
-            services.UpdateSaiBaMen(this);
+            if (context.CompanionGateway is not null)
+            {
+                Saibamen.Update(context, context.CompanionGateway);
+            }
+            else
+            {
+                services.UpdateSaiBaMen(this);
+            }
         }
 
         services.UpdateNPoint(this);
@@ -138,7 +146,14 @@ public partial class Player
 
         if (PetFollow is not null)
         {
-            services.UpdatePetFollow(this);
+            if (context.CompanionGateway is not null)
+            {
+                PetFollow.Update(context, context.CompanionGateway);
+            }
+            else
+            {
+                services.UpdatePetFollow(this);
+            }
         }
 
         if (TangMonk is not null)

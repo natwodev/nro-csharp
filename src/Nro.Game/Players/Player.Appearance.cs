@@ -98,7 +98,7 @@ public partial class Player
     }
 
     // Lấy đầu hiển thị; thứ tự hiệu ứng, hợp thể, cải trang và trang bị giữ nguyên Java (Java: getHead).
-    public short GetHead(IPlayerRandom? random = null)
+    public virtual short GetHead(IPlayerRandom? random = null)
     {
         if (EffectSkill is { IsBottled: true })
         {
@@ -149,7 +149,7 @@ public partial class Player
     }
 
     // Lấy thân hiển thị; phù hộ Mabu đứng trước hợp thể đúng thứ tự Java (Java: getBody).
-    public short GetBody()
+    public virtual short GetBody()
     {
         if (EffectSkill is { IsBottled: true })
         {
@@ -200,7 +200,7 @@ public partial class Player
     }
 
     // Lấy chân hiển thị; phù hộ Mabu chỉ áp dụng khi không hợp thể đúng nhánh Java (Java: getLeg).
-    public short GetLeg()
+    public virtual short GetLeg()
     {
         if (EffectSkill is { IsBottled: true })
         {
