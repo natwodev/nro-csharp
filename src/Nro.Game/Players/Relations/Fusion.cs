@@ -21,12 +21,12 @@ public sealed class Fusion : IDisposable
     // Gắn trạng thái hợp thể vào người chơi (Java: Fusion).
     public Fusion(Player player) => Player = player ?? throw new ArgumentNullException(nameof(player));
 
-    // Tự tách Lưỡng long nhất thể sau đúng 600000 ms qua đồng hồ/cổng tiêm (Java: update).
+    // Tự tách Lưỡng long nhất thể sau hơn 600000 ms qua đồng hồ/cổng tiêm (Java: update, Util.canDoWithTime).
     public void Update(IPlayerClock clock, IFusionGateway gateway)
     {
         ArgumentNullException.ThrowIfNull(clock);
         ArgumentNullException.ThrowIfNull(gateway);
-        if (Player is not null && TypeFusion == ConstPlayer.FUSION_DANCE && clock.NowMilliseconds - LastTimeFusion >= TIME_FUSION)
+        if (Player is not null && TypeFusion == ConstPlayer.FUSION_DANCE && unchecked(clock.NowMilliseconds - LastTimeFusion) > TIME_FUSION)
         {
             gateway.UnfusePet(Player);
         }

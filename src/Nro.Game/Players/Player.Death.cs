@@ -114,7 +114,7 @@ public partial class Player
             && !attacker.ItemTime.IsUseIncognito;
     }
 
-    // Tính phần trăm đóng góp Chọn Ai Đây; mẫu số không dương trả "0" có chủ đích vì Java double chia 0 thành Infinity và catch ArithmeticException không bắt được (Java: percentGold).
+    // Tính phần trăm đóng góp Chọn Ai Đây; khác Java: Java trả NaN/Infinity khi mẫu số 0, còn C# tạm trả "0" chờ chủ dự án duyệt (Java: percentGold).
     public string PercentGold(int type, int normalGoldPool, int vipGoldPool)
     {
         int numerator = type switch

@@ -6,8 +6,16 @@ namespace Nro.Game.Players.Ports;
 // Cổng cho side effect map, gói tin và combat của companion; Zone/MapService/Service Java không được gọi trực tiếp.
 public interface IPlayerCompanionGateway
 {
-    // Kiểm tra điều kiện join map của thú theo biểu thức loại map Java (Java: PetFollow.update).
+    // Cổng chính sách cũ giữ lại tương thích; PetFollow không dùng để từ chối vì Java dùng chuỗi OR các loại map (Java: PetFollow.update 76–83).
     bool CanJoinPetFollowMasterZone(Player master);
+
+    // Sáu phân loại MapService được PetFollow dùng nguyên văn trong biểu thức OR Java.
+    bool IsOfflineMap(int mapId);
+    bool IsClanMap(int mapId);
+    bool IsPotaufeuMap(int mapId);
+    bool IsWarMap(int mapId);
+    bool IsTestDamageMap(int mapId);
+    bool IsContestedNamekMap(int mapId);
 
     // Đưa companion vào Zone hiện tại của chủ và phát dữ liệu join map (Java: ChangeMapService.goToMap, Zone.load_Me_To_Another).
     void JoinMasterZone(Player companion, Player master);

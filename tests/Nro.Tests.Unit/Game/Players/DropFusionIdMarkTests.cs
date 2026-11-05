@@ -42,9 +42,9 @@ public sealed class DropFusionIdMarkTests
         Assert.Same(player, result.Player);
     }
 
-    // Kiểm tra Fusion tách đúng ngưỡng 600000 ms qua IPlayerClock và chỉ với Lưỡng long nhất thể (Java: update).
+    // Kiểm tra Fusion chỉ tách sau ngưỡng strict 600000 ms qua IPlayerClock (Java: Fusion.update, Util.canDoWithTime).
     [Fact]
-    public void Fusion_unfuses_at_the_java_time_threshold()
+    public void Fusion_unfuses_only_after_the_java_strict_time_threshold()
     {
         Player player = new();
         var gateway = new FusionGateway();
@@ -52,9 +52,13 @@ public sealed class DropFusionIdMarkTests
         player.Fusion.LastTimeFusion = 10;
 
         player.Fusion.Update(new FixedClock(600_009), gateway);
+        // Java Fusion.java 22 + Util.canDoWithTime: 599999 ms không thỏa now - last > target.
         Assert.Equal(0, gateway.UnfuseCalls);
         player.Fusion.Update(new FixedClock(600_010), gateway);
-
+        // Java Fusion.java 22 + Util.canDoWithTime: 600000 ms vẫn không thỏa so sánh strict >.
+        Assert.Equal(0, gateway.UnfuseCalls);
+        player.Fusion.Update(new FixedClock(600_011), gateway);
+        // Java Fusion.java 22 + Util.canDoWithTime: 600001 ms mới gọi Detu.unFusion.
         Assert.Equal(1, gateway.UnfuseCalls);
         Assert.Same(player, gateway.Player);
         player.Fusion.Dispose();

@@ -99,7 +99,6 @@ public partial class Player
                     UpdatePlayerOnly(now, context);
                 }
 
-                // Java 1073 và 1078 gọi MajinBuu12H hai lần; C# cố ý chỉ gọi một lần.
                 UpdateRemainingEvents(now, context);
             }
         }
@@ -258,8 +257,11 @@ public partial class Player
         services.SendDailyGiftReminders(this, now);
         services.UpdateNamekWar(this);
         UpdateOptionClan(services);
-        services.CheckClanTask(this);
-        services.ResetExpiredClanExperienceBuff(this, now);
+        if (Clan is not null)
+        {
+            services.CheckClanTask(this);
+            services.ResetExpiredClanExperienceBuff(this, now);
+        }
         if (CanDoWithTime(now, LastLifecycleLoginUpdate, 60_000))
         {
             services.UpdateLastLogin(this);

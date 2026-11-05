@@ -118,6 +118,8 @@ public abstract class PlayerRuntimeServices : IPlayerRuntimeServices
     public virtual bool IsSnakeWayCompleted(Player player) => false;
     // Không làm gì khi ChangeMapService chưa ghép (Java: changeMapYardrat).
     public virtual void MoveToSnakeWayExit(Player player, int x, int y) { }
+    // Mặc định danh sách Whis rỗng khi manager chưa ghép (Java: TopKillWhisManager.getList).
+    public virtual int GetWhisParticipantCount() => 0;
     // Mặc định không có hạng Whis khi manager chưa ghép (Java: getPlayerWhis).
     public virtual int GetWhisRank(Player player) => 0;
     // Không làm gì khi effect notifier chưa ghép (Java: addEffectChar).

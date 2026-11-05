@@ -174,7 +174,10 @@ public interface IPlayerRuntimeServices
     // Chuyển người chơi sang map 144 của Con Đường Rắn Độc (Java: ChangeMapService.changeMapYardrat).
     void MoveToSnakeWayExit(Player player, int x, int y);
 
-    // Lấy thứ hạng Whis đủ điều kiện hiệu ứng; trả 0 nếu danh sách Java chưa đạt 5 (Java: TopKillWhisManager.getList, getPlayerWhis).
+    // Lấy số người trong danh sách Whis trước các điều kiện size > 2 và size >= 5 (Java: TopKillWhisManager.getList).
+    int GetWhisParticipantCount();
+
+    // Lấy thứ hạng Whis sau khi caller đã xác nhận kích thước danh sách Java (Java: getPlayerWhis).
     int GetWhisRank(Player player);
 
     // Thêm hiệu ứng Whis cho hạng 1–3 (Java: Service.addEffectChar).

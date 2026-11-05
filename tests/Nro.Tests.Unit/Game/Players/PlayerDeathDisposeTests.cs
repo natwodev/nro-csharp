@@ -95,16 +95,17 @@ public sealed class PlayerDeathDisposeTests
         Assert.True(player.IsDisposed);
     }
 
-    // Kiểm tra mẫu số không dương trả 0 thay Infinity của Java double division (Java: percentGold).
+    // Khóa quyết định tạm: khác Java, Java trả NaN/Infinity khi mẫu số 0 (Java: percentGold 3081–3088).
     [Theory]
     [InlineData(0)]
-    [InlineData(-1)]
-    public void Percent_gold_returns_zero_for_non_positive_denominator(int denominator)
+    [InlineData(5)]
+    public void Percent_gold_returns_zero_for_zero_normal_pool(int numerator)
     {
         Player player = MakePlayer();
-        player.GoldNormar = 5;
+        player.GoldNormar = numerator;
 
-        Assert.Equal("0", player.PercentGold(0, denominator, 10));
+        // Java Player.java 3081 chia 0 trả NaN cho 0/0 và Infinity cho n/0; C# giữ quyết định tạm "0".
+        Assert.Equal("0", player.PercentGold(0, 0, 10));
     }
 
     // Kiểm tra giá trị hợp lệ giữ hậu tố .0 của String.valueOf(double) Java (Java: percentGold).
@@ -115,6 +116,22 @@ public sealed class PlayerDeathDisposeTests
         player.GoldNormar = 1;
 
         Assert.Equal("34.0", player.PercentGold(0, 3, 10));
+    }
+
+    // Java luôn gọi pvp.dispose() trước khi bỏ tham chiếu, không phụ thuộc gateway (Java: Player.java 2989–2991).
+    [Fact]
+    public void Dispose_disposes_pvp_even_without_a_death_gateway()
+    {
+        Player player = MakePlayer();
+        var pvp = new FakePvp();
+        player.Pvp = pvp;
+
+        player.Dispose();
+
+        // Java Player.java 2990: pvp.dispose() vẫn chạy khi gateway C# là null.
+        Assert.True(pvp.Disposed);
+        // Java Player.java 2991: tham chiếu pvp được xóa sau dispose.
+        Assert.Null(player.Pvp);
     }
 
     // Tạo Player đủ component cho nhánh chết/hủy (Java: Player()).
@@ -136,6 +153,11 @@ public sealed class PlayerDeathDisposeTests
     // PVP tối thiểu để kích hoạt nhánh PVP (Java: IPVP).
     private sealed class FakePvp : IPVP
     {
+        // Cờ dispose aggregate (Java: IPVP.dispose).
+        public bool Disposed { get; private set; }
+
+        // Ghi disposal trực tiếp từ Player.Dispose (Java: Player.java 2990).
+        public void Dispose() => Disposed = true;
     }
 
     // Gateway ghi thứ tự world/PVP/war/trade để assertion (Java: các singleton service).

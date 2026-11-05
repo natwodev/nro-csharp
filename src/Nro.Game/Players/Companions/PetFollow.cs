@@ -86,9 +86,20 @@ public class PetFollow : Player, IPlayerCompanion
             gateway.Respawn(this, NPoint.HpMax, NPoint.MpMax);
         }
 
-        if (Owner is not null && Owner.Zone is not null && (Zone is null || !ReferenceEquals(Zone, Owner.Zone)) && gateway.CanJoinPetFollowMasterZone(Owner))
+        if (Owner is not null && Owner.Zone is not null && (Zone is null || !ReferenceEquals(Zone, Owner.Zone)))
         {
-            JoinMasterMap(context.Random, gateway);
+            int mapId = Owner.Zone.Map.MapId;
+            // Giữ nguyên biểu thức Java PetFollow.java 76–83: !offline || !bangHoi || !potaufeu || !war || !testDame || !tranhNgocNamec.
+            // Với phân loại map thông thường chỉ một loại đúng, chuỗi OR này luôn true; không thay bằng chính sách CanJoinPetFollowMasterZone.
+            if (!gateway.IsOfflineMap(mapId)
+                || !gateway.IsClanMap(mapId)
+                || !gateway.IsPotaufeuMap(mapId)
+                || !gateway.IsWarMap(mapId)
+                || !gateway.IsTestDamageMap(mapId)
+                || !gateway.IsContestedNamekMap(mapId))
+            {
+                JoinMasterMap(context.Random, gateway);
+            }
         }
 
         if (Owner is null || Owner.IsDead())

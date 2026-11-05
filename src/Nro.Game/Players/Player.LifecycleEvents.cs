@@ -48,6 +48,12 @@ public partial class Player
             return;
         }
 
+        // Java Player.java 1183–1186: zone không có boss thì thoát im lặng, kể cả player đủ điều kiện tuần lộc.
+        if (Zone.Bosses is not { Count: > 0 })
+        {
+            return;
+        }
+
         Player? santa = null;
         foreach (Player boss in Zone.Bosses)
         {
@@ -197,14 +203,24 @@ public partial class Player
             return;
         }
 
-        if (TypeChibi == 1 && NPoint.Mp < NPoint.MpMax)
+        if (TypeChibi == 1)
         {
-            NPoint.Mp = NPoint.MpMax - NPoint.Mp < NPoint.MpMax / 10 ? NPoint.MpMax : NPoint.Mp + NPoint.MpMax / 10;
+            if (NPoint.Mp < NPoint.MpMax)
+            {
+                NPoint.Mp = NPoint.MpMax - NPoint.Mp < NPoint.MpMax / 10 ? NPoint.MpMax : NPoint.Mp + NPoint.MpMax / 10;
+            }
+
+            // Java Player.java 1349–1357 gửi gói KI cả khi KI đã đầy.
             services.SendInfoMp(this);
         }
-        else if (TypeChibi == 3 && NPoint.Hp < NPoint.HpMax)
+        else if (TypeChibi == 3)
         {
-            NPoint.Hp = NPoint.HpMax - NPoint.Hp < NPoint.HpMax / 10 ? NPoint.HpMax : NPoint.Hp + NPoint.HpMax / 10;
+            if (NPoint.Hp < NPoint.HpMax)
+            {
+                NPoint.Hp = NPoint.HpMax - NPoint.Hp < NPoint.HpMax / 10 ? NPoint.HpMax : NPoint.Hp + NPoint.HpMax / 10;
+            }
+
+            // Java Player.java 1358–1366 gửi gói HP cả khi HP đã đầy.
             services.SendInfoHp(this);
         }
 
@@ -235,10 +251,16 @@ public partial class Player
         }
     }
 
-    // Hiệu ứng Whis cho ba hạng đầu khi manager trả thứ hạng hợp lệ (Java: UpdateEffectKillWhis).
+    // Hiệu ứng Whis cho ba hạng đầu, nhưng Java còn đòi list > 2 rồi list >= 5 (Java: UpdateEffectKillWhis 1399–1418).
     private void UpdateWhisKillEffect(IPlayerRuntimeServices services)
     {
-        if (!IsPl())
+        int whisParticipantCount = services.GetWhisParticipantCount();
+        if (!IsPl() || whisParticipantCount <= 2)
+        {
+            return;
+        }
+
+        if (whisParticipantCount < 5)
         {
             return;
         }
@@ -272,6 +294,8 @@ public partial class Player
         UpdateChat(now, context.Random, services);
         UpdateDungeon(now, context.Random, services);
         SendMabuFourteenHour(context);
+        // Java gọi hai lần (1073, 1078); giữ nguyên, chờ chủ dự án quyết định có bỏ trùng không.
+        services.UpdateMabuTwelveHour(this);
         UpdateWhisKillEffect(services);
         SendDropTail(now, services);
         services.UpdateTravelMarkers(this, now, context.Random);

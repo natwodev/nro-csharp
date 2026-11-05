@@ -100,6 +100,7 @@ public partial class Player : IDisposable
         ItemsWoodChest.Clear();
         if (Pvp is not null)
         {
+            Pvp.Dispose();
             gateway?.DisposePvp(this);
             Pvp = null;
         }

@@ -1,6 +1,8 @@
 using Nro.Game.Players;
 using Nro.Game.Players.Companions;
 using Nro.Game.Players.Ports;
+using Nro.Game.World.Maps;
+using Nro.Tests.Unit.Game.World;
 
 namespace Nro.Tests.Unit.Game.Players.Companions;
 
@@ -66,13 +68,13 @@ public sealed class CompanionTests
         Assert.Equal((112, 200), Assert.Single(gateway.Moves));
     }
 
-    // Pet hồi sinh, rồi join Zone chủ khi gateway xác nhận biểu thức map Java (Java: update dòng 68–87).
+    // Pet hồi sinh, rồi join Zone chủ theo biểu thức map Java (Java: update dòng 68–87).
     [Fact]
     public void Pet_follow_respawns_and_joins_owner_zone()
     {
-        var gateway = new FakeCompanionGateway { MayJoinPetZone = true };
+        var gateway = new FakeCompanionGateway();
         Player owner = AlivePlayer(100, 200);
-        owner.Zone = new Nro.Game.World.Maps.Zone(null!, 0, 1);
+        owner.Zone = CreateZone(19);
         var pet = new PetFollow(owner, 1, 2, 3, gateway);
         pet.NPoint.Hp = 0;
         pet.NPoint.HpMax = 40;
@@ -83,6 +85,59 @@ public sealed class CompanionTests
         Assert.Equal((40L, 50L), Assert.Single(gateway.Respawns));
         Assert.Same(owner, Assert.Single(gateway.JoinedOwners));
         Assert.Equal((90, 200), (pet.Location.X, pet.Location.Y));
+    }
+
+    // Java dùng !A || !B || !C || !D || !E || !F; một loại map thông thường vẫn join vì các vế còn lại true (Java: PetFollow.java 76–83).
+    [Theory]
+    [InlineData("ordinary", false, false, false, false, false, false)]
+    [InlineData("offline", true, false, false, false, false, false)]
+    [InlineData("clan", false, true, false, false, false, false)]
+    [InlineData("potaufeu", false, false, true, false, false, false)]
+    [InlineData("war", false, false, false, true, false, false)]
+    [InlineData("test-damage", false, false, false, false, true, false)]
+    [InlineData("contested-namek", false, false, false, false, false, true)]
+    public void Pet_follow_joins_master_zone_for_each_java_map_classification(string _, bool offline, bool clan, bool potaufeu, bool war, bool testDamage, bool contestedNamek)
+    {
+        var gateway = new FakeCompanionGateway
+        {
+            Offline = offline,
+            Clan = clan,
+            Potaufeu = potaufeu,
+            War = war,
+            TestDamage = testDamage,
+            ContestedNamek = contestedNamek,
+        };
+        Player owner = AlivePlayer(100, 200);
+        owner.Zone = CreateZone(19);
+        var pet = new PetFollow(owner, 1, 2, 3, gateway);
+
+        pet.Update(Context(1, new FixedRandom(-10)), gateway);
+
+        // Java PetFollow.java 76–83: với một phân loại true, ít nhất năm phủ định khác true nên joinMapMaster chạy.
+        Assert.Same(owner, Assert.Single(gateway.JoinedOwners));
+    }
+
+    // Chỉ tổ hợp phi thực tế sáu loại map đều true mới làm toàn bộ phủ định false (Java: PetFollow.java 76–83).
+    [Fact]
+    public void Pet_follow_does_not_join_when_every_java_map_classification_is_true()
+    {
+        var gateway = new FakeCompanionGateway
+        {
+            Offline = true,
+            Clan = true,
+            Potaufeu = true,
+            War = true,
+            TestDamage = true,
+            ContestedNamek = true,
+        };
+        Player owner = AlivePlayer(100, 200);
+        owner.Zone = CreateZone(19);
+        var pet = new PetFollow(owner, 1, 2, 3, gateway);
+
+        pet.Update(Context(1, new FixedRandom(-10)), gateway);
+
+        // Java PetFollow.java 76–83: !true || !true || ... là false nên không gọi joinMapMaster.
+        Assert.Empty(gateway.JoinedOwners);
     }
 
     // Player.Update gọi implementation PetFollow trực tiếp khi Zone đã ghép CompanionGateway (Java: Player.update gọi PetFollow.update).
@@ -155,7 +210,9 @@ public sealed class CompanionTests
         saibamen.Update(Context(2_500, new FixedRandom()), gateway);
         saibamen.Update(Context(2_501, new FixedRandom()), gateway);
 
+        // Java SaiBaMen.java 91–93: effect 104 có duration 2000 ms.
         Assert.Equal([(104, (short)2_000)], gateway.SelfDestructEffects);
+        // Java SaiBaMen.java 103–104: explode nhận đúng Saibamen và nPoint.hpMax.
         Assert.Equal([(saibamen, 999d)], gateway.Explosions);
         Assert.False(saibamen.PlayerSkill.PrepareTuSat);
     }
@@ -209,6 +266,14 @@ public sealed class CompanionTests
         return player;
     }
 
+    // Tạo Zone có Map thật để biểu thức map PetFollow nhận MapId (Java: master.zone.map.mapId).
+    private static Zone CreateZone(int mapId)
+    {
+        var game = new FakeGame();
+        var map = new Map(game.Runtime, mapId, "test", 0, 0, 0, 0, 0, [], [], 0, 7, [], [], 0);
+        return new Zone(map, 0, 7);
+    }
+
     // Dựng ngữ cảnh tick không dùng thời gian tường hay random toàn cục (Java: update).
     private static PlayerRuntimeContext Context(long now, IPlayerRandom random, IPlayerCompanionGateway? gateway = null) => new()
     {
@@ -248,8 +313,13 @@ public sealed class CompanionTests
     // Gateway ghi side effect map/combat để kiểm tra companion không gọi singleton Java.
     private sealed class FakeCompanionGateway : IPlayerCompanionGateway
     {
-        // Cờ điều khiển join thú (Java: điều kiện loại map PetFollow.update).
-        public bool MayJoinPetZone { get; set; }
+        // Sáu phân loại map mà biểu thức OR Java đọc (Java: PetFollow.update 76–83).
+        public bool Offline { get; set; }
+        public bool Clan { get; set; }
+        public bool Potaufeu { get; set; }
+        public bool War { get; set; }
+        public bool TestDamage { get; set; }
+        public bool ContestedNamek { get; set; }
 
         // Các owner đã được companion join (Java: goToMap/load_Me_To_Another).
         public List<Player> JoinedOwners { get; } = [];
@@ -269,8 +339,16 @@ public sealed class CompanionTests
         // Các AOE đã handoff (Java: setDie + injured).
         public List<(SaiBaMen SaiBaMen, double Damage)> Explosions { get; } = [];
 
-        // Trả fixture điều kiện join thú (Java: PetFollow.update).
-        public bool CanJoinPetFollowMasterZone(Player master) => MayJoinPetZone;
+        // Cổng chính sách cũ: không được PetFollow dùng để từ chối biểu thức Java.
+        public bool CanJoinPetFollowMasterZone(Player master) => false;
+
+        // Sáu predicate MapService Java cho PetFollow.
+        public bool IsOfflineMap(int mapId) => Offline;
+        public bool IsClanMap(int mapId) => Clan;
+        public bool IsPotaufeuMap(int mapId) => Potaufeu;
+        public bool IsWarMap(int mapId) => War;
+        public bool IsTestDamageMap(int mapId) => TestDamage;
+        public bool IsContestedNamekMap(int mapId) => ContestedNamek;
 
         // Ghi nhận join map (Java: ChangeMapService.goToMap, Zone.load_Me_To_Another).
         public void JoinMasterZone(Player companion, Player master) => JoinedOwners.Add(master);
