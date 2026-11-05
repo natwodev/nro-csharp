@@ -1,20 +1,26 @@
 namespace Nro.Game.Players.Gifts;
 
-// Giữ liên kết chủ sở hữu cho dữ liệu quà tặng.
-// Nguồn Java: nro/player/Gift.java (PLACEHOLDER(H-00) giữ nguyên: sẽ được worker H thay thế).
-
-
-public class Gift
+// Nguồn Java: source-game/SRC_6/AWN_Version/AWN_Version/src/nro/player/Gift.java (dòng 4–19).
+public class Gift : IDisposable
 {
+    // Lưu người chơi sở hữu trạng thái quà, được bỏ liên kết khi hủy (Java: player).
+    public Player? Player { get; private set; }
 
-    // Người chơi sở hữu dữ liệu quà tặng này (Java: player).
+    // Lưu cờ đã nhận quà vàng tân thủ (Java: goldTanThu).
+    public bool IsNewbieGoldClaimed { get; set; }
 
-    public Player Player { get; }
+    // Lưu cờ đã nhận quà ngọc tân thủ (Java: gemTanThu).
+    public bool IsNewbieGemClaimed { get; set; }
 
-    // Gắn dữ liệu quà tặng vào người chơi.
-
+    // Gắn trạng thái quà vào người chơi (Java: Gift).
     public Gift(Player player)
     {
         Player = player;
+    }
+
+    // Bỏ liên kết với người chơi như Java (Java: dispose).
+    public void Dispose()
+    {
+        Player = null;
     }
 }

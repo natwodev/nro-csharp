@@ -8,7 +8,7 @@ namespace Nro.Game.Players.Stats;
 
 // Host mặc định chụp dữ liệu nằm trên Player: cờ, thời hạn thẻ, hệ số clan, buff, mã số, ItemTime, EffectSkill, EffectSkin, vật phẩm, Ngọc Rồng, nội tại, kỹ năng chọn và chỉ số đệ tử.
 // Nguồn Java: nro/player/NPoint.java (Java gọi các singleton MapService.gI(), ServerManager.gI(), InventoryService.gI(), Service.gI(); D1 cấm gI(), nên H-01/J phải kế thừa lớp này và ghi đè hook bằng dịch vụ thực. Lớp không trạng thái, dùng chung Shared).
-// DEFERRED: SetClothes, Charms, Fusion.typeFusion, PointFusion, Card, Clan, Satellite, MySession.Vip_Point và bản ghi đệ tử còn placeholder; các vị từ map, cấu hình/thuộc tính server, hạng Whis, PowerLimit, thưởng inventory/badge, HP quanh người tung cầu và mọi lời gọi ra đều chưa nối. Trước khi ghi đè, thưởng tắt và lời gọi không làm gì.
+// DEFERRED: Charms, Fusion.typeFusion, PointFusion, Card, Clan, Satellite, MySession.Vip_Point và bản ghi đệ tử còn placeholder; các vị từ map, cấu hình/thuộc tính server, hạng Whis, PowerLimit, thưởng inventory/badge, HP quanh người tung cầu và mọi lời gọi ra đều chưa nối. Trước khi ghi đè, thưởng tắt và lời gọi không làm gì.
 public class PlayerNPointHost : INPointHost
 {
     // Thực thể host không trạng thái dùng chung cho new NPoint(player).
@@ -95,6 +95,11 @@ public class PlayerNPointHost : INPointHost
         if (player.EffectFlagBag is not null)
         {
             facts.Player.UseFishSkewer = player.EffectFlagBag.UseFishSkewer;
+        }
+
+        if (player.SetClothes is not null)
+        {
+            CopyByName(player.SetClothes, facts.SetClothes);
         }
 
         if (player.Inventory is not null)
@@ -226,7 +231,7 @@ public class PlayerNPointHost : INPointHost
     // Ghi các kết quả tính chỉ số có thể ghi trả vào đối tượng thực.
     public virtual void Commit(NPoint npoint, NPointFacts facts)
     {
-        // Chưa thể ghi SetClothes.Worldcup trước khi SetClothes được chuyển; hook bên dưới nhận số lượng đã đếm.
+        // Ghi số áo World Cup NPoint đã đếm về trạng thái SetClothes đã port.
         CommitWorldcup(npoint, facts.SetClothes.Worldcup);
         Player player = npoint.Player;
         if (player.Inventory is not null && facts.Inventory.TrainingArmor?.Source is Item armor)
@@ -238,6 +243,7 @@ public class PlayerNPointHost : INPointHost
     // Hook ghi số áo World Cup NPoint đếm được vào player.setClothes.worldcup.
     protected virtual void CommitWorldcup(NPoint npoint, sbyte worldcup)
     {
+        npoint.Player.SetClothes.Worldcup = worldcup;
     }
 
     // Chụp dữ liệu cần riêng cho một đòn tấn công.
@@ -262,11 +268,16 @@ public class PlayerNPointHost : INPointHost
             CopyByName(player.EffectSkin, af.EffectSkin);
         }
 
+        if (player.SetClothes is not null)
+        {
+            CopyByName(player.SetClothes, af.SetClothes);
+        }
+
         CaptureAttackCollaborators(npoint, af);
         return af;
     }
 
-    // Hook chụp thưởng SetClothes, bùa chủ của đệ tử, Manager.readInt và HP quanh người tung Quả cầu kênh khí.
+    // Hook chụp bùa chủ của đệ tử, Manager.readInt và HP quanh người tung Quả cầu kênh khí.
     protected virtual void CaptureAttackCollaborators(NPoint npoint, NPointAttackFacts facts)
     {
     }
