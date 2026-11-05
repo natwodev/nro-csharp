@@ -26,6 +26,14 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     private const string KolTaskTemplatesSql = "select id, info, max_count from task_kol_template order by id";
     private const string EventTaskTemplatesSql = "select id, name, max_count_lv1, max_count_lv2, max_count_lv3, max_count_lv4, max_count_lv5 from task_event_template order by id";
     private const string AchievementTemplatesSql = "select id, info1, info2, money, max_count from achievement_template order by id";
+    private const string ShopsSql = "select id, npc_id, tag_name, type_shop from shop order by npc_id, id";
+    private const string ShopTabsSql = "select id, shop_id, name from tab_shop order by shop_id, id";
+    private const string ShopItemsSql = "select id, tab_id, temp_id, is_new, is_sell, type_sell, cost, costgold, icon_spec, create_time from item_shop where is_sell = true order by tab_id, create_time desc, id";
+    private const string ShopItemOptionsSql = "select id, item_shop_id, option_id, param from item_shop_option order by item_shop_id, id";
+    private const string BadgeTaskTemplatesSql = "select id, name, max_count, id_badges_reward from task_badges_template order by id";
+    private const string BadgeTemplatesSql = "select id, id_effect, id_item, name, options from data_badges order by id";
+    private const string NotificationsSql = "select id, name, text from notify order by id desc";
+    private const string RadarCardsSql = "select id, icon_id, rank, max, type, mob_id, body, name, info, options, aura_id from radar order by id";
     private readonly INroSqlExecutor database;
 
     // Tạo nguồn hàng từ executor có tham số hóa sẵn của Nro.Data. (Java: ConnectDB)
@@ -230,6 +238,54 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
         AchievementTemplateId = snapshot.GetInt("id"), Info1 = TextOrEmpty(snapshot, "info1"), Info2 = TextOrEmpty(snapshot, "info2"), Money = snapshot.GetInt("money"), MaxCount = snapshot.GetLong("max_count"),
     }, cancellationToken);
 
+    // Đọc cửa hàng theo NPC rồi id để phá tie ổn định. (Java: ShopDAO.getShops)
+    public Task<IReadOnlyList<ShopRow>> ReadShopsAsync(CancellationToken cancellationToken = default) => ReadAsync(ShopsSql, snapshot => new ShopRow
+    {
+        ShopId = snapshot.GetInt("id"), NpcId = snapshot.GetInt("npc_id"), TagName = TextOrEmpty(snapshot, "tag_name"), TypeShop = NullableInt(snapshot, "type_shop"),
+    }, cancellationToken);
+
+    // Đọc tab cửa hàng theo shop rồi id. (Java: ShopDAO.loadShopTab)
+    public Task<IReadOnlyList<TabShopRow>> ReadShopTabsAsync(CancellationToken cancellationToken = default) => ReadAsync(ShopTabsSql, snapshot => new TabShopRow
+    {
+        TabShopId = snapshot.GetInt("id"), ShopId = snapshot.GetInt("shop_id"), Name = TextOrEmpty(snapshot, "name"),
+    }, cancellationToken);
+
+    // Đọc item đang bán theo tab, thời điểm tạo giảm dần rồi id. (Java: ShopDAO.loadItemShop)
+    public Task<IReadOnlyList<ItemShopRow>> ReadShopItemsAsync(CancellationToken cancellationToken = default) => ReadAsync(ShopItemsSql, snapshot => new ItemShopRow
+    {
+        ItemShopId = snapshot.GetInt("id"), TabId = snapshot.GetInt("tab_id"), TempId = snapshot.GetInt("temp_id"), IsNew = checked((short)snapshot.GetInt("is_new")), IsSell = snapshot.GetBoolean("is_sell"), TypeSell = NullableInt(snapshot, "type_sell"), Cost = NullableInt(snapshot, "cost"), Costgold = NullableInt(snapshot, "costgold"), IconSpec = NullableInt(snapshot, "icon_spec"), CreateTime = snapshot.GetObject("create_time") as DateTime?,
+    }, cancellationToken);
+
+    // Đọc option item shop theo item rồi id. (Java: ShopDAO.loadItemShopOption)
+    public Task<IReadOnlyList<ItemShopOptionRow>> ReadShopItemOptionsAsync(CancellationToken cancellationToken = default) => ReadAsync(ShopItemOptionsSql, snapshot => new ItemShopOptionRow
+    {
+        ItemShopOptionId = snapshot.GetInt("id"), ItemShopId = snapshot.GetInt("item_shop_id"), OptionId = snapshot.GetInt("option_id"), Param = snapshot.GetInt("param"),
+    }, cancellationToken);
+
+    // Đọc điều kiện nhiệm vụ huy hiệu theo id. (Java: TASKS_BADGES_TEMPLATE)
+    public Task<IReadOnlyList<TaskBadgesTemplateRow>> ReadBadgeTaskTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(BadgeTaskTemplatesSql, snapshot => new TaskBadgesTemplateRow
+    {
+        TaskBadgesTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"), MaxCount = snapshot.GetInt("max_count"), IdBadgesReward = snapshot.GetInt("id_badges_reward"),
+    }, cancellationToken);
+
+    // Đọc mẫu huy hiệu theo id. (Java: BAGES_TEMPLATES)
+    public Task<IReadOnlyList<DataBadgesRow>> ReadBadgeTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(BadgeTemplatesSql, snapshot => new DataBadgesRow
+    {
+        DataBadgesId = snapshot.GetInt("id"), IdEffect = snapshot.GetInt("id_effect"), IdItem = snapshot.GetInt("id_item"), Name = TextOrEmpty(snapshot, "name"), Options = TextOrEmpty(snapshot, "options"),
+    }, cancellationToken);
+
+    // Đọc thông báo theo id giảm dần. (Java: NOTIFY)
+    public Task<IReadOnlyList<NotifyRow>> ReadNotificationsAsync(CancellationToken cancellationToken = default) => ReadAsync(NotificationsSql, snapshot => new NotifyRow
+    {
+        NotifyId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"), Text = TextOrEmpty(snapshot, "text"),
+    }, cancellationToken);
+
+    // Đọc thẻ radar theo id. (Java: RadarService.RADAR_TEMPLATE)
+    public Task<IReadOnlyList<RadarRow>> ReadRadarCardsAsync(CancellationToken cancellationToken = default) => ReadAsync(RadarCardsSql, snapshot => new RadarRow
+    {
+        RadarId = snapshot.GetInt("id"), IconId = NullableInt(snapshot, "icon_id"), Rank = NullableShort(snapshot, "rank"), Max = NullableInt(snapshot, "max"), Type = NullableInt(snapshot, "type"), MobId = NullableInt(snapshot, "mob_id"), Body = NullableText(snapshot, "body"), Name = NullableText(snapshot, "name"), Info = NullableText(snapshot, "info"), Options = NullableText(snapshot, "options"), AuraId = NullableShort(snapshot, "aura_id"),
+    }, cancellationToken);
+
     private async Task<IReadOnlyList<T>> ReadAsync<T>(string sql, Func<IResultSnapshot, T> map, CancellationToken cancellationToken)
     {
         using IResultSnapshot snapshot = await database.ExecuteQueryAsync(sql, cancellationToken).ConfigureAwait(false);
@@ -244,4 +300,15 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     }
 
     private static string TextOrEmpty(IResultSnapshot snapshot, string column) => snapshot.GetObject(column) as string ?? String.Empty;
+    private static string? NullableText(IResultSnapshot snapshot, string column) => snapshot.GetObject(column) as string;
+    private static int? NullableInt(IResultSnapshot snapshot, string column) => snapshot.GetObject(column) switch
+    {
+        null => null,
+        int value => value,
+        short value => value,
+        long value when value is >= int.MinValue and <= int.MaxValue => (int)value,
+        object value when Int32.TryParse(value.ToString(), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int parsed) => parsed,
+        object value => throw new InvalidDataException($"Cột {column} có giá trị '{value}' không phải Int32."),
+    };
+    private static short? NullableShort(IResultSnapshot snapshot, string column) => NullableInt(snapshot, column) is int value ? checked((short)value) : null;
 }

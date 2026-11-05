@@ -6,7 +6,7 @@ namespace Nro.Game.Content;
 public sealed class StaticCatalogSnapshot : IStaticCatalogs
 {
     // Khởi tạo snapshot với toàn bộ danh mục con đã hoàn tất. (Java: loadDatabase)
-    public StaticCatalogSnapshot(IItemCatalog items, IWorldCatalog world, IAppearanceCatalog appearance, IImageCatalog images, ISkillCatalog skills, ITaskCatalog tasks, IShopCatalog shops, IProgressionCatalog progression, INotificationCatalog notifications, IRadarCatalog radar)
+    public StaticCatalogSnapshot(IItemCatalog items, IWorldCatalog world, IAppearanceCatalog appearance, IImageCatalog images, ISkillCatalog skills, ITaskCatalog tasks, IShopCatalog shops, IProgressionCatalog progression, IBadgesCatalog badges, INotificationCatalog notifications, IRadarCatalog radar)
     {
         Items = items ?? throw new ArgumentNullException(nameof(items));
         World = world ?? throw new ArgumentNullException(nameof(world));
@@ -16,6 +16,7 @@ public sealed class StaticCatalogSnapshot : IStaticCatalogs
         Tasks = tasks ?? throw new ArgumentNullException(nameof(tasks));
         Shops = shops ?? throw new ArgumentNullException(nameof(shops));
         Progression = progression ?? throw new ArgumentNullException(nameof(progression));
+        Badges = badges ?? throw new ArgumentNullException(nameof(badges));
         Notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         Radar = radar ?? throw new ArgumentNullException(nameof(radar));
     }
@@ -43,6 +44,9 @@ public sealed class StaticCatalogSnapshot : IStaticCatalogs
 
     // Danh mục tiến trình của snapshot. (Java: INTRINSICS)
     public IProgressionCatalog Progression { get; }
+
+    // Danh mục huy hiệu của snapshot. (Java: BAGES_TEMPLATES)
+    public IBadgesCatalog Badges { get; }
 
     // Danh mục thông báo của snapshot. (Java: NOTIFY)
     public INotificationCatalog Notifications { get; }

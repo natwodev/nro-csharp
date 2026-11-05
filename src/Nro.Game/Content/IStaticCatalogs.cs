@@ -29,6 +29,9 @@ public interface IStaticCatalogs
     // Danh mục tiến trình dùng kiểu miền Nro.Game.Skills và Nro.Game.Progress. (Java: INTRINSICS)
     IProgressionCatalog Progression { get; }
 
+    // Danh mục huy hiệu máy chủ. (Java: TASKS_BADGES_TEMPLATE, BAGES_TEMPLATES)
+    IBadgesCatalog Badges { get; }
+
     // Danh mục thông báo máy chủ. (Java: NOTIFY)
     INotificationCatalog Notifications { get; }
 

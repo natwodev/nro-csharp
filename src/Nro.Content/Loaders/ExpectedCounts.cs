@@ -71,6 +71,30 @@ public static class ExpectedCounts
     // Số thành tựu trong dump đã duyệt. (Java: achievement_template)
     public const int Achievement = 20;
 
+    // Số cửa hàng trong dump đã duyệt. (Java: shop)
+    public const int Shop = 59;
+
+    // Số tab cửa hàng trong dump đã duyệt. (Java: tab_shop)
+    public const int ShopTab = 89;
+
+    // Số item đang bán trong dump đã duyệt. (Java: item_shop)
+    public const int ShopItem = 1340;
+
+    // Số option item shop trong dump đã duyệt. (Java: item_shop_option)
+    public const int ShopItemOption = 2278;
+
+    // Số điều kiện huy hiệu trong dump đã duyệt. (Java: task_badges_template)
+    public const int BadgeTask = 21;
+
+    // Số mẫu huy hiệu trong dump đã duyệt. (Java: data_badges)
+    public const int Badge = 17;
+
+    // Số thông báo trong dump đã duyệt. (Java: notify)
+    public const int Notification = 2;
+
+    // Số thẻ radar trong dump đã duyệt. (Java: radar)
+    public const int Radar = 21;
+
     // Bảng số lượng gắn trực tiếp với tên bước, truyền cho StaticCatalogLoader để đưa vào CatalogLoadReport. (Java: loadDatabase)
     public static IReadOnlyDictionary<string, int> AppearanceItems { get; } = new ReadOnlyDictionary<string, int>(new Dictionary<string, int>(StringComparer.Ordinal)
     {
@@ -91,5 +115,18 @@ public static class ExpectedCounts
         [SkillCatalogLoadStep.StepName] = SkillTemplate,
         [ProgressionCatalogLoadStep.StepName] = AttributeTemplate + PowerLimit + Caption + Intrinsic + Achievement,
         [TaskCatalogLoadStep.StepName] = TaskMain + TaskSub + SideTask + ClanTask + KolTask + EventTask,
+    });
+
+    // Số bản ghi J-01D gắn trực tiếp với từng bước nạp. (Java: loadDatabase)
+    public static IReadOnlyDictionary<string, int> CommerceBadgesNotificationsRadar { get; } = new ReadOnlyDictionary<string, int>(new Dictionary<string, int>(StringComparer.Ordinal)
+    {
+        [ShopCatalogLoadStep.StepName] = Shop,
+        [ShopTabCatalogLoadStep.StepName] = ShopTab,
+        [ShopItemCatalogLoadStep.StepName] = ShopItem,
+        [ShopItemOptionCatalogLoadStep.StepName] = ShopItemOption,
+        [BadgeTaskCatalogLoadStep.StepName] = BadgeTask,
+        [BadgesCatalogLoadStep.StepName] = Badge,
+        [NotificationCatalogLoadStep.StepName] = Notification,
+        [RadarCatalogLoadStep.StepName] = Radar,
     });
 }

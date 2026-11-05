@@ -64,4 +64,28 @@ public interface IStaticRowSource
 
     // Đọc template thành tựu theo id tăng dần. (Java: achievement_template)
     Task<IReadOnlyList<AchievementTemplateRow>> ReadAchievementTemplatesAsync(CancellationToken cancellationToken = default);
+
+    // Đọc cửa hàng theo NPC rồi id để phá tie ổn định. (Java: ShopDAO.getShops)
+    Task<IReadOnlyList<ShopRow>> ReadShopsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ShopRow>>(Array.Empty<ShopRow>());
+
+    // Đọc tab cửa hàng theo shop rồi id. (Java: ShopDAO.loadShopTab)
+    Task<IReadOnlyList<TabShopRow>> ReadShopTabsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TabShopRow>>(Array.Empty<TabShopRow>());
+
+    // Đọc mọi item đang bán theo tab, thời điểm tạo giảm dần rồi id. (Java: ShopDAO.loadItemShop)
+    Task<IReadOnlyList<ItemShopRow>> ReadShopItemsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ItemShopRow>>(Array.Empty<ItemShopRow>());
+
+    // Đọc option item shop theo item rồi id. (Java: ShopDAO.loadItemShopOption)
+    Task<IReadOnlyList<ItemShopOptionRow>> ReadShopItemOptionsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ItemShopOptionRow>>(Array.Empty<ItemShopOptionRow>());
+
+    // Đọc điều kiện nhiệm vụ huy hiệu theo id. (Java: TASKS_BADGES_TEMPLATE)
+    Task<IReadOnlyList<TaskBadgesTemplateRow>> ReadBadgeTaskTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TaskBadgesTemplateRow>>(Array.Empty<TaskBadgesTemplateRow>());
+
+    // Đọc mẫu huy hiệu theo id. (Java: BAGES_TEMPLATES)
+    Task<IReadOnlyList<DataBadgesRow>> ReadBadgeTemplatesAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<DataBadgesRow>>(Array.Empty<DataBadgesRow>());
+
+    // Đọc thông báo theo id giảm dần. (Java: NOTIFY)
+    Task<IReadOnlyList<NotifyRow>> ReadNotificationsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<NotifyRow>>(Array.Empty<NotifyRow>());
+
+    // Đọc thẻ radar theo id. (Java: RadarService.RADAR_TEMPLATE)
+    Task<IReadOnlyList<RadarRow>> ReadRadarCardsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<RadarRow>>(Array.Empty<RadarRow>());
 }

@@ -1,10 +1,13 @@
 using Nro.Core.Content;
 using Nro.Core.Templates;
+using Nro.Data.Models.Shop;
+using Nro.Game.Cards;
+using Nro.Game.Progress.Badges;
 
 namespace Nro.Game.Content;
 
 // Danh mục rỗng dùng cho snapshot trước lần nạp đầu tiên. Nguồn Java: nro/server/Manager.java (dòng 192–218).
-internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppearanceCatalog, IImageCatalog, ISkillCatalog, ITaskCatalog, IShopCatalog, IProgressionCatalog, INotificationCatalog, IRadarCatalog
+internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppearanceCatalog, IImageCatalog, ISkillCatalog, ITaskCatalog, IShopCatalog, IProgressionCatalog, IBadgesCatalog, INotificationCatalog, IRadarCatalog
 {
     internal static readonly EmptyStaticCatalogs Instance = new();
 
@@ -67,6 +70,21 @@ internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppear
 
     // Danh sách thành tựu rỗng trước khi nạp. (Java: ACHIEVEMENT_TEMPLATE)
     public IReadOnlyList<AchievementTemplate> Achievements { get; } = Array.Empty<AchievementTemplate>();
+
+    // Danh sách điều kiện huy hiệu rỗng trước khi nạp. (Java: TASKS_BADGES_TEMPLATE)
+    public IReadOnlyList<BadgeTaskTemplate> TaskTemplates { get; } = Array.Empty<BadgeTaskTemplate>();
+
+    // Danh sách mẫu huy hiệu rỗng trước khi nạp. (Java: BAGES_TEMPLATES)
+    public IReadOnlyList<BadgeTemplate> Templates { get; } = Array.Empty<BadgeTemplate>();
+
+    // Danh sách cửa hàng rỗng trước khi nạp. (Java: SHOPS)
+    public IReadOnlyList<ShopDefinition> Shops { get; } = Array.Empty<ShopDefinition>();
+
+    // Danh sách thông báo rỗng trước khi nạp. (Java: NOTIFY)
+    public IReadOnlyList<ServerNotification> Latest { get; } = Array.Empty<ServerNotification>();
+
+    // Danh sách thẻ radar rỗng trước khi nạp. (Java: RadarService.RADAR_TEMPLATE)
+    public IReadOnlyList<RadarCard> Cards { get; } = Array.Empty<RadarCard>();
 
     // Từ chối tra cứu item khi snapshot chưa được nạp. (Java: ITEM_TEMPLATES.get)
     public ItemTemplate GetItemTemplate(int id) => throw new ArgumentOutOfRangeException(nameof(id));
@@ -141,4 +159,13 @@ internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppear
 
     // Từ chối tra thành tựu khi snapshot chưa được nạp. (Java: ACHIEVEMENT_TEMPLATE.get)
     public AchievementTemplate GetAchievement(int index) => throw new ArgumentOutOfRangeException(nameof(index));
+
+    // Không có cửa hàng theo NPC trước khi nạp. (Java: ShopService.getShop)
+    public ShopDefinition? GetByNpc(int npcId) => null;
+
+    // Từ chối tra cửa hàng khi snapshot chưa được nạp. (Java: SHOPS)
+    ShopDefinition IShopCatalog.Get(int id) => throw new KeyNotFoundException();
+
+    // Từ chối tra thẻ radar khi snapshot chưa được nạp. (Java: RadarService.RADAR_TEMPLATE)
+    RadarCard IRadarCatalog.Get(int id) => throw new KeyNotFoundException();
 }

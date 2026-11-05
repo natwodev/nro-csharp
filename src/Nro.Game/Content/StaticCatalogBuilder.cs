@@ -13,6 +13,7 @@ public sealed class StaticCatalogBuilder
     private ITaskCatalog tasks = EmptyStaticCatalogs.Instance;
     private IShopCatalog shops = EmptyStaticCatalogs.Instance;
     private IProgressionCatalog progression = EmptyStaticCatalogs.Instance;
+    private IBadgesCatalog badges = EmptyStaticCatalogs.Instance;
     private INotificationCatalog notifications = EmptyStaticCatalogs.Instance;
     private IRadarCatalog radar = EmptyStaticCatalogs.Instance;
 
@@ -40,6 +41,9 @@ public sealed class StaticCatalogBuilder
     // Gán danh mục tiến trình cho snapshot đang dựng. (Java: INTRINSICS)
     public void SetProgression(IProgressionCatalog value) => progression = value ?? throw new ArgumentNullException(nameof(value));
 
+    // Gán danh mục huy hiệu cho snapshot đang dựng. (Java: BAGES_TEMPLATES)
+    public void SetBadges(IBadgesCatalog value) => badges = value ?? throw new ArgumentNullException(nameof(value));
+
     // Gán danh mục thông báo cho snapshot đang dựng. (Java: NOTIFY)
     public void SetNotifications(INotificationCatalog value) => notifications = value ?? throw new ArgumentNullException(nameof(value));
 
@@ -47,5 +51,5 @@ public sealed class StaticCatalogBuilder
     public void SetRadar(IRadarCatalog value) => radar = value ?? throw new ArgumentNullException(nameof(value));
 
     // Đóng bộ dựng thành snapshot chỉ đọc mới. (Java: loadDatabase)
-    public IStaticCatalogs Build() => new StaticCatalogSnapshot(items, world, appearance, images, skills, tasks, shops, progression, notifications, radar);
+    public IStaticCatalogs Build() => new StaticCatalogSnapshot(items, world, appearance, images, skills, tasks, shops, progression, badges, notifications, radar);
 }

@@ -14,6 +14,7 @@ namespace Nro.Game.Progress.Badges;
 
 public sealed class BadgesCatalog : IBadgesCatalog
 {
+    // Sẽ thay bằng Nro.Content ở J-01F.
     private const string SelectBadgesSql = "select id, id_effect, id_item, name, options from data_badges order by id";
     private const string SelectTasksSql = "select id, name, max_count, id_badges_reward from task_badges_template order by id";
 
