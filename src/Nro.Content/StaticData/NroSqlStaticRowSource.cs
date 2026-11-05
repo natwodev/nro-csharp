@@ -28,15 +28,15 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     private const string AchievementTemplatesSql = "select id, info1, info2, money, max_count from achievement_template order by id";
     private const string ShopsSql = "select id, npc_id, tag_name, type_shop from shop order by npc_id, id";
     private const string ShopTabsSql = "select id, shop_id, name from tab_shop order by shop_id, id";
-    private const string ShopItemsSql = "select id, tab_id, temp_id, is_new, is_sell, type_sell, cost, costgold, icon_spec, create_time from item_shop where is_sell = true order by tab_id, create_time desc, id";
+    private const string ShopItemsSql = "select id, tab_id, temp_id, is_new, is_sell, type_sell, cost, costgold, icon_spec, create_time from item_shop order by tab_id, create_time desc, id";
     private const string ShopItemOptionsSql = "select id, item_shop_id, option_id, param from item_shop_option order by item_shop_id, id";
     private const string BadgeTaskTemplatesSql = "select id, name, max_count, id_badges_reward from task_badges_template order by id";
     private const string BadgeTemplatesSql = "select id, id_effect, id_item, name, options from data_badges order by id";
     private const string NotificationsSql = "select id, name, text from notify order by id desc";
     private const string RadarCardsSql = "select id, icon_id, rank, max, type, mob_id, body, name, info, options, aura_id from radar order by id";
-    private const string MobTemplatesSql = "select id, type, name, hp, range_move, speed, dart_type, percent_dame, percent_tiem_nang, percent_gold from mob_template order by id";
+    private const string MobTemplatesSql = "select id, type, name, hp, range_move, speed, dart_type, damage_percent, percent_potential, percent_gold from mob_template order by id";
     private const string NpcTemplatesSql = "select id, name, head, body, leg, avatar from npc_template order by id";
-    private const string MapTemplatesSql = "select id, name, zones, max_player, data, type, planet_id, bg_type, tile_id, bg_id, waypoints, mobs, npcs, genderType from map_template order by id";
+    private const string MapTemplatesSql = "select id, name, zones, max_player, data, type, planet_id, bg_type, tile_id, bg_id, waypoints, mobs, npcs, gender_type from map_template order by id";
     private readonly INroSqlExecutor database;
 
     // Tạo nguồn hàng từ executor có tham số hóa sẵn của Nro.Data. (Java: ConnectDB)
@@ -253,7 +253,7 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
         TabShopId = snapshot.GetInt("id"), ShopId = snapshot.GetInt("shop_id"), Name = TextOrEmpty(snapshot, "name"),
     }, cancellationToken);
 
-    // Đọc item đang bán theo tab, thời điểm tạo giảm dần rồi id. (Java: ShopDAO.loadItemShop)
+    // Đọc mọi item theo tab để loader đếm hàng không đạt được; cây công bố chỉ giữ is_sell=1. (Java: ShopDAO.loadItemShop)
     public Task<IReadOnlyList<ItemShopRow>> ReadShopItemsAsync(CancellationToken cancellationToken = default) => ReadAsync(ShopItemsSql, snapshot => new ItemShopRow
     {
         ItemShopId = snapshot.GetInt("id"), TabId = snapshot.GetInt("tab_id"), TempId = snapshot.GetInt("temp_id"), IsNew = checked((short)snapshot.GetInt("is_new")), IsSell = snapshot.GetBoolean("is_sell"), TypeSell = NullableInt(snapshot, "type_sell"), Cost = NullableInt(snapshot, "cost"), Costgold = NullableInt(snapshot, "costgold"), IconSpec = NullableInt(snapshot, "icon_spec"), CreateTime = snapshot.GetObject("create_time") as DateTime?,
@@ -292,7 +292,7 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     // Đọc mẫu quái theo id, thay thứ tự select * không xác định của Java. (Java: mob_template)
     public Task<IReadOnlyList<MobTemplateRow>> ReadMobTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(MobTemplatesSql, snapshot => new MobTemplateRow
     {
-        MobTemplateId = snapshot.GetInt("id"), Type = snapshot.GetInt("type"), Name = TextOrEmpty(snapshot, "name"), Hp = snapshot.GetInt("hp"), RangeMove = checked((short)snapshot.GetInt("range_move")), Speed = checked((short)snapshot.GetInt("speed")), DartType = checked((short)snapshot.GetInt("dart_type")), DamagePercent = checked((short)snapshot.GetInt("percent_dame")), PercentPotential = checked((short)snapshot.GetInt("percent_tiem_nang")), PercentGold = checked((short)snapshot.GetInt("percent_gold")),
+        MobTemplateId = snapshot.GetInt("id"), Type = snapshot.GetInt("type"), Name = TextOrEmpty(snapshot, "name"), Hp = snapshot.GetInt("hp"), RangeMove = checked((short)snapshot.GetInt("range_move")), Speed = checked((short)snapshot.GetInt("speed")), DartType = checked((short)snapshot.GetInt("dart_type")), DamagePercent = checked((short)snapshot.GetInt("damage_percent")), PercentPotential = checked((short)snapshot.GetInt("percent_potential")), PercentGold = checked((short)snapshot.GetInt("percent_gold")),
     }, cancellationToken);
 
     // Đọc mẫu NPC theo id, giữ NULL avatar cho loader áp dụng getInt Java. (Java: npc_template)
@@ -304,7 +304,7 @@ public sealed class NroSqlStaticRowSource : IStaticRowSource
     // Đọc mẫu map theo id để phát hiện map 205 bị khuyết trước khi công bố snapshot. (Java: map_template)
     public Task<IReadOnlyList<MapTemplateRow>> ReadMapTemplatesAsync(CancellationToken cancellationToken = default) => ReadAsync(MapTemplatesSql, snapshot => new MapTemplateRow
     {
-        MapTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"), Zones = snapshot.GetInt("zones"), MaxPlayer = snapshot.GetInt("max_player"), Data = TextOrEmpty(snapshot, "data"), Type = snapshot.GetInt("type"), PlanetId = snapshot.GetInt("planet_id"), BgType = snapshot.GetInt("bg_type"), TileId = snapshot.GetInt("tile_id"), BgId = snapshot.GetInt("bg_id"), Waypoints = TextOrEmpty(snapshot, "waypoints"), Mobs = TextOrEmpty(snapshot, "mobs"), Npcs = TextOrEmpty(snapshot, "npcs"), GenderType = snapshot.GetInt("genderType"),
+        MapTemplateId = snapshot.GetInt("id"), Name = TextOrEmpty(snapshot, "name"), Zones = snapshot.GetInt("zones"), MaxPlayer = snapshot.GetInt("max_player"), Data = TextOrEmpty(snapshot, "data"), Type = snapshot.GetInt("type"), PlanetId = snapshot.GetInt("planet_id"), BgType = snapshot.GetInt("bg_type"), TileId = snapshot.GetInt("tile_id"), BgId = snapshot.GetInt("bg_id"), Waypoints = TextOrEmpty(snapshot, "waypoints"), Mobs = TextOrEmpty(snapshot, "mobs"), Npcs = TextOrEmpty(snapshot, "npcs"), GenderType = snapshot.GetInt("gender_type"),
     }, cancellationToken);
 
     private async Task<IReadOnlyList<T>> ReadAsync<T>(string sql, Func<IResultSnapshot, T> map, CancellationToken cancellationToken)

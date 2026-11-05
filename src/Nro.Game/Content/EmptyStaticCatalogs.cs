@@ -96,6 +96,9 @@ internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppear
     // Không có mẫu bản đồ trước lần nạp đầu tiên. (Java: MAP_TEMPLATES.length)
     public int MapCount => 0;
 
+    // Không có map theo thứ tự trước lần nạp đầu tiên. (Java: Manager.MAPS)
+    public IReadOnlyList<MapTemplate> Maps { get; } = Array.Empty<MapTemplate>();
+
     // Từ chối tra cứu item khi snapshot chưa được nạp. (Java: ITEM_TEMPLATES.get)
     public ItemTemplate GetItemTemplate(int id) => throw new ArgumentOutOfRangeException(nameof(id));
 
@@ -164,6 +167,9 @@ internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppear
     // Không có caption khi snapshot chưa được nạp. (Java: CaptionManager.find)
     public Caption? FindCaption(int id) => null;
 
+    // Không có caption theo cấp khi snapshot chưa được nạp. (Java: CaptionManager.findLevel)
+    public Caption GetCaptionAtLevel(int index) => throw new ArgumentOutOfRangeException(nameof(index));
+
     // Không có nội tại khi snapshot chưa được nạp. (Java: INTRINSIC_TD/NM/XD)
     public IReadOnlyList<Intrinsic> GetIntrinsics(sbyte gender) => Array.Empty<Intrinsic>();
 
@@ -185,6 +191,13 @@ internal sealed class EmptyStaticCatalogs : IItemCatalog, IWorldCatalog, IAppear
     // Từ chối tra NPC khi snapshot chưa được nạp. (Java: NPC_TEMPLATES.get)
     public NpcTemplate GetNpc(int id) => throw new ArgumentOutOfRangeException(nameof(id));
 
-    // Từ chối tra map khi snapshot chưa được nạp. (Java: MAP_TEMPLATES[index])
-    public MapTemplate GetMap(int id) => throw new ArgumentOutOfRangeException(nameof(id));
+    // Không có map theo id khi snapshot chưa được nạp. (Java: MapService.getMapById)
+    public MapTemplate? GetMap(int id) => null;
+
+    // Không có map theo id khi snapshot chưa được nạp. (Java: MapService.getMapById)
+    public bool TryGetMap(int id, out MapTemplate? map)
+    {
+        map = null;
+        return false;
+    }
 }

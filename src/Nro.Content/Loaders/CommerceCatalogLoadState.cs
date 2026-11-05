@@ -15,7 +15,9 @@ internal sealed class CommerceCatalogLoadState
     public IItemCatalog Items { get; }
     public IReadOnlyList<ShopRow>? Shops { get; set; }
     public IReadOnlyList<TabShopRow>? Tabs { get; set; }
+    public IReadOnlySet<int>? AllShopTabIds { get; set; }
     public IReadOnlyList<ItemShopRow>? ShopItems { get; set; }
+    public IReadOnlySet<int>? AllShopItemIds { get; set; }
     public IReadOnlyList<ItemShopOptionRow>? ShopItemOptions { get; set; }
     public IReadOnlyList<BadgeTaskTemplate>? BadgeTasks { get; set; }
 }

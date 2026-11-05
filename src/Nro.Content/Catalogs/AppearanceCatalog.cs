@@ -59,8 +59,8 @@ public sealed class AppearanceCatalog : IAppearanceCatalog
         ? value
         : throw new KeyNotFoundException($"Không có túi cờ id {id}.");
 
-    // Lấy hoạt ảnh đầu theo vị trí id đã được kiểm liên tục. (Java: ARR_HEAD_2_FRAMES.get)
-    public ArrHead2Frames GetHeadAnimationFrame(int id) => (uint)id < (uint)headFrames.Count
-        ? headFrames[id]
-        : throw new ArgumentOutOfRangeException(nameof(id), id, "Không có hoạt ảnh đầu tại id đã cho.");
+    // Java Manager.java 588–599 chỉ ARR_HEAD_2_FRAMES.add(frame), bỏ cột id; get dùng vị trí List.
+    public ArrHead2Frames GetHeadAnimationFrame(int index) => (uint)index < (uint)headFrames.Count
+        ? headFrames[index]
+        : throw new ArgumentOutOfRangeException(nameof(index), index, "Không có hoạt ảnh đầu tại chỉ mục đã cho.");
 }

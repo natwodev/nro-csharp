@@ -20,6 +20,12 @@ public sealed class SkillsProgressionTaskCatalogStepsTests
         Assert.Equal(3, snapshot.Skills.Classes.Count);
         Assert.Equal(8, snapshot.Skills.GetTemplate(2, 8).Id);
         Assert.Equal(5, snapshot.Progression.AttributeTemplates.Count);
+        Assert.Equal(1, snapshot.Progression.GetAttributeTemplate(1).Id);
+        Assert.Equal(1, snapshot.Progression.Captions[0].Id);
+        Assert.Equal(21, snapshot.Progression.Captions[^1].Id);
+        Assert.Equal(21, snapshot.Progression.FindCaption(21)?.Id);
+        Assert.Equal(1, snapshot.Progression.GetCaptionAtLevel(0).Id);
+        Assert.Equal("a", snapshot.Progression.GetAchievement(0).Info1);
         Assert.Equal(27, snapshot.Progression.GetIntrinsics(0).Count);
         Assert.Equal(20, snapshot.Progression.Achievements.Count);
         Assert.Equal(33, snapshot.Tasks.TaskMains.Count);
@@ -37,14 +43,14 @@ public sealed class SkillsProgressionTaskCatalogStepsTests
         var rows = ValidRows() with { SkillTemplates = [new SkillTemplateRow { NclassId = 0, SkillTemplateId = 0, Name = "K", MaxPoint = 1, ManaUseType = 1, Type = 1, IconId = 1, DamInfo = "D", Slot = 0, Skills = "{" }] };
         var loader = new StaticCatalogLoader([new SkillCatalogLoadStep(rows)]);
 
-        CatalogLoadException error = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        CatalogLoadException error = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
 
         Assert.Equal(SkillCatalogLoadStep.StepName, error.StepName);
         Assert.Contains("JSON", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task Rejects_out_of_range_task_byte_and_missing_parent()
+    public async Task Rejects_out_of_range_task_byte_and_skips_missing_parent_like_java_inner_join()
     {
         var invalidByte = new InMemoryRows
         {
@@ -52,13 +58,14 @@ public sealed class SkillsProgressionTaskCatalogStepsTests
             TaskSubs = [new TaskSubTemplateRow { Idmain = 1, TaskMainId = 0, Name = "sub", MaxCount = 1, Notify = "n", NpcId = 128, Map = 1 }],
         };
         var loader = new StaticCatalogLoader([new TaskCatalogLoadStep(invalidByte, new TestKolItems())]);
-        CatalogLoadException range = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        CatalogLoadException range = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
         Assert.Contains("npc_id", range.Message, StringComparison.Ordinal);
 
         var missingParent = invalidByte with { TaskSubs = [new TaskSubTemplateRow { Idmain = 1, TaskMainId = 9, Name = "sub", MaxCount = 1, Notify = "n", NpcId = 1, Map = 1 }] };
         loader = new StaticCatalogLoader([new TaskCatalogLoadStep(missingParent, new TestKolItems())]);
-        CatalogLoadException foreignKey = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
-        Assert.Contains("không tồn tại", foreignKey.Message, StringComparison.Ordinal);
+        IStaticCatalogs snapshot = await loader.LoadAsync();
+        Assert.Empty(snapshot.Tasks.TaskMains);
+        Assert.Contains("task_catalog: bỏ qua 1 hàng task_sub_template mồ côi task_main_id không tồn tại (Java INNER JOIN không đọc các hàng này)", loader.LastReport.Warnings);
     }
 
     [Fact]
@@ -77,14 +84,48 @@ public sealed class SkillsProgressionTaskCatalogStepsTests
         Assert.Equal(0, snapshot.Tasks.TaskMains[0].Id);
     }
 
+    [Theory]
+    [InlineData("1-10", 1, 10)]
+    [InlineData("1-1-10", 1, 1)]
+    public async Task Task_ranges_use_the_first_two_java_split_values(string value, int min, int max)
+    {
+        InMemoryRows rows = ValidRows();
+        TaskEventTemplateRow[] events = rows.EventTaskTemplates.ToArray();
+        events[17] = Event(17, value);
+        var loader = new StaticCatalogLoader([new TaskCatalogLoadStep(rows with { EventTaskTemplates = events }, new TestKolItems())]);
+
+        IStaticCatalogs snapshot = await loader.LoadAsync();
+
+        Assert.Equal([min, max], snapshot.Tasks.GetEventTaskTemplate(17, 17).Count[0]);
+    }
+
+    [Theory]
+    [InlineData("5")]
+    [InlineData("a-3")]
+    public async Task Task_ranges_report_table_id_column_and_value_when_java_would_fail(string value)
+    {
+        InMemoryRows rows = ValidRows();
+        TaskEventTemplateRow[] events = rows.EventTaskTemplates.ToArray();
+        events[17] = Event(17, value);
+        var loader = new StaticCatalogLoader([new TaskCatalogLoadStep(rows with { EventTaskTemplates = events }, new TestKolItems())]);
+
+        CatalogLoadAggregateException error = await Assert.ThrowsAsync<CatalogLoadAggregateException>(() => loader.LoadAsync());
+
+        CatalogLoadException failure = Assert.Single(error.Errors);
+        Assert.Contains("task_event_template id 17", failure.Message, StringComparison.Ordinal);
+        Assert.Contains($"max_count_lv1='{value}'", failure.Message, StringComparison.Ordinal);
+    }
+
     private static InMemoryRows ValidRows()
     {
         const string skillJson = "[{\"id\":0,\"point\":1,\"power_require\":2,\"mana_use\":3,\"cool_down\":4,\"dx\":5,\"dy\":6,\"max_fight\":7,\"damage\":8,\"price\":9,\"info\":\"ok\"}]";
         return new InMemoryRows
         {
-            AttributeTemplates = Enumerable.Range(0, 5).Select(id => new AttributeTemplateRow { AttributeTemplateId = id, Name = $"a{id}" }).ToArray(),
+            // Dump thật: attribute/caption/achievement dùng id 1-based; Java giữ list theo thứ tự nạp
+            // cho access theo index, đồng thời AttributeTemplate/Caption vẫn có tra theo id.
+            AttributeTemplates = Enumerable.Range(1, 5).Select(id => new AttributeTemplateRow { AttributeTemplateId = id, Name = $"a{id}" }).ToArray(),
             PowerLimits = Enumerable.Range(0, 14).Select(id => new PowerLimitRow { PowerLimitId = id }).ToArray(),
-            Captions = Enumerable.Range(0, 21).Select(id => new CaptionRow { CaptionId = id, Earth = "e", Saiya = "s", Namek = "n" }).ToArray(),
+            Captions = Enumerable.Range(1, 21).Select(id => new CaptionRow { CaptionId = id, Earth = "e", Saiya = "s", Namek = "n" }).ToArray(),
             SkillTemplates = Enumerable.Range(0, 3).SelectMany(classId => Enumerable.Range(0, 9).Select(id => new SkillTemplateRow { NclassId = classId, SkillTemplateId = id, Name = $"s{id}", MaxPoint = 1, ManaUseType = 1, Type = 1, IconId = 1, DamInfo = "d", Slot = id, Skills = skillJson })).ToArray(),
             Intrinsics = Enumerable.Range(0, 27).Select(id => new IntrinsicRow { IntrinsicId = id, Name = "i", Gender = 3 }).ToArray(),
             AchievementTemplates = Enumerable.Range(1, 20).Select(id => new AchievementTemplateRow { AchievementTemplateId = id, Info1 = "a", Info2 = "b" }).ToArray(),
@@ -93,13 +134,13 @@ public sealed class SkillsProgressionTaskCatalogStepsTests
             SideTaskTemplates = Enumerable.Range(0, 59).Select(Side).ToArray(),
             ClanTaskTemplates = Enumerable.Range(0, 59).Select(Clan).ToArray(),
             KolTaskTemplates = Enumerable.Range(0, 7).Select(id => new TaskKolTemplateRow { TaskKolTemplateId = id, Info = "k", MaxCount = "1" }).ToArray(),
-            EventTaskTemplates = Enumerable.Range(0, 59).Select(Event).ToArray(),
+            EventTaskTemplates = Enumerable.Range(0, 59).Select(id => Event(id)).ToArray(),
         };
     }
 
     private static SideTaskTemplateRow Side(int id) => new() { SideTaskTemplateId = id, Name = "s", MaxCountLv1 = "1-2", MaxCountLv2 = "1-2", MaxCountLv3 = "1-2", MaxCountLv4 = "1-2", MaxCountLv5 = "1-2" };
     private static ClanTaskTemplateRow Clan(int id) => new() { ClanTaskTemplateId = id, Name = "c", MaxCountLv1 = "1-2", MaxCountLv2 = "1-2", MaxCountLv3 = "1-2", MaxCountLv4 = "1-2", MaxCountLv5 = "1-2" };
-    private static TaskEventTemplateRow Event(int id) => new() { TaskEventTemplateId = id, Name = "e", MaxCountLv1 = "1-2", MaxCountLv2 = "1-2", MaxCountLv3 = "1-2", MaxCountLv4 = "1-2", MaxCountLv5 = "1-2" };
+    private static TaskEventTemplateRow Event(int id, string maxCountLv1 = "1-2") => new() { TaskEventTemplateId = id, Name = "e", MaxCountLv1 = maxCountLv1, MaxCountLv2 = "1-2", MaxCountLv3 = "1-2", MaxCountLv4 = "1-2", MaxCountLv5 = "1-2" };
 
     private sealed record InMemoryRows : IStaticRowSource
     {

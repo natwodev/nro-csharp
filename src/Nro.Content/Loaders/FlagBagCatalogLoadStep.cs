@@ -62,10 +62,17 @@ public sealed class FlagBagCatalogLoadStep : ICatalogLoadStep
         }
 
         string[] values = csv.Split(',', StringSplitOptions.None);
-        var icons = new short[values.Length];
-        for (int index = 0; index < values.Length; index++)
+        int count = csv.Length == 0 ? 1 : values.Length;
+        // String.split(",") của Java loại các phần tử rỗng ở cuối, nhưng vẫn giữ phần tử rỗng ở giữa.
+        while (count > 0 && values[count - 1].Length == 0)
         {
-            if (!Int16.TryParse(values[index], NumberStyles.Integer, CultureInfo.InvariantCulture, out short icon))
+            count--;
+        }
+
+        var icons = new short[count];
+        for (int index = 0; index < count; index++)
+        {
+            if (!Int16.TryParse(values[index].Trim(), NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out short icon))
             {
                 throw new CatalogLoadException(StepName, $"Hàng id {rowId} có icon_data[{index}]='{values[index]}' không phải Int16.");
             }

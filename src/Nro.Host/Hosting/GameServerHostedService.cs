@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nro.Content.Loaders;
 using Nro.Game.Content;
 using Nro.Host.Configurations;
 
@@ -45,10 +46,26 @@ public sealed class GameServerHostedService : IHostedService
             {
                 await catalogs.LoadAsync(cancellationToken).ConfigureAwait(false);
             }
+            catch (CatalogLoadAggregateException exception)
+            {
+                foreach (CatalogLoadException error in exception.Errors)
+                {
+                    // Không truyền exception gốc cho logger: provider/driver có thể chứa chuỗi kết nối hoặc mật khẩu.
+                    logger.LogError("Static catalog lỗi ở bước {CatalogStep}: {CatalogMessage}", error.StepName, error.Message);
+                }
+
+                foreach (CatalogLoadSkippedStep skipped in exception.SkippedSteps)
+                {
+                    logger.LogError("Static catalog: {CatalogSkip}", skipped.Message);
+                }
+
+                // Aggregate vẫn giữ ngoại lệ gốc cho caller trực tiếp, nhưng Host không bọc nó để logger nền không in thông tin kết nối nhạy cảm.
+                throw new InvalidOperationException("Khởi động thất bại: không thể nạp static catalog trước khi mở cổng.");
+            }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
-                logger.LogCritical(exception, "Không thể nạp static catalog; GameServer sẽ không mở cổng.");
-                throw new InvalidOperationException("Khởi động thất bại: không thể nạp static catalog trước khi mở cổng.", exception);
+                logger.LogError("Không thể nạp static catalog; GameServer sẽ không mở cổng.");
+                throw new InvalidOperationException("Khởi động thất bại: không thể nạp static catalog trước khi mở cổng.");
             }
         }
         else

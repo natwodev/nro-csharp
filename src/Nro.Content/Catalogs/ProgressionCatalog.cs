@@ -58,6 +58,11 @@ public sealed class ProgressionCatalog : IProgressionCatalog
 
     public Caption? FindCaption(int id) => captionsById.TryGetValue(id, out Caption? value) ? Clone(value) : null;
 
+    // Java CaptionManager.findLevel(level) gọi captions.get(level); cột caption.id thật bắt đầu từ 1.
+    public Caption GetCaptionAtLevel(int index) => (uint)index < (uint)captions.Count
+        ? Clone(captions[index])
+        : throw new ArgumentOutOfRangeException(nameof(index), index, "Không có danh hiệu tại cấp đã cho.");
+
     public IReadOnlyList<Intrinsic> GetIntrinsics(sbyte gender)
     {
         IReadOnlyList<Intrinsic> selected = gender switch { 0 => earth, 1 => namek, _ => saiyan };

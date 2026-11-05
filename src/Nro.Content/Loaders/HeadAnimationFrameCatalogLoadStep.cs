@@ -4,7 +4,8 @@ using Nro.Game.Content;
 
 namespace Nro.Content.Loaders;
 
-// Nạp frame hoạt ảnh đầu theo id liên tục để giữ hợp đồng tra vị trí. Nguồn Java: nro/server/Manager.java (dòng 590–600).
+// Nạp frame hoạt ảnh đầu theo thứ tự đọc. Java không lưu cột id vào ArrHead2Frames;
+// ARR_HEAD_2_FRAMES.get(index) dùng vị trí ArrayList, không dùng id DB. Nguồn Java: nro/server/Manager.java (dòng 588–599).
 public sealed class HeadAnimationFrameCatalogLoadStep : ICatalogLoadStep
 {
     // Tên bước và khóa ExpectedCounts. (Java: array_head_2_frames)
@@ -27,7 +28,7 @@ public sealed class HeadAnimationFrameCatalogLoadStep : ICatalogLoadStep
     // Frame đầu không phụ thuộc catalog khác khi đọc. (Java: loadDatabase)
     public IReadOnlyCollection<string> Dependencies { get; } = Array.Empty<string>();
 
-    // Parse data JSON thành danh sách int và kiểm id liên tục. (Java: ARR_HEAD_2_FRAMES)
+    // Parse data JSON thành danh sách int; id chỉ cần duy nhất. (Java: ARR_HEAD_2_FRAMES.add)
     public async Task<CatalogStepResult> LoadAsync(StaticCatalogBuilder builder, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -41,7 +42,6 @@ public sealed class HeadAnimationFrameCatalogLoadStep : ICatalogLoadStep
             frames.Add(new ArrHead2Frames { Frames = StaticCatalogJson.Frames(row.Data, StepName, row.HeadAnimationFrameId) });
         }
 
-        StaticCatalogValidation.ContinuousIds(rows.Select(row => row.HeadAnimationFrameId), StepName);
         state.HeadFrames = frames.AsReadOnly();
         return new CatalogStepResult(frames.Count);
     }

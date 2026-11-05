@@ -71,7 +71,7 @@ public interface IStaticRowSource
     // Đọc tab cửa hàng theo shop rồi id. (Java: ShopDAO.loadShopTab)
     Task<IReadOnlyList<TabShopRow>> ReadShopTabsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<TabShopRow>>(Array.Empty<TabShopRow>());
 
-    // Đọc mọi item đang bán theo tab, thời điểm tạo giảm dần rồi id. (Java: ShopDAO.loadItemShop)
+    // Đọc mọi item theo tab để loader phân loại hàng Java không bao giờ đọc. (Java: ShopDAO.loadItemShop)
     Task<IReadOnlyList<ItemShopRow>> ReadShopItemsAsync(CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ItemShopRow>>(Array.Empty<ItemShopRow>());
 
     // Đọc option item shop theo item rồi id. (Java: ShopDAO.loadItemShopOption)

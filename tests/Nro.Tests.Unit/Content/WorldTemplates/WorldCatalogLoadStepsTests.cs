@@ -21,7 +21,7 @@ public sealed class WorldCatalogLoadStepsTests
 
         IStaticCatalogs snapshot = await loader.LoadAsync();
 
-        var map = snapshot.World.GetMap(0);
+        MapTemplate map = Assert.IsType<MapTemplate>(snapshot.World.GetMap(0));
         Assert.Equal("Test map", map.Name);
         WayPoint waypoint = Assert.Single(map.WayPoints);
         Assert.Equal((short)1, waypoint.MinX);
@@ -33,7 +33,8 @@ public sealed class WorldCatalogLoadStepsTests
         Assert.Equal([0], map.NpcId);
         Assert.Equal((short)7, map.NpcX[0]);
         map.MobTemp[0] = 99;
-        Assert.Equal((sbyte)0, snapshot.World.GetMap(0).MobTemp[0]);
+        MapTemplate unmodifiedMap = Assert.IsType<MapTemplate>(snapshot.World.GetMap(0));
+        Assert.Equal((sbyte)0, unmodifiedMap.MobTemp[0]);
     }
 
     // NULL avatar của ADO.NET có cùng giá trị 0 như ResultSet.getInt Java. (Java: rs.getInt("avatar"))
@@ -55,7 +56,7 @@ public sealed class WorldCatalogLoadStepsTests
         var source = Source(Map(0));
         source.Mobs = [new MobTemplateRow { MobTemplateId = 0, Type = 128, Name = "M", Hp = 1 }];
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => CreateLoader(source).LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => CreateLoader(source).LoadAsync());
 
         Assert.Contains("vượt khoảng Int8", exception.Message, StringComparison.Ordinal);
     }
@@ -67,21 +68,24 @@ public sealed class WorldCatalogLoadStepsTests
         MapTemplateRow map = Map(0);
         map.TileId = 128;
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => CreateLoader(Source(map)).LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => CreateLoader(Source(map)).LoadAsync());
 
         Assert.Contains("tile_id=128", exception.Message, StringComparison.Ordinal);
     }
 
-    // Từ chối mob JSON không tồn tại trong danh mục đã nạp. (Java: mapTemplate.mobTemp)
+    // Mob JSON không tồn tại vẫn ở template; Java initMob bỏ qua tại runtime. (Java: Map.initMob)
     [Fact]
-    public async Task Rejects_missing_mob_foreign_key()
+    public async Task Keeps_missing_mob_reference_and_reports_java_runtime_skip()
     {
         MapTemplateRow map = Map(0);
         map.Mobs = "[[1,1,100,2,3]]";
+        StaticCatalogLoader loader = CreateLoader(Source(map));
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => CreateLoader(Source(map)).LoadAsync());
+        IStaticCatalogs snapshot = await loader.LoadAsync();
 
-        Assert.Contains("mob id 1", exception.Message, StringComparison.Ordinal);
+        MapTemplate loadedMap = Assert.IsType<MapTemplate>(snapshot.World.GetMap(0));
+        Assert.Equal([1], loadedMap.MobTemp);
+        Assert.Contains("map-template: giữ 1 tham chiếu mob không tồn tại (Java initMob bỏ qua các mob này ở runtime)", loader.LastReport.Warnings);
     }
 
     // Từ chối id mẫu quái trùng trước khi công bố snapshot. (Java: MOB_TEMPLATES.add)
@@ -91,22 +95,56 @@ public sealed class WorldCatalogLoadStepsTests
         var source = Source(Map(0));
         source.Mobs = [Mob(0), Mob(0)];
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => CreateLoader(source).LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => CreateLoader(source).LoadAsync());
 
         Assert.Contains("trùng", exception.Message, StringComparison.Ordinal);
     }
 
-    // Báo chính xác id map 205 bị thiếu thay vì dịch chỉ số Java im lặng. (Java: MAP_TEMPLATES[index])
+    // Map có lỗ 205 vẫn nạp theo mapId, không dịch map 206 sang chỉ số 205 và không cảnh báo. (Java: MapService.getMapById)
     [Fact]
-    public async Task Reports_each_missing_catalog_id()
+    public async Task Allows_sparse_map_ids_without_reporting_a_gap()
     {
         var source = Source(Map(0));
-        source.Maps = [Map(0), Map(2)];
+        source.Maps = [Map(0), Map(206, "Map 206")];
 
-        CatalogGapException exception = await Assert.ThrowsAsync<CatalogGapException>(() => CreateLoader(source).LoadAsync());
+        StaticCatalogLoader loader = CreateLoader(source);
+        IStaticCatalogs snapshot = await loader.LoadAsync();
 
-        Assert.Equal([1], exception.MissingIds);
-        Assert.Contains("1", exception.Message, StringComparison.Ordinal);
+        Assert.Empty(loader.LastReport.Warnings);
+        Assert.Equal([0, 206], snapshot.World.Maps.Select(map => map.Id));
+        Assert.Equal("Map 206", snapshot.World.GetMap(206)?.Name);
+        Assert.Null(snapshot.World.GetMap(205));
+        Assert.False(snapshot.World.TryGetMap(205, out MapTemplate? missing));
+        Assert.Null(missing);
+    }
+
+    // Mob/NPC vẫn là danh sách Java truy cập theo chỉ số nên lỗ id phải là lỗi cứng. (Java: MOB_TEMPLATES.get, NPC_TEMPLATES.get)
+    [Fact]
+    public async Task Rejects_sparse_mob_and_npc_ids()
+    {
+        var mobGap = Source(Map(0));
+        mobGap.Mobs = [Mob(0), Mob(2)];
+        var npcGap = Source(Map(0));
+        npcGap.Npcs = [Npc(0, 3), Npc(2, 3)];
+
+        CatalogLoadAggregateException mobAggregate = await Assert.ThrowsAsync<CatalogLoadAggregateException>(() => CreateLoader(mobGap).LoadAsync());
+        CatalogLoadAggregateException npcAggregate = await Assert.ThrowsAsync<CatalogLoadAggregateException>(() => CreateLoader(npcGap).LoadAsync());
+        CatalogGapException mobException = Assert.IsType<CatalogGapException>(Assert.Single(mobAggregate.Errors));
+        CatalogGapException npcException = Assert.IsType<CatalogGapException>(Assert.Single(npcAggregate.Errors));
+
+        Assert.Equal([1], mobException.MissingIds);
+        Assert.Equal([1], npcException.MissingIds);
+    }
+
+    // Id map trùng vẫn không xác định được tra cứu theo id nên phải từ chối. (Java: MapService.getMapById)
+    [Fact]
+    public async Task Rejects_duplicate_map_ids()
+    {
+        var source = Source(Map(0), Map(0, "duplicate"));
+
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => CreateLoader(source).LoadAsync());
+
+        Assert.Contains("Id bị trùng: 0", exception.Message, StringComparison.Ordinal);
     }
 
     // Reload dựng snapshot mới và để snapshot cũ giữ map cũ. (Java: loadMap)
@@ -121,8 +159,10 @@ public sealed class WorldCatalogLoadStepsTests
         IStaticCatalogs after = await loader.LoadAsync();
 
         Assert.NotSame(before, after);
-        Assert.Equal("before", before.World.GetMap(0).Name);
-        Assert.Equal("after", after.World.GetMap(0).Name);
+        MapTemplate beforeMap = Assert.IsType<MapTemplate>(before.World.GetMap(0));
+        MapTemplate afterMap = Assert.IsType<MapTemplate>(after.World.GetMap(0));
+        Assert.Equal("before", beforeMap.Name);
+        Assert.Equal("after", afterMap.Name);
     }
 
     // Chặn map id không thuộc catalog và gốc chứa parent segment trước bất kỳ I/O asset nào. (Java: tile_map_data/{mapId})

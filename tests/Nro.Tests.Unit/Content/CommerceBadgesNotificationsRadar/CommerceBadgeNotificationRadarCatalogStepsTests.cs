@@ -32,24 +32,77 @@ public sealed class CommerceBadgeNotificationRadarCatalogStepsTests
     public async Task Rejects_missing_shop_template_and_option_foreign_keys()
     {
         CommerceRows missingTemplate = ValidRows() with { ShopItems = [new ItemShopRow { ItemShopId = 7, TabId = 10, TempId = 9, IsSell = true }] };
-        CatalogLoadException templateError = await Assert.ThrowsAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(missingTemplate, Items())).LoadAsync());
+        CatalogLoadException templateError = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(missingTemplate, Items())).LoadAsync());
         Assert.Contains("temp_id", templateError.Message, StringComparison.Ordinal);
 
         CommerceRows missingOption = ValidRows() with { ShopItemOptions = [new ItemShopOptionRow { ItemShopOptionId = 11, ItemShopId = 7, OptionId = 9, Param = 5 }] };
-        CatalogLoadException optionError = await Assert.ThrowsAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(missingOption, Items())).LoadAsync());
+        CatalogLoadException optionError = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(missingOption, Items())).LoadAsync());
         Assert.Contains("option_id", optionError.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Skips_unreachable_shop_rows_with_structured_warnings_but_rejects_reachable_missing_template()
+    {
+        CommerceRows rows = ValidRows() with
+        {
+            ShopItems =
+            [
+                new ItemShopRow { ItemShopId = 8, TabId = 10, TempId = 0, IsSell = true, CreateTime = new DateTime(2026, 1, 2) },
+                new ItemShopRow { ItemShopId = 7, TabId = 10, TempId = 0, IsSell = true, CreateTime = new DateTime(2026, 1, 1) },
+                new ItemShopRow { ItemShopId = 99, TabId = 99, TempId = 9, IsSell = true },
+                new ItemShopRow { ItemShopId = 100, TabId = 10, TempId = 9, IsSell = false },
+                new ItemShopRow { ItemShopId = 102, TabId = 41, TempId = 0, IsSell = true },
+            ],
+            ShopItemOptions =
+            [
+                new ItemShopOptionRow { ItemShopOptionId = 11, ItemShopId = 7, OptionId = 0, Param = 5 },
+                new ItemShopOptionRow { ItemShopOptionId = 12, ItemShopId = 8, OptionId = 0, Param = 6 },
+                new ItemShopOptionRow { ItemShopOptionId = 13, ItemShopId = 99, OptionId = 9, Param = 7 },
+                new ItemShopOptionRow { ItemShopOptionId = 14, ItemShopId = 100, OptionId = 9, Param = 8 },
+                new ItemShopOptionRow { ItemShopOptionId = 15, ItemShopId = 101, OptionId = 9, Param = 9 },
+                new ItemShopOptionRow { ItemShopOptionId = 16, ItemShopId = 102, OptionId = 0, Param = 10 },
+            ],
+        };
+        var loader = new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(rows, Items()));
+
+        IStaticCatalogs snapshot = await loader.LoadAsync();
+
+        Assert.Equal([8, 7], snapshot.Shops.Get(2).Tabs[0].Items.Select(item => item.Id));
+        Assert.Equal(2, snapshot.Shops.Get(2).Tabs[0].Items.Sum(item => item.Options.Count));
+        Assert.Contains("item_shop: bỏ qua 1 hàng mồ côi tab_id không tồn tại (Java đọc theo cây, không đọc các hàng này)", loader.LastReport.Warnings);
+        Assert.Contains("item_shop: bỏ qua 1 hàng is_sell=false (Java đọc theo cây, không đọc các hàng này)", loader.LastReport.Warnings);
+        Assert.Contains("item_shop: 1 hàng của tab 41–43 không được Java đọc (quirk)", loader.LastReport.Warnings);
+        Assert.Contains("item_shop_option: bỏ qua 1 hàng mồ côi item_shop_id không tồn tại (Java đọc theo cây, không đọc các hàng này)", loader.LastReport.Warnings);
+        Assert.Contains("item_shop_option: bỏ qua 3 hàng thuộc item_shop không đạt được (Java đọc theo cây, không đọc các hàng này)", loader.LastReport.Warnings);
+
+        CommerceRows reachableMissingTemplate = rows with { ShopItems = [new ItemShopRow { ItemShopId = 7, TabId = 10, TempId = 9, IsSell = true }] };
+        CatalogLoadException error = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(reachableMissingTemplate, Items())).LoadAsync());
+        Assert.Contains("temp_id", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
     public async Task Rejects_invalid_badge_and_radar_json()
     {
         CommerceRows badBadge = ValidRows() with { Badges = [new DataBadgesRow { DataBadgesId = 1, IdItem = 0, Name = "B", Options = "{" }] };
-        CatalogLoadException badgeError = await Assert.ThrowsAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(badBadge, Items())).LoadAsync());
+        CatalogLoadException badgeError = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(badBadge, Items())).LoadAsync());
         Assert.Equal(BadgesCatalogLoadStep.StepName, badgeError.StepName);
 
         CommerceRows badRadar = ValidRows() with { RadarCards = [new RadarRow { RadarId = 3, Body = "[]", Options = "[{}]" }] };
-        CatalogLoadException radarError = await Assert.ThrowsAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(badRadar, Items())).LoadAsync());
+        CatalogLoadException radarError = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(badRadar, Items())).LoadAsync());
         Assert.Equal(RadarCatalogLoadStep.StepName, radarError.StepName);
+    }
+
+    [Fact]
+    public async Task Keeps_badge_item_id_that_java_only_copies_without_lookup()
+    {
+        CommerceRows rows = ValidRows() with
+        {
+            Badges = [new DataBadgesRow { DataBadgesId = 1, IdEffect = 4, IdItem = 9, Name = "B", Options = "[]" }],
+        };
+
+        IStaticCatalogs snapshot = await new StaticCatalogLoader(CommerceBadgeNotificationRadarCatalogSteps.Create(rows, Items())).LoadAsync();
+
+        Assert.Equal(9, snapshot.Badges.Templates[0].ItemId);
     }
 
     private static CommerceRows ValidRows() => new()

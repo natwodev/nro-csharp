@@ -11,8 +11,9 @@ public sealed class WorldCatalog : IWorldCatalog
     private readonly MobTemplate[] mobs;
     private readonly NpcTemplate[] npcs;
     private readonly MapTemplate[] maps;
+    private readonly IReadOnlyDictionary<int, MapTemplate> mapsById;
 
-    // Đóng danh mục từ các mảng đã xác thực liên tục theo id. (Java: ArrayList.add, MAP_TEMPLATES[y++])
+    // Đóng danh mục map theo thứ tự id để duyệt tuần tự như Java, đồng thời lập chỉ mục thưa theo mapId. (Java: Manager.MAPS, MapService.getMapById)
     public WorldCatalog(IEnumerable<MobTemplate> mobs, IEnumerable<NpcTemplate> npcs, IEnumerable<MapTemplate> maps)
     {
         ArgumentNullException.ThrowIfNull(mobs);
@@ -20,7 +21,8 @@ public sealed class WorldCatalog : IWorldCatalog
         ArgumentNullException.ThrowIfNull(maps);
         this.mobs = mobs.Select(Clone).ToArray();
         this.npcs = npcs.Select(Clone).ToArray();
-        this.maps = maps.Select(Clone).ToArray();
+        this.maps = maps.OrderBy(map => map.Id).Select(Clone).ToArray();
+        mapsById = this.maps.ToDictionary(map => map.Id);
     }
 
     // Số mẫu quái. (Java: MOB_TEMPLATES.size)
@@ -32,6 +34,9 @@ public sealed class WorldCatalog : IWorldCatalog
     // Số mẫu map. (Java: MAP_TEMPLATES.length)
     public int MapCount => maps.Length;
 
+    // Danh sách map theo thứ tự id để duyệt tuần tự, trả bản sao để snapshot không bị sửa. (Java: for (Map map : Manager.MAPS))
+    public IReadOnlyList<MapTemplate> Maps => maps.Select(Clone).ToArray();
+
     // Lấy bản sao mẫu quái tại id. (Java: MOB_TEMPLATES.get)
     public MobTemplate GetMob(int id) => (uint)id < (uint)mobs.Length
         ? Clone(mobs[id])
@@ -42,10 +47,21 @@ public sealed class WorldCatalog : IWorldCatalog
         ? Clone(npcs[id])
         : throw new ArgumentOutOfRangeException(nameof(id), id, "Không có mẫu NPC tại id đã cho.");
 
-    // Lấy bản sao mẫu map tại id. (Java: MAP_TEMPLATES[index])
-    public MapTemplate GetMap(int id) => (uint)id < (uint)maps.Length
-        ? Clone(maps[id])
-        : throw new ArgumentOutOfRangeException(nameof(id), id, "Không có mẫu bản đồ tại id đã cho.");
+    // Tìm map theo mapId; id bị khuyết không là chỉ số mảng. (Java: MapService.getMapById)
+    public MapTemplate? GetMap(int id) => TryGetMap(id, out MapTemplate? map) ? map : null;
+
+    // Tìm map theo mapId mà không ném cho id không có trong dump. (Java: MapService.getMapById)
+    public bool TryGetMap(int id, out MapTemplate? map)
+    {
+        if (mapsById.TryGetValue(id, out MapTemplate? value))
+        {
+            map = Clone(value);
+            return true;
+        }
+
+        map = null;
+        return false;
+    }
 
     // Sao chép mẫu quái để giữ snapshot bất biến. (Java: MobTemplate)
     private static MobTemplate Clone(MobTemplate value) => new()

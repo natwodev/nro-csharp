@@ -14,14 +14,16 @@ internal static class StaticCatalogJson
         int index = 0;
         foreach (JsonElement detail in root.EnumerateArray())
         {
-            if (detail.ValueKind != JsonValueKind.Array || detail.GetArrayLength() != 3)
+            JsonElement row = EmbeddedArray(detail, stepName, rowId, $"data[{index}]");
+            if (row.GetArrayLength() < 3)
             {
-                throw new CatalogLoadException(stepName, $"Hàng id {rowId} có data[{index}] phải là mảng ba số [iconId, dx, dy].");
+                throw new CatalogLoadException(stepName, $"Hàng id {rowId} có data[{index}] cần ít nhất ba số [iconId, dx, dy].");
             }
 
-            int iconId = Int(detail[0], stepName, rowId, $"data[{index}][0]");
-            int dx = Int(detail[1], stepName, rowId, $"data[{index}][1]");
-            int dy = Int(detail[2], stepName, rowId, $"data[{index}][2]");
+            // Java lấy [0..2] và bỏ qua dữ liệu dư trong JSONArray.
+            int iconId = Int(row[0], stepName, rowId, $"data[{index}][0]");
+            int dx = Int(row[1], stepName, rowId, $"data[{index}][1]");
+            int dy = Int(row[2], stepName, rowId, $"data[{index}][2]");
             result.Add(new PartDetail(
                 StaticCatalogValidation.Short(iconId, stepName, "iconId", rowId),
                 StaticCatalogValidation.SByte(dx, stepName, "dx", rowId),
@@ -65,7 +67,37 @@ internal static class StaticCatalogJson
         }
     }
 
-    private static int Int(JsonElement value, string stepName, int rowId, string field) => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out int result)
-        ? result
-        : throw new CatalogLoadException(stepName, $"Hàng id {rowId} có {field} phải là Int32 JSON.");
+    private static JsonElement EmbeddedArray(JsonElement value, string stepName, int rowId, string field)
+    {
+        if (value.ValueKind == JsonValueKind.Array)
+        {
+            return value;
+        }
+
+        if (value.ValueKind == JsonValueKind.String)
+        {
+            try
+            {
+                using JsonDocument nested = JsonDocument.Parse(value.GetString() ?? String.Empty);
+                if (nested.RootElement.ValueKind == JsonValueKind.Array)
+                {
+                    return nested.RootElement.Clone();
+                }
+            }
+            catch (JsonException exception)
+            {
+                throw new CatalogLoadException(stepName, $"Hàng id {rowId} có {field} chuỗi JSON không hợp lệ.", exception);
+            }
+        }
+
+        throw new CatalogLoadException(stepName, $"Hàng id {rowId} có {field} phải là mảng JSON hoặc chuỗi JSON.");
+    }
+
+    private static int Int(JsonElement value, string stepName, int rowId, string field)
+    {
+        string? text = value.ValueKind == JsonValueKind.String ? value.GetString() : value.ValueKind == JsonValueKind.Number ? value.GetRawText() : null;
+        return Int32.TryParse(text, System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out int result)
+            ? result
+            : throw new CatalogLoadException(stepName, $"Hàng id {rowId} có {field} phải là Int32 JSON.");
+    }
 }

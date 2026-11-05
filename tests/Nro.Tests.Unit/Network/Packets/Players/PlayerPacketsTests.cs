@@ -146,6 +146,69 @@ public sealed class PlayerPacketsTests
         Assert.Equal(new byte[] { 0x04, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 8, 0, 0, 0, 7, 0, 0, 0, 6, 0, 0, 0, 5 }, session.Packets[2].Payload);
     }
 
+    // -42: 7×i, b FF/14/14/01, i, i, b FE, L, s 100, s FFFE, b FF. D17 giữ defg hai byte Java.
+    [Fact]
+    public void Player_point_packet_is_byte_exact_and_keeps_the_java_short_base_defense()
+    {
+        Message message = PlayerPointPacketCodec.Encode(new PlayerPointPacket(1, -2, 0x01020304, -1, 2, 3, 4, -1, 0x05060708, -9, -2, 0x0102030405060708L, -2, -1));
+
+        Assert.Equal((sbyte)-42, message.Command);
+        Assert.Equal(new byte[]
+        {
+            0,0,0,1, 0xff,0xff,0xff,0xfe, 1,2,3,4, 0xff,0xff,0xff,0xff, 0,0,0,2, 0,0,0,3, 0,0,0,4,
+            0xff,20,20,1, 5,6,7,8, 0xff,0xff,0xff,0xf7, 0xfe, 1,2,3,4,5,6,7,8, 0,100, 0xff,0xfe, 0xff,
+        }, message.GetData());
+    }
+
+    // -17 ép id xuống b 04; -8 ép cùng id xuống s 0304, cPk 0; tọa độ -1 và 65536 giữ low 16 bit Java.
+    [Fact]
+    public void Character_death_packets_are_byte_exact_for_narrowing_and_protocol_d9()
+    {
+        var packet = new CharacterDeathPacket(0x01020304, -1, 65536);
+
+        Assert.Equal(new byte[] { 0x04, 0xff, 0xff, 0, 0 }, CharacterDeathPacketCodec.EncodeSelf(packet).GetData());
+        Assert.Equal(new byte[] { 0x03, 0x04, 0, 0xff, 0xff, 0, 0 }, CharacterDeathPacketCodec.EncodeOther(packet).GetData());
+    }
+
+    // -30/0: tính tay từ Java: b sub, i id, b task/gender, s head, UTF modified (A/NUL/😀), rồi các sentinel/đếm rỗng và tail cố định.
+    [Fact]
+    public void Character_load_packet_is_byte_exact_with_modified_utf_and_overflowing_gold()
+    {
+        var packet = new CharacterLoadPacket(
+            0x01020304, -2, -1, -2, "A\0😀", -3, -2, [-1], 0x0102030405060708L, -1, 0x11223344,
+            [new CharacterLoadItem(-1, 0, "", "", [])], [], [], [], true, -2, true, -2, -1, -2);
+
+        Message message = CharacterLoadPacketCodec.Encode(packet, clientVersion: 213);
+
+        Assert.Equal((sbyte)-30, message.Command);
+        Assert.Equal(new byte[]
+        {
+            0, 1,2,3,4, 0xfe, 0xff, 0xff,0xfe, 0,9, 0x41,0xc0,0x80,0xed,0xa0,0xbd,0xed,0xb8,0x80,
+            0, 0xfd, 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe, 0,0, 0,0, 0xff, 1, 0xff,0xff,
+            5,6,7,8, 0xff,0xff,0xff,0xff, 0x11,0x22,0x33,0x44, 1, 0xff,0xff, 0, 0, 0,0,
+            2,2, 2,3, 2,0x19, 1, 0xff,0xff,0xff,0xfe, 1, 0xff,0xfe, 0xff, 0xff,0xfe,
+        }, message.GetData());
+    }
+
+    // Adapter I-02 bỏ session null/đóng như Player.SendMessage/IPlayerSessionTransport; không được ném ở đường login/chết.
+    [Fact]
+    public void Character_packet_adapter_ignores_missing_or_closed_session()
+    {
+        var sent = new List<string>();
+        Player open = NewPlayer(1, "closed", sent);
+        ((RecordingSession)open.Session!.Transport!).Disconnect();
+        var adapter = new PlayerPacketAdapter(readInt: true);
+
+        adapter.SendPlayerPoint(new Player { IsPlayer = true });
+        adapter.SendCharacterLoad(new Player { IsPlayer = true }, []);
+        adapter.SendCharacterDeath(new Player { IsPlayer = true });
+        adapter.SendPlayerPoint(open);
+        adapter.SendCharacterLoad(open, []);
+        adapter.SendCharacterDeath(open);
+
+        Assert.Empty(sent);
+    }
+
     private static Player NewPlayer(long id, string label, List<string> sent, Zone? zone = null, int version = 0)
     {
         var transport = new RecordingSession(label, sent);

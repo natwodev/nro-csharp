@@ -14,7 +14,7 @@ public interface IAppearanceCatalog
     // Các túi cờ theo id. (Java: FLAGS_BAGS)
     IReadOnlyList<FlagBag> FlagBags { get; }
 
-    // Các frame đầu nhân vật theo id. (Java: ARR_HEAD_2_FRAMES)
+    // Các frame đầu nhân vật theo thứ tự nạp; Java bỏ cột id khi thêm ArrHead2Frames. (Java: Manager.java 588–599)
     IReadOnlyList<ArrHead2Frames> HeadFrames { get; }
 
     // Tra bộ phận ngoại hình theo id. (Java: parts)
@@ -26,6 +26,6 @@ public interface IAppearanceCatalog
     // Tra túi cờ theo id. (Java: FLAGS_BAGS)
     FlagBag GetFlagBag(int id);
 
-    // Tra frame đầu theo vị trí id đã được kiểm liên tục. (Java: ARR_HEAD_2_FRAMES.get)
-    ArrHead2Frames GetHeadAnimationFrame(int id);
+    // Tra frame đầu theo vị trí List, không phải id DB. (Java: ARR_HEAD_2_FRAMES.get)
+    ArrHead2Frames GetHeadAnimationFrame(int index);
 }

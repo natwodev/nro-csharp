@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\..\postgres\schema\schema.sql" Link="schema.sql" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Nro.Tests.Shared\Nro.Tests.Shared.csproj" />
     <ProjectReference Include="..\..\src\Nro.Core\Nro.Core.csproj" />
     <ProjectReference Include="..\..\src\Nro.Data\Nro.Data.csproj" />

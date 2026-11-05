@@ -24,7 +24,7 @@ public sealed class StaticCatalogLoaderTests
         ]);
         IStaticCatalogs before = loader.Current;
 
-        await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
 
         Assert.Same(before, loader.Current);
         Assert.NotSame(newItems, loader.Current.Items);
@@ -72,6 +72,7 @@ public sealed class StaticCatalogLoaderTests
     public async Task Cancellation_between_steps_keeps_the_previous_snapshot()
     {
         var began = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        bool ranAfterCancellation = false;
         var loader = new StaticCatalogLoader(
         [
             new TestStep("first", [], (_, _) => Task.FromResult(new CatalogStepResult(1))),
@@ -80,6 +81,11 @@ public sealed class StaticCatalogLoaderTests
                 began.SetResult();
                 await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
                 return new CatalogStepResult(0);
+            }),
+            new TestStep("independent-after", [], (_, _) =>
+            {
+                ranAfterCancellation = true;
+                return Task.FromResult(new CatalogStepResult(1));
             }),
         ]);
         IStaticCatalogs before = loader.Current;
@@ -91,6 +97,7 @@ public sealed class StaticCatalogLoaderTests
 
         await Assert.ThrowsAsync<OperationCanceledException>(() => loading);
         Assert.Same(before, loader.Current);
+        Assert.False(ranAfterCancellation);
     }
 
     // Lưu số bản ghi của từng bước theo đúng thứ tự đã chạy. (Java: Logger.success)
@@ -111,6 +118,20 @@ public sealed class StaticCatalogLoaderTests
             entry => Assert.Equal(("world", 3), (entry.StepName, entry.RecordCount)));
     }
 
+    // Gom cảnh báo từ bước vào báo cáo công bố cùng snapshot. (Java: Logger.warning)
+    [Fact]
+    public async Task Reports_step_warnings()
+    {
+        var loader = new StaticCatalogLoader(
+        [
+            new TestStep("world", [], (_, _) => Task.FromResult(new CatalogStepResult(1, ["map-template: thiếu id 205"]))),
+        ]);
+
+        await loader.LoadAsync();
+
+        Assert.Equal(["map-template: thiếu id 205"], loader.LastReport.Warnings);
+    }
+
     // Không công bố snapshot khi số bản ghi khác số đã xác nhận. (Java: Logger.success)
     [Fact]
     public async Task Expected_record_count_mismatch_is_rejected()
@@ -120,9 +141,31 @@ public sealed class StaticCatalogLoaderTests
             new Dictionary<string, int>(StringComparer.Ordinal) { ["items"] = 5 });
         IStaticCatalogs before = loader.Current;
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
 
         Assert.Equal("items", exception.StepName);
+        Assert.Same(before, loader.Current);
+    }
+
+    // Các nhánh độc lập vẫn chạy để một lượt bootstrap trả đủ lỗi; nhánh phụ thuộc bị ghi nhận là bỏ qua.
+    [Fact]
+    public async Task Aggregates_independent_failures_and_skips_dependents_without_publishing()
+    {
+        var ran = new List<string>();
+        var loader = new StaticCatalogLoader(
+        [
+            new TestStep("first", [], (_, _) => Task.FromException<CatalogStepResult>(new InvalidOperationException("first boom"))),
+            new TestStep("dependent", ["first"], (_, _) => { ran.Add("dependent"); return Task.FromResult(new CatalogStepResult(1)); }),
+            new TestStep("second", [], (_, _) => Task.FromException<CatalogStepResult>(new InvalidOperationException("second boom"))),
+        ]);
+        IStaticCatalogs before = loader.Current;
+
+        CatalogLoadAggregateException error = await Assert.ThrowsAsync<CatalogLoadAggregateException>(() => loader.LoadAsync());
+
+        Assert.Equal(["first", "second"], error.Errors.Select(value => value.StepName));
+        CatalogLoadSkippedStep skipped = Assert.Single(error.SkippedSteps);
+        Assert.Equal(("dependent", "first"), (skipped.StepName, skipped.FailedDependencyStepName));
+        Assert.Empty(ran);
         Assert.Same(before, loader.Current);
     }
 

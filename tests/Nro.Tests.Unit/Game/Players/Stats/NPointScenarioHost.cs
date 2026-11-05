@@ -172,7 +172,7 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
         }
 
         NPointItem item = new() { TemplateId = spec.GetProperty("id").GetInt32(), TemplateType = spec.GetProperty("type").GetInt32() };
-        item.TrainArmorPercent = TrainArmorPercent(item.TemplateId);
+        item.TrainArmorPercent = PlayerNPointHost.TrainArmorPercent(item.TemplateId);
         JsonElement opts = spec.GetProperty("opts");
         if (opts.ValueKind == JsonValueKind.Null)
         {
@@ -188,16 +188,6 @@ internal sealed class NPointScenarioHost : PlayerNPointHost
 
         return item;
     }
-
-    /// <summary>Java <c>ItemService.getPercentTrainArmor</c> (ItemService belongs to track D; the table is repeated here for the scenarios).</summary>
-    private static int TrainArmorPercent(int templateId) => templateId switch
-    {
-        529 or 534 => 10,
-        530 or 535 => 20,
-        531 or 536 => 30,
-        1797 => 40,
-        _ => 0,
-    };
 
     // ---- scenario sets ----
 

@@ -4,7 +4,7 @@ using Nro.Game.Content;
 
 namespace Nro.Content.Loaders;
 
-// Nạp tab shop và kiểm khóa ngoại shop. Nguồn Java: jbcd/dao/ShopDAO.java (dòng 49–74).
+// Nạp tab đạt được từ shop; Java chỉ truy vấn tab theo từng shop. Nguồn Java: jbcd/dao/ShopDAO.java (dòng 49–74).
 public sealed class ShopTabCatalogLoadStep : ICatalogLoadStep
 {
     public const string StepName = "tab_shop";
@@ -27,17 +27,31 @@ public sealed class ShopTabCatalogLoadStep : ICatalogLoadStep
         IReadOnlyList<TabShopRow> rows = await source.ReadShopTabsAsync(cancellationToken).ConfigureAwait(false);
         var ids = new HashSet<int>();
         var shopIds = shops.Select(row => row.ShopId).ToHashSet();
+        var reachable = new List<TabShopRow>(rows.Count);
+        int orphanCount = 0;
         foreach (TabShopRow row in rows)
         {
             StaticCatalogValidation.Unique(ids, row.TabShopId, StepName);
             if (!shopIds.Contains(row.ShopId))
             {
-                throw new CatalogLoadException(StepName, $"Tab id {row.TabShopId} tham chiếu shop_id {row.ShopId} không tồn tại.");
+                orphanCount++;
+                continue;
             }
+
+            reachable.Add(row);
         }
 
-        state.Tabs = rows;
-        return new CatalogStepResult(rows.Count);
+        state.AllShopTabIds = ids;
+        state.Tabs = reachable;
+        return new CatalogStepResult(reachable.Count, Warnings(orphanCount));
+    }
+
+    private static IEnumerable<string> Warnings(int orphanCount)
+    {
+        if (orphanCount != 0)
+        {
+            yield return $"{StepName}: bỏ qua {orphanCount} hàng mồ côi shop_id không tồn tại (Java đọc theo cây, không đọc các hàng này)";
+        }
     }
 
     private static CatalogLoadException Missing(string step) => new(StepName, $"Thiếu dữ liệu từ bước '{step}'.");

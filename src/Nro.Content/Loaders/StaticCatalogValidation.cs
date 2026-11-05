@@ -41,14 +41,23 @@ internal static class StaticCatalogValidation
     {
         ArgumentNullException.ThrowIfNull(ids);
         int[] ordered = ids.OrderBy(id => id).ToArray();
-        if (ordered.Length != 0 && ordered[0] < 0)
-        {
-            throw new CatalogLoadException(stepName, $"Id phải không âm khi được dùng làm chỉ số Java; nhận {ordered[0]}.");
-        }
+        NonNegativeIds(ordered, stepName, "được dùng làm chỉ số Java");
+        IReadOnlyList<int> missing = MissingZeroBasedIds(ordered);
 
-        var missing = new List<int>();
+        if (missing.Count != 0)
+        {
+            throw new CatalogGapException(stepName, missing);
+        }
+    }
+
+    // Liệt kê các id bị khuyết chỉ cho catalog mà Java dùng chính id làm chỉ số List.get.
+    public static IReadOnlyList<int> MissingZeroBasedIds(IEnumerable<int> ids)
+    {
+        ArgumentNullException.ThrowIfNull(ids);
+        int[] ordered = ids.OrderBy(id => id).ToArray();
         int maximum = ordered.Length == 0 ? -1 : ordered[^1];
         var actual = new HashSet<int>(ordered);
+        var missing = new List<int>();
         for (int expected = 0; expected <= maximum; expected++)
         {
             if (!actual.Contains(expected))
@@ -57,30 +66,18 @@ internal static class StaticCatalogValidation
             }
         }
 
-        if (missing.Count != 0)
-        {
-            throw new CatalogGapException(stepName, missing);
-        }
+        return missing;
     }
 
-    // Kiểm id liên tục với điểm bắt đầu do dữ liệu quyết định khi contract chỉ dùng vị trí ORDER BY. (Java: List.get)
-    public static void ContinuousIds(IEnumerable<int> ids, string stepName)
+    // Kiểm mapId không âm dù map được tra cứu theo id thưa. (Java: mapId)
+    public static void NonNegativeIds(IEnumerable<int> ids, string stepName, string usage = "")
     {
-        using IEnumerator<int> enumerator = ids.GetEnumerator();
-        if (!enumerator.MoveNext())
+        ArgumentNullException.ThrowIfNull(ids);
+        int? negative = ids.Where(id => id < 0).Select(id => (int?)id).FirstOrDefault();
+        if (negative is not null)
         {
-            return;
-        }
-
-        int expected = enumerator.Current + 1;
-        while (enumerator.MoveNext())
-        {
-            if (enumerator.Current != expected)
-            {
-                throw new CatalogLoadException(stepName, $"Id phải liên tục theo thứ tự nạp; kỳ vọng {expected} nhưng nhận {enumerator.Current}.");
-            }
-
-            expected++;
+            string context = String.IsNullOrEmpty(usage) ? String.Empty : $" khi {usage}";
+            throw new CatalogLoadException(stepName, $"Id phải không âm{context}; nhận {negative.Value}.");
         }
     }
 

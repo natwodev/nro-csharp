@@ -43,12 +43,15 @@ public sealed class TaskCatalogLoadStep : ICatalogLoadStep
         }
 
         var subIds = new HashSet<int>();
+        int orphanSubCount = 0;
         foreach (TaskSubTemplateRow row in subRows)
         {
             StaticCatalogValidation.Unique(subIds, row.Idmain, StepName);
             if (!mains.TryGetValue(row.TaskMainId, out TaskMain? main))
             {
-                throw new CatalogLoadException(StepName, $"task_sub_template idmain {row.Idmain} tham chiếu task_main_id {row.TaskMainId} không tồn tại.");
+                // Java đọc bằng INNER JOIN, nên hàng con mồ côi không bao giờ được tạo SubTaskMain.
+                orphanSubCount++;
+                continue;
             }
 
             main.SubTasks.Add(new SubTaskMain
@@ -61,8 +64,9 @@ public sealed class TaskCatalogLoadStep : ICatalogLoadStep
             });
         }
 
-        // Java JOIN chỉ thêm main khi có sub; giữ đúng quirk này, nhưng source đã có FK được kiểm riêng.
+        // Java INNER JOIN chỉ thêm main có sub; main rỗng cũng không được đọc.
         List<TaskMain> joinedMains = mains.Values.Where(value => value.SubTasks.Count != 0).OrderBy(value => value.Id).ToList();
+        int mainWithoutSubCount = mains.Count - joinedMains.Count;
         List<SideTaskTemplate> side = CreateSide(sideRows);
         List<ClanTaskTemplate> clan = CreateClan(clanRows);
         List<KolTaskTemplate> kol = CreateKol(kolRows);
@@ -72,7 +76,22 @@ public sealed class TaskCatalogLoadStep : ICatalogLoadStep
         Continuous(kol.Select(value => value.Id), "task_kol_template");
         Continuous(events.Select(value => value.Id), "task_event_template");
         builder.SetTasks(new Nro.Content.Catalogs.TaskCatalog(joinedMains, side, clan, kol, events, kolItems));
-        return new CatalogStepResult(joinedMains.Count + subRows.Count + sideRows.Count + clanRows.Count + kolRows.Count + eventRows.Count);
+        return new CatalogStepResult(
+            joinedMains.Count + (subRows.Count - orphanSubCount) + sideRows.Count + clanRows.Count + kolRows.Count + eventRows.Count,
+            Warnings(mainWithoutSubCount, orphanSubCount));
+    }
+
+    private static IEnumerable<string> Warnings(int mainWithoutSubCount, int orphanSubCount)
+    {
+        if (mainWithoutSubCount != 0)
+        {
+            yield return $"{StepName}: bỏ qua {mainWithoutSubCount} hàng task_main_template không có task_sub_template (Java INNER JOIN không đọc các hàng này)";
+        }
+
+        if (orphanSubCount != 0)
+        {
+            yield return $"{StepName}: bỏ qua {orphanSubCount} hàng task_sub_template mồ côi task_main_id không tồn tại (Java INNER JOIN không đọc các hàng này)";
+        }
     }
 
     private static void Continuous(IEnumerable<int> ids, string table) => StaticCatalogValidation.ContinuousZeroBasedIds(ids, StepName + ":" + table);
@@ -111,13 +130,20 @@ public sealed class TaskCatalogLoadStep : ICatalogLoadStep
     private static int[] Range(string text, string table, int id, int level)
     {
         string[] pieces = text.Split('-', StringSplitOptions.None);
-        if (pieces.Length != 2)
+        if (pieces.Length < 2)
         {
-            throw new CatalogLoadException(StepName, $"{table} id {id} có max_count_lv{level} không theo dạng min-max.");
+            throw RangeError(table, id, level, text, "thiếu giá trị thứ hai (Java sẽ lỗi truy cập phần tử [1])");
         }
 
-        return [ParseInt(pieces[0], table, id, $"max_count_lv{level}"), ParseInt(pieces[1], table, id, $"max_count_lv{level}")];
+        // Java Manager chỉ đọc mc[0] và mc[1]; ví dụ dữ liệu thật id 17: "1-1-10" -> {1, 1}, phần "-10" bị bỏ qua.
+        return [ParseRangeValue(pieces[0], text, table, id, level, 0), ParseRangeValue(pieces[1], text, table, id, level, 1)];
     }
+
+    private static int ParseRangeValue(string text, string original, string table, int id, int level, int index) => Int32.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int value)
+        ? value
+        : throw RangeError(table, id, level, original, $"phần tử [{index}]='{text}' không phải Int32 Java hợp lệ");
+
+    private static CatalogLoadException RangeError(string table, int id, int level, string value, string reason) => new(StepName, $"{table} id {id} có max_count_lv{level}='{value}' không hợp lệ: {reason}.");
 
     private static int ParseInt(string text, string table, int id, string field) => Int32.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int value)
         ? value

@@ -12,6 +12,12 @@ internal static class CommerceCatalogJson
     public static IReadOnlyList<ItemOption> BadgeOptions(string json, int rowId, Func<int, ItemOption> create)
     {
         ArgumentNullException.ThrowIfNull(create);
+        // JSONValue.parse của Java trả null cho chuỗi rỗng/null; Java chỉ bỏ qua options trong trường hợp đó.
+        if (String.IsNullOrWhiteSpace(json) || String.Equals(json, "null", StringComparison.OrdinalIgnoreCase))
+        {
+            return Array.Empty<ItemOption>();
+        }
+
         using JsonDocument document = ParseArray(json, BadgesCatalogLoadStep.StepName, rowId, "options");
         var result = new List<ItemOption>(document.RootElement.GetArrayLength());
         int index = 0;
@@ -38,6 +44,12 @@ internal static class CommerceCatalogJson
         int index = 0;
         foreach (JsonElement element in document.RootElement.EnumerateArray())
         {
+            if (element.ValueKind == JsonValueKind.Null)
+            {
+                index++;
+                continue;
+            }
+
             RequireObject(element, RadarCatalogLoadStep.StepName, rowId, $"body[{index}]");
             head = StaticCatalogValidation.Short(Int(element, "head", RadarCatalogLoadStep.StepName, rowId, $"body[{index}].head"), RadarCatalogLoadStep.StepName, "head", rowId);
             body = StaticCatalogValidation.Short(Int(element, "body", RadarCatalogLoadStep.StepName, rowId, $"body[{index}].body"), RadarCatalogLoadStep.StepName, "body", rowId);
@@ -57,6 +69,12 @@ internal static class CommerceCatalogJson
         int index = 0;
         foreach (JsonElement element in document.RootElement.EnumerateArray())
         {
+            if (element.ValueKind == JsonValueKind.Null)
+            {
+                index++;
+                continue;
+            }
+
             RequireObject(element, RadarCatalogLoadStep.StepName, rowId, $"options[{index}]");
             int id = Int(element, "id", RadarCatalogLoadStep.StepName, rowId, $"options[{index}].id");
             int param = StaticCatalogValidation.Short(Int(element, "param", RadarCatalogLoadStep.StepName, rowId, $"options[{index}].param"), RadarCatalogLoadStep.StepName, "option.param", rowId);

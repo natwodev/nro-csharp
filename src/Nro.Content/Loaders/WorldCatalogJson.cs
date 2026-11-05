@@ -130,6 +130,7 @@ internal static class WorldCatalogJson
     // Đọc chuỗi theo String.valueOf Java. (Java: String.valueOf)
     private static string Text(JsonElement element, int mapId, string field) => element.ValueKind == JsonValueKind.String
         ? element.GetString() ?? String.Empty
+        : element.ValueKind == JsonValueKind.Null ? "null"
         : element.ValueKind is JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False ? element.GetRawText() : throw Error(mapId, $"{field} không phải chuỗi.");
 
     // Đọc số nguyên có thể được dump thành chuỗi. (Java: Integer.parseInt)

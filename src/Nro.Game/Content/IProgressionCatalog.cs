@@ -15,7 +15,7 @@ public interface IProgressionCatalog
     // Các mốc giới hạn sức mạnh theo chỉ mục. (Java: PowerLimitManager.powers)
     IReadOnlyList<PowerLimit> PowerLimits { get; }
 
-    // Các danh hiệu theo id. (Java: CaptionManager.captions)
+    // Danh hiệu theo thứ tự nạp; id của phần tử không phải chỉ số. (Java: CaptionManager.load/findLevel/getLevel)
     IReadOnlyList<Caption> Captions { get; }
 
     // Toàn bộ nội tại theo id. (Java: INTRINSICS)
@@ -32,6 +32,9 @@ public interface IProgressionCatalog
 
     // Tìm danh hiệu theo id. (Java: CaptionManager.find)
     Caption? FindCaption(int id);
+
+    // Lấy danh hiệu theo cấp/vị trí danh sách, không suy diễn index từ cột id 1-based. (Java: CaptionManager.findLevel)
+    Caption GetCaptionAtLevel(int index);
 
     // Lấy danh sách nội tại cho giới tính; giá trị khác 0/1 chọn Saiyan như Java. (Java: INTRINSIC_TD/NM/XD)
     IReadOnlyList<Intrinsic> GetIntrinsics(sbyte gender);

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Nro.Content.Catalogs;
 using Nro.Content.StaticData;
@@ -115,7 +116,12 @@ public sealed class SkillCatalogLoadStep : ICatalogLoadStep
         }
     }
 
-    private static int Int(JsonElement parent, string name, int rowId) => Property(parent, name, rowId).TryGetInt32(out int value) ? value : throw Invalid(rowId, name, "Int32");
+    private static int Int(JsonElement parent, string name, int rowId)
+    {
+        JsonElement value = Property(parent, name, rowId);
+        string? text = value.ValueKind == JsonValueKind.String ? value.GetString() : value.ValueKind == JsonValueKind.Number ? value.GetRawText() : null;
+        return Int32.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int result) ? result : throw Invalid(rowId, name, "Int32");
+    }
     private static long Long(JsonElement parent, string name, int rowId) => Property(parent, name, rowId).TryGetInt64(out long value) ? value : throw Invalid(rowId, name, "Int64");
     private static short Short(JsonElement parent, string name, int rowId) => StaticCatalogValidation.Short(Int(parent, name, rowId), StepName, name, rowId);
     private static sbyte SByte(JsonElement parent, string name, int rowId) => StaticCatalogValidation.SByte(Int(parent, name, rowId), StepName, name, rowId);

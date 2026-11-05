@@ -7,6 +7,7 @@ using Nro.Game.Content;
 using Nro.Game.Items.Core;
 using Nro.Game.Progress.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Nro.Host.Hosting;
 
@@ -15,21 +16,24 @@ public sealed class HostStaticCatalogLoader : IStaticCatalogLoader
 {
     private readonly IServiceProvider services;
     private readonly TimeProvider timeProvider;
+    private readonly ILogger<HostStaticCatalogLoader> logger;
     private IStaticCatalogs current = new StaticCatalogBuilder().Build();
 
     // Nhận factory DI trì hoãn row source đến lúc bootstrap thật sự cần DB. (Java: Manager.loadDatabase)
-    public HostStaticCatalogLoader(IServiceProvider services, TimeProvider timeProvider)
+    public HostStaticCatalogLoader(IServiceProvider services, TimeProvider timeProvider, ILogger<HostStaticCatalogLoader> logger)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(timeProvider);
+        ArgumentNullException.ThrowIfNull(logger);
         this.services = services;
         this.timeProvider = timeProvider;
+        this.logger = logger;
     }
 
     // Trả snapshot công bố gần nhất, không thay đổi nếu bất kỳ graph nào lỗi. (Java: Manager)
     public IStaticCatalogs Current => Volatile.Read(ref current);
 
-    // Nạp J-01B trước để J-01C/D có item catalog đã kiểm FK, đồng thời bắt J-01E fail-fast khi map thiếu id 205. (Java: Manager.loadDatabase)
+    // Nạp J-01B trước để J-01C/D có item catalog đã kiểm FK, đồng thời cảnh báo mapId thưa theo bằng chứng tra cứu Java. (Java: Manager.loadDatabase, MapService.getMapById)
     public async Task<IStaticCatalogs> LoadAsync(CancellationToken cancellationToken = default)
     {
         IStaticRowSource source = services.GetRequiredService<IStaticRowSource>();
@@ -38,6 +42,10 @@ public sealed class HostStaticCatalogLoader : IStaticCatalogLoader
 
         StaticCatalogLoader world = WorldCatalogSteps.CreateLoader(source);
         IStaticCatalogs worldCatalogs = await world.LoadAsync(cancellationToken).ConfigureAwait(false);
+        foreach (string warning in world.LastReport.Warnings)
+        {
+            logger.LogWarning("Cảnh báo static catalog: {CatalogWarning}", warning);
+        }
 
         var gameItems = new ItemCatalog(appearanceCatalogs.Items.ItemTemplates, appearanceCatalogs.Items.ItemOptionTemplates);
         var itemService = new ItemService(

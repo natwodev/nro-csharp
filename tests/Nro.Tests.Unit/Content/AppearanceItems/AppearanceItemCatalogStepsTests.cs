@@ -23,7 +23,8 @@ public sealed class AppearanceItemCatalogStepsTests
             ItemOptionTemplates = [new ItemOptionTemplateRow { ItemOptionTemplateId = 0, Name = "Sức mạnh #", Type = 2 }],
             HeadAvatars = [new HeadAvatarRow { HeadId = 10, AvatarId = 11 }],
             FlagBags = [new FlagBagRow { FlagBagId = 12, IconData = "13,14", Name = "Cờ", IconId = 15, Gold = 16, Gem = 17 }],
-            HeadAnimationFrames = [new HeadAnimationFrameRow { HeadAnimationFrameId = 0, Data = "[18,19]" }],
+            // Dump thật id 1..57; Java ARR_HEAD_2_FRAMES.get(0) lấy phần tử đầu, không phải id 0.
+            HeadAnimationFrames = [new HeadAnimationFrameRow { HeadAnimationFrameId = 1, Data = "[18,19]" }],
             ImagesByName = [new ImgByNameRow { ImgByNameId = 20, Name = "mount_5_0", NFrame = 2 }],
         };
         var loader = new StaticCatalogLoader(AppearanceItemCatalogSteps.Create(source));
@@ -52,7 +53,7 @@ public sealed class AppearanceItemCatalogStepsTests
         };
         var loader = new StaticCatalogLoader(AppearanceItemCatalogSteps.Create(source));
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
 
         Assert.Equal(PartCatalogLoadStep.StepName, exception.StepName);
         Assert.Contains("JSON", exception.Message, StringComparison.Ordinal);
@@ -68,30 +69,28 @@ public sealed class AppearanceItemCatalogStepsTests
         };
         var loader = new StaticCatalogLoader(AppearanceItemCatalogSteps.Create(source));
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
 
         Assert.Equal(ItemTemplateCatalogLoadStep.StepName, exception.StepName);
         Assert.Contains("power_require", exception.Message, StringComparison.Ordinal);
     }
 
-    // Từ chối ID frame có lỗ vì consumer Java tra theo vị trí danh sách. (Java: ARR_HEAD_2_FRAMES.get)
+    // Hồ sơ dump thật là id 1..57; Java chỉ ARR_HEAD_2_FRAMES.add/get(index), nên vị trí 0 là hàng id 1.
     [Fact]
-    public async Task Rejects_a_gap_in_head_animation_frame_ids()
+    public async Task Uses_load_order_for_the_real_one_based_head_animation_frame_profile()
     {
         var source = new InMemoryStaticRowSource
         {
-            HeadAnimationFrames =
-            [
-                new HeadAnimationFrameRow { HeadAnimationFrameId = 1, Data = "[]" },
-                new HeadAnimationFrameRow { HeadAnimationFrameId = 3, Data = "[]" },
-            ],
+            HeadAnimationFrames = Enumerable.Range(1, 57)
+                .Select(id => new HeadAnimationFrameRow { HeadAnimationFrameId = id, Data = $"[{id}]" })
+                .ToArray(),
         };
         var loader = new StaticCatalogLoader(AppearanceItemCatalogSteps.Create(source));
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        IStaticCatalogs catalog = await loader.LoadAsync();
 
-        Assert.Equal(HeadAnimationFrameCatalogLoadStep.StepName, exception.StepName);
-        Assert.Contains("liên tục", exception.Message, StringComparison.Ordinal);
+        Assert.Equal([1], catalog.Appearance.GetHeadAnimationFrame(0).Frames);
+        Assert.Equal([57], catalog.Appearance.GetHeadAnimationFrame(56).Frames);
     }
 
     // Từ chối ID item trùng trước khi áp dụng tra cứu vị trí. (Java: ITEM_TEMPLATES.get)
@@ -104,7 +103,7 @@ public sealed class AppearanceItemCatalogStepsTests
         };
         var loader = new StaticCatalogLoader(AppearanceItemCatalogSteps.Create(source));
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
 
         Assert.Equal(ItemTemplateCatalogLoadStep.StepName, exception.StepName);
         Assert.Contains("trùng", exception.Message, StringComparison.Ordinal);
@@ -117,7 +116,7 @@ public sealed class AppearanceItemCatalogStepsTests
         var loader = AppearanceItemCatalogSteps.CreateLoader(new InMemoryStaticRowSource());
         IStaticCatalogs before = loader.Current;
 
-        CatalogLoadException exception = await Assert.ThrowsAsync<CatalogLoadException>(() => loader.LoadAsync());
+        CatalogLoadException exception = await Assert.ThrowsAnyAsync<CatalogLoadException>(() => loader.LoadAsync());
 
         Assert.Equal(PartCatalogLoadStep.StepName, exception.StepName);
         Assert.Same(before, loader.Current);

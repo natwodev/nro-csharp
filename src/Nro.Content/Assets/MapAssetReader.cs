@@ -57,7 +57,11 @@ public sealed class MapAssetReader : IMapAssetReader
     // Đọc tile_map_data/mapId sau khi kiểm map id thuộc catalog; map id không bao giờ là một chuỗi đường dẫn. (Java: readTileMap)
     public TileMapAsset ReadMap(int mapId)
     {
-        _ = world.GetMap(mapId);
+        if (!world.TryGetMap(mapId, out _))
+        {
+            throw new ArgumentOutOfRangeException(nameof(mapId), mapId, "Không có mẫu bản đồ tại id đã cho.");
+        }
+
         ReadOnlySpan<byte> bytes = File.ReadAllBytes(TileMapPath(mapId));
         int offset = 0;
         int width = ReadSignedByte(bytes, ref offset, "width");

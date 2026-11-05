@@ -77,11 +77,11 @@ public static class ExpectedCounts
     // Số tab cửa hàng trong dump đã duyệt. (Java: tab_shop)
     public const int ShopTab = 89;
 
-    // Số item đang bán trong dump đã duyệt. (Java: item_shop)
-    public const int ShopItem = 1340;
+    // Java đọc 1273 item qua shop->tab->item(is_sell); tổng item_shop là 1340, gồm 41 hàng mồ côi và 26 hàng riêng tab 41–43 không được đọc do quirk. (Java: item_shop)
+    public const int ShopItem = 1273;
 
-    // Số option item shop trong dump đã duyệt. (Java: item_shop_option)
-    public const int ShopItemOption = 2278;
+    // Java đọc 2116 option đạt được; tổng item_shop_option là 2278, có 11 hàng mồ côi và quirk tab 41–43 bỏ qua 104 option (2220-2116). (Java: item_shop_option)
+    public const int ShopItemOption = 2116;
 
     // Số điều kiện huy hiệu trong dump đã duyệt. (Java: task_badges_template)
     public const int BadgeTask = 21;

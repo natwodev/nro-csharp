@@ -33,15 +33,7 @@ public sealed class BadgesCatalogLoadStep : ICatalogLoadStep
         foreach (DataBadgesRow row in rows)
         {
             StaticCatalogValidation.Unique(ids, row.DataBadgesId, StepName);
-            try
-            {
-                _ = state.Items.GetItemTemplate(row.IdItem);
-            }
-            catch (ArgumentOutOfRangeException exception)
-            {
-                throw new CatalogLoadException(StepName, $"Huy hiệu id {row.DataBadgesId} tham chiếu id_item {row.IdItem} không tồn tại trong ItemCatalog.", exception);
-            }
-
+            // Java chỉ giữ idItem để so khớp hiệu ứng; không tra ItemService khi nạp data_badges.
             IReadOnlyList<ItemOption> options = CommerceCatalogJson.BadgeOptions(row.Options ?? String.Empty, row.DataBadgesId, optionId =>
             {
                 try

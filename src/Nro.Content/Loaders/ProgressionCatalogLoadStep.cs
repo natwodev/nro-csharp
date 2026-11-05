@@ -61,7 +61,8 @@ public sealed class ProgressionCatalogLoadStep : ICatalogLoadStep
             captions.Add(new Caption(StaticCatalogValidation.Short(row.CaptionId, StepName, "id", row.CaptionId), row.Earth, row.Saiya, row.Namek, row.Power));
         }
 
-        StaticCatalogValidation.ContinuousZeroBasedIds(captions.Select(value => value.Id), StepName);
+        // Java CaptionManager.find tra id, còn findLevel/getLevel truy cập vị trí List theo thứ tự nạp;
+        // id thật bắt đầu ở 1 nên tuyệt đối không coi id là chỉ số List.
         foreach (IntrinsicRow row in intrinsicRows)
         {
             StaticCatalogValidation.Unique(intrinsicIds, row.IntrinsicId, StepName);
@@ -84,7 +85,8 @@ public sealed class ProgressionCatalogLoadStep : ICatalogLoadStep
             achievements.Add(new AchievementTemplate(row.Info1, row.Info2, row.Money, row.MaxCount));
         }
 
-        StaticCatalogValidation.ContinuousIds(achievementRows.Select(row => row.AchievementTemplateId), StepName);
+        // Java ACHIEVEMENT_TEMPLATE.get(index) dùng vị trí ArrayList; cột id không được mang vào
+        // AchievementTemplate nên không phải hợp đồng chỉ số (dump thật bắt đầu ở 1).
 
         builder.SetProgression(new ProgressionCatalog(attributes, powers, captions, intrinsics, achievements));
         return new CatalogStepResult(attributeRows.Count + powerRows.Count + captionRows.Count + intrinsicRows.Count + achievementRows.Count);

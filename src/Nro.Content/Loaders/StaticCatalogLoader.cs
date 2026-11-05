@@ -32,10 +32,22 @@ public sealed class StaticCatalogLoader : IStaticCatalogLoader
     {
         var builder = new StaticCatalogBuilder();
         var entries = new List<CatalogLoadReportEntry>(steps.Count);
+        var warnings = new List<string>();
+        var failures = new List<CatalogLoadException>();
+        var failedSteps = new Dictionary<string, string>(StringComparer.Ordinal);
+        var skippedSteps = new List<CatalogLoadSkippedStep>();
 
         foreach (ICatalogLoadStep step in steps)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            string? failedDependency = FindFailedDependency(step, failedSteps);
+            if (failedDependency is not null)
+            {
+                skippedSteps.Add(new CatalogLoadSkippedStep(step.Name, failedDependency));
+                failedSteps.Add(step.Name, failedDependency);
+                continue;
+            }
+
             CatalogStepResult result;
             try
             {
@@ -46,35 +58,62 @@ public sealed class StaticCatalogLoader : IStaticCatalogLoader
                 // Chuẩn hóa ngoại lệ hủy của bước (TaskCanceledException) thành hợp đồng hủy của loader.
                 throw new OperationCanceledException(exception.Message, exception, cancellationToken);
             }
-            catch (CatalogLoadException)
+            catch (CatalogLoadException exception)
             {
-                throw;
+                failures.Add(exception);
+                failedSteps.Add(step.Name, step.Name);
+                continue;
             }
             catch (Exception exception)
             {
-                throw new CatalogLoadException(step.Name, $"Không thể nạp bước danh mục '{step.Name}'.", exception);
+                failures.Add(new CatalogLoadException(step.Name, $"Không thể nạp bước danh mục '{step.Name}'.", exception));
+                failedSteps.Add(step.Name, step.Name);
+                continue;
             }
 
             if (result is null)
             {
-                throw new CatalogLoadException(step.Name, $"Bước danh mục '{step.Name}' không trả kết quả.");
+                failures.Add(new CatalogLoadException(step.Name, $"Bước danh mục '{step.Name}' không trả kết quả."));
+                failedSteps.Add(step.Name, step.Name);
+                continue;
             }
 
             cancellationToken.ThrowIfCancellationRequested();
             if (expectedRecordCounts.TryGetValue(step.Name, out int expectedCount) && result.RecordCount != expectedCount)
             {
-                throw new CatalogLoadException(step.Name, $"Bước danh mục '{step.Name}' nạp {result.RecordCount} bản ghi, kỳ vọng {expectedCount}.");
+                failures.Add(new CatalogLoadException(step.Name, $"Bước danh mục '{step.Name}' nạp {result.RecordCount} bản ghi, kỳ vọng {expectedCount}."));
+                failedSteps.Add(step.Name, step.Name);
+                continue;
             }
 
             entries.Add(new CatalogLoadReportEntry(step.Name, result.RecordCount));
+            warnings.AddRange(result.Warnings);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
+        if (failures.Count != 0)
+        {
+            throw new CatalogLoadAggregateException(failures, skippedSteps);
+        }
+
         IStaticCatalogs next = builder.Build();
-        var report = new CatalogLoadReport(entries);
+        var report = new CatalogLoadReport(entries, warnings);
         Volatile.Write(ref current, next);
         Volatile.Write(ref lastReport, report);
         return next;
+    }
+
+    private static string? FindFailedDependency(ICatalogLoadStep step, IReadOnlyDictionary<string, string> failedSteps)
+    {
+        foreach (string dependency in step.Dependencies)
+        {
+            if (failedSteps.TryGetValue(dependency, out string? rootFailure))
+            {
+                return rootFailure;
+            }
+        }
+
+        return null;
     }
 
     private static List<ICatalogLoadStep> OrderSteps(IEnumerable<ICatalogLoadStep> source)
