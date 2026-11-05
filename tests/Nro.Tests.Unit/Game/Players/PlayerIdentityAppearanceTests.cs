@@ -1,9 +1,11 @@
 using Nro.Core.IO;
+using Nro.Core.Consts;
 using Nro.Core.Templates;
 using Nro.Game.Items.Core;
 using Nro.Game.Players;
 using Nro.Game.Players.Ports;
 using Nro.Game.Players.Sessions;
+using Nro.Game.Skills;
 
 namespace Nro.Tests.Unit.Game.Players;
 
@@ -238,12 +240,192 @@ public sealed class PlayerIdentityAppearanceTests
         Assert.False(caller.IsTargetForPet(new Player { IsPet = true }));
     }
 
+    [Theory]
+    [InlineData(0, 380, 381, 382)]
+    [InlineData(1, 391, 392, 393)]
+    [InlineData(2, 380, 381, 382)]
+    public void Appearance_FusionWinsOverCostumeAndEquipmentForEveryGender(int gender, int expectedHead, int expectedBody, int expectedLeg)
+    {
+        Player player = NewAppearancePlayer((sbyte)gender);
+        player.Inventory.ItemsBody[0] = OutfitItem(part: 900);
+        player.Inventory.ItemsBody[1] = OutfitItem(part: 901);
+        player.Inventory.ItemsBody[5] = OutfitItem(id: 500, head: 100, body: 101, leg: 102);
+        player.AppearanceFusionType = ConstPlayer.FUSION_DANCE;
+
+        Assert.Equal((short)expectedHead, player.GetHead());
+        Assert.Equal((short)expectedBody, player.GetBody());
+        Assert.Equal((short)expectedLeg, player.GetLeg());
+
+        player.FusionDisplayState = 0;
+        Assert.Equal((short)100, player.GetHead());
+        Assert.Equal((short)101, player.GetBody());
+        Assert.Equal((short)102, player.GetLeg());
+    }
+
+    [Fact]
+    public void Appearance_EffectsAndMabuKeepTheirJavaPriorityOverFusionAndEquipment()
+    {
+        Player player = NewAppearancePlayer(ConstPlayer.EARTHLING);
+        player.Inventory.ItemsBody[5] = OutfitItem(id: 601, head: 99, body: 98, leg: 97);
+        player.AppearanceFusionType = ConstPlayer.PORATA_FUSION;
+        player.EffectSkill.IsChocolate = true;
+        player.EffectSkin.IsRabbitLeader = true;
+
+        Assert.Equal((short)412, player.GetHead());
+        Assert.Equal((short)413, player.GetBody());
+        Assert.Equal((short)414, player.GetLeg());
+
+        player.EffectSkill.IsChocolate = false;
+        player.IsMabuMapProtection = true;
+        Assert.Equal((short)406, player.GetHead());
+        Assert.Equal((short)407, player.GetBody());
+        Assert.Equal((short)408, player.GetLeg());
+
+        player.EffectSkin.IsRabbitLeader = false;
+        Assert.Equal((short)566, player.GetHead());
+        Assert.Equal((short)472, player.GetBody());
+        Assert.Equal((short)568, player.GetLeg());
+    }
+
+    [Fact]
+    public void Appearance_MonkeyTailUsesInjectedRandomAndAuraUsesCostumeThenUsedRadarThenPower()
+    {
+        Player player = NewAppearancePlayer(ConstPlayer.EARTHLING);
+        player.IsMonkeyTailActive = true;
+        Assert.Equal((short)198, player.GetHead(new FixedPlayerRandom(6)));
+        Assert.Equal((short)193, player.GetBody());
+        Assert.Equal((short)194, player.GetLeg());
+
+        player.IsMonkeyTailActive = false;
+        player.Inventory.ItemsBody[5] = OutfitItem(id: 2014);
+        player.NPoint.Power = 180_000_000_000L;
+        Assert.Equal((sbyte)14, player.GetAura([(12, (sbyte)1)], new Dictionary<int, sbyte> { [12] = 42 }));
+
+        player.Inventory.ItemsBody[5] = new Item();
+        Assert.Equal((sbyte)42, player.GetAura([(12, (sbyte)1), (13, (sbyte)1)], new Dictionary<int, sbyte> { [12] = 42, [13] = 43 }));
+        Assert.Equal((sbyte)84, player.GetAura());
+    }
+
+    [Theory]
+    [InlineData(0, 545, 548, 549)]
+    [InlineData(1, 547, 548, 549)]
+    [InlineData(2, 546, 548, 549)]
+    public void Appearance_HalloweenEffectWinsOverCostumeFusionAndEquipmentForEveryGender(int gender, int head, int body, int leg)
+    {
+        Player player = NewAppearancePlayer((sbyte)gender);
+        player.Inventory.ItemsBody[5] = OutfitItem(id: 601, head: 100, body: 101, leg: 102);
+        player.AppearanceFusionType = ConstPlayer.PORATA_FUSION;
+        player.EffectSkill.IsHalloween = true;
+        player.EffectSkill.HalloweenOutfitId = 2;
+
+        Assert.Equal((short)head, player.GetHead());
+        Assert.Equal((short)body, player.GetBody());
+        Assert.Equal((short)leg, player.GetLeg());
+    }
+
+    [Theory]
+    [InlineData(79_999_999_999L, -1)]
+    [InlineData(80_000_000_000L, 6)]
+    [InlineData(100_000_000_000L, 6)]
+    [InlineData(110_000_000_000L, 82)]
+    [InlineData(120_000_000_000L, 83)]
+    [InlineData(180_000_000_000L, 84)]
+    public void AuraPower_UsesEveryJavaThreshold(long power, int aura)
+    {
+        Player player = NewAppearancePlayer(ConstPlayer.EARTHLING);
+        player.NPoint.Power = power;
+        Assert.Equal((sbyte)aura, player.GetAuraPower());
+    }
+
+    [Theory]
+    [InlineData(0, 27, 1, 1436, 1437, 1438)]
+    [InlineData(1, 28, 6, 1447, 1431, 1432)]
+    [InlineData(2, 29, 3, 1448, 1434, 1435)]
+    public void SuperOutfit_UsesJavaSkillIndexAndReturnsMinusOneOutsideTheSixEntryRange(int gender, int skillId, int point, int head, int body, int leg)
+    {
+        Player player = NewAppearancePlayer((sbyte)gender);
+        player.PlayerSkill.Skills!.Add(new Skill { Template = new SkillTemplate { Id = (sbyte)skillId }, Point = point });
+        player.NumUseSkill = 0;
+
+        Assert.Equal((short)head, player.GetHeadSuper());
+        Assert.Equal((short)body, player.GetBodySuper());
+        Assert.Equal((short)leg, player.GetLegSuper());
+
+        player.NumUseSkill = point;
+        Assert.Equal((short)-1, player.GetHeadSuper());
+        Assert.Equal((short)-1, player.GetBodySuper());
+        Assert.Equal((short)-1, player.GetLegSuper());
+    }
+
+    [Fact]
+    public void FlagBagAndMount_KeepJavaBranchOrderAndInjectedMapLookup()
+    {
+        Player player = NewAppearancePlayer(ConstPlayer.EARTHLING);
+        player.IdNRNM = 353;
+        player.Inventory.ItemsBody[8] = OutfitItem(part: 77);
+        Assert.Equal((short)31, player.GetFlagBag(true, ConstTask.TASK_3_2, 66));
+        Assert.Equal((short)30, player.GetFlagBag(false, ConstTask.TASK_3_2, 66));
+
+        player.IdNRNM = -1;
+        Assert.Equal((short)77, player.GetFlagBag(false, ConstTask.TASK_3_2, 66));
+        player.Inventory.ItemsBody[8] = new Item();
+        Assert.Equal((short)28, player.GetFlagBag(false, ConstTask.TASK_3_2, 66));
+        Assert.Equal((short)66, player.GetFlagBag(false, 0, 66));
+
+        player.Inventory.ItemsBody[9] = OutfitItem(id: 499, type: 0);
+        Assert.Equal((short)499, player.GetMount());
+        player.Inventory.ItemsBody[9] = OutfitItem(id: 700, type: 0);
+        Assert.Equal((short)17, player.GetMount(new Dictionary<int, short> { [700] = 17 }));
+        player.Inventory.ItemsBody[9] = OutfitItem(id: 701, type: 24, gender: 1);
+        Assert.Equal((short)-1, player.GetMount());
+    }
+
+    [Fact]
+    public void DailyGiftAndHpMp_UseFakeNotifierAtJavaIntervals()
+    {
+        Player player = NewAppearancePlayer(ConstPlayer.NAMEKIAN);
+        var notifier = new RecordingClientNotifier { FreeCharmAvailable = true, DailyCheckInAvailable = true };
+
+        player.SendDailyGiftReminders(300_000, notifier);
+        Assert.Equal((sbyte)6, Assert.Single(notifier.TimedTexts).TextId);
+        Assert.Contains("Ông Moori", notifier.TimedTexts[0].Text);
+        Assert.Equal(0L, player.LastTimeSendTextTime);
+        Assert.Equal(300_000L, player.LastTimeSendTextTime_2);
+
+        player.SendDailyGiftReminders(300_001, notifier);
+        Assert.Equal(2, notifier.TimedTexts.Count);
+        Assert.Equal((sbyte)5, notifier.TimedTexts[1].TextId);
+        Assert.Equal(300_001L, player.LastTimeSendTextTime);
+        Assert.Equal(300_000L, player.LastTimeSendTextTime_2);
+
+        player.NPoint.Hp = 123;
+        player.NPoint.Mp = 456;
+        player.SendInfoHpMp(notifier);
+        Assert.Equal(new[] { (123L, 456L) }, notifier.HpMp);
+
+        player.IsPlayer = false;
+        player.SendInfoHpMp(notifier);
+        Assert.Single(notifier.HpMp);
+    }
+
     private static Player NewPlayerWithBodyItems()
     {
         Player player = new() { IsPlayer = true };
         player.Inventory.ItemsBody = Enumerable.Repeat(new Item(), 20).ToList();
         return player;
     }
+
+    private static Player NewAppearancePlayer(sbyte gender)
+    {
+        Player player = new() { IsPlayer = true, Gender = gender };
+        player.Inventory.ItemsBody = Enumerable.Range(0, 12).Select(_ => new Item()).ToList();
+        return player;
+    }
+
+    private static Item OutfitItem(short id = 0, sbyte type = 0, sbyte gender = 3, short part = -1, int head = -1, int body = -1, int leg = -1) => new()
+    {
+        Template = new ItemTemplate { Id = id, Type = type, Gender = gender, Part = part, Head = head, Body = body, Leg = leg },
+    };
 
     private static Item ItemWithUpgradeLevel(int level) => new()
     {
@@ -275,5 +457,42 @@ public sealed class PlayerIdentityAppearanceTests
         public bool IsJail(MySession session) => Jail;
 
         public bool IsModerator(MySession session) => Moderator;
+    }
+
+    private sealed class FixedPlayerRandom(int result) : IPlayerRandom
+    {
+        public int NextInt(int minInclusive, int maxInclusive)
+        {
+            Assert.Equal(0, minInclusive);
+            Assert.Equal(6, maxInclusive);
+            return result;
+        }
+    }
+
+    private sealed class RecordingClientNotifier : IPlayerClientNotifier
+    {
+        public bool FreeCharmAvailable { get; init; }
+
+        public bool DailyCheckInAvailable { get; init; }
+
+        public List<(sbyte TextId, string Text, sbyte Seconds)> TimedTexts { get; } = [];
+
+        public List<(long Hp, long Mp)> HpMp { get; } = [];
+
+        public bool CanReceiveDailyGift(Player player, sbyte dailyGiftId) => dailyGiftId == ConstDailyGift.FREE_CHARM ? FreeCharmAvailable : DailyCheckInAvailable;
+
+        public void SendTimedText(Player player, sbyte textId, string text, sbyte seconds) => TimedTexts.Add((textId, text, seconds));
+
+        public void SendCurrentHp(Player player, long hp) => HpMp.Add((hp, -1));
+
+        public void SendCurrentMp(Player player, long mp)
+        {
+            (long hp, _) = HpMp[^1];
+            HpMp[^1] = (hp, mp);
+        }
+
+        public void ReportNotificationFailure(Player player, Exception exception)
+        {
+        }
     }
 }

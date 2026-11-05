@@ -8,6 +8,7 @@ public sealed class StaticCatalogBuilder
     private IItemCatalog items = EmptyStaticCatalogs.Instance;
     private IWorldCatalog world = EmptyStaticCatalogs.Instance;
     private IAppearanceCatalog appearance = EmptyStaticCatalogs.Instance;
+    private IImageCatalog images = EmptyStaticCatalogs.Instance;
     private ISkillCatalog skills = EmptyStaticCatalogs.Instance;
     private ITaskCatalog tasks = EmptyStaticCatalogs.Instance;
     private IShopCatalog shops = EmptyStaticCatalogs.Instance;
@@ -23,6 +24,9 @@ public sealed class StaticCatalogBuilder
 
     // Gán danh mục ngoại hình cho snapshot đang dựng. (Java: parts)
     public void SetAppearance(IAppearanceCatalog value) => appearance = value ?? throw new ArgumentNullException(nameof(value));
+
+    // Gán danh mục ảnh cho snapshot đang dựng. (Java: IMAGES_BY_NAME)
+    public void SetImages(IImageCatalog value) => images = value ?? throw new ArgumentNullException(nameof(value));
 
     // Gán danh mục kỹ năng cho snapshot đang dựng. (Java: NCLASS)
     public void SetSkills(ISkillCatalog value) => skills = value ?? throw new ArgumentNullException(nameof(value));
@@ -43,5 +47,5 @@ public sealed class StaticCatalogBuilder
     public void SetRadar(IRadarCatalog value) => radar = value ?? throw new ArgumentNullException(nameof(value));
 
     // Đóng bộ dựng thành snapshot chỉ đọc mới. (Java: loadDatabase)
-    public IStaticCatalogs Build() => new StaticCatalogSnapshot(items, world, appearance, skills, tasks, shops, progression, notifications, radar);
+    public IStaticCatalogs Build() => new StaticCatalogSnapshot(items, world, appearance, images, skills, tasks, shops, progression, notifications, radar);
 }

@@ -6,11 +6,12 @@ namespace Nro.Game.Content;
 public sealed class StaticCatalogSnapshot : IStaticCatalogs
 {
     // Khởi tạo snapshot với toàn bộ danh mục con đã hoàn tất. (Java: loadDatabase)
-    public StaticCatalogSnapshot(IItemCatalog items, IWorldCatalog world, IAppearanceCatalog appearance, ISkillCatalog skills, ITaskCatalog tasks, IShopCatalog shops, IProgressionCatalog progression, INotificationCatalog notifications, IRadarCatalog radar)
+    public StaticCatalogSnapshot(IItemCatalog items, IWorldCatalog world, IAppearanceCatalog appearance, IImageCatalog images, ISkillCatalog skills, ITaskCatalog tasks, IShopCatalog shops, IProgressionCatalog progression, INotificationCatalog notifications, IRadarCatalog radar)
     {
         Items = items ?? throw new ArgumentNullException(nameof(items));
         World = world ?? throw new ArgumentNullException(nameof(world));
         Appearance = appearance ?? throw new ArgumentNullException(nameof(appearance));
+        Images = images ?? throw new ArgumentNullException(nameof(images));
         Skills = skills ?? throw new ArgumentNullException(nameof(skills));
         Tasks = tasks ?? throw new ArgumentNullException(nameof(tasks));
         Shops = shops ?? throw new ArgumentNullException(nameof(shops));
@@ -27,6 +28,9 @@ public sealed class StaticCatalogSnapshot : IStaticCatalogs
 
     // Danh mục ngoại hình của snapshot. (Java: parts)
     public IAppearanceCatalog Appearance { get; }
+
+    // Danh mục ảnh theo tên của snapshot. (Java: IMAGES_BY_NAME)
+    public IImageCatalog Images { get; }
 
     // Danh mục kỹ năng của snapshot. (Java: NCLASS)
     public ISkillCatalog Skills { get; }

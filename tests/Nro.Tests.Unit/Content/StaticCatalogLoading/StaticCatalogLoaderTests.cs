@@ -158,5 +158,28 @@ public sealed class StaticCatalogLoaderTests
 
         // Danh sách tùy chọn vật phẩm giả. (Java: ITEM_OPTION_TEMPLATES)
         public IReadOnlyList<ItemOptionTemplate> ItemOptionTemplates { get; } = Array.Empty<ItemOptionTemplate>();
+
+        // Danh sách nền giả. (Java: BG_ITEMS)
+        public IReadOnlyList<BgItem> BgItems { get; } = Array.Empty<BgItem>();
+
+        // Ánh xạ thú cưỡi giả. (Java: MAP_MOUNT_NUM)
+        public IReadOnlyDictionary<short, int> MountItemParts { get; } = new Dictionary<short, int>();
+
+        // Không có item giả theo id. (Java: ITEM_TEMPLATES.get)
+        public ItemTemplate GetItemTemplate(int id) => throw new ArgumentOutOfRangeException(nameof(id));
+
+        // Không có option giả theo id. (Java: ITEM_OPTION_TEMPLATES.get)
+        public ItemOptionTemplate GetItemOptionTemplate(int id) => throw new ArgumentOutOfRangeException(nameof(id));
+
+        // Không có nền giả theo id. (Java: BG_ITEMS)
+        public BgItem GetBgItem(int id) => throw new KeyNotFoundException();
+
+        // Không có thú cưỡi giả. (Java: MAP_MOUNT_NUM.get)
+        public bool TryGetMountPart(short itemId, out int part)
+        {
+            part = default;
+            return false;
+        }
+
     }
 }

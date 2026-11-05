@@ -14,6 +14,9 @@ public interface IStaticCatalogs
     // Danh mục ngoại hình dùng kiểu miền Nro.Core.Templates. (Java: parts)
     IAppearanceCatalog Appearance { get; }
 
+    // Danh mục ảnh theo tên. (Java: IMAGES_BY_NAME)
+    IImageCatalog Images { get; }
+
     // Danh mục kỹ năng dùng kiểu miền Nro.Game.Skills. (Java: NCLASS)
     ISkillCatalog Skills { get; }
 
