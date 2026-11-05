@@ -5,7 +5,7 @@ namespace Nro.Game.Players;
 // Nguồn Java: nro/player/Player.java (tên property viết hoa chữ đầu, byte Java là sbyte, Timestamp/Date là DateTime? UTC; component luôn khác null; Runnable/run/start, timer/task và lichSuGiaoDichDangXem được bỏ có chủ đích).
 
 
-public class Player
+public partial class Player
 {
     internal const long TIME_TRUNG_THU = 120000;
 
